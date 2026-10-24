@@ -18,6 +18,10 @@ class SourceError(RuntimeError):
     """The source could not be read. The message is shown to the buyer."""
 
 
+class SourceUnavailable(SourceError):
+    """The source is not connected yet; its checks stay unread."""
+
+
 @dataclass(frozen=True)
 class SourceContext:
     project: Project
