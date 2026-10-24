@@ -94,3 +94,10 @@ through the same API, so the whole app works offline. Sample data must never be 
 NeevScore is a risk indicator based on public records, not a credit rating or legal advice. Findings are
 stated as cited facts with retrieval dates; allegations and news are marked "requires review". Government
 CAPTCHAs are never solved automatically.
+
+## Team
+
+Team RYZEN · KIET Group of Institutions
+
+- Rishi Bhaskar ([@rishibhaskar777](https://github.com/rishibhaskar777))
+- Nitin Mittal ([@Nitinmittal373](https://github.com/Nitinmittal373))
