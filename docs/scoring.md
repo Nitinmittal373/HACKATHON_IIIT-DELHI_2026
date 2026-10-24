@@ -1,6 +1,6 @@
 # NeevScore method
 
-NeevScore is a number from 0 to 100. It is **deterministic**: the same records always produce the same score, and every point lost is linked to the record that caused it.
+NeevScore is a number from 0 to 100. It is **deterministic**: the same records always produce the same score, and every point lost is linked to the record that caused it. The code is in [`backend/app/scoring/`](../backend/app/scoring/); keep it and this page in sync.
 
 ## Formula
 
@@ -10,7 +10,7 @@ NeevScore = round(100 − Σ (weight × penalty))
 
 - Each **area** has a weight (they add up to 100%).
 - Each **finding** has a penalty from 0 to 100 within its area.
-- Penalties within one area are capped at 100.
+- Penalties within one area are capped at 100 (News at 60). The cap is spent on the largest penalties first, so the drivers shown in a report add up to the score exactly.
 - A **hard stop** caps the final score at 39 (Critical).
 
 ## Weights
@@ -24,6 +24,25 @@ NeevScore = round(100 − Σ (weight × penalty))
 | Builder history | 15% |
 | News | 10% |
 
+Land authority dues count under **Financial and insolvency**.
+
+## Penalties
+
+Penalties come only from parsed facts, never from rules written for one builder.
+
+| Finding | Area | Penalty |
+| --- | --- | --: |
+| Completion date extended *n* times (COVID-19 force-majeure extensions not counted) | Project execution | 30 + 20 × (*n* − 1) |
+| More than 12 months past the latest approved end date, project not completed | Project execution | 40 |
+| More than 24 months past the latest approved end date, project not completed | Project execution | 70 |
+| Insolvency limited to another project | Financial and insolvency | 60 |
+| Insolvency of the company or this project | Financial and insolvency | 100 and hard stop |
+| Listed for unpaid land authority dues | Financial and insolvency | 70 |
+| UP-RERA registration lapsed or revoked | UP-RERA compliance | 100 and hard stop |
+| One news story on delays (secondary) | News | 10 each |
+
+Everything else in a report (registration date, completion date on record, an insolvency admission whose scope is decided by a later order, court orders such as the Supreme Court's NBCC ruling, complaint counts) is shown as evidence with 0 points.
+
 ## Rules that keep the score honest
 
 | Rule | Why |
@@ -31,9 +50,16 @@ NeevScore = round(100 − Σ (weight × penalty))
 | Absence of a record never adds points | "Nothing found" may only mean a site was unreadable |
 | An unreadable source lowers confidence, not the score | We never punish a project for a CAPTCHA |
 | Insolvency counts fully only when it covers the company or this project | Supertech's process was limited to Eco Village-II by NCLAT |
+| An admission and the order that sets its scope are two findings; only the scope is scored | The same case is never counted twice |
 | A petition that is not yet admitted is a "review" finding | Filing is not the same as admission |
 | News is a secondary source | It can only add small penalties and is marked for review |
 | COVID-19 force-majeure extensions are not counted as delays | They were granted to all projects |
+| Delay is measured from the latest approved end date, not the original one | Extensions already count once; the delay must not count them again |
+| A completion or occupancy certificate on record skips the delay penalty | The certificate is shown as a "review" finding: verify possession before relying on it |
+
+## Confidence
+
+Confidence is the share of seven key checks that were actually read: registration, completion date, extensions, company status, insolvency, land dues and consumer cases. A blocked, failed or not-yet-connected source leaves its checks unread. If UP-RERA itself cannot be read, the check fails and no score is shown.
 
 ## Bands
 
@@ -46,7 +72,7 @@ NeevScore = round(100 − Σ (weight × penalty))
 
 ## Worked example
 
-Supertech Eco Village-I Phase I-C (`UPRERAPRJ8334`), read 24 Oct 2026:
+Supertech Eco Village-I Phase I-C (`UPRERAPRJ8334`) with every source read, as recorded on 24 Oct 2026. The same numbers are a test in `backend/tests/test_scoring.py`.
 
 | Finding | Area | Penalty | Points |
 | --- | --- | --: | --: |
@@ -55,4 +81,6 @@ Supertech Eco Village-I Phase I-C (`UPRERAPRJ8334`), read 24 Oct 2026:
 | One news story on delays | News (10%) | 10 | −1 |
 | **NeevScore** | | | **76 · Moderate** |
 
-Confidence is 71% because consumer cases (e-Jagriti, CAPTCHA) and delay length could not be read.
+Confidence is 71% (5 of 7 checks) because consumer cases (e-Jagriti, CAPTCHA) and the completion date could not be read.
+
+Until the Phase 2 agents land, a live check reads UP-RERA only. For this project UP-RERA shows a completion date of 30 Dec 2017 and a completion certificate proforma uploaded on 17 Apr 2019, so the delay is not counted and the score is 100 with 29% confidence (2 of 7 checks). The low confidence is the signal that most of the record is still unread.

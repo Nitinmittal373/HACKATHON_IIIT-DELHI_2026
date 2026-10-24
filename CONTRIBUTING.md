@@ -11,7 +11,7 @@ Thanks for helping families check a builder before they book a home.
 
 ## Run it locally
 
-See the [Quick start](README.md#quick-start) in the README. Demo mode needs no API key.
+See [Getting started](README.md#getting-started) in the README. Checks need a TinyFish API key in `.env`; the test suite does not.
 
 ## Workflow
 

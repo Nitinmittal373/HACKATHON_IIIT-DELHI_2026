@@ -24,10 +24,10 @@ body:
     attributes:
       label: What did you expect?
   - type: dropdown
-    id: mode
+    id: area
     attributes:
-      label: Mode
-      options: ["Demo mode", "Live mode (TinyFish key)"]
+      label: Where did it happen?
+      options: ["Search", "Check and Agent Cam", "Report", "API only"]
   - type: input
     id: browser
     attributes:
