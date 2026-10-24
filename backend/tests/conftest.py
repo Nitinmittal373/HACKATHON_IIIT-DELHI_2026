@@ -12,6 +12,7 @@ from fastapi.testclient import TestClient  # noqa: E402
 
 from app.config import Settings  # noqa: E402
 from app.main import create_app  # noqa: E402
+from tests.fakes import FakeWebClient, load_search  # noqa: E402
 
 
 def make_settings(tmp_path: Path, **overrides: object) -> Settings:
@@ -24,12 +25,28 @@ def make_settings(tmp_path: Path, **overrides: object) -> Settings:
     return Settings(_env_file=None, **values)  # type: ignore[arg-type, call-arg]
 
 
+def make_web() -> FakeWebClient:
+    return FakeWebClient(
+        searches={
+            "Gaur City UP RERA project": load_search("search_gaur_city.json"),
+            "Supertech Eco Village UP RERA project": load_search(
+                "search_supertech_eco_village.json"
+            ),
+        },
+    )
+
+
 @pytest.fixture
 def settings(tmp_path: Path) -> Settings:
     return make_settings(tmp_path)
 
 
 @pytest.fixture
-def client(settings: Settings) -> Iterator[TestClient]:
-    with TestClient(create_app(settings)) as test_client:
+def web() -> FakeWebClient:
+    return make_web()
+
+
+@pytest.fixture
+def client(settings: Settings, web: FakeWebClient) -> Iterator[TestClient]:
+    with TestClient(create_app(settings, web=web)) as test_client:
         yield test_client
