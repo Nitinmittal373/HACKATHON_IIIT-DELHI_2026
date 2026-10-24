@@ -1,0 +1,21 @@
+[project]
+name = "neevcheck-backend"
+version = "0.1.0"
+requires-python = ">=3.12"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "S", "ASYNC"]
+ignore = ["S101"]  # assert is how pytest checks things
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S105", "S106"]  # dummy keys in tests are not secrets
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# Live tests call the real TinyFish API and cost money; run them with: pytest -m live
+addopts = "-m 'not live'"
+markers = ["live: calls the real TinyFish API (needs TINYFISH_API_KEY)"]

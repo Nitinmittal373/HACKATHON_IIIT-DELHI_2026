@@ -1,0 +1,4 @@
+-r requirements.txt
+httpx2==2.16.0  # starlette's TestClient
+pytest==9.1.1
+ruff==0.17.2
