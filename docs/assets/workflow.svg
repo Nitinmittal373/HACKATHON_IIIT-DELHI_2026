@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 440" width="1200" height="440" role="img" aria-label="NeevCheck workflow: search, confirm, five TinyFish agents read official sources, evidence, NeevScore, report, Sentinel">
+  <style>
+    text { font-family: -apple-system, "Segoe UI", Inter, Helvetica, Arial, sans-serif; fill: #111111; }
+    .t { font-size: 15px; font-weight: 600; }
+    .s { font-size: 12px; fill: #5F5F5F; font-weight: 400; }
+    .m { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; fill: #F26B1D; letter-spacing: .06em; }
+    .box { fill: #FFFFFF; stroke: #EEEAE6; stroke-width: 1.5; }
+    .hot { fill: #FFF5EC; stroke: #F26B1D; stroke-width: 1.5; }
+    .wire { fill: none; stroke: #E8DDD3; stroke-width: 2; }
+    .flow { fill: none; stroke: #F26B1D; stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 8 220; animation: flow 3s linear infinite; }
+    .d1 { animation-delay: .4s } .d2 { animation-delay: .8s } .d3 { animation-delay: 1.2s } .d4 { animation-delay: 1.6s } .d5 { animation-delay: 2s }
+    @keyframes flow { from { stroke-dashoffset: 228; } to { stroke-dashoffset: 0; } }
+    .pulse { fill: #F26B1D; transform-box: fill-box; transform-origin: center; animation: pulse 1.6s ease-out infinite; }
+    @keyframes pulse { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(2.6); } }
+    .lane { animation: lane 6s ease-in-out infinite; }
+    .l1 { animation-delay: 0s } .l2 { animation-delay: .6s } .l3 { animation-delay: 1.2s } .l4 { animation-delay: 1.8s } .l5 { animation-delay: 2.4s }
+    @keyframes lane { 0%, 100% { fill: #FFFFFF; } 15%, 45% { fill: #FFF1E6; } }
+    .ring { fill: none; stroke: #F26B1D; stroke-width: 7; stroke-linecap: round; stroke-dasharray: 151; animation: ring 6s ease-in-out infinite; transform: rotate(-90deg); transform-origin: 1003px 120px; }
+    @keyframes ring { 0% { stroke-dashoffset: 151; } 40%, 100% { stroke-dashoffset: 36; } }
+    .loop { fill: none; stroke: #F26B1D; stroke-width: 1.6; stroke-dasharray: 5 6; animation: loop 1.2s linear infinite; opacity: .7; }
+    @keyframes loop { to { stroke-dashoffset: -22; } }
+  </style>
+  <rect width="1200" height="440" rx="24" fill="#FFFCFA"/>
+
+  <!-- wires -->
+  <path class="wire" d="M178 120 H228"/><path class="flow" d="M178 120 H228"/>
+  <path class="wire" d="M372 120 C 410 120, 410 60, 450 60"/><path class="flow d1" d="M372 120 C 410 120, 410 60, 450 60"/>
+  <path class="wire" d="M372 120 C 410 120, 410 120, 450 120"/><path class="flow d2" d="M372 120 H450"/>
+  <path class="wire" d="M372 120 C 410 120, 410 180, 450 180"/><path class="flow d3" d="M372 120 C 410 120, 410 180, 450 180"/>
+  <path class="wire" d="M372 120 C 410 120, 410 240, 450 240"/><path class="flow d4" d="M372 120 C 410 120, 410 240, 450 240"/>
+  <path class="wire" d="M372 120 C 410 120, 410 300, 450 300"/><path class="flow d5" d="M372 120 C 410 120, 410 300, 450 300"/>
+  <path class="wire" d="M690 60 C 730 60, 730 180, 770 180"/><path class="flow d1" d="M690 60 C 730 60, 730 180, 770 180"/>
+  <path class="wire" d="M690 120 C 730 120, 730 180, 770 180"/><path class="flow d2" d="M690 120 C 730 120, 730 180, 770 180"/>
+  <path class="wire" d="M690 180 H770"/><path class="flow d3" d="M690 180 H770"/>
+  <path class="wire" d="M690 240 C 730 240, 730 180, 770 180"/><path class="flow d4" d="M690 240 C 730 240, 730 180, 770 180"/>
+  <path class="wire" d="M690 300 C 730 300, 730 180, 770 180"/><path class="flow d5" d="M690 300 C 730 300, 730 180, 770 180"/>
+  <path class="wire" d="M914 180 C 940 180, 940 120, 950 120"/><path class="flow d2" d="M914 180 C 940 180, 940 120, 950 120"/>
+  <path class="wire" d="M1003 172 V 250"/><path class="flow d3" d="M1003 172 V 250"/>
+  <path class="loop" d="M930 347 C 850 347, 760 312, 696 304"/>
+  <text class="s" x="800" y="380">Sentinel re-checks every week</text>
+
+  <!-- 1 search -->
+  <rect class="box" x="30" y="84" width="148" height="72" rx="14"/>
+  <text class="m" x="46" y="108">01 · SEARCH</text>
+  <text class="t" x="46" y="130">Project or RERA no.</text>
+  <text class="s" x="46" y="147">No long forms</text>
+
+  <!-- 2 confirm -->
+  <rect class="hot" x="228" y="84" width="144" height="72" rx="14"/>
+  <text class="m" x="244" y="108">02 · CONFIRM</text>
+  <text class="t" x="244" y="130">“Is this the one?”</text>
+  <text class="s" x="244" y="147">Matches from UP-RERA</text>
+
+  <!-- 3 agents -->
+  <text class="m" x="450" y="30">03 · TINYFISH BROWSER AGENTS (LIVE)</text>
+  <rect class="box lane l1" x="450" y="38" width="240" height="44" rx="12"/><text class="t" x="468" y="65">UP-RERA</text><text class="s" x="560" y="65">dates, extensions</text>
+  <rect class="box lane l2" x="450" y="98" width="240" height="44" rx="12"/><text class="t" x="468" y="125">Company registry</text><text class="s" x="604" y="125">status</text>
+  <rect class="box lane l3" x="450" y="158" width="240" height="44" rx="12"/><text class="t" x="468" y="185">IBBI · NCLT</text><text class="s" x="566" y="185">insolvency scope</text>
+  <rect class="box lane l4" x="450" y="218" width="240" height="44" rx="12"/><text class="t" x="468" y="245">Land authority</text><text class="s" x="590" y="245">dues lists</text>
+  <rect class="box lane l5" x="450" y="278" width="240" height="44" rx="12"/><text class="t" x="468" y="305">Courts &amp; news</text><text class="s" x="584" y="305">orders, rulings</text>
+  <circle class="pulse" cx="676" cy="60" r="4"/><circle class="pulse" cx="676" cy="120" r="4" style="animation-delay:.4s"/><circle class="pulse" cx="676" cy="180" r="4" style="animation-delay:.8s"/><circle class="pulse" cx="676" cy="240" r="4" style="animation-delay:1.2s"/><circle class="pulse" cx="676" cy="300" r="4" style="animation-delay:1.6s"/>
+  <text class="s" x="450" y="350">CAPTCHA? The agent stops and marks “Unable to verify”.</text>
+
+  <!-- 4 evidence -->
+  <rect class="box" x="770" y="144" width="144" height="72" rx="14"/>
+  <text class="m" x="786" y="168">04 · EVIDENCE</text>
+  <text class="t" x="786" y="190">Source + read time</text>
+  <text class="s" x="786" y="207">No source, no claim</text>
+
+  <!-- 5 score -->
+  <circle cx="1003" cy="120" r="24" fill="none" stroke="#F3EEE9" stroke-width="7"/>
+  <circle class="ring" cx="1003" cy="120" r="24"/>
+  <text x="1003" y="126" text-anchor="middle" style="font-size:17px;font-weight:700">76</text>
+  <text class="m" x="1040" y="108">05 · NEEVSCORE</text>
+  <text class="t" x="1040" y="130">100 − findings</text>
+  <text class="s" x="1040" y="147">Weighted, explained</text>
+
+  <!-- 6 report -->
+  <rect class="hot" x="930" y="250" width="146" height="72" rx="14"/>
+  <text class="m" x="946" y="274">06 · REPORT</text>
+  <text class="t" x="946" y="296">Score, proof, steps</text>
+  <text class="s" x="946" y="313">EN · हिंदी</text>
+  <rect class="box" x="930" y="332" width="176" height="30" rx="10"/>
+  <text class="m" x="944" y="352">07 · SENTINEL ALERTS</text>
+</svg>
