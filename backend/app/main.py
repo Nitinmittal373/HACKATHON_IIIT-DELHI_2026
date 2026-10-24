@@ -1,62 +1,105 @@
-"""NeevCheck API.
+"""NeevCheck API (FastAPI).
 
-POST /api/investigate            {"query": "..."}  -> {"job_id"}
-GET  /api/investigate/{id}/events  Server-Sent Events for the War Room
-GET  /api/report/{id}              Final report (signals, evidence, NeevScore)
-GET  /api/report/{id}/complaint    UP-RERA complaint draft built only from evidence
-POST /api/watch/{id}               Start Watch mode (TinyFish Monitor -> webhook)
-POST /api/webhooks/tinyfish        Monitor webhook receiver
-GET  /api/alerts                   Alerts received from monitors
-Run:  uvicorn app.main:app --reload --port 8000   (from the backend folder)
+Investigations
+  POST /api/investigations                  {"query": "..."} -> {"id"}
+  GET  /api/investigations/{id}             status: running | done | failed
+  GET  /api/investigations/{id}/events      Server-Sent Events for the War Room
+Reports
+  GET  /api/reports                         summaries, newest first
+  GET  /api/reports/{id}                    full report: signals, evidence, checks, NeevScore, family tree
+  POST /api/reports/{id}/ask                {"question": "..."} -> answer built only from cited evidence
+  POST /api/reports/{id}/complaint-draft    UP-RERA complaint draft from verified evidence
+Projects / Watch mode
+  GET  /api/projects/{id}/evidence          evidence ledger for one checked project
+  POST /api/projects/{id}/watch             TinyFish Monitors -> our webhook
+  GET  /api/watches                         watched projects
+  POST /api/webhooks/tinyfish               Monitor webhook receiver (shared secret)
+  GET  /api/alerts                          alerts received
+  GET  /api/health
+Run from the backend folder:  uvicorn app.main:app --reload --port 8000
 """
 from __future__ import annotations
 
 import asyncio
+import hmac
 import json
+import time
 import uuid
-from pathlib import Path
+from collections import defaultdict, deque
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, PlainTextResponse, StreamingResponse
-from pydantic import BaseModel
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, Field
 
-from . import config, sources, tf
-from .models import LaneStatus, Report, Signals, now_iso
+from . import config, insights, sources, store, tf
+from .models import Check, Evidence, LaneStatus, Report, Signals, now_iso
 from .scoring import score
 
-app = FastAPI(title="NeevCheck API")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
-
-JOBS: dict[str, dict] = {}     # in-memory is enough for a 24h demo; swap for a DB later
-ALERTS: list[dict] = []
 LANES = ["rera", "mca", "ibbi", "authority", "news"]
+JOBS: dict[str, dict] = {}                     # live investigations; finished reports go to the database
+_hits: dict[str, deque] = defaultdict(deque)   # simple per-IP rate limit for new investigations
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    store.init()
+    yield
+
+
+app = FastAPI(title="NeevCheck API", version="1.1", lifespan=lifespan)
+app.add_middleware(CORSMiddleware, allow_origins=config.FRONTEND_ORIGINS,
+                   allow_methods=["GET", "POST"], allow_headers=["Content-Type"])
+
+
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    resp = await call_next(request)
+    resp.headers["X-Content-Type-Options"] = "nosniff"
+    resp.headers["Referrer-Policy"] = "no-referrer"
+    resp.headers["X-Frame-Options"] = "DENY"
+    return resp
 
 
 class InvestigateIn(BaseModel):
-    query: str
+    query: str = Field(min_length=3, max_length=160)
+
+
+class AskIn(BaseModel):
+    question: str = Field(min_length=2, max_length=300)
 
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "demo_mode": config.DEMO_MODE, "key_loaded": bool(config.TINYFISH_API_KEY)}
+    return {"ok": True, "demo_mode": config.DEMO_MODE, "key_loaded": bool(config.TINYFISH_API_KEY),
+            "watch_ready": bool(config.PUBLIC_BASE_URL)}
 
 
-@app.post("/api/investigate")
-async def investigate(body: InvestigateIn):
-    q = body.query.strip()
-    if len(q) < 3:
-        raise HTTPException(400, "Enter a project name, RERA number or builder name")
-    job_id = uuid.uuid4().hex[:10]
-    JOBS[job_id] = {"query": q, "events": [], "done": False, "report": None, "cond": asyncio.Condition()}
-    asyncio.create_task(_run(job_id))
-    return {"job_id": job_id}
+# ---------------- investigations ----------------
+def _rate_limit(ip: str) -> None:
+    q, now = _hits[ip], time.monotonic()
+    while q and now - q[0] > 60:
+        q.popleft()
+    if len(q) >= config.RATE_LIMIT_PER_MINUTE:
+        raise HTTPException(429, "Too many checks from this address. Try again in a minute.")
+    q.append(now)
 
 
-async def _run(job_id: str) -> None:
-    job = JOBS[job_id]
+@app.post("/api/investigations")
+async def start_investigation(body: InvestigateIn, request: Request):
+    _rate_limit(request.client.host if request.client else "unknown")
+    q = " ".join(body.query.split())
+    inv_id = uuid.uuid4().hex[:12]
+    JOBS[inv_id] = {"query": q, "events": [], "status": "running", "cond": asyncio.Condition()}
+    asyncio.create_task(_run(inv_id))
+    return {"id": inv_id}
+
+
+async def _run(inv_id: str) -> None:
+    job = JOBS[inv_id]
     q = job["query"]
-    sig, ev, ctx, lanes = Signals(), [], {}, {}
+    sig, ev, checks, ctx, lanes = Signals(), [], [], {}, {}
 
     async def emit(e: dict):
         e["ts"] = now_iso()
@@ -67,38 +110,67 @@ async def _run(job_id: str) -> None:
     async def run_lane(name: str, fn):
         await emit({"lane": name, "type": "started", "message": "started"})
         try:
-            await fn(q, sig, ev, ctx, emit)
+            await fn(q, sig, ev, checks, ctx, emit)
             lanes[name] = LaneStatus(lane=name, ok=True, message="done")
             await emit({"lane": name, "type": "done", "message": "done"})
-        except Exception as e:
+        except Exception as e:  # one failed source must never stop the others
             lanes[name] = LaneStatus(lane=name, ok=False, message=str(e))
             await emit({"lane": name, "type": "error", "message": str(e)})
 
-    # Phase 1: RERA tells us the promoter; news can start right away on the query
-    await asyncio.gather(run_lane("rera", sources.rera_lane), run_lane("news", sources.news_lane))
-    # Phase 2: everything keyed on the promoter company, in parallel (agents still capped at 2)
-    await asyncio.gather(run_lane("mca", sources.mca_lane), run_lane("ibbi", sources.ibbi_lane),
-                         run_lane("authority", sources.authority_lane))
+    try:
+        # Phase 1: UP-RERA gives the promoter's exact name; news can start on the query right away
+        await asyncio.gather(run_lane("rera", sources.rera_lane), run_lane("news", sources.news_lane))
+        # Phase 2: everything keyed on the promoter, in parallel (agents still capped at 2)
+        await asyncio.gather(run_lane("mca", sources.mca_lane), run_lane("ibbi", sources.ibbi_lane),
+                             run_lane("authority", sources.authority_lane))
+        # The company registry saying "Under CIRP" confirms admission, even if no IBBI page was found
+        if ctx.get("registry_says_cirp") and not sig.promoter_in_cirp:
+            sig.promoter_in_cirp = True
+            sig.insolvency_case_found = None
+        for i, e in enumerate(ev, 1):
+            e.n = i
+        report = Report(
+            id=inv_id, query=q, project_name=ctx.get("project_name"), rera_number=ctx.get("rera_number"),
+            promoter_name=ctx.get("promoter_name"), rera_url=ctx.get("rera_url"),
+            photo_url=ctx.get("photo_url"), signals=sig, evidence=ev,
+            checks=checks, lanes=[lanes[n] for n in LANES if n in lanes], score=score(sig),
+            graph=insights.build_graph(ctx.get("project_name"), ctx.get("promoter_name"), sig,
+                                       ctx.get("group_names", [])),
+            demo_replay=config.DEMO_MODE)
+        store.save_report(report)
+        job["status"] = "done"
+        await emit({"lane": "score", "type": "report", "message": inv_id,
+                    "score": report.score["score"], "band": report.score["band"]})
+    except Exception as e:
+        job["status"] = "failed"
+        await emit({"lane": "score", "type": "error", "message": f"Investigation failed: {e}"})
+    finally:
+        async with job["cond"]:
+            job["cond"].notify_all()
 
-    result = score(sig)
-    job["report"] = Report(query=q, project_name=ctx.get("project_name"), rera_number=ctx.get("rera_number"),
-                           promoter_name=ctx.get("promoter_name"), rera_url=ctx.get("rera_url"),
-                           signals=sig, evidence=ev, lanes=list(lanes.values()), score=result)
-    await emit({"lane": "score", "type": "report", "message": json.dumps(result)})
-    job["done"] = True
-    async with job["cond"]:
-        job["cond"].notify_all()
+
+@app.get("/api/investigations/{inv_id}")
+def investigation(inv_id: str):
+    job = JOBS.get(inv_id)
+    if job:
+        return {"id": inv_id, "query": job["query"], "status": job["status"],
+                "report_id": inv_id if job["status"] == "done" else None}
+    if store.get_report(inv_id):
+        return {"id": inv_id, "status": "done", "report_id": inv_id}
+    raise HTTPException(404, "Unknown investigation")
 
 
-@app.get("/api/investigate/{job_id}/events")
-async def events(job_id: str):
-    job = JOBS.get(job_id) or _404()
+@app.get("/api/investigations/{inv_id}/events")
+async def events(inv_id: str):
+    job = JOBS.get(inv_id)
+    if not job:
+        raise HTTPException(404, "Unknown investigation")
 
     async def stream():
         i = 0
         while True:
             async with job["cond"]:
-                while i >= len(job["events"]) and not job["done"]:
+                while i >= len(job["events"]) and job["status"] == "running":
                     try:
                         await asyncio.wait_for(job["cond"].wait(), timeout=15)
                     except asyncio.TimeoutError:
@@ -106,8 +178,8 @@ async def events(job_id: str):
             while i < len(job["events"]):
                 yield f"data: {json.dumps(job['events'][i], ensure_ascii=False)}\n\n"
                 i += 1
-            if job["done"] and i >= len(job["events"]):
-                yield "event: end\ndata: {}\n\n"
+            if job["status"] != "running" and i >= len(job["events"]):
+                yield f"event: end\ndata: {json.dumps({'status': job['status']})}\n\n"
                 return
             yield ": keep-alive\n\n"
 
@@ -115,53 +187,54 @@ async def events(job_id: str):
                              headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
 
-@app.get("/api/report/{job_id}")
-def report(job_id: str):
-    job = JOBS.get(job_id) or _404()
-    if not job["report"]:
-        raise HTTPException(202, "Still investigating")
-    return job["report"]
-
-
-@app.get("/api/report/{job_id}/complaint", response_class=PlainTextResponse)
-def complaint(job_id: str):
-    """Draft for the buyer to review and file themselves. Facts come only from cited evidence."""
-    job = JOBS.get(job_id) or _404()
-    r: Report | None = job["report"]
+# ---------------- reports ----------------
+def _report(report_id: str) -> Report:
+    r = store.get_report(report_id)
     if not r:
-        raise HTTPException(202, "Still investigating")
-    facts = "\n".join(f"{i}. {e.claim} (Source: {e.source_url}, checked {e.fetched_at[:10]})"
-                      for i, e in enumerate(r.evidence, 1)) or "No adverse facts were found."
-    return (
-        "DRAFT: FOR THE ALLOTTEE TO REVIEW, EDIT AND FILE. NOT LEGAL ADVICE.\n\n"
-        "To: Uttar Pradesh Real Estate Regulatory Authority (UP-RERA)\n"
-        f"Subject: Complaint under the RERA Act, 2016 regarding project '{r.project_name or r.query}'"
-        f" (Registration No. {r.rera_number or '[enter]'})\n\n"
-        "Complainant: [Your name], Allottee of Unit [number], [contact details]\n"
-        f"Respondent: {r.promoter_name or '[Promoter name]'}\n\n"
-        "Facts found in public records:\n" + facts + "\n\n"
-        "Relief sought: [e.g. possession with delay interest under Section 18 / refund with interest / "
-        "direction to file pending quarterly progress reports]\n\n"
-        "Annexures: copies of the above source pages, allotment letter, payment receipts.\n"
-    )
+        raise HTTPException(404, "Unknown report")
+    return r
+
+
+@app.get("/api/reports")
+def reports():
+    return store.list_reports()
+
+
+@app.get("/api/reports/{report_id}")
+def report(report_id: str):
+    return _report(report_id)
+
+
+@app.post("/api/reports/{report_id}/ask")
+def ask(report_id: str, body: AskIn):
+    return insights.answer(_report(report_id), body.question)
+
+
+@app.post("/api/reports/{report_id}/complaint-draft")
+def complaint_draft(report_id: str):
+    return {"text": insights.complaint(_report(report_id))}
+
+
+@app.get("/api/projects/{report_id}/evidence")
+def evidence(report_id: str) -> list[Evidence]:
+    return _report(report_id).evidence
 
 
 # ---------------- Watch mode (TinyFish Monitor) ----------------
-@app.post("/api/watch/{job_id}")
-async def watch(job_id: str):
-    job = JOBS.get(job_id) or _404()
-    r: Report | None = job["report"]
-    if not r:
-        raise HTTPException(409, "Finish the investigation first")
+@app.post("/api/projects/{report_id}/watch")
+async def watch(report_id: str):
+    r = _report(report_id)
     if not config.PUBLIC_BASE_URL:
-        raise HTTPException(400, "Set PUBLIC_BASE_URL in .env (an https URL that TinyFish can reach)")
-    hook = f"{config.PUBLIC_BASE_URL}/api/webhooks/tinyfish?job={job_id}"
+        raise HTTPException(400, "Watch mode needs PUBLIC_BASE_URL in .env (an https address TinyFish can reach)")
+    hook = f"{config.PUBLIC_BASE_URL}/api/webhooks/tinyfish?report={report_id}"
+    if config.WEBHOOK_SECRET:
+        hook += f"&token={config.WEBHOOK_SECRET}"
     created = []
     if r.rera_url:
         m = await tf.client().monitors.create(
-            "fetch", {"url": r.rera_url}, "0 6 * * *", name=f"NeevCheck RERA {r.rera_number or job_id}",
+            "fetch", {"url": r.rera_url}, "0 6 * * *", name=f"NeevCheck RERA {r.rera_number or report_id}"[:80],
             webhook_url=hook,
-            purpose="Alert if completion date changes, a new extension or penalty order appears, "
+            purpose="Alert if the completion date changes, a new extension or penalty order appears, "
                     "or the registration status changes.")
         created.append(m.model_dump())
     who = r.promoter_name or r.project_name or r.query
@@ -170,29 +243,28 @@ async def watch(job_id: str):
         name=f"NeevCheck news {who}"[:80], webhook_url=hook,
         purpose="Alert on new news about delays, buyer protests, insolvency or lender action.")
     created.append(m.model_dump())
-    return {"watching": True, "monitors": created}
+    store.save_watch(report_id, created)
+    return {"watching": True, "monitors": len(created)}
+
+
+@app.get("/api/watches")
+def watches():
+    return store.list_watches()
 
 
 @app.post("/api/webhooks/tinyfish")
-async def tinyfish_webhook(request: Request, job: str | None = None):
+async def tinyfish_webhook(request: Request, report: str | None = None, token: str = ""):
+    if config.WEBHOOK_SECRET and not hmac.compare_digest(token, config.WEBHOOK_SECRET):
+        raise HTTPException(401, "Bad webhook token")
     payload = await request.json()
-    ALERTS.append({"job_id": job, "received_at": now_iso(), "payload": payload})
+    store.add_alert(report, payload)
     return {"ok": True}
 
 
 @app.get("/api/alerts")
 def alerts():
-    return ALERTS[-50:]
+    return store.list_alerts()
 
 
-# ---------------- simple War Room page (frontend team can replace with Next.js) ----------------
-FRONTEND = Path(__file__).resolve().parents[2] / "frontend" / "index.html"
-
-
-@app.get("/")
-def index():
-    return FileResponse(FRONTEND)
-
-
-def _404():
-    raise HTTPException(404, "Unknown job")
+# Re-exported for tests
+__all__ = ["app", "Check"]

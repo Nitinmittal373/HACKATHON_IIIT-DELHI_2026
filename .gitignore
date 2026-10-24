@@ -10,14 +10,19 @@ __pycache__/
 *.pyc
 .pytest_cache/
 
-# Node
+# Node / Next.js
 node_modules/
 .next/
+out/
+*.tsbuildinfo
+next-env.d.ts
 
-# Local cache of agent runs (each laptop has its own)
+# Local data: cached agent runs and the SQLite database (each laptop has its own)
 backend/cache/*.json
+backend/data/
 
 # OS / editor
 .DS_Store
 Thumbs.db
 .vscode/
+.idea/
