@@ -30,6 +30,7 @@ class FakeWebClient:
         self.pages = pages or {}
         self.agent_runs = agent_runs or {}
         self.calls: list[tuple[str, str]] = []
+        self.agent_requests: list[dict[str, Any]] = []
 
     async def search(
         self, query: str, *, purpose: str, domain_type: str | None = None
@@ -47,6 +48,7 @@ class FakeWebClient:
         self, *, url: str, goal: str, output_schema: dict[str, Any], max_steps: int
     ) -> AsyncIterator[AgentEvent]:
         self.calls.append(("agent", url))
+        self.agent_requests.append({"url": url, "goal": goal, "output_schema": output_schema})
         for event in self.agent_runs.get(url, []):
             yield event
 
