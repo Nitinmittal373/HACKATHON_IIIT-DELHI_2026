@@ -33,3 +33,7 @@ backend/data/cache/
 Thumbs.db
 .vscode/
 .idea/
+
+# ---------- Local references (kept on each machine) ----------
+design-ref/
+*.local.md
