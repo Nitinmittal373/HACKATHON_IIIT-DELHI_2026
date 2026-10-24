@@ -1,0 +1,1349 @@
+<label id="ctl00_ContentPlaceHolder1_lblProjectNameHeading" style="color: red !important; font-size: 18px;">Project Name: 14th Avenue (Group Housing) - Gaur City </label><label id="ctl00_ContentPlaceHolder1_lblProjectNameWithID" style="color: red !important; font-size: 16px;">Project Id: (UPRERAPRJ6742)</label><label id="ctl00_ContentPlaceHolder1_lblregisdate" style="color: red !important; font-size: 16px;">Registration Date: 31-07-2017</label><label id="ctl00_ContentPlaceHolder1_lblPromoterNameHeading" style="color: red !important; font-size: 18px;">Promoter Name: Gaursons Promoters Private Limited</label><label id="ctl00_ContentPlaceHolder1_lblPromoterNameWithID" style="color: red !important; font-size: 16px;">Promoter Id: (UPRERAPRM5722)</label><div id="ctl00_ContentPlaceHolder1_PanelBasicDetails">
+<div class="panel panel-danger">
+<div class="panel-body">
+<fieldset>
+<legend>
+<h4 style="background-color: #518b93; color: white; height: 40px; clear: both; color: #ddd; background-color: #518b93; padding: 10px 20px; font-family: 'Oswald',sans-serif; transition: all 0.5s;"><strong>Basic Details</strong></h4>
+</legend>
+<table style="width: 100%">
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label>
+                                                                                                    Project Type
+                                                                                                </label>
+</td>
+<td class="auto-style6 control-label" style="">:
+                                                       <span id="ctl00_ContentPlaceHolder1_lblProjectType">Ongoing</span>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">  </td>
+<td class="auto-style6 control-label" style="">  </td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="project_Catagory" id="ctl00_ContentPlaceHolder1_lblproject_Catagory">Project Category </label>
+<input class="btn-link" id="lnkEditProjectCategory" onclick="ShowProjectCategory()" style="display: none;" type="button" value="Edit"/>
+<input class="btn-link" id="lnkEditProjectCategory_Close" onclick="CloseProjectCategory()" style="display: none;" type="button" value="Close"/>
+</td>
+<td class="auto-style6 control-label" style="">:
+                                                       <span id="ctl00_ContentPlaceHolder1_lblProjectCategory">Residential</span>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="Total_area">Total area in round figure (Sq.mt.)</label>
+<input class="btn-link" id="lnkTotalAreaInRound" onclick="ShowTblTotalArea()" style="display: none;" type="button" value="Edit"/>
+<input class="btn-link" id="btnCloseTblTotalArea" onclick="CloseTblTotalArea()" style="display: none;" type="button" value="Close"/>
+</td>
+<td class="auto-style6 control-label" style="">
+<input class="form-control" disabled="disabled" id="ctl00_ContentPlaceHolder1_lblTotalArea" name="ctl00$ContentPlaceHolder1$lblTotalArea" onkeypress="return isNumber(event)" type="text" value="63810"/>
+</td>
+</tr>
+<tr>
+<td colspan="4">
+<table id="tblEditTotalArea" style="border-style: solid; background-color: lemonchiffon; display: none; padding-bottom: 15px;">
+<tr>
+<td colspan="4"> </td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="Total_area">Order Number</label>
+</td>
+<td class="auto-style6 control-label">
+<input class="form-control" id="ctl00_ContentPlaceHolder1_txtTotalArea_OrderNo" name="ctl00$ContentPlaceHolder1$txtTotalArea_OrderNo" onkeypress="return isNumbernotpoint(event)" type="text"/>
+</td>
+<td class="auto-style7" style="padding-left: 32px;"> 
+                                                                                                        </td>
+<td class="auto-style6 control-label"> 
+                                                                                                        </td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="new_project_Catagory">Order Date </label>
+</td>
+<td class="auto-style6 control-label">
+<input class="form-control" id="ctl00_ContentPlaceHolder1_txtTotalArea_OrderDate" name="ctl00$ContentPlaceHolder1$txtTotalArea_OrderDate" readonly="true" type="text"/>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="Total_area">Upload Order</label>
+</td>
+<td class="auto-style6 control-label" style="">
+<input id="ctl00_ContentPlaceHolder1_FileUpload_TotalArea" name="ctl00$ContentPlaceHolder1$FileUpload_TotalArea" type="file"/>
+</td>
+</tr>
+<tr>
+<td colspan="4" style="text-align: center;">
+<a class="btn btn-danger" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Button2','')" id="ctl00_ContentPlaceHolder1_Button2">Update</a>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td colspan="4">
+<table id="trnewprojectcategory" style="border-style: solid; background-color: lemonchiffon; padding-bottom: 15px; display: none;">
+<tr>
+<td colspan="4"> 
+                                                                                                        </td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="new_project_Catagory">New Project Category </label>
+</td>
+<td class="auto-style6 control-label">
+<select class="form-control" id="ctl00_ContentPlaceHolder1_ddlnewProjectCatg" name="ctl00$ContentPlaceHolder1$ddlnewProjectCatg">
+</select>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="Total_area">Order Number</label>
+</td>
+<td class="auto-style6 control-label">
+<input class="form-control" id="ctl00_ContentPlaceHolder1_txtOrderNo" name="ctl00$ContentPlaceHolder1$txtOrderNo" onkeypress="return isNumbernotpoint(event)" type="text"/>
+</td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="new_project_Catagory">Order Date </label>
+</td>
+<td class="auto-style6 control-label">
+<input class="form-control" id="ctl00_ContentPlaceHolder1_txtOrderDate" name="ctl00$ContentPlaceHolder1$txtOrderDate" readonly="true" type="text"/>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="Total_area">Upload Order</label>
+</td>
+<td class="auto-style6 control-label" style="">
+<input id="ctl00_ContentPlaceHolder1_FileUploadOrder" name="ctl00$ContentPlaceHolder1$FileUploadOrder" type="file"/>
+</td>
+</tr>
+<tr>
+<td colspan="4" style="text-align: center;">
+<input class="btn btn-danger" id="ctl00_ContentPlaceHolder1_btnUpdateProjectCategory" name="ctl00$ContentPlaceHolder1$btnUpdateProjectCategory" type="submit" value="Update"/>
+</td>
+</tr>
+<tr>
+<td colspan="4"> 
+                                                                                                        </td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="project_name">Project Name</label>
+<input class="btn-link" id="lnkProjectName" onclick="ShowProjectName()" style="display: none;" type="button" value="Edit"/>
+<input class="btn-link" id="lnkProjectName_Close" onclick="CloseProjectName()" style="display: none;" type="button" value="Close"/>
+</td>
+<td class="auto-style6 control-label" style="">
+<textarea class="form-control" cols="40" disabled="disabled" id="ctl00_ContentPlaceHolder1_lblProjectName" name="ctl00$ContentPlaceHolder1$lblProjectName" rows="2">
+14th Avenue (Group Housing) - Gaur City </textarea>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="Registration">Registration Fee (in Rs.)  </label>
+</td>
+<td class="auto-style6 control-label" style="">:
+                                                       <span id="ctl00_ContentPlaceHolder1_lblRegistrationFee">324500</span>
+</td>
+</tr>
+<tr>
+<td colspan="4">
+<table id="tblnewprojectName" style="border-style: solid; background-color: lemonchiffon; padding-bottom: 15px; display: none;">
+<tr>
+<td colspan="4"> 
+                                                                                                        </td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="Total_area">Order Number</label>
+</td>
+<td class="auto-style6 control-label">
+<input class="form-control" id="ctl00_ContentPlaceHolder1_txtOrderNumberForProjectName" name="ctl00$ContentPlaceHolder1$txtOrderNumberForProjectName" onkeypress="return isNumbernotpoint(event)" type="text"/>
+</td>
+<td class="auto-style7" style="padding-left: 32px;"> 
+                                                                                                        </td>
+<td class="auto-style6 control-label"> 
+
+                                                                                                        </td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="new_project_Catagory">Order Date </label>
+</td>
+<td class="auto-style6 control-label">
+<input class="form-control" id="ctl00_ContentPlaceHolder1_txtOrderDateForProjectName" name="ctl00$ContentPlaceHolder1$txtOrderDateForProjectName" readonly="true" type="text"/>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="Total_area">Upload Order</label>
+</td>
+<td class="auto-style6 control-label" style="">
+<input id="ctl00_ContentPlaceHolder1_FileOrderForProjectName" name="ctl00$ContentPlaceHolder1$FileOrderForProjectName" type="file"/>
+</td>
+</tr>
+<tr>
+<td colspan="4" style="text-align: center;">
+<input class="btn btn-danger" id="ctl00_ContentPlaceHolder1_btnUpdateProjectName" name="ctl00$ContentPlaceHolder1$btnUpdateProjectName" type="submit" value="Update"/>
+</td>
+</tr>
+<tr>
+<td colspan="4"> 
+                                                                                                        </td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="project_address">
+                                                                                            Address</label>
+</td>
+<td class="auto-style6 control-label" style="">:
+                                                      <span id="ctl00_ContentPlaceHolder1_projetaddress"></span>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for=" Village_locality">
+                                                                                            Village/Locality/Sector etc.</label>
+</td>
+<td class="auto-style6 control-label" style="">: 
+                                                      <span id="ctl00_ContentPlaceHolder1_lblvill_locality"></span>
+</td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="project_state_id">State</label>
+</td>
+<td class="auto-style6 control-label" style="">:
+                                                       <span id="ctl00_ContentPlaceHolder1_lblState">Uttar Pradesh</span>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="proposed_period_month">Project Duration (In month)</label>
+</td>
+<td class="auto-style6 control-label" style="">: 
+                                                       <span id="ctl00_ContentPlaceHolder1_lblProjectDuration">108</span>
+</td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="project_district_code">District </label>
+</td>
+<td class="auto-style6 control-label" style="">
+<select class="form-control" disabled="disabled" id="ctl00_ContentPlaceHolder1_ddlDistrict" name="ctl00$ContentPlaceHolder1$ddlDistrict">
+<option value="1">Agra</option>
+<option value="2">Aligarh</option>
+<option value="3">Prayagraj</option>
+<option value="4">Ambedkar Nagar</option>
+<option value="5">Amethi</option>
+<option value="6">Amroha</option>
+<option value="7">Auraiya</option>
+<option value="8">Azamgarh</option>
+<option value="9">Bagpat</option>
+<option value="10">Bahraich</option>
+<option value="11">Balrampur</option>
+<option value="12">Ballia</option>
+<option value="13">Banda</option>
+<option value="14">Barabanki</option>
+<option value="15">Bareilly</option>
+<option value="16">Basti</option>
+<option value="17">Bijnor</option>
+<option value="18">Budaun</option>
+<option value="19">Bulandshahr</option>
+<option value="20">Chandauli</option>
+<option value="21">Chitrakoot</option>
+<option value="22">Deoria</option>
+<option value="23">Etah</option>
+<option value="24">Etawah</option>
+<option value="25">Ayodhya</option>
+<option value="26">Farrukhabad</option>
+<option value="27">Fatehpur</option>
+<option value="28">Firozabad</option>
+<option selected="selected" value="29">Gautam Buddha Nagar</option>
+<option value="30">Ghaziabad</option>
+<option value="31">Ghazipur</option>
+<option value="32">Gonda</option>
+<option value="33">Gorakhpur</option>
+<option value="34">Hamirpur</option>
+<option value="35">Hapur</option>
+<option value="36">Hardoi</option>
+<option value="37">Hathras</option>
+<option value="38">Jalaun</option>
+<option value="39">Jaunpur</option>
+<option value="40">Jhansi</option>
+<option value="41">Kannauj</option>
+<option value="42">Kanpur Dehat</option>
+<option value="43">Kanpur Nagar</option>
+<option value="44">Kasganj</option>
+<option value="45">Kaushambi</option>
+<option value="46">Kushinagar</option>
+<option value="47">Lakhimpur Kheri</option>
+<option value="48">Lalitpur</option>
+<option value="49">Lucknow</option>
+<option value="50">Maharajganj</option>
+<option value="51">Mahoba</option>
+<option value="52">Mainpuri</option>
+<option value="53">Mathura</option>
+<option value="54">Mau</option>
+<option value="55">Meerut</option>
+<option value="56">Mirzapur</option>
+<option value="57">Moradabad</option>
+<option value="58">Muzaffarnagar</option>
+<option value="59">Pilibhit</option>
+<option value="60">Pratapgarh</option>
+<option value="61">Raebareli</option>
+<option value="62">Rampur</option>
+<option value="63">Saharanpur</option>
+<option value="64">Sambhal</option>
+<option value="65">Sant Kabir Nagar</option>
+<option value="66">Sant Ravidas Nagar</option>
+<option value="67">Shahjahanpur</option>
+<option value="68">Shamli</option>
+<option value="69">Shravasti</option>
+<option value="70">Siddharthnagar</option>
+<option value="71">Sitapur</option>
+<option value="72">Sonbhadra</option>
+<option value="73">Sultanpur</option>
+<option value="74">Unnao</option>
+<option value="75">Varanasi</option>
+<option value="76">Other</option>
+<option value="0">--Select--</option>
+</select>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="original_start_date" id="ctl00_ContentPlaceHolder1_divoriginalstartdate">Original Start Date </label>
+</td>
+<td class="auto-style6 control-label" style="">
+<input class="form-control" disabled="disabled" id="ctl00_ContentPlaceHolder1_lblOriginalStartDate" name="ctl00$ContentPlaceHolder1$lblOriginalStartDate" readonly="readonly" type="text" value="01-04-2014"/>
+</td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="project_tehsil_id">
+                                                                                                    Tehsil 
+                                                <span>
+<a href='javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions("ctl00$ContentPlaceHolder1$LinkEditTehsil", "", true, "", "", false, true))' id="ctl00_ContentPlaceHolder1_LinkEditTehsil" style="display: none;">Edit</a>
+</span>
+</label>
+</td>
+<td class="auto-style6 control-label" style="">
+<select class="form-control" disabled="disabled" id="ctl00_ContentPlaceHolder1_ddlTehsil" name="ctl00$ContentPlaceHolder1$ddlTehsil">
+<option value="302">Gautam Buddha Nagar</option>
+<option selected="selected" value="311">Dadri</option>
+<option value="312">Jewar</option>
+<option value="0">Select</option>
+</select>
+<label id="ctl00_ContentPlaceHolder1_ddlTehsil_old" style="display: none;">Dadri</label>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="proposed_start_date" id="ctl00_ContentPlaceHolder1_lblProposedStartDate">Proposed Start Date </label>
+</td>
+<td class="auto-style6 control-label" style="">
+<input class="form-control" id="ctl00_ContentPlaceHolder1_lblStartDate" name="ctl00$ContentPlaceHolder1$lblStartDate" readonly="true" type="text" value="01-04-2014"/>
+</td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label>Sanctioning Competent Authority<span style="color: red;">*</span></label>
+<a href='javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions("ctl00$ContentPlaceHolder1$lnkEditCompetentAuthority", "", true, "", "", false, true))' id="ctl00_ContentPlaceHolder1_lnkEditCompetentAuthority" style="display: none;">Edit</a>
+</td>
+<td class="auto-style6 control-label">
+<select class="form-control" disabled="disabled" enableclientscript="true" id="ctl00_ContentPlaceHolder1_ddlAuthority" name="ctl00$ContentPlaceHolder1$ddlAuthority" setfocusonerror="true">
+<option value="5">Agra Development Authority</option>
+<option value="13">Aligarh Development Authority</option>
+<option value="34">Any Other Competent Authority</option>
+<option value="17">Ayodhya(Faizabad)  Development Authority</option>
+<option value="27">Azamgarh Development Authority</option>
+<option value="26">Baghpat-baraut-khekra development Authority</option>
+<option value="14">Banda Development Authority</option>
+<option value="11">Bareily Development Authority</option>
+<option value="28">Basti Development Authority</option>
+<option value="24">Bulandsahar Development Authority</option>
+<option value="31">Chitrakoot Development Authority (SPL. Area)</option>
+<option value="18">Firozabad-Shikohabad Development Authority</option>
+<option value="9">Ghaziabad Development Authority</option>
+<option value="7">Gorakhpur Development Authority</option>
+<option value="36">Greater Noida Authority</option>
+<option value="20">Hapur Pilkhuwa Development Authority</option>
+<option value="16">Jhansi Development Authority</option>
+<option value="3">Kanpur Development Authority</option>
+<option value="30">Kapilvastu Development Authority (SPL. Area)</option>
+<option value="25">Khurja Development Authority</option>
+<option value="33">Kushinagar Development Authority (SPL. Area)</option>
+<option value="4">Lucknow  Development Authority</option>
+<option value="39">Lucknow Industrial Development Authority</option>
+<option value="10">Mathura-Vrindavan Development Authority</option>
+<option value="6">Meerut Development Authority</option>
+<option value="29">Mirzapur-Vindhyanchal Development Authority (SPL. Area)</option>
+<option value="12">Moradabad Development Authority</option>
+<option value="21">Muzaffarnagar Development Authority</option>
+<option value="35">Noida Authority</option>
+<option value="23">Orai Development Authority</option>
+<option value="2">Prayagraj(Allahabad) Development Authority</option>
+<option value="8">Raebareily Development Authority</option>
+<option value="22">Rampur Development Authority</option>
+<option value="19">Saharanpur Development Authority</option>
+<option value="32">Shaktinagar Development Authority (SPL. Area)</option>
+<option value="38">U.P. Awas Evam Vikas Parishad</option>
+<option value="15">Unnao Shuklaganj Development Authority</option>
+<option value="1">Varanasi Development Authority</option>
+<option value="37">Yamuna Expressway Authority</option>
+<option selected="selected" value="0">Greater Noida Authority</option>
+</select>
+<span id="ctl00_ContentPlaceHolder1_RequiredFieldValidator7" style="color:Red;color:red;visibility:hidden;">Select Competant Authority</span>
+</td>
+<td class="auto-style7" colspan="2" style="padding-left: 32px;">
+<span style="font-size: 15px !important;"></span>
+</td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="registration_fee">Project Cost (in Lacs) </label>
+<input class="btn-link" id="lnkEditProjCost" onclick="ShowProjectCost()" style="display: none;" type="button" value="Edit"/>
+<input class="btn-link" id="lnkEditProjCost_Close" onclick="CloseProjectCost()" style="display: none;" type="button" value="Close"/>
+</td>
+<td class="auto-style6 control-label" style="">
+<input class="form-control" disabled="disabled" id="ctl00_ContentPlaceHolder1_lblProjectCost" name="ctl00$ContentPlaceHolder1$lblProjectCost" onkeypress="return isNumbernotpoint(event)" type="text" value="160679.63"/>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="proposed_end_date">Proposed Completion Date</label>
+</td>
+<td class="auto-style6 control-label" style="">
+<input class="form-control" id="ctl00_ContentPlaceHolder1_lblEndDate" name="ctl00$ContentPlaceHolder1$lblEndDate" onchange="javascript:setTimeout('__doPostBack(\'ctl00$ContentPlaceHolder1$lblEndDate\',\'\')', 0)" onkeypress="if (WebForm_TextBoxKeyHandler(event) == false) return false;" readonly="readonly" type="text" value="26-03-2023"/>
+</td>
+</tr>
+<tr>
+<td colspan="4">
+<table id="tblEditProjectCost" style="border-style: solid; background-color: lemonchiffon; padding-bottom: 15px; display: none;">
+<tr>
+<td colspan="4"> 
+                                                                                                        </td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="Total_area">Order Number</label>
+</td>
+<td class="auto-style6 control-label">
+<input class="form-control" id="ctl00_ContentPlaceHolder1_txtProjectCost_OrderNo" name="ctl00$ContentPlaceHolder1$txtProjectCost_OrderNo" onkeypress="return isNumbernotpoint(event)" type="text"/>
+</td>
+<td class="auto-style7" style="padding-left: 32px;"> 
+                                                                                                        </td>
+<td class="auto-style6 control-label"> 
+                                                                                                        </td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="new_project_Catagory">Order Date </label>
+</td>
+<td class="auto-style6 control-label">
+<input class="form-control" id="ctl00_ContentPlaceHolder1_txtProjectCost_OrderDate" name="ctl00$ContentPlaceHolder1$txtProjectCost_OrderDate" readonly="true" type="text"/>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="Total_area">Upload Order</label>
+</td>
+<td class="auto-style6 control-label" style="">
+<input id="ctl00_ContentPlaceHolder1_FileUpload_ProjectCost" name="ctl00$ContentPlaceHolder1$FileUpload_ProjectCost" type="file"/>
+</td>
+</tr>
+<tr>
+<td colspan="4" style="text-align: center;">
+<input class="btn btn-danger" id="ctl00_ContentPlaceHolder1_btnProjectCost_Update" name="ctl00$ContentPlaceHolder1$btnProjectCost_Update" type="submit" value="Update"/>
+</td>
+</tr>
+<tr>
+<td colspan="4"> 
+                                                                                                        </td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td colspan="4">
+<table style="width: 100%;">
+<tr>
+<td class="auto-style7" colspan="4" style="padding-left: 0px;">
+<h4 style="background-color: #518b93; color: white; height: 40px; clear: both; color: #ddd; background-color: #518b93; padding: 10px 20px; font-family: 'Oswald',sans-serif; transition: all 0.5s;">Geographic Location 
+                                               <span style="font-size: 15px !important;">
+</span>
+</h4>
+<br/>
+<label>(end points of scheme/ project)</label>
+</td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="Latitude1">
+                                                                                                                Latitude
+                                                                                                            </label>
+</td>
+<td class="auto-style6 control-label" style="">
+<input class="form-control" disabled="disabled" id="ctl00_ContentPlaceHolder1_lblLat1" name="ctl00$ContentPlaceHolder1$lblLat1" onkeypress="return isNumber(event)" type="text" value="28.618857212330255"/>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="Latitude2">
+                                                                                                                Latitude
+                                                                                                            </label>
+</td>
+<td class="auto-style6 control-label" style="">
+<input class="form-control" disabled="disabled" id="ctl00_ContentPlaceHolder1_lblLat2" name="ctl00$ContentPlaceHolder1$lblLat2" onkeypress="return isNumber(event)" type="text" value="28o37’2.72”N"/>
+</td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="Long1">
+                                                                                                                Longtitude
+                                                                                                            </label>
+</td>
+<td class="auto-style6 control-label" style="">
+<input class="form-control" disabled="disabled" id="ctl00_ContentPlaceHolder1_lblLong1" name="ctl00$ContentPlaceHolder1$lblLong1" onkeypress="return isNumber(event)" type="text" value="77.41922536466424"/>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="Long1">
+                                                                                                                Longtitude
+                                                                                                            </label>
+</td>
+<td class="auto-style6 control-label" style="">
+<input class="form-control" disabled="disabled" id="ctl00_ContentPlaceHolder1_lblLong2" name="ctl00$ContentPlaceHolder1$lblLong2" onkeypress="return isNumber(event)" type="text" value="77o25’9.76”E"/>
+</td>
+</tr>
+<tr>
+<td colspan="4">
+<table style="width:100%;">
+<tr>
+<td class="auto-style6 control-label" colspan="4" style="padding-left: 32px;">
+<label for="Agent_Selection">
+                                                                                                                Agents 
+                                                                                                            </label>
+</td>
+</tr>
+<tr>
+<td class="auto-style6 control-label" colspan="4" style="">
+<br/>
+<div>
+</div>
+<span id="ctl00_ContentPlaceHolder1_lblnotapplicable">Not Applicable</span>
+<span style="font-size: 15px !important;">
+</span>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</fieldset>
+</div>
+</div>
+</div><input class="form-control" id="ctl00_ContentPlaceHolder1_txtrevised_end_date" name="ctl00$ContentPlaceHolder1$txtrevised_end_date" onchange="checkprojectenddate()" readonly="readonly" type="text"/><table border="0" cellpadding="4" cellspacing="0" class="table table-bordered table-striped" id="ctl00_ContentPlaceHolder1_grdPermitDetails" style="color:#333333;width:170%;border-collapse:collapse;">
+<tr style="color:White;background-color:Orange;font-weight:bold;">
+<th scope="col">
+                                                                                                                SNo.
+                                                                                                            </th><th scope="col">Orignal Permit No</th><th scope="col">Orignal Permit Date</th><th scope="col">Valid Upto</th><th scope="col">Revalidated Permit No</th><th scope="col">Revalidated Permit Date</th><th scope="col" style="width:200px;">Revalidated Permit Valid Upto</th><th scope="col" style="width:200px;">Permit Extendable Upto</th><th scope="col">End Date</th><th scope="col">Uploaded Approve Layout</th><th scope="col">Uploaded Sanctioned Letter</th><th scope="col">Uploaded Approved Map</th><th scope="col">Uploaded Floor Plan Of All Types</th><th scope="col">Uploaded  Project Specifications</th><th scope="col">Uploaded Sajra Detail</th>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lblSRNO">1</span>
+</td><td style="width:150px;">
+<span id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lblPermitNumber">Plg(BP)-2526/GH/FTS-1556</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lblPermitDate">26-02-2014</span>
+</td><td style="width:100px;">
+<span id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lblValidUpto">25-02-2019</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lblrPermitNumber">PLG/BP 3770 6505/2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lblrPermitDate">28-09-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lblrValidUpto">27-09-2022</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lblrextUpto">26-09-2027</span>
+</td><td style="width:100px;">
+<span id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lblRevisedEndDateShow">27-09-2022</span>
+</td><td>
+<a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grdPermitDetails$ctl02$lnkUploadedApprovedLayout','')" id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lnkUploadedApprovedLayout" style="color: black"><i aria-hidden="true" class="fa fa-eye" style="font-size:20px;color:crimson"></i>Download</a> 
+                                                                                                            </td><td>
+<a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grdPermitDetails$ctl02$lnkUploadedSanctionedLetter','')" id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lnkUploadedSanctionedLetter" style="color: black"><i aria-hidden="true" class="fa fa-eye" style="font-size:20px;color:crimson"></i>Download</a> 
+                                                                                                            </td><td>
+<a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grdPermitDetails$ctl02$lnkUploadedApprovedMap','')" id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lnkUploadedApprovedMap" style="color: black"><i aria-hidden="true" class="fa fa-eye" style="font-size:20px;color:crimson"></i>Download</a> 
+                                                                                                            </td><td>
+<a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grdPermitDetails$ctl02$lnkUploadedFloorPlanOfAllTypes','')" id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lnkUploadedFloorPlanOfAllTypes" style="color: black"><i aria-hidden="true" class="fa fa-eye" style="font-size:20px;color:crimson"></i>Download</a> 
+                                                                                                            </td><td>
+<a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grdPermitDetails$ctl02$lnkUploadedProjectSpecifications','')" id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lnkUploadedProjectSpecifications" style="color: black"><i aria-hidden="true" class="fa fa-eye" style="font-size:20px;color:crimson"></i>Download</a> 
+                                                                                                            </td><td>
+                                                                                                                
+                                                                                                                         
+                                                                                                                   
+                                                                                                                </td>
+</tr>
+</table><table border="0" cellpadding="4" cellspacing="0" class="table table-bordered table-striped" id="ctl00_ContentPlaceHolder1_grvdocumentdetails" style="color:#333333;border-collapse:collapse;">
+<tr style="color:White;background-color:Orange;font-weight:bold;">
+<th scope="col">
+                                                                                                                            SNo.
+                                                                                                                        </th><th scope="col">Document Name</th><th scope="col">Uploaded File Name</th><th scope="col">Uploaded Date</th><th scope="col">Upload Doc Type</th><th scope="col">Download</th>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl02_lblSRNO">1</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl02_Label2">Proforma of Completion Certificate(Occupancy)</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl02_Label7">Promoter select NA for this document</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl02_Labeldate"></span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl02_Labdoc"></span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl02_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl02$mainid" type="hidden"/>
+                                                                                                                             
+                                                                                                 <span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl02_lblna">NA</span>
+</td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl03_lblSRNO">2</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl03_Label2">Details of Encumbrances</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl03_Label7">PRJ69-6742Encumbrace14th Avenue.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl03_Labeldate">10-08-2021</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl03_Labdoc">New</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl03_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl03$mainid" type="hidden" value="77895"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl03$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl03_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl04_lblSRNO">3</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl04_Label2">Commencement Certificate</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl04_Label7">PRJ65-6742commencement certificates.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl04_Labeldate">29-07-2018</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl04_Labdoc">New</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl04_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl04$mainid" type="hidden" value="53745"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl04$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl04_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl05_lblSRNO">4</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl05_Label2">Other Plan(If Any)</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl05_Label7">PRJ93-6742PC-1_compressed-34-35.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl05_Labeldate">16-04-2019</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl05_Labdoc">New</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl05_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl05$mainid" type="hidden" value="64310"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl05$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl05_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl06_lblSRNO">5</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl06_Label2">Proforma of Application Form</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl06_Label7">PRJ75-6742application.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl06_Labeldate">29-07-2018</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl06_Labdoc">New</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl06_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl06$mainid" type="hidden" value="53746"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl06$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl06_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl07_lblSRNO">6</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl07_Label2">Proforma of Allotment Letter</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl07_Label7">PRJ41-6742allotment.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl07_Labeldate">29-07-2018</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl07_Labdoc">New</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl07_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl07$mainid" type="hidden" value="53747"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl07$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl07_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl08_lblSRNO">7</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl08_Label2">Proforma of Conveyance Deed</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl08_Label7">PRJ48-6742conveyance.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl08_Labeldate">29-07-2018</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl08_Labdoc">New</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl08_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl08$mainid" type="hidden" value="53749"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl08$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl08_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl09_lblSRNO">8</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl09_Label2">Waste Disposal Plan</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl09_Label7">PRJ78-6742waste disposal.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl09_Labeldate">29-07-2018</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl09_Labdoc">New</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl09_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl09$mainid" type="hidden" value="53754"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl09$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl09_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl10_lblSRNO">9</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl10_Label2">Water Supply Plan</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl10_Label7">PRJ70-6742water supply.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl10_Labeldate">29-07-2018</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl10_Labdoc">New</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl10_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl10$mainid" type="hidden" value="53758"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl10$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl10_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl11_lblSRNO">10</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl11_Label2">Electricity Supply Plan</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl11_Label7">PRJ78-6742ELECTRICITY SUPPLY PLA.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl11_Labeldate">31-07-2018</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl11_Labdoc">New</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl11_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl11$mainid" type="hidden" value="54741"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl11$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl11_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl12_lblSRNO">11</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl12_Label2">Development Work Plan</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl12_Label7">PRJ21-6742development works.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl12_Labeldate">29-07-2018</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl12_Labdoc">New</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl12_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl12$mainid" type="hidden" value="53763"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl12$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl12_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl13_lblSRNO">12</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl13_Label2">Affidavit (Form-B)</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl13_Label7">PRJ37-6742AFFIDAVIT GC-14.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl13_Labeldate">29-07-2018</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl13_Labdoc">New</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl13_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl13$mainid" type="hidden" value="53770"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl13$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl13_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl14_lblSRNO">13</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl14_Label2">CA CERTIFICATE</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl14_Label7">PRJ96-674214THAVENUE.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl14_Labeldate">20-11-2020</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl14_Labdoc">New</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl14_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl14$mainid" type="hidden" value="74370"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl14$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl14_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl15_lblSRNO">14</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl15_Label2">ARCHITECT CERTIFICATE</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl15_Label7">PRJ87-674214THAVENUE_compressed.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl15_Labeldate">20-11-2020</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl15_Labdoc">New</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl15_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl15$mainid" type="hidden" value="74371"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl15$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl15_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl16_lblSRNO">15</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl16_Label2">ENGINEERS CERTIFICATE</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl16_Label7">PRJ70-674214THAVENUE.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl16_Labeldate">20-11-2020</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl16_Labdoc">New</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl16_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl16$mainid" type="hidden" value="74372"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl16$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl16_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl17_lblSRNO">16</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl17_Label2">Registry Document In Case of Own Land</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl17_Label7">PRJ6742registration.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl17_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl17_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl17_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl17$mainid" type="hidden" value="17430"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl17$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl17_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl18_lblSRNO">17</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl18_Label2">Authentic copy of Approval of Project</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl18_Label7">PRJ6742Approvals.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl18_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl18_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl18_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl18$mainid" type="hidden" value="17447"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl18$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl18_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl19_lblSRNO">18</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl19_Label2">Commencement Certificate</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl19_Label7">PRJ6742commencement certificates.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl19_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl19_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl19_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl19$mainid" type="hidden" value="17453"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl19$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl19_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl20_lblSRNO">19</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl20_Label2">Sanctioned Layout Plan (Of Entire Project)</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl20_Label7">PRJ6742sanctioned layout.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl20_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl20_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl20_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl20$mainid" type="hidden" value="17557"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl20$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl20_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl21_lblSRNO">20</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl21_Label2">Sanctioned Building/ Block Plan (Add Plans for All Buildings or Blocks)</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl21_Label7">PRJ6742sanctioned plans.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl21_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl21_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl21_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl21$mainid" type="hidden" value="17569"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl21$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl21_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl22_lblSRNO">21</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl22_Label2">Floor plans of all types</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl22_Label7">PRJ6742floor plans.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl22_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl22_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl22_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl22$mainid" type="hidden" value="17592"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl22$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl22_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl23_lblSRNO">22</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl23_Label2">Floor plans of all types</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl23_Label7">PRJ6742floor plans revised.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl23_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl23_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl23_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl23$mainid" type="hidden" value="17614"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl23$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl23_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl24_lblSRNO">23</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl24_Label2">Proforma of Application Form</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl24_Label7">PRJ6742application.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl24_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl24_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl24_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl24$mainid" type="hidden" value="17622"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl24$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl24_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl25_lblSRNO">24</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl25_Label2">Proforma of Allotment Letter</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl25_Label7">PRJ6742allotment.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl25_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl25_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl25_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl25$mainid" type="hidden" value="17626"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl25$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl25_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl26_lblSRNO">25</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl26_Label2">Proforma of Conveyance Deed</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl26_Label7">PRJ6742conveyance.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl26_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl26_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl26_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl26$mainid" type="hidden" value="17629"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl26$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl26_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl27_lblSRNO">26</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl27_Label2">Waste Disposal Plan</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl27_Label7">PRJ6742waste disposal.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl27_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl27_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl27_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl27$mainid" type="hidden" value="17634"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl27$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl27_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl28_lblSRNO">27</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl28_Label2">Water Supply Plan</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl28_Label7">PRJ6742water supply.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl28_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl28_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl28_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl28$mainid" type="hidden" value="17641"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl28$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl28_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl29_lblSRNO">28</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl29_Label2">Development Work Plan</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl29_Label7">PRJ6742development works.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl29_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl29_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl29_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl29$mainid" type="hidden" value="17647"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl29$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl29_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl30_lblSRNO">29</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl30_Label2">Affidavit (Form-B)</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl30_Label7">PRJ6742Affidevit -14th Avenue.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl30_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl30_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl30_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl30$mainid" type="hidden" value="19938"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl30$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl30_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl31_lblSRNO">30</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl31_Label2">Authentic copy of Approval of Project</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl31_Label7">PRJ6742Rev. St Vetting GC-14 Bl-O  - 2017.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl31_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl31_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl31_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl31$mainid" type="hidden" value="30055"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl31$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl31_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl32_lblSRNO">31</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl32_Label2">Sanctioned Building/ Block Plan (Add Plans for All Buildings or Blocks)</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl32_Label7">PRJ67421.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl32_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl32_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl32_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl32$mainid" type="hidden" value="30188"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl32$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl32_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl33_lblSRNO">32</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl33_Label2">Sanctioned Building/ Block Plan (Add Plans for All Buildings or Blocks)</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl33_Label7">PRJ67422.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl33_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl33_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl33_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl33$mainid" type="hidden" value="30189"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl33$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl33_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl34_lblSRNO">33</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl34_Label2">Sanctioned Building/ Block Plan (Add Plans for All Buildings or Blocks)</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl34_Label7">PRJ67423.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl34_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl34_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl34_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl34$mainid" type="hidden" value="30190"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl34$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl34_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl35_lblSRNO">34</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl35_Label2">Sanctioned Building/ Block Plan (Add Plans for All Buildings or Blocks)</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl35_Label7">PRJ67424.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl35_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl35_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl35_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl35$mainid" type="hidden" value="30191"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl35$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl35_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl36_lblSRNO">35</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl36_Label2">Sanctioned Building/ Block Plan (Add Plans for All Buildings or Blocks)</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl36_Label7">PRJ67425.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl36_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl36_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl36_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl36$mainid" type="hidden" value="30192"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl36$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl36_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl37_lblSRNO">36</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl37_Label2">Sanctioned Building/ Block Plan (Add Plans for All Buildings or Blocks)</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl37_Label7">PRJ67426.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl37_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl37_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl37_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl37$mainid" type="hidden" value="30193"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl37$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl37_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl38_lblSRNO">37</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl38_Label2">Sanctioned Building/ Block Plan (Add Plans for All Buildings or Blocks)</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl38_Label7">PRJ67427.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl38_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl38_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl38_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl38$mainid" type="hidden" value="30194"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl38$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl38_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl39_lblSRNO">38</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl39_Label2">Sanctioned Building/ Block Plan (Add Plans for All Buildings or Blocks)</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl39_Label7">PRJ67428.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl39_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl39_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl39_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl39$mainid" type="hidden" value="30195"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl39$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl39_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl40_lblSRNO">39</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl40_Label2">Sanctioned Building/ Block Plan (Add Plans for All Buildings or Blocks)</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl40_Label7">PRJ67429.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl40_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl40_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl40_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl40$mainid" type="hidden" value="30196"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl40$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl40_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl41_lblSRNO">40</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl41_Label2">Sanctioned Building/ Block Plan (Add Plans for All Buildings or Blocks)</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl41_Label7">PRJ674210.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl41_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl41_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl41_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl41$mainid" type="hidden" value="30197"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl41$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl41_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl42_lblSRNO">41</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl42_Label2">Sanctioned Building/ Block Plan (Add Plans for All Buildings or Blocks)</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl42_Label7">PRJ674211.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl42_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl42_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl42_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl42$mainid" type="hidden" value="30198"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl42$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl42_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl43_lblSRNO">42</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl43_Label2">Commencement Certificate</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl43_Label7">PRJ6742revised sanctioned letter.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl43_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl43_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl43_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl43$mainid" type="hidden" value="30199"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl43$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl43_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl44_lblSRNO">43</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl44_Label2">Sanctioned Layout Plan (Of Entire Project)</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl44_Label7">PRJ67421.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl44_Labeldate">31-07-2017</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl44_Labdoc">Old</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl44_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl44$mainid" type="hidden" value="30200"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl44$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl44_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr>
+</table>

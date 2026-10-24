@@ -1,6 +1,7 @@
 """Turn what a buyer types into UP-RERA project candidates.
 
-- An old-format RERA number maps straight to its details page.
+- An old-format RERA number maps straight to its details page, which is
+  read to show the buyer the project's name before anything runs.
 - A new-format number, a project name or a promoter name goes through
   TinyFish Search; only up-rera.in results count, and the number, name and
   date are read from each result's title and snippet.
@@ -11,6 +12,7 @@ from datetime import date, datetime
 from urllib.parse import urlsplit
 
 from app.models import Project, is_new_format, is_uprera_url, normalize_rera_id
+from app.sources.uprera import describe_project
 from app.tinyfish import SearchHit, WebClient
 
 MAX_CANDIDATES = 8
@@ -36,7 +38,8 @@ def details_url_for(rera_id: str) -> str | None:
 async def resolve(query: str, web: WebClient) -> list[Project]:
     rera_id = normalize_rera_id(query)
     if rera_id and (url := details_url_for(rera_id)):
-        return [Project(rera_id=rera_id, details_url=url)]
+        project = await describe_project(Project(rera_id=rera_id, details_url=url), web)
+        return [project] if project else []
 
     hits = await web.search(f"{query.strip()} UP RERA project", purpose=SEARCH_PURPOSE)
     candidates = candidates_from_hits(hits)

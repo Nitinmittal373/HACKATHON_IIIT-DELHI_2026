@@ -4,7 +4,9 @@ from datetime import date
 from fastapi.testclient import TestClient
 
 from app.resolve import candidates_from_hits, resolve
-from tests.fakes import FakeWebClient, load_search
+from tests.fakes import FakeWebClient, load_page, load_search
+
+URL_8334 = "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334"
 
 
 def test_gaur_city_search_keeps_only_up_rera_projects() -> None:
@@ -55,11 +57,21 @@ def test_supertech_search_finds_eco_village_phases() -> None:
     assert "UPRERAPRJ4878" in ids
 
 
-def test_old_format_number_skips_search() -> None:
-    web = FakeWebClient()
+def test_old_format_number_reads_the_page_instead_of_searching() -> None:
+    web = FakeWebClient(pages={URL_8334: load_page("uprera_8334.html")})
     candidates = asyncio.run(resolve(" upreraprj8334 ", web))
+
     assert [c.rera_id for c in candidates] == ["UPRERAPRJ8334"]
-    assert ("search", "UPRERAPRJ8334 UP RERA project") not in web.calls
+    assert candidates[0].name == "SUPERTECH ECO VILLAGE-I PHASE I-C"
+    assert candidates[0].promoter == "SUPERTECH LIMITED"
+    assert candidates[0].district == "Gautam Buddha Nagar"
+    assert web.calls == [("fetch", URL_8334)]
+
+
+def test_number_whose_page_shows_another_project_gives_no_candidate() -> None:
+    url = "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=6742"
+    web = FakeWebClient(pages={url: load_page("uprera_8334.html")})
+    assert asyncio.run(resolve("UPRERAPRJ6742", web)) == []
 
 
 def test_search_endpoint(client: TestClient) -> None:
