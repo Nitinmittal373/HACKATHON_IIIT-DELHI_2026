@@ -1,0 +1,21 @@
+name: Feature request
+description: Suggest an idea for NeevCheck
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Which problem does this solve for a homebuyer?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Public source it would use (if any)
+      description: For example a state RERA portal, a court site or a land authority list.

@@ -1,0 +1,34 @@
+name: Bug report
+description: Something does not work as expected
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: Include the project or RERA number you checked, if any.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Search for ...
+        2. Confirm ...
+        3. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Mode
+      options: ["Demo mode", "Live mode (TinyFish key)"]
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and OS

@@ -1,27 +1,34 @@
-# Secrets: never commit
+# ---------- Secrets (never commit) ----------
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
+*.pem
+*.key
 
-# Python
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
 .venv/
 venv/
-__pycache__/
-*.pyc
 .pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
 
-# Node / Next.js
+# ---------- Node / Next.js ----------
 node_modules/
 .next/
 out/
 *.tsbuildinfo
 next-env.d.ts
+npm-debug.log*
 
-# Local data: cached agent runs and the SQLite database (each laptop has its own)
-backend/cache/*.json
-backend/data/
+# ---------- Local data (each machine keeps its own) ----------
+backend/data/*.db
+backend/data/cache/
 
-# OS / editor
+# ---------- OS / editors ----------
 .DS_Store
 Thumbs.db
 .vscode/

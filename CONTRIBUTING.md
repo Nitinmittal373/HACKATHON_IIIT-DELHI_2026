@@ -1,29 +1,55 @@
-# Working on NeevCheck
+# Contributing to NeevCheck
 
-## Branches
-- `main` always runs. Never push broken code to it.
-- One branch per task: `feat/war-room-live-browser`, `fix/mca-name-match`, `docs/methodology`.
-- Open a pull request into `main`; CI must be green; one teammate reviews.
+Thanks for helping families check a builder before they book a home.
 
-## Commits
-Short, present tense, what changed and why:
-`feat(scoring): treat insolvency of another project as review, not hard stop`
-Types: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`.
+## Maintainers
 
-## Before you commit
-1. `git status`: `.env`, `.venv/`, `node_modules/`, `backend/data/` must not appear.
-2. Backend: `python -m pytest -q`
-3. Frontend: `npm run typecheck && npm run lint`
+| Name | GitHub | Focus |
+| --- | --- | --- |
+| Rishi Bhaskar | [@rishibhaskar777](https://github.com/rishibhaskar777) | Product, frontend, design |
+| Nitin Mittal | [@Nitinmittal373](https://github.com/Nitinmittal373) | Backend, TinyFish agents, data |
 
-## Who owns what
-| Area | Folder | Owner |
-|---|---|---|
-| Agents and sources | `backend/app/sources.py`, `tf.py` | [name] |
-| Scoring, API, data | `backend/app/scoring.py`, `main.py`, `store.py` | [name] |
-| Frontend | `frontend/` | [name] |
-| Research, QA, demo | `docs/`, test projects, pitch | [name] |
+## Run it locally
 
-## Rules that protect the product
-- No source, no claim. Every finding is `Evidence` with a URL and retrieval time.
-- Change a scoring rule only together with `docs/METHODOLOGY.md` and a test.
-- Never present sample or mock data as a real check.
+See the [Quick start](README.md#quick-start) in the README. Demo mode needs no API key.
+
+## Workflow
+
+1. Create a branch from `main`: `feat/agent-cam`, `fix/score-rounding`, `docs/readme`.
+2. Keep each pull request to one change.
+3. Make sure these pass before you open the pull request:
+
+   ```bash
+   # backend
+   cd backend && ruff check . && pytest -q
+   # frontend
+   cd frontend && npm run lint && npm run typecheck && npm run build
+   ```
+
+4. Fill in the pull request template. One maintainer reviews and merges.
+
+## Commit messages
+
+We follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+feat(backend): stream TinyFish live browser URLs to the check page
+
+Why the change was needed, in one or two sentences.
+
+- what changed, one line per meaningful change
+- how it was tested
+```
+
+Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `ci`.
+
+## Code style
+
+- **Python:** small functions, type hints, `ruff` formatting rules in `backend/pyproject.toml`.
+- **TypeScript:** function components, one component per file, plain CSS in `src/styles`.
+- **Data rule:** no source, no claim. Every finding shown to a user must carry a source link and the time it was read.
+
+## Never commit
+
+- `.env` or any key, token or password
+- local databases (`backend/data/*.db`) or cached agent runs
