@@ -19,7 +19,7 @@ jobs:
       - if: steps.present.outputs.yes == 'false'
         run: echo "No backend yet, skipping."
       - if: steps.present.outputs.yes == 'true'
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
