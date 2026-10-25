@@ -1,0 +1,457 @@
+{
+  "check": {
+    "id": "4ad9752355f9455aa9d242c93950ea04",
+    "rera_id": "UPRERAPRJ8334",
+    "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
+    "status": "completed",
+    "started_at": "2026-10-25T04:00:00Z",
+    "completed_at": "2026-10-25T04:00:00Z",
+    "sources": [
+      {
+        "source": "uprera",
+        "status": "completed",
+        "live_url": null,
+        "message": null,
+        "checks_read": [
+          "registration",
+          "completion_date",
+          "extensions"
+        ]
+      },
+      {
+        "source": "registry",
+        "status": "completed",
+        "live_url": null,
+        "message": null,
+        "checks_read": [
+          "company_status"
+        ]
+      },
+      {
+        "source": "insolvency",
+        "status": "completed",
+        "live_url": "https://live.tinyfish.example/session",
+        "message": null,
+        "checks_read": [
+          "insolvency"
+        ]
+      },
+      {
+        "source": "land",
+        "status": "completed",
+        "live_url": null,
+        "message": null,
+        "checks_read": []
+      },
+      {
+        "source": "consumer",
+        "status": "blocked",
+        "live_url": "https://live.tinyfish.example/session",
+        "message": "This page asks for a CAPTCHA. We never bypass one",
+        "checks_read": []
+      },
+      {
+        "source": "news",
+        "status": "completed",
+        "live_url": null,
+        "message": null,
+        "checks_read": []
+      }
+    ]
+  },
+  "project": {
+    "rera_id": "UPRERAPRJ8334",
+    "name": "SUPERTECH ECO VILLAGE-I PHASE I-C",
+    "promoter": "SUPERTECH LIMITED",
+    "registered_on": "2017-08-09",
+    "district": "Gautam Buddha Nagar",
+    "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334"
+  },
+  "score": {
+    "value": 68,
+    "band": "Moderate",
+    "band_label": "Moderate",
+    "confidence": 0.71,
+    "provisional": false,
+    "hard_stop": false,
+    "hard_stop_reason": null,
+    "drivers": [
+      {
+        "finding_id": "85a9381ff01b491ebc2f386508008742",
+        "title": "Completion date on record (30 Dec 2017) passed 105 months ago; project still listed as Ongoing",
+        "area": "execution",
+        "penalty": 70,
+        "points": -14.0
+      },
+      {
+        "finding_id": "0829e38d9ac84553b8e5d821351d3763",
+        "title": "2803 complaints on UP-RERA against the promoter, across all its projects",
+        "area": "builder_history",
+        "penalty": 60,
+        "points": -9.0
+      },
+      {
+        "finding_id": "0ebfe4981bdc4efdb22416a1f32fa77c",
+        "title": "15 complaints on UP-RERA about this project",
+        "area": "legal",
+        "penalty": 40,
+        "points": -6.0
+      },
+      {
+        "finding_id": "5330858f03a14dd48f863e103b831a1e",
+        "title": "News on delays, about the promoter: 16 years, Rs 50 lakh lost: How Supertech delays are costing homebuyers lakhs (published about 1 month ago)",
+        "area": "news",
+        "penalty": 10,
+        "points": -1.0
+      },
+      {
+        "finding_id": "b5c947ccbcb645da80297e99ffa5a1dc",
+        "title": "News on delays, about the promoter: NBCC to resume work on 16 stalled Supertech projects in Jan (published about 4 weeks ago)",
+        "area": "news",
+        "penalty": 10,
+        "points": -1.0
+      },
+      {
+        "finding_id": "dfcab68b57b14089bbe6d956d22de1a2",
+        "title": "News on delays, about the promoter: NBCC moves Supreme Court over RERA rules for 16 Supertech projects (published about 2 months ago)",
+        "area": "news",
+        "penalty": 10,
+        "points": -1.0
+      }
+    ],
+    "areas": [
+      {
+        "area": "rera",
+        "label": "UP-RERA compliance",
+        "weight": 0.25,
+        "penalty": 0
+      },
+      {
+        "area": "execution",
+        "label": "Project execution",
+        "weight": 0.2,
+        "penalty": 70
+      },
+      {
+        "area": "legal",
+        "label": "Legal and courts",
+        "weight": 0.15,
+        "penalty": 40
+      },
+      {
+        "area": "financial",
+        "label": "Financial and insolvency",
+        "weight": 0.15,
+        "penalty": 0
+      },
+      {
+        "area": "builder_history",
+        "label": "Builder history",
+        "weight": 0.15,
+        "penalty": 60
+      },
+      {
+        "area": "news",
+        "label": "News",
+        "weight": 0.1,
+        "penalty": 30
+      }
+    ],
+    "checks_unread": [
+      "land_dues",
+      "consumer_cases"
+    ]
+  },
+  "findings": [
+    {
+      "id": "85a9381ff01b491ebc2f386508008742",
+      "source": "uprera",
+      "kind": "past_end_date",
+      "title": "Completion date on record (30 Dec 2017) passed 105 months ago; project still listed as Ongoing",
+      "area": "execution",
+      "verdict": "fail",
+      "reliability": "primary",
+      "source_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": "2017-12-30",
+      "count": null,
+      "months": 105,
+      "scope": null
+    },
+    {
+      "id": "0829e38d9ac84553b8e5d821351d3763",
+      "source": "uprera",
+      "kind": "promoter_complaints",
+      "title": "2803 complaints on UP-RERA against the promoter, across all its projects",
+      "area": "builder_history",
+      "verdict": "review",
+      "reliability": "primary",
+      "source_url": "https://up-rera.in/Projectsummary?UI0aPA1ISD=fwOn88bfRpA=&hfFlag=9emr4VdBw22M7BGjKtJWMPDI4s5cHQZP&NPJ6RAme=gUoAr6nOB9CeG4WCZ3sI8xdst3G+GkrZUR6kve89n8F2pfuywUDJcw==&PaURJEMAN4=ZL9MNERkNdZ1OH5DIB2u4Q==&IRSAHEB=D6PY3lyims8=",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": null,
+      "count": 2803,
+      "months": null,
+      "scope": null
+    },
+    {
+      "id": "0ebfe4981bdc4efdb22416a1f32fa77c",
+      "source": "uprera",
+      "kind": "project_complaints",
+      "title": "15 complaints on UP-RERA about this project",
+      "area": "legal",
+      "verdict": "review",
+      "reliability": "primary",
+      "source_url": "https://up-rera.in/Projectsummary?UI0aPA1ISD=fwOn88bfRpA=&hfFlag=9emr4VdBw22M7BGjKtJWMPDI4s5cHQZP&NPJ6RAme=gUoAr6nOB9CeG4WCZ3sI8xdst3G+GkrZUR6kve89n8F2pfuywUDJcw==&PaURJEMAN4=ZL9MNERkNdZ1OH5DIB2u4Q==&IRSAHEB=D6PY3lyims8=",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": null,
+      "count": 15,
+      "months": null,
+      "scope": null
+    },
+    {
+      "id": "5330858f03a14dd48f863e103b831a1e",
+      "source": "news",
+      "kind": "news_story",
+      "title": "News on delays, about the promoter: 16 years, Rs 50 lakh lost: How Supertech delays are costing homebuyers lakhs (published about 1 month ago)",
+      "area": "news",
+      "verdict": "review",
+      "reliability": "secondary",
+      "source_url": "https://indianexpress.com/article/cities/delhi/noida-supertech-homebuyers-wait-delay-nclat-nbcc-status-report-10863197/",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": "2026-09-25",
+      "count": null,
+      "months": null,
+      "scope": null
+    },
+    {
+      "id": "b5c947ccbcb645da80297e99ffa5a1dc",
+      "source": "news",
+      "kind": "news_story",
+      "title": "News on delays, about the promoter: NBCC to resume work on 16 stalled Supertech projects in Jan (published about 4 weeks ago)",
+      "area": "news",
+      "verdict": "review",
+      "reliability": "secondary",
+      "source_url": "https://timesofindia.indiatimes.com/city/noida/nbcc-to-resume-work-on-16-stalled-supertech-projects-in-jan/articleshow/134525503.cms",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": "2026-09-27",
+      "count": null,
+      "months": null,
+      "scope": null
+    },
+    {
+      "id": "dfcab68b57b14089bbe6d956d22de1a2",
+      "source": "news",
+      "kind": "news_story",
+      "title": "News on delays, about the promoter: NBCC moves Supreme Court over RERA rules for 16 Supertech projects (published about 2 months ago)",
+      "area": "news",
+      "verdict": "review",
+      "reliability": "secondary",
+      "source_url": "https://m.economictimes.com/industry/services/property-/-cstruction/nbcc-moves-supreme-court-over-rera-rules-for-16-supertech-projects/articleshow/133299157.cms",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": "2026-08-26",
+      "count": null,
+      "months": null,
+      "scope": null
+    },
+    {
+      "id": "575f90e5d5d340eeb5ba0a52a1587507",
+      "source": "uprera",
+      "kind": "registration",
+      "title": "Registered on UP-RERA on 09 Aug 2017",
+      "area": "rera",
+      "verdict": "ok",
+      "reliability": "primary",
+      "source_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": "2017-08-09",
+      "count": null,
+      "months": null,
+      "scope": null
+    },
+    {
+      "id": "b8a461edad78480e9267e8d9beccbefc",
+      "source": "registry",
+      "kind": "company_status",
+      "title": "Company status: Active (CIN U74899DL1995PLC074422)",
+      "area": "financial",
+      "verdict": "ok",
+      "reliability": "secondary",
+      "source_url": "https://economictimes.indiatimes.com/company/supertech-limited/U74899DL1995PLC074422",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": null,
+      "count": null,
+      "months": null,
+      "scope": null
+    },
+    {
+      "id": "88f196e6c98e48b6b253dd432c0102e8",
+      "source": "insolvency",
+      "kind": "insolvency_admitted",
+      "title": "Insolvency application against SUPERTECH LIMITED was admitted on 25 Mar 2022",
+      "area": "financial",
+      "verdict": "review",
+      "reliability": "secondary",
+      "source_url": "https://www.fortuneindia.com/enterprise/nclt-declares-supertech-insolvent-whats-the-future-of-25000-homebuyers/107553",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": "2022-03-25",
+      "count": null,
+      "months": null,
+      "scope": null
+    },
+    {
+      "id": "524ef4f844544ff98b948d5475717f7e",
+      "source": "insolvency",
+      "kind": "insolvency_scope_unverified",
+      "title": "A news report says the insolvency covers the whole company (page says: \"The NCLT order terming Supertech Limited insolvent will not affect operations of any other Supertech Group company, the realty firm stated.\"). No court order was read, so this is not scored; check the NCLT and NCLAT orders",
+      "area": "financial",
+      "verdict": "review",
+      "reliability": "secondary",
+      "source_url": "https://www.fortuneindia.com/enterprise/nclt-declares-supertech-insolvent-whats-the-future-of-25000-homebuyers/107553",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": null,
+      "count": null,
+      "months": null,
+      "scope": "company"
+    },
+    {
+      "id": "4777bfbcf10f46cf898921e73a6a5738",
+      "source": "news",
+      "kind": "court_order",
+      "title": "Supreme Court order of 05 Feb 2026 names this project among the stalled SUPERTECH LIMITED projects the NBCC is to complete",
+      "area": "legal",
+      "verdict": "context",
+      "reliability": "primary",
+      "source_url": "https://api.sci.gov.in/supremecourt/2025/5007/5007_2025_1_18_68404_Order_05-Feb-2026.pdf",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": "2026-02-05",
+      "count": null,
+      "months": null,
+      "scope": null
+    }
+  ],
+  "timeline": [
+    {
+      "id": "575f90e5d5d340eeb5ba0a52a1587507",
+      "source": "uprera",
+      "kind": "registration",
+      "title": "Registered on UP-RERA on 09 Aug 2017",
+      "area": "rera",
+      "verdict": "ok",
+      "reliability": "primary",
+      "source_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": "2017-08-09",
+      "count": null,
+      "months": null,
+      "scope": null
+    },
+    {
+      "id": "85a9381ff01b491ebc2f386508008742",
+      "source": "uprera",
+      "kind": "past_end_date",
+      "title": "Completion date on record (30 Dec 2017) passed 105 months ago; project still listed as Ongoing",
+      "area": "execution",
+      "verdict": "fail",
+      "reliability": "primary",
+      "source_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": "2017-12-30",
+      "count": null,
+      "months": 105,
+      "scope": null
+    },
+    {
+      "id": "88f196e6c98e48b6b253dd432c0102e8",
+      "source": "insolvency",
+      "kind": "insolvency_admitted",
+      "title": "Insolvency application against SUPERTECH LIMITED was admitted on 25 Mar 2022",
+      "area": "financial",
+      "verdict": "review",
+      "reliability": "secondary",
+      "source_url": "https://www.fortuneindia.com/enterprise/nclt-declares-supertech-insolvent-whats-the-future-of-25000-homebuyers/107553",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": "2022-03-25",
+      "count": null,
+      "months": null,
+      "scope": null
+    },
+    {
+      "id": "4777bfbcf10f46cf898921e73a6a5738",
+      "source": "news",
+      "kind": "court_order",
+      "title": "Supreme Court order of 05 Feb 2026 names this project among the stalled SUPERTECH LIMITED projects the NBCC is to complete",
+      "area": "legal",
+      "verdict": "context",
+      "reliability": "primary",
+      "source_url": "https://api.sci.gov.in/supremecourt/2025/5007/5007_2025_1_18_68404_Order_05-Feb-2026.pdf",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": "2026-02-05",
+      "count": null,
+      "months": null,
+      "scope": null
+    },
+    {
+      "id": "dfcab68b57b14089bbe6d956d22de1a2",
+      "source": "news",
+      "kind": "news_story",
+      "title": "News on delays, about the promoter: NBCC moves Supreme Court over RERA rules for 16 Supertech projects (published about 2 months ago)",
+      "area": "news",
+      "verdict": "review",
+      "reliability": "secondary",
+      "source_url": "https://m.economictimes.com/industry/services/property-/-cstruction/nbcc-moves-supreme-court-over-rera-rules-for-16-supertech-projects/articleshow/133299157.cms",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": "2026-08-26",
+      "count": null,
+      "months": null,
+      "scope": null
+    },
+    {
+      "id": "5330858f03a14dd48f863e103b831a1e",
+      "source": "news",
+      "kind": "news_story",
+      "title": "News on delays, about the promoter: 16 years, Rs 50 lakh lost: How Supertech delays are costing homebuyers lakhs (published about 1 month ago)",
+      "area": "news",
+      "verdict": "review",
+      "reliability": "secondary",
+      "source_url": "https://indianexpress.com/article/cities/delhi/noida-supertech-homebuyers-wait-delay-nclat-nbcc-status-report-10863197/",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": "2026-09-25",
+      "count": null,
+      "months": null,
+      "scope": null
+    },
+    {
+      "id": "b5c947ccbcb645da80297e99ffa5a1dc",
+      "source": "news",
+      "kind": "news_story",
+      "title": "News on delays, about the promoter: NBCC to resume work on 16 stalled Supertech projects in Jan (published about 4 weeks ago)",
+      "area": "news",
+      "verdict": "review",
+      "reliability": "secondary",
+      "source_url": "https://timesofindia.indiatimes.com/city/noida/nbcc-to-resume-work-on-16-stalled-supertech-projects-in-jan/articleshow/134525503.cms",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": "2026-09-27",
+      "count": null,
+      "months": null,
+      "scope": null
+    }
+  ]
+}

@@ -69,6 +69,8 @@ def create_app(
         allow_origins=settings.cors_origins,
         allow_methods=["GET", "POST"],
         allow_headers=["Content-Type"],
+        # Without this the browser hides Retry-After and cannot tell a visitor how long to wait.
+        expose_headers=["Retry-After"],
     )
     for module in (health, projects, checks, events, reports):
         app.include_router(module.router)

@@ -62,6 +62,13 @@ jobs:
       - if: steps.present.outputs.yes == 'true'
         working-directory: frontend
         run: npm run build
+      - if: steps.present.outputs.yes == 'true'
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+      - if: steps.present.outputs.yes == 'true'
+        working-directory: frontend
+        # Replays the recorded check against a mock API; no backend or key is needed.
+        run: npm run e2e
 
   secrets:
     name: Secret scan

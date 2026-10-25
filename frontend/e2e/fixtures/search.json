@@ -1,0 +1,21 @@
+{
+  "query": "Supertech Eco Village",
+  "candidates": [
+    {
+      "rera_id": "UPRERAPRJ8334",
+      "name": "SUPERTECH ECO VILLAGE-I PHASE I-C",
+      "promoter": null,
+      "registered_on": null,
+      "district": null,
+      "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334"
+    },
+    {
+      "rera_id": "UPRERAPRJ4878",
+      "name": "SUPERTECH ECO VILLAGE-I (PHASE-III)",
+      "promoter": null,
+      "registered_on": "2017-08-09",
+      "district": null,
+      "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=4878"
+    }
+  ]
+}
