@@ -103,7 +103,7 @@ A live check of `UPRERAPRJ8334`, read on 25 Oct 2026. Every value comes from a p
 | Company status | Active, CIN U74899DL1995PLC074422 | [Economic Times company page](https://economictimes.indiatimes.com/company/supertech-limited/U74899DL1995PLC074422) |
 | Insolvency | NCLT admitted an application on 25 Mar 2022. A news report says the order covers the whole company; no court order was read, so this is **not scored** and needs checking against the NCLT and NCLAT orders | [Fortune India](https://www.fortuneindia.com/enterprise/nclt-declares-supertech-insolvent-whats-the-future-of-25000-homebuyers/107553) |
 | Completion order | Supreme Court order of 5 Feb 2026 names Eco Village-1 among the 16 stalled Supertech projects the NBCC is to complete | [Supreme Court](https://api.sci.gov.in/supremecourt/2025/5007/5007_2025_1_18_68404_Order_05-Feb-2026.pdf) |
-| Consumer cases | 1 case against SUPERTECH LIMITED on the first page of results (NCDRC) | [e-Jagriti](https://e-jagriti.gov.in/advance-case-search) |
+| Consumer cases | Not read: e-Jagriti asks for a CAPTCHA, so the agent stopped. Search it yourself by the promoter's name | [e-Jagriti](https://e-jagriti.gov.in/advance-case-search) |
 | Land authority dues | Not read: the authorities' dues lists could not be fetched | |
 
 **NeevScore 68 / 100 · Moderate risk**
@@ -115,7 +115,7 @@ A live check of `UPRERAPRJ8334`, read on 25 Oct 2026. Every value comes from a p
  -6  15 complaints on UP-RERA about this project            (UP-RERA)
  -3  three news stories on delays                           (secondary)
  ──
- 68  Moderate · confidence 86% (6 of 7 key checks) · no hard stop
+ 68  Moderate · confidence 71% (5 of 7 key checks) · no hard stop
 ```
 
 **What the buyer should do next:** read the NCLT and NCLAT orders on the insolvency, ask the builder for the current possession date in writing, check whether this phase is on NBCC's list of 16 projects, and ask the Greater Noida authority for the project's dues position.

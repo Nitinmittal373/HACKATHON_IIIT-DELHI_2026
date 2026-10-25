@@ -16,6 +16,7 @@ every source:
 import json
 from abc import ABC, abstractmethod
 from collections.abc import AsyncIterator
+from contextlib import aclosing
 from dataclasses import dataclass
 from typing import Any
 from urllib.parse import urlsplit
@@ -95,18 +96,25 @@ class AgentSource(ABC):
             yield Progress("Read the page directly, no browser needed")
             done = AgentDone(status="COMPLETED", result=direct)
         else:
-            async for event in ctx.web.run_agent(
+            stream = ctx.web.run_agent(
                 url=task.url,
                 goal=task.goal + CAPTCHA_RULE,
                 output_schema=with_captcha_field(task.output_schema),
                 max_steps=task.max_steps,
-            ):
-                if isinstance(event, AgentLiveUrl):
-                    yield LiveUrl(event.url)
-                elif isinstance(event, AgentProgress):
-                    yield Progress(short(event.text))
-                else:
-                    done = event
+            )
+            async with aclosing(stream):
+                async for event in stream:
+                    if isinstance(event, AgentLiveUrl):
+                        yield LiveUrl(event.url)
+                    elif isinstance(event, AgentProgress):
+                        yield Progress(short(event.text))
+                        # The agent's own flag is not trusted: its notes show what it did.
+                        # Stopping here closes the run before it can type anything in.
+                        if mentions_captcha(event.text):
+                            yield Blocked(CAPTCHA_REASON)
+                            return
+                    else:
+                        done = event
 
         if done is None:
             raise SourceError("The agent stopped without an answer")
@@ -133,6 +141,10 @@ def short(text: str) -> str:
     """One calm line for the Agent Cam, however long the agent's note was."""
     line = " ".join(text.split())
     return line if len(line) <= MAX_PROGRESS_CHARS else line[: MAX_PROGRESS_CHARS - 1] + "…"
+
+
+def mentions_captcha(text: str) -> bool:
+    return "captcha" in text.lower()
 
 
 def ran_out_of_time(error: str | None) -> bool:

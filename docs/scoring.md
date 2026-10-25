@@ -97,6 +97,6 @@ Supertech Eco Village-I Phase I-C (`UPRERAPRJ8334`), checked live on 25 Oct 2026
 | Three news stories on delays (10 each, secondary) | News (10%) | 30 | −3 |
 | **NeevScore** | | | **68 · Moderate** |
 
-Shown with no points: registration (ok), company status (Active), the insolvency admission of 25 Mar 2022, a news report that the insolvency covers the whole company (**unverified**: no court order was read, so it cannot cap the score), one consumer case on e-Jagriti, and the Supreme Court's NBCC order (context).
+Shown with no points: registration (ok), company status (Active), the insolvency admission of 25 Mar 2022, a news report that the insolvency covers the whole company (**unverified**: no court order was read, so it cannot cap the score), and the Supreme Court's NBCC order (context).
 
-Confidence is 86% (6 of 7 checks): land dues were not read because the authorities' lists could not be fetched. If a CAPTCHA had stopped e-Jagriti, confidence would be 71% and the score would stay 68.
+Confidence is 71% (5 of 7 checks): land dues were not read because the authorities' lists could not be fetched, and e-Jagriti stopped at its CAPTCHA. Neither changes the score of 68.
