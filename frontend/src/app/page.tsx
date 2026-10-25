@@ -1,4 +1,7 @@
+import { AgentDemo } from "@/components/AgentDemo";
+import { BrochureVsRecords } from "@/components/BrochureVsRecords";
 import { Hero } from "@/components/Hero";
+import { SourcesMarquee } from "@/components/SourcesMarquee";
 import { EXAMPLE_REPORT } from "@/lib/example8334";
 
 /** The home page fetches nothing: its examples are a recorded real check, labelled as such. */
@@ -6,6 +9,9 @@ export default function HomePage() {
   return (
     <main>
       <Hero report={EXAMPLE_REPORT} />
+      <SourcesMarquee />
+      <BrochureVsRecords report={EXAMPLE_REPORT} />
+      <AgentDemo report={EXAMPLE_REPORT} />
     </main>
   );
 }
