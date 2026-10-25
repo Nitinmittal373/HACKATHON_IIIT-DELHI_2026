@@ -24,11 +24,22 @@ export const check = {
       "Search by the UP-RERA number, for example UPRERAPRJ8334. It is on your agreement and on the builder's brochure.",
       "Check the spelling, or search by the builder's name.",
       "Use the project name as written on your agreement, with the phase.",
+      "NeevCheck reads the UP-RERA register only, so projects outside Uttar Pradesh are not listed.",
     ],
     searchAgain: "Search again",
+    waking: "Waking up the server, this takes up to a minute on the free plan…",
+    searching: "Searching UP-RERA…",
+    searchingNote: "Reading the UP-RERA register live. A name search can take up to a minute.",
     searchFailedTitle: "We could not search UP-RERA just now",
     searchFailedBody:
       "The search did not finish. Nothing was charged and nothing was saved. Please try again in a minute.",
+    searchTimeout:
+      "UP-RERA or the search service did not answer in time. Nothing was charged. Please try again.",
+    searchKey:
+      "The search service did not accept NeevCheck's key, so nothing could be read. This is on our side; please try again later.",
+    searchBusy: (seconds: number) =>
+      `The search service is busy right now. Please try again in ${seconds} ${seconds === 1 ? "second" : "seconds"}.`,
+    reason: (text: string) => `Reason: ${text}`,
     startFailedTitle: "We could not start the check",
   },
   cam: {

@@ -28,9 +28,13 @@ export function ReportHeader({ report, t, lang }: Props) {
             {meta && `${meta} · `}
             <span className="mono">{project.rera_id}</span>
           </p>
-          <RecheckNote hours={hoursSince(check.completed_at ?? check.started_at)} project={project} />
+          <RecheckNote
+            hours={hoursSince(check.completed_at ?? check.started_at)}
+            readOn={checkedOn}
+            project={project}
+          />
         </div>
-        <ReportActions reportId={check.id} project={project} />
+        <ReportActions reportId={check.id} project={project} score={report.score.value} band={report.score.band} />
       </div>
     </header>
   );

@@ -5,12 +5,14 @@ import { cache } from "react";
 import { ApiProblem } from "@/components/ApiProblem";
 import { PageMessage } from "@/components/PageMessage";
 import { ActionPlan } from "@/components/report/ActionPlan";
+import { BuilderQuestions } from "@/components/report/BuilderQuestions";
 import { DriversCard } from "@/components/report/DriversCard";
 import { EvidenceList } from "@/components/report/EvidenceList";
 import { SentinelCard } from "@/components/report/SentinelCard";
 import { ReportHeader } from "@/components/report/ReportHeader";
 import { ScoreCard } from "@/components/report/ScoreCard";
 import { Timeline } from "@/components/report/Timeline";
+import { TrackRecord } from "@/components/report/TrackRecord";
 import { ApiError, getReport } from "@/lib/api";
 import { dayOf } from "@/lib/format";
 import { getStrings } from "@/lib/i18n/server";
@@ -64,6 +66,10 @@ export default async function ReportPage({ params }: Props) {
         </div>
         <aside className={styles.column}>
           <ActionPlan report={report} t={t} />
+          <BuilderQuestions report={report} t={t} />
+          {report.project.promoter && (
+            <TrackRecord promoter={report.project.promoter} reraId={report.project.rera_id} />
+          )}
           <Timeline events={report.timeline} t={t} lang={lang} />
           <SentinelCard project={report.project} t={t} />
           <p className={styles.disclaimer}>{t.report.disclaimer(readDate)}</p>

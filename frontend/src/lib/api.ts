@@ -1,10 +1,27 @@
-import type { Alert, Check, Project, Report, SearchResponse, Watch } from "@/lib/types";
+import type {
+  Alert,
+  Check,
+  CheckSummary,
+  Comparison,
+  Project,
+  RecentCheck,
+  Report,
+  SearchResponse,
+  TrackRecord,
+  Watch,
+} from "@/lib/types";
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
-// Search reads live pages, so it is allowed to take a while; everything else is quick.
-const SEARCH_TIMEOUT_MS = 90_000;
+// Search reads live pages and the free-plan server may first need a minute to wake up, so it
+// is allowed to take a while; everything else is quick.
+const SEARCH_TIMEOUT_MS = 120_000;
+const WAKE_TIMEOUT_MS = 90_000;
 const REQUEST_TIMEOUT_MS = 20_000;
+// A server that answered recently is still awake; the free plan sleeps after 15 idle minutes.
+const AWAKE_FOR_MS = 5 * 60_000;
+// Proxy answers while the server starts. Our own errors carry a code and are never retried.
+const STARTING_UP_STATUSES = [502, 503, 504];
 
 export class ApiError extends Error {
   constructor(
@@ -37,8 +54,15 @@ async function request<T>(
       body: body === undefined ? undefined : JSON.stringify(body),
       signal: AbortSignal.timeout(timeoutMs),
     });
-  } catch {
-    throw new ApiError("The NeevCheck service could not be reached", UNREACHABLE);
+  } catch (error) {
+    // A request we gave up on is not a dropped connection, and retrying it would double the wait.
+    const timedOut = error instanceof DOMException && error.name === "TimeoutError";
+    throw new ApiError(
+      timedOut ? "The NeevCheck service did not answer in time" : "The NeevCheck service could not be reached",
+      UNREACHABLE,
+      null,
+      timedOut ? "client_timeout" : null,
+    );
   }
   if (!response.ok) throw await toApiError(response);
   return (await response.json()) as T;
@@ -53,7 +77,7 @@ async function toApiError(response: Response): Promise<ApiError> {
     message = describeDetail(payload.detail) ?? message;
     code = codeOf(payload.detail);
   } catch {
-    // The body was not JSON; the status message above is enough.
+    // The body was not JSON (a proxy page, for example); the status message above is enough.
   }
   const wait = Number.isFinite(retry) && retry > 0 ? retry : null;
   return new ApiError(message, response.status, wait, code);
@@ -74,10 +98,47 @@ function codeOf(detail: unknown): string | null {
   return typeof code === "string" ? code : null;
 }
 
-export function searchProjects(query: string): Promise<SearchResponse> {
-  return request(`/api/projects/search?q=${encodeURIComponent(query)}`, {
-    timeoutMs: SEARCH_TIMEOUT_MS,
-  });
+let awakeSince = 0;
+let wakePing: Promise<boolean> | null = null;
+
+/**
+ * A silent GET /api/health that wakes a sleeping free-plan server. The home page fires it on
+ * load and the confirm page waits for the same request, so a visitor pays the start-up once.
+ */
+export function wakeServer(): Promise<boolean> {
+  if (Date.now() - awakeSince < AWAKE_FOR_MS) return Promise.resolve(true);
+  wakePing ??= request<{ status: string }>("/api/health", { timeoutMs: WAKE_TIMEOUT_MS }).then(
+    () => {
+      awakeSince = Date.now();
+      wakePing = null;
+      return true;
+    },
+    () => {
+      wakePing = null;
+      return false;
+    },
+  );
+  return wakePing;
+}
+
+/** A dropped connection or a proxy error while the server starts: worth one more try. */
+export function isTransient(error: unknown): boolean {
+  if (!(error instanceof ApiError) || error.code !== null) return false;
+  return error.status === UNREACHABLE || STARTING_UP_STATUSES.includes(error.status);
+}
+
+/** Runs in the browser, straight to the API, and tries once more after a transient failure. */
+export async function searchProjects(query: string): Promise<SearchResponse> {
+  const search = () =>
+    request<SearchResponse>(`/api/projects/search?q=${encodeURIComponent(query)}`, {
+      timeoutMs: SEARCH_TIMEOUT_MS,
+    });
+  try {
+    return await search();
+  } catch (error) {
+    if (!isTransient(error)) throw error;
+    return search();
+  }
 }
 
 /** `fresh` skips the reuse of a check from the last 24 hours ("Re-check now"). */
@@ -85,10 +146,10 @@ export function createCheck(
   project: Pick<Project, "rera_id" | "details_url">,
   options: { fresh?: boolean } = {},
 ): Promise<Check> {
-  // Old-format numbers have a fixed page; only new-format ones need the link from search.
+  // The page search confirmed: many numbers registered after 2018 have no stable address.
   const body = {
     rera_id: project.rera_id,
-    ...(project.rera_id.includes("/") ? { details_url: project.details_url } : {}),
+    details_url: project.details_url,
     ...(options.fresh ? { fresh: true } : {}),
   };
   return request("/api/checks", { method: "POST", body });
@@ -101,7 +162,7 @@ export function createWatch(
 ): Promise<Watch> {
   const body = {
     rera_id: project.rera_id,
-    ...(project.rera_id.includes("/") ? { details_url: project.details_url } : {}),
+    details_url: project.details_url,
     email,
     language,
   };
@@ -110,6 +171,35 @@ export function createWatch(
 
 export function getAlerts(email: string): Promise<Alert[]> {
   return request(`/api/sentinel/alerts?email=${encodeURIComponent(email)}`);
+}
+
+/** The checks a visitor started, for "My reports". Ids the server no longer has are left out. */
+export function listChecks(ids: string[]): Promise<CheckSummary[]> {
+  return request(`/api/checks?ids=${ids.join(",")}`, { timeoutMs: WAKE_TIMEOUT_MS });
+}
+
+/** Two or three finished checks side by side. */
+export function compareChecks(ids: string[]): Promise<Comparison> {
+  return request(`/api/checks/compare?ids=${ids.join(",")}`, { timeoutMs: WAKE_TIMEOUT_MS });
+}
+
+/** A promoter's other UP-RERA projects, found with Search on up-rera.in. */
+export function promoterProjects(promoter: string, exclude: string): Promise<TrackRecord> {
+  const query = `name=${encodeURIComponent(promoter)}&exclude=${encodeURIComponent(exclude)}`;
+  return request(`/api/promoters/projects?${query}`, { timeoutMs: WAKE_TIMEOUT_MS });
+}
+
+const RECENT_FRESH_FOR_MS = 60_000;
+let recent: { at: number; checks: Promise<RecentCheck[]> } | null = null;
+
+/** The latest finished checks site-wide. The hero card and the strip below it share one request. */
+export function recentChecks(): Promise<RecentCheck[]> {
+  if (!recent || Date.now() - recent.at > RECENT_FRESH_FOR_MS) {
+    const checks = request<RecentCheck[]>("/api/checks/recent", { timeoutMs: WAKE_TIMEOUT_MS });
+    recent = { at: Date.now(), checks };
+    checks.catch(() => (recent = null));
+  }
+  return recent.checks;
 }
 
 export function getCheck(id: string): Promise<Check> {

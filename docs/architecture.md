@@ -38,11 +38,24 @@ flowchart TB
 
 | Step | Endpoint | What happens |
 | --- | --- | --- |
-| 1. Search | `GET /api/projects/search?q=` | A RERA number opens its UP-RERA page; a name or promoter goes through TinyFish Search (up-rera.in results only) |
+| 1. Search (from the browser) | `GET /api/projects/search?q=` | A RERA number is confirmed on its own UP-RERA page; a name or promoter goes through TinyFish Search limited to up-rera.in (see [Finding a project](#finding-a-project)) |
 | 2. Confirm | `POST /api/checks` | Creates a check for one registration number and starts it; returns the check and its `id` (202) |
 | 3. Watch | `GET /api/checks/{id}/events` | Server-Sent Events: `source.started`, `source.live_url`, `source.progress`, `finding.added`, `source.blocked`, `source.completed`, `check.completed` |
 | 4. Report | `GET /api/checks/{id}/report` | Score, drivers, evidence and timeline (action plan in Phase 4) |
 | 5. Watch list | `POST /api/sentinel` | Adds the project to weekly re-checks; alerts are read with `GET /api/sentinel/alerts?email=` |
+
+## Finding a project
+
+`app/resolve.py` turns what the buyer typed into at most 8 candidates, each with its name, promoter, district and registration date, and the page a check will read.
+
+| Typed | How it is found |
+| --- | --- |
+| A number from 2017-18, `UPRERAPRJ8334` | Its stable details page is read directly; no Search |
+| A later number, `UPRERAPRJ188811/08/2024` or six digits such as `UPRERAPRJ396176` | These have no stable page, so Search for the exact number on up-rera.in finds its Projectsummary page |
+| A project or promoter name | TinyFish Search limited to up-rera.in. If no result carries a number, a second Search without the limit is read for UPRERAPRJ numbers |
+| `uprera prj 8334`, `UPRERA-PRJ-8334` | Spaces, hyphens, dots and case are normalised first |
+
+A number counts only when its own up-rera.in page shows it with a name and a promoter. Numbers from the second, unlimited Search must also share a word with the query, because pages about one project often print the numbers of others. Search results are completed from their own pages, four at a time within 35 seconds; a page that cannot be read in time keeps what Search said, since that came from up-rera.in itself. A query with no UP-RERA project (a project outside Uttar Pradesh, for example) returns an empty list, which the app shows as "No UP-RERA project found" with tips.
 
 ## Sources
 
@@ -89,8 +102,12 @@ Interactive docs are served at `/docs`.
 | Method and path | Success | Errors |
 | --- | --- | --- |
 | `GET /api/health` | `200 {"status": "ok"}` | |
-| `GET /api/projects/search?q=` | `200 {query, candidates[]}`, at most 8 | `422` query shorter than 2 characters, `502` TinyFish unreachable |
+| `GET /api/projects/search?q=` | `200 {query, candidates[]}`, at most 8; answers within 90 seconds | `422` query shorter than 2 characters; `502` TinyFish failed, `504` too slow, `429` TinyFish rate limit (with `Retry-After`). Each error's `detail.code` names the reason: `tinyfish_key`, `wallet_empty`, `rate_limited`, `timeout`, `unreachable` or `upstream` |
+| `GET /api/promoters/projects?name=&exclude=` | `200 {promoter, projects[], searched_at}`: up to 10 other UP-RERA projects whose up-rera.in search results carry the promoter's full legal name; Search only, cached per promoter for 24 hours | `422` name shorter than 3 characters; `502` with `detail.code` when TinyFish fails |
 | `POST /api/checks` `{rera_id, details_url?, fresh?}` | `202` check, `Location` header; `200` with `reused: true` when a check of the same project finished in the last 24 hours (send `fresh: true` to re-check) | `422` bad input, `429` over `RATE_LIMIT_PER_MINUTE` or over `MAX_CHECKS_PER_DAY` (`detail.code` is `daily_cap`; both send `Retry-After`) |
+| `GET /api/checks?ids=a,b,c` | `200` a summary of each known check (`id`, `rera_id`, `details_url`, `project`, `promoter`, `status`, `score`, `band`, `confidence`, `created_at`, `completed_at`), in the order asked; ids the server does not have are left out | `422` more than 50 ids or a malformed one |
+| `GET /api/checks/recent` | `200` the latest finished check of up to 12 projects, newest first, each with its top three drivers, registration date and sources read. No emails or IP addresses | |
+| `GET /api/checks/compare?ids=a,b,c` | `200` two or three finished checks side by side: score, band, confidence, points lost per area, months past the completion date, complaint counts, insolvency, company status, unread checks and top three findings with links (`null` where a check could not read something), plus `best` and `reason` (`best_score`, `tie`, `not_enough_evidence`) | `422` not two or three valid ids, `404` unknown check, `409` a check with no score |
 | `GET /api/checks/{id}` | `200` check with each source's status | `404`, `422` malformed id |
 | `GET /api/checks/{id}/events` | `200 text/event-stream` | `404` |
 | `GET /api/checks/{id}/report` | `200` score, drivers, findings, timeline | `404`, `409` still running or failed |
@@ -98,7 +115,7 @@ Interactive docs are served at `/docs`.
 | `GET /api/sentinel/alerts?email=` | `200` alerts, newest first | `422` bad email |
 | `POST /api/sentinel/run` with header `X-Webhook-Secret` | `202` `{started}`; starts a re-check run for an external cron | `401` missing or wrong secret (always, when `WEBHOOK_SECRET` is not set) |
 
-`rera_id` accepts `UPRERAPRJ8334` and new-format numbers such as `UPRERAPRJ188811/08/2024` (case and spaces are ignored). New-format numbers also need the `details_url` that search returned; it must be an `https` link on up-rera.in.
+`rera_id` accepts `UPRERAPRJ8334` and new-format numbers such as `UPRERAPRJ188811/08/2024` (case, spaces, hyphens and dots are ignored). Send the `details_url` that search returned; it must be an `https` link on up-rera.in. It is required for new-format numbers, and a number sent without one gets its stable details page, which only numbers registered in 2017-18 have.
 
 ### Events
 
@@ -183,3 +200,29 @@ An alert stores the old and new score and the diff, and is shown at `/alerts?ema
 ### Cost guards
 
 `MAX_CHECKS_PER_DAY` (default 30) caps the checks started per UTC day, Sentinel's included; past it new checks get `429` with the wait until midnight and Sentinel stops its run. A check of the same project that finished in the last 24 hours is returned instead of starting another (`reused: true`); the report then says "Checked X h ago" with a **Re-check now** button that sends `fresh: true`.
+
+## Free-plan cold starts
+
+The API runs on Render's free plan, which sleeps after 15 idle minutes and takes about a minute to wake. Search therefore runs in the **browser**, straight to the API, never in a Vercel function (whose time limit a cold start plus a live search can exceed):
+
+1. The home page sends a silent `GET /api/health` on load, so the server starts while the visitor reads.
+2. The confirm page waits for that same ping. If it takes longer than 1.5 seconds it says "Waking up the server…", then "Searching UP-RERA…" once the server answers.
+3. Search may take up to 120 seconds in the browser. A dropped connection, or a `502`/`503`/`504` from Render's proxy (no `detail.code`), is retried once. Errors from the API itself carry a `detail.code` and are shown as they are, never retried.
+
+## My reports, without accounts
+
+NeevCheck has no sign-in. The app keeps the ids of the checks a visitor starts in `localStorage` (`neevcheck-reports`, newest first, at most 50) and asks `GET /api/checks?ids=` for their state, so the list is private to that browser. Ids the server no longer knows (for example after its database was reset) are dropped from the list with a note. The home page's report card and its "Recently checked" strip come from `GET /api/checks/recent`, fetched in the browser after the page loads; before any check has finished, the card is an empty frame that says "Your report appears here", never sample numbers.
+
+## Compare
+
+`app/compare.py` builds the comparison from each check's report. A value a check could not read is `null`, never zero. "Best on the records" is the highest score among checks that read at least half of their key records (the same bar a score needs for a risk band); with fewer than two such checks the answer is "not enough evidence to rank", and equal scores are a tie. The app tints the better value of each row in orange only when every column has a value, and compares the six scoring areas only when every check has enough evidence, because zero points lost can mean nothing was found or nothing was read. Picks are kept in `localStorage` (`neevcheck-compare`, at most three), shared by My reports and each report's **Add to compare** button.
+
+## Report extras
+
+- **Builder track record**: `app/track_record.py` runs two TinyFish Searches on up-rera.in for the promoter's legal name and keeps only results that carry that full name, so "Supertech Limited" never collects a sister company's projects. Snippets are often cut short, so the list can be incomplete, and the report says so. Each project has a **Check** button that opens its confirm step.
+- **Questions to ask the builder**: five questions chosen by rules in `frontend/src/lib/builderQuestions.ts` (a delay asks for the revised possession date in writing, complaints ask what they were about, insolvency asks about the NCLT order's scope, an unread e-Jagriti asks about pending cases; the RERA collection account number is always asked), with a copy-all button.
+- **Share on WhatsApp** opens `wa.me` with a short text: project, score, band and the report link.
+
+## Resuming a check
+
+`/check/{id}` loads the check in the browser. A finished check goes straight to its report; a running one opens the Agent Cam, whose event stream replays every event so far and then follows the run, so a refresh or a reopened tab loses nothing. Agents run inside the API process, so a restart or redeploy ends them: on startup the API marks any check still queued or running as failed, instead of leaving it "running" forever. Each report shows "Records read on <date>"; after seven days it says the records are more than a week old and puts **Re-check now** first.

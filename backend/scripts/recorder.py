@@ -41,13 +41,21 @@ class RecordingWebClient:
         self.agents: list[dict[str, Any]] = []
 
     async def search(
-        self, query: str, *, purpose: str, domain_type: str | None = None
+        self,
+        query: str,
+        *,
+        purpose: str,
+        domain_type: str | None = None,
+        include_domains: str | None = None,
     ) -> list[SearchHit]:
-        hits = await self._inner.search(query, purpose=purpose, domain_type=domain_type)
+        hits = await self._inner.search(
+            query, purpose=purpose, domain_type=domain_type, include_domains=include_domains
+        )
         self.searches.append(
             {
                 "query": query,
                 "domain_type": domain_type,
+                "include_domains": include_domains,
                 "results": [hit.model_dump(exclude_none=True) for hit in hits],
             }
         )

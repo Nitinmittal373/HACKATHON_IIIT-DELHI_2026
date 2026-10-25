@@ -1,8 +1,8 @@
 /**
  * A stand-in for the NeevCheck backend that replays recorded answers (e2e/fixtures/, written by
- * backend/scripts/export_e2e_fixtures.py). Pages that run on the server (search, report) fetch
- * the API from the Next server, where a browser tool cannot intercept requests, so the browser
- * tests start this small server instead of the real backend. Nothing here reaches the network.
+ * backend/scripts/export_e2e_fixtures.py). Some pages (report, live check) fetch the API from
+ * the Next server, where a browser tool cannot intercept requests, so the browser tests start
+ * this small server instead of the real backend. Nothing here reaches the network.
  *
  *   node e2e/mock-api.ts          (port MOCK_API_PORT, default 8010)
  */
@@ -55,6 +55,41 @@ function readBody(req: import("node:http").IncomingMessage): Promise<string> {
   });
 }
 
+interface RecordedReport {
+  check: { id: string; rera_id: string; details_url: string; started_at: string; completed_at: string; sources: { status: string }[] };
+  project: { name: string; promoter: string; registered_on: string };
+  score: { value: number; band: string; confidence: number; drivers: unknown[] };
+}
+
+/** The recorded check as "My reports" lists it (GET /api/checks?ids=). */
+function recordedSummary() {
+  const { check, project, score } = json("report.json") as unknown as RecordedReport;
+  return {
+    id: check.id,
+    rera_id: check.rera_id,
+    details_url: check.details_url,
+    project: project.name,
+    promoter: project.promoter,
+    status: "completed",
+    score: score.value,
+    band: score.band,
+    confidence: score.confidence,
+    created_at: check.started_at,
+    completed_at: check.completed_at,
+  };
+}
+
+/** The recorded check as the home page shows it (GET /api/checks/recent). */
+function recordedRecent() {
+  const { check, project, score } = json("report.json") as unknown as RecordedReport;
+  return {
+    ...recordedSummary(),
+    registered_on: project.registered_on,
+    sources_read: check.sources.filter((run) => run.status === "completed").length,
+    drivers: score.drivers.slice(0, 3),
+  };
+}
+
 createServer(async (req, res) => {
   const url = new URL(req.url ?? "/", `http://localhost:${PORT}`);
   const path = url.pathname;
@@ -76,6 +111,25 @@ createServer(async (req, res) => {
     finished = false;
     return send(res, 202, json("check-created.json"));
   }
+
+  if (path === "/api/checks" && req.method === "GET") {
+    const ids = (url.searchParams.get("ids") ?? "").split(",");
+    const known = [recordedSummary(), json("summary-6742.json")];
+    return send(res, 200, ids.flatMap((id) => known.filter((check) => check.id === id)));
+  }
+
+  if (path === "/api/checks/compare") {
+    // The recorded comparison of the 8334 check with the 6742 page, in the order asked.
+    const ids = (url.searchParams.get("ids") ?? "").split(",");
+    const comparison = json("compare.json") as { projects: { check_id: string }[] };
+    const projects = ids.flatMap((id) => comparison.projects.filter((p) => p.check_id === id));
+    if (projects.length < 2) return send(res, 404, { detail: "No check with this id" });
+    return send(res, 200, { ...comparison, projects });
+  }
+
+  if (path === "/api/checks/recent") return send(res, 200, [recordedRecent()]);
+
+  if (path === "/api/promoters/projects") return send(res, 200, json("track-record.json"));
 
   const check = path.match(/^\/api\/checks\/([0-9a-f]{32})(\/events|\/report)?$/);
   if (check) {

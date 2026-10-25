@@ -1,0 +1,270 @@
+.summary {
+  margin-top: 22px;
+  padding: 14px 18px;
+  border: 1px solid var(--oS);
+  border-radius: var(--r-sm);
+  background: var(--soft);
+  color: var(--ink2);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.muted {
+  color: var(--fa);
+}
+
+.small {
+  margin-top: 6px;
+  color: var(--mu);
+  font-size: 13px;
+}
+
+/* ---------- wide screens: a table ---------- */
+
+.tableWrap {
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.table th,
+.table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--ln);
+  text-align: left;
+  vertical-align: top;
+}
+
+.table tbody th {
+  width: 220px;
+  color: var(--mu);
+  font-weight: 500;
+}
+
+.table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.head {
+  vertical-align: bottom;
+}
+
+.headName {
+  display: block;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.headName:hover {
+  color: var(--o-text);
+}
+
+.remove {
+  margin-top: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mu);
+  font-size: 13px;
+  text-decoration: underline;
+}
+
+.groupRow th {
+  padding-top: 18px;
+  color: var(--ink) !important;
+  font-weight: 600 !important;
+  font: 500 12px var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.indented {
+  padding-left: 28px !important;
+}
+
+/* The better value of a row: a quiet orange tint, never a green or red judgement. */
+.better {
+  background: var(--soft);
+  box-shadow: inset 3px 0 0 var(--o);
+}
+
+.score {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.area {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bar {
+  position: relative;
+  display: block;
+  flex: none;
+  width: 96px;
+  height: 7px;
+  overflow: hidden;
+  border-radius: 9px;
+  background: #f3eee9;
+}
+
+.bar b {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 9px;
+  background: var(--o);
+}
+
+.findings {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.findings li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.findings a {
+  display: inline-flex;
+  gap: 4px;
+  align-items: flex-start;
+  color: var(--ink2);
+  line-height: 1.4;
+}
+
+.points {
+  flex: none;
+  color: var(--o-text);
+  font-weight: 600;
+}
+
+/* ---------- phones: stacked cards ---------- */
+
+.cards {
+  display: none;
+}
+
+.switcher {
+  position: sticky;
+  top: 66px;
+  z-index: 4;
+  display: flex;
+  gap: 8px;
+  margin: 18px -18px 0;
+  padding: 10px 18px;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--ln);
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.switcher a {
+  flex: none;
+  max-width: 220px;
+  overflow: hidden;
+  padding: 7px 12px;
+  border: 1px solid var(--ln2);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink2);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.projectCard {
+  margin-top: 14px;
+  padding: 16px;
+  /* Leaves room under the sticky header and switcher when jumped to. */
+  scroll-margin-top: 130px;
+}
+
+.cardHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.facts {
+  margin: 12px 0 0;
+}
+
+.facts > div {
+  padding: 10px 8px;
+  border-top: 1px solid var(--ln);
+}
+
+.facts dt {
+  color: var(--mu);
+  font-size: 12.5px;
+}
+
+.facts dd {
+  margin: 4px 0 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- adding a project ---------- */
+
+.add {
+  margin-top: 20px;
+  padding: 18px 20px;
+}
+
+.addTitle {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.addForm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.addForm select {
+  min-width: 0;
+  flex: 1 1 260px;
+  padding: 11px 12px;
+  border: 1px solid var(--ln2);
+  border-radius: var(--r-sm);
+  background: #fff;
+  font: inherit;
+  font-size: 14.5px;
+}
+
+.inlineLink {
+  color: var(--o-text);
+  font-weight: 600;
+}
+
+@media (max-width: 760px) {
+  .tableWrap {
+    display: none;
+  }
+
+  .cards {
+    display: block;
+  }
+}

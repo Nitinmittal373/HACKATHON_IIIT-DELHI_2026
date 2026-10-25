@@ -140,3 +140,86 @@ def test_rate_limit_returns_429_after_the_limit(tmp_path: Path) -> None:
 
     assert blocked.status_code == 429
     assert int(blocked.headers["Retry-After"]) >= 1
+
+
+def test_a_check_reads_the_page_search_confirmed(client: TestClient) -> None:
+    # Six-digit numbers have no stable details page, so the link search confirmed is kept.
+    url = "https://up-rera.in/Projectsummary?UI0aPA1ISD=nffnnE2PJOk="
+    response = client.post("/api/checks", json={"rera_id": "UPRERAPRJ396176", "details_url": url})
+    assert response.status_code == 202
+    assert response.json()["details_url"] == url
+
+
+def test_a_number_sent_alone_gets_its_stable_page(client: TestClient) -> None:
+    response = client.post("/api/checks", json={"rera_id": "UPRERAPRJ6742"})
+    assert response.json()["details_url"].endswith("Frm_View_Project_Details.aspx?id=6742")
+
+
+def test_my_reports_lists_known_checks_in_the_order_asked(client: TestClient) -> None:
+    first, second = start_check(client), start_check(client, "UPRERAPRJ6742")
+    read_events(client, first)
+    read_events(client, second)
+    unknown = "c" * 32
+
+    response = client.get("/api/checks", params={"ids": f"{second},{unknown},{first}"})
+    assert response.status_code == 200
+    listed = response.json()
+    assert [c["id"] for c in listed] == [second, first]
+    assert listed[1] == {
+        "id": first,
+        "rera_id": "UPRERAPRJ8334",
+        "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
+        "project": "SUPERTECH ECO VILLAGE-I PHASE I-C",
+        "promoter": "SUPERTECH LIMITED",
+        "status": "completed",
+        "score": 71,
+        "band": "insufficient_evidence",
+        "confidence": 0.43,
+        "created_at": listed[1]["created_at"],
+        "completed_at": listed[1]["completed_at"],
+    }
+
+
+@pytest.mark.parametrize("ids", ["not-an-id", ",".join(["a" * 32] * 51)])
+def test_my_reports_rejects_bad_ids(client: TestClient, ids: str) -> None:
+    unique = ids if "," not in ids else ",".join(f"{n:032x}" for n in range(51))
+    assert client.get("/api/checks", params={"ids": unique}).status_code == 422
+
+
+def test_recent_checks_show_each_project_once_with_no_personal_data(client: TestClient) -> None:
+    for rera_id in ("UPRERAPRJ8334", "UPRERAPRJ6742"):
+        read_events(client, start_check(client, rera_id))
+    again = client.post("/api/checks", json={"rera_id": "UPRERAPRJ8334", "fresh": True})
+    read_events(client, again.json()["id"])
+
+    # The test clock is fixed, so every check finished at the same moment; order is not tested.
+    listed = client.get("/api/checks/recent").json()
+    assert sorted(r["rera_id"] for r in listed) == ["UPRERAPRJ6742", "UPRERAPRJ8334"]
+    eco = next(r for r in listed if r["rera_id"] == "UPRERAPRJ8334")
+    assert eco["drivers"][0]["points"] == -14.0
+    assert len(eco["drivers"]) <= 3
+    assert eco["sources_read"] >= 1
+    assert eco["registered_on"] == "2017-08-09"
+    assert not {"email", "ip", "client"} & set(eco)
+
+
+def test_recent_checks_leave_out_unfinished_and_failed_ones(client: TestClient) -> None:
+    store = client.app.state.store  # type: ignore[attr-defined]
+    store.save_project(Project(rera_id="UPRERAPRJ1", details_url="https://www.up-rera.in/x?id=1"))
+    store.create_check("d" * 32, "UPRERAPRJ1", datetime(2026, 10, 25, tzinfo=UTC))
+    assert client.get("/api/checks/recent").json() == []
+
+
+def test_checks_cut_off_by_a_restart_are_failed_on_startup(tmp_path: Path) -> None:
+    settings = make_settings(tmp_path)
+    with TestClient(create_app(settings, web=make_web(), clock=lambda: FIXED_NOW)) as client:
+        store = client.app.state.store  # type: ignore[attr-defined]
+        url = "https://www.up-rera.in/x?id=1"
+        store.save_project(Project(rera_id="UPRERAPRJ1", details_url=url))
+        store.create_check("a" * 32, "UPRERAPRJ1", FIXED_NOW)
+
+    with TestClient(create_app(settings, web=make_web(), clock=lambda: FIXED_NOW)) as client:
+        check = client.get(f"/api/checks/{'a' * 32}").json()
+        events = read_events(client, "a" * 32)
+    assert check["status"] == "failed"
+    assert events[-1]["data"]["status"] == "failed"

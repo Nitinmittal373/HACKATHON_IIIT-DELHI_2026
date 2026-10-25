@@ -3,7 +3,7 @@ import type { app as en } from "@/lib/i18n/en/app";
 export const app: typeof en = {
   nav: {
     check: "प्रोजेक्ट जाँचें",
-    sample: "नमूना रिपोर्ट",
+    reports: "मेरी रिपोर्टें",
     how: "यह कैसे काम करता है",
     rwa: "RWA के लिए",
     alerts: "अलर्ट",

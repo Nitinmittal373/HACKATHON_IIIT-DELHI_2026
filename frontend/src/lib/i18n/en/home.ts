@@ -1,10 +1,25 @@
 export const home = {
-  exampleNote: (reraId: string, date: string) =>
-    `An example, not a live check: every value is from the check of ${reraId} read on ${date}.`,
   marqueeLabel: "Sources we read",
   report: {
-    ariaLabel: (name: string) => `Example report for ${name}`,
-    kicker: (date: string) => `EXAMPLE REPORT · READ ${date}`,
+    ariaLabel: (name: string, score: number, band: string) =>
+      `Latest NeevCheck report: ${name}, NeevScore ${score} out of 100, ${band}`,
+    kicker: (date: string) => `LATEST REPORT · READ ${date}`,
+    latestNote: (date: string) => `The most recent real check on NeevCheck, read live on ${date}.`,
+    open: "Open this report",
+    registered: (date: string) => `registered ${date}`,
+    sources: (count: number) => `read ${count} ${count === 1 ? "source" : "sources"}`,
+    confidence: "of key checks read",
+    skeletonLabel: "Placeholder for your report",
+    skeletonKicker: "NEEVCHECK REPORT",
+    skeletonTitle: "Your report appears here",
+    skeletonBody: "Search a project above. Every point on your report links to the record it came from.",
+    skeletonNote: "No check has finished on NeevCheck yet. Yours can be the first.",
+  },
+  recent: {
+    title: "Recently checked on NeevCheck",
+    lead: "Real checks run by other buyers. Each one opens its full report, with every source.",
+    item: (name: string, score: number, band: string, date: string) =>
+      `${name}: NeevScore ${score}, ${band}, checked ${date}`,
   },
   problem: {
     eyebrow: "The problem",

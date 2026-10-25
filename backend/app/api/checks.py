@@ -1,8 +1,9 @@
+import re
 from collections.abc import Callable
 from datetime import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 
 from app.api.deps import (
     CheckId,
@@ -16,13 +17,18 @@ from app.api.deps import (
 )
 from app.budget import REUSE_WINDOW, seconds_until_cap_resets
 from app.config import Settings
-from app.models import Check, CheckCreate, Project
+from app.models import Check, CheckCreate, CheckSummary, Project, RecentCheck
 from app.orchestrator import Orchestrator
 from app.ratelimit import RateLimiter
 from app.store import Store
 from app.uprera_links import details_url_for
 
 router = APIRouter(tags=["checks"])
+
+# A visitor's history lives in their browser; it asks for at most this many checks at once.
+MAX_LISTED = 50
+RECENT_SHOWN = 12
+CHECK_ID = re.compile(r"^[0-9a-f]{32}$")
 
 
 def rate_limit(
@@ -71,12 +77,32 @@ async def create_check(
             },
             headers={"Retry-After": str(wait)},
         )
-    # Old-format numbers always use their canonical page, whatever link was sent.
-    details_url = details_url_for(body.rera_id) or body.details_url
+    # The page search confirmed for this number; a number sent alone gets its stable page.
+    details_url = body.details_url or details_url_for(body.rera_id)
     assert details_url is not None  # CheckCreate requires a link for new-format numbers
     check = orchestrator.start(Project(rera_id=body.rera_id, details_url=details_url))
     response.headers["Location"] = f"/api/checks/{check.id}"
     return check
+
+
+@router.get("/api/checks", responses={422: {"description": "A malformed id, or more than 50"}})
+def list_checks(
+    # 50 ids of 32 characters and their commas.
+    ids: Annotated[str, Query(max_length=MAX_LISTED * 33, description="Comma-separated ids")],
+    store: Annotated[Store, Depends(get_store)],
+) -> list[CheckSummary]:
+    """The checks a visitor started, for "My reports". Ids the server no longer has are left out."""
+    wanted = list(dict.fromkeys(part.strip() for part in ids.split(",") if part.strip()))
+    if len(wanted) > MAX_LISTED or not all(CHECK_ID.match(check_id) for check_id in wanted):
+        raise HTTPException(status_code=422, detail=f"ids must be up to {MAX_LISTED} check ids")
+    return store.summaries(wanted)
+
+
+# Declared before /api/checks/{check_id}, which would otherwise reject "recent" as an id.
+@router.get("/api/checks/recent")
+def recent_checks(store: Annotated[Store, Depends(get_store)]) -> list[RecentCheck]:
+    """The latest finished check of up to 12 projects, for the home page. No emails or IPs."""
+    return store.recent_completed(RECENT_SHOWN)
 
 
 @router.get("/api/checks/{check_id}")

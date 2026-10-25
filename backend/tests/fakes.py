@@ -4,6 +4,7 @@ import json
 from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 from app.tinyfish import (
     AgentDone,
@@ -24,6 +25,15 @@ def load_search(name: str) -> list[SearchHit]:
     return [SearchHit.model_validate(hit) for hit in payload["results"]]
 
 
+def recorded_searches(*names: str) -> dict[str, list[SearchHit]]:
+    """Search fixtures keyed the way FakeWebClient looks them up, domain limit included."""
+    searches = {}
+    for name in names:
+        payload = json.loads((FIXTURES / name).read_text(encoding="utf-8"))
+        searches[search_key(payload["query"], payload.get("include_domains"))] = load_search(name)
+    return searches
+
+
 def load_page(name: str) -> str:
     return (FIXTURES / name).read_text(encoding="utf-8")
 
@@ -31,6 +41,18 @@ def load_page(name: str) -> str:
 def load_recording(name: str) -> dict[str, Any]:
     """A live check recorded by scripts/capture_fixtures.py."""
     return json.loads((FIXTURES / name).read_text(encoding="utf-8"))
+
+
+def search_key(query: str, include_domains: str | None) -> str:
+    """How a search limited to some domains is stored: "<query> @<domains>"."""
+    return f"{query} @{include_domains}" if include_domains else query
+
+
+def in_domains(url: str, include_domains: str | None) -> bool:
+    if not include_domains:
+        return True
+    host = urlsplit(url).hostname or ""
+    return any(host == d or host.endswith("." + d) for d in include_domains.split(","))
 
 
 def agent_event(raw: dict[str, Any]) -> AgentEvent:
@@ -50,8 +72,11 @@ class FakeWebClient:
         pages: dict[str, str] | None = None,
         agent_runs: dict[str, list[AgentEvent]] | None = None,
         texts: dict[str, str] | None = None,
+        search_error: WebError | None = None,
     ) -> None:
         self.searches = searches or {}
+        # Raised by every search, to replay a TinyFish failure.
+        self.search_error = search_error
         self.pages = pages or {}
         self.texts = texts or {}
         self.agent_runs = agent_runs or {}
@@ -59,10 +84,21 @@ class FakeWebClient:
         self.agent_requests: list[dict[str, Any]] = []
 
     async def search(
-        self, query: str, *, purpose: str, domain_type: str | None = None
+        self,
+        query: str,
+        *,
+        purpose: str,
+        domain_type: str | None = None,
+        include_domains: str | None = None,
     ) -> list[SearchHit]:
         self.calls.append(("search", query))
-        return self.searches.get(query, [])
+        if self.search_error:
+            raise self.search_error
+        if include_domains and search_key(query, include_domains) in self.searches:
+            return self.searches[search_key(query, include_domains)]
+        # No recording with the domain limit: apply the limit to the plain search, as TinyFish does.
+        hits = self.searches.get(query, [])
+        return [hit for hit in hits if in_domains(hit.url, include_domains)]
 
     async def fetch_html(self, url: str, *, selectors: list[str], purpose: str) -> FetchedPage:
         self.calls.append(("fetch", url))
@@ -80,7 +116,8 @@ class FakeWebClient:
         """Add the searches, documents and agent runs of a recorded live check."""
         for search in recording["searches"]:
             hits = [SearchHit.model_validate(raw) for raw in search["results"]]
-            self.searches.setdefault(search["query"], hits)
+            key = search_key(search["query"], search.get("include_domains"))
+            self.searches.setdefault(key, hits)
         self.texts |= recording["texts"]
         for run in recording["agents"]:
             self.agent_runs[run["url"]] = [agent_event(raw) for raw in run["events"]]

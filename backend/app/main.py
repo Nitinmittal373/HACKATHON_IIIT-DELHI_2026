@@ -9,7 +9,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import checks, events, health, projects, reports, sentinel
+from app.api import checks, compare, events, health, projects, promoters, reports, sentinel
 from app.config import BACKEND_DIR, Settings, load_settings
 from app.db import make_engine, make_session_factory
 from app.events import EventHub
@@ -20,6 +20,7 @@ from app.sentinel.service import Sentinel
 from app.sentinel.store import SentinelStore
 from app.store import Store
 from app.tinyfish import LiveWebClient, WebClient
+from app.track_record import TrackRecords
 
 DEFAULT_CACHE_DIR = BACKEND_DIR / "data" / "cache"
 SOURCE_TIMEOUT_GRACE_SECONDS = 30
@@ -44,8 +45,12 @@ def create_app(
         )
         engine = make_engine(settings.database_url)
         app.state.store = Store(make_session_factory(engine))
+        # A check's agents run inside this process; any it was running before a restart or a
+        # redeploy are gone, so those checks can never finish and are failed honestly.
+        app.state.store.fail_unfinished_checks(clock())
         app.state.hub = EventHub()
         app.state.limiter = RateLimiter(settings.rate_limit_per_minute)
+        app.state.track_records = TrackRecords(app.state.web, clock)
         app.state.orchestrator = Orchestrator(
             app.state.store,
             app.state.hub,
@@ -89,7 +94,8 @@ def create_app(
         # Without this the browser hides Retry-After and cannot tell a visitor how long to wait.
         expose_headers=["Retry-After"],
     )
-    for module in (health, projects, checks, events, reports, sentinel):
+    # compare before checks: /api/checks/compare must not be read as a check id.
+    for module in (health, projects, promoters, compare, checks, events, reports, sentinel):
         app.include_router(module.router)
     return app
 

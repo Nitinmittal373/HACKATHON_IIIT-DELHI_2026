@@ -157,3 +157,77 @@ export interface Alert {
   removed: AlertChange[];
   changed: AlertChange[];
 }
+
+/** One line of "My reports" (GET /api/checks?ids=). */
+export interface CheckSummary {
+  id: string;
+  rera_id: string;
+  details_url: string;
+  project: string | null;
+  promoter: string | null;
+  status: CheckStatus;
+  score: number | null;
+  band: Band | null;
+  confidence: number | null;
+  created_at: string;
+  completed_at: string | null;
+}
+
+/** A finished check shown on the home page (GET /api/checks/recent). */
+export interface RecentCheck extends CheckSummary {
+  registered_on: string | null;
+  sources_read: number;
+  drivers: Driver[];
+}
+
+export type InsolvencyStatus =
+  | "none_found"
+  | "admitted"
+  | "other_project"
+  | "this_project"
+  | "company"
+  | "unverified";
+
+export interface AreaPoints {
+  area: Area;
+  label: string;
+  lost: number;
+  max: number;
+}
+
+export interface FindingLine {
+  title: string;
+  source_url: string;
+  points: number;
+}
+
+/** One column of a comparison. null means the check could not read it, never "clean". */
+export interface ComparedProject {
+  check_id: string;
+  project: Project;
+  score: number;
+  band: Band;
+  confidence: number;
+  hard_stop: boolean;
+  areas: AreaPoints[];
+  delay_months: number | null;
+  project_complaints: number | null;
+  promoter_complaints: number | null;
+  insolvency: InsolvencyStatus | null;
+  company_status: string | null;
+  unread: CheckKey[];
+  top_findings: FindingLine[];
+}
+
+export interface Comparison {
+  projects: ComparedProject[];
+  best: string | null;
+  reason: "best_score" | "tie" | "not_enough_evidence";
+}
+
+/** A promoter's other UP-RERA projects, from Search on up-rera.in (GET /api/promoters/projects). */
+export interface TrackRecord {
+  promoter: string;
+  projects: Project[];
+  searched_at: string;
+}

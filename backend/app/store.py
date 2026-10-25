@@ -5,11 +5,24 @@ Each method opens a short session, so callers never hold ORM objects.
 
 from datetime import datetime
 
-from sqlalchemy import func, select
+from sqlalchemy import Row, Select, func, select
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.db import CheckRow, FindingRow, ProjectRow, ScoreRow, SourceRunRow
-from app.models import Check, CheckStatus, Finding, Project, Score, SourceRun
+from app.models import (
+    Check,
+    CheckStatus,
+    CheckSummary,
+    Driver,
+    Finding,
+    Project,
+    RecentCheck,
+    Score,
+    SourceRun,
+)
+
+# The home page card shows the three biggest reasons behind a score.
+RECENT_DRIVERS = 3
 
 
 class Store:
@@ -38,6 +51,17 @@ class Store:
             row = session.get_one(CheckRow, check_id)
             row.status = status
             row.completed_at = completed_at
+
+    def fail_unfinished_checks(self, now: datetime) -> int:
+        """Mark checks left queued or running by a stopped process as failed; returns how many."""
+        with self._sessions.begin() as session:
+            rows = session.scalars(
+                select(CheckRow).where(CheckRow.status.in_(("queued", "running")))
+            ).all()
+            for row in rows:
+                row.status = "failed"
+                row.completed_at = now
+            return len(rows)
 
     def get_check(self, check_id: str) -> Check | None:
         with self._sessions() as session:
@@ -77,6 +101,34 @@ class Store:
                 query = query.where(CheckRow.completed_at >= since)
             check_id = session.scalar(query.order_by(CheckRow.completed_at.desc()).limit(1))
         return self.get_check(check_id) if check_id else None
+
+    def summaries(self, check_ids: list[str]) -> list[CheckSummary]:
+        """The checks among these ids that exist, in the order asked; unknown ids are skipped."""
+        with self._sessions() as session:
+            rows = session.execute(_summary_query().where(CheckRow.id.in_(check_ids))).all()
+        by_id = {row.CheckRow.id: _summary(row) for row in rows}
+        return [by_id[check_id] for check_id in check_ids if check_id in by_id]
+
+    def recent_completed(self, limit: int) -> list[RecentCheck]:
+        """The newest finished check of each project, newest first."""
+        query = _summary_query().where(CheckRow.status == "completed")
+        query = query.order_by(CheckRow.completed_at.desc()).limit(limit * 4)
+        with self._sessions() as session:
+            picked: list[Row[tuple[CheckRow, ProjectRow, ScoreRow]]] = []
+            for row in session.execute(query):
+                seen = {p.CheckRow.rera_id for p in picked}
+                if row.CheckRow.rera_id not in seen and len(picked) < limit:
+                    picked.append(row)
+            read = self._sources_read(session, [row.CheckRow.id for row in picked])
+        return [_recent(row, read.get(row.CheckRow.id, 0)) for row in picked]
+
+    def _sources_read(self, session: Session, check_ids: list[str]) -> dict[str, int]:
+        counts = session.execute(
+            select(SourceRunRow.check_id, func.count())
+            .where(SourceRunRow.check_id.in_(check_ids), SourceRunRow.status == "completed")
+            .group_by(SourceRunRow.check_id)
+        ).all()
+        return {check_id: count for check_id, count in counts}
 
     def save_source_run(self, check_id: str, run: SourceRun) -> None:
         """Insert the run, or update it if this source already has one for the check."""
@@ -142,6 +194,43 @@ class Store:
                 hard_stop=row.hard_stop,
                 **row.detail,  # type: ignore[arg-type]
             )
+
+
+def _summary_query() -> Select[tuple[CheckRow, ProjectRow, ScoreRow]]:
+    return (
+        select(CheckRow, ProjectRow, ScoreRow)
+        .join(ProjectRow, ProjectRow.rera_id == CheckRow.rera_id)
+        .outerjoin(ScoreRow, ScoreRow.check_id == CheckRow.id)
+    )
+
+
+def _summary(row: Row[tuple[CheckRow, ProjectRow, ScoreRow]]) -> CheckSummary:
+    check, project, score = row.CheckRow, row.ProjectRow, row.ScoreRow
+    return CheckSummary.model_validate(
+        {
+            "id": check.id,
+            "rera_id": check.rera_id,
+            "details_url": project.details_url,
+            "project": project.name,
+            "promoter": project.promoter,
+            "status": check.status,
+            "score": score.value if score else None,
+            "band": score.band if score else None,
+            "confidence": score.confidence if score else None,
+            "created_at": check.started_at,
+            "completed_at": check.completed_at,
+        }
+    )
+
+
+def _recent(row: Row[tuple[CheckRow, ProjectRow, ScoreRow]], sources_read: int) -> RecentCheck:
+    drivers = row.ScoreRow.detail.get("drivers", []) if row.ScoreRow else []
+    return RecentCheck(
+        **_summary(row).model_dump(),
+        registered_on=row.ProjectRow.registered_on,
+        sources_read=sources_read,
+        drivers=[Driver.model_validate(driver) for driver in drivers[:RECENT_DRIVERS]],
+    )
 
 
 def _project(row: ProjectRow) -> Project:

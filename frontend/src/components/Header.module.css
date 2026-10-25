@@ -65,6 +65,14 @@
 .cta {
   padding: 10px 16px;
   font-size: 14px;
+  white-space: nowrap;
+}
+
+@media (max-width: 420px) {
+  .cta {
+    padding: 9px 12px;
+    font-size: 13.5px;
+  }
 }
 
 @media (max-width: 960px) {

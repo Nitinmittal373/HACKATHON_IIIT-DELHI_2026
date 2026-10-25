@@ -16,7 +16,7 @@ export function Header() {
           <Logo />
         </Link>
         <div className={styles.links}>
-          <Link href="/#sample-report">{t.nav.sample}</Link>
+          <Link href="/#search">{t.nav.check}</Link>
           <Link href="/#how-it-works">{t.nav.how}</Link>
           <Link href="/#sentinel">{t.nav.rwa}</Link>
           <Link href="/alerts">{t.nav.alerts}</Link>
@@ -29,8 +29,9 @@ export function Header() {
             हिं
           </button>
         </div>
-        <Link href="/#search" className={`btn ${styles.cta}`}>
-          {t.nav.check}
+        {/* No accounts: a visitor's checks are kept in this browser and listed here. */}
+        <Link href="/reports" className={`btn ${styles.cta}`}>
+          {t.nav.reports}
         </Link>
       </nav>
     </header>

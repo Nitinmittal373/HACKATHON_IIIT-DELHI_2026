@@ -1,0 +1,94 @@
+.box {
+  max-width: 860px;
+}
+
+.title {
+  font-size: 32px;
+}
+
+.track {
+  position: relative;
+  height: 6px;
+  margin-top: 22px;
+  border-radius: 999px;
+  background: var(--oS);
+  overflow: hidden;
+}
+
+/* An indeterminate bar: nobody knows how long a cold start takes, so no fake percentage. */
+.shimmer {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 38%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, var(--o), transparent);
+  animation: sweep 1.6s var(--ease-out) infinite;
+}
+
+.rows {
+  margin-top: 22px;
+  padding: 8px 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 22px;
+}
+
+.row + .row {
+  border-top: 1px solid var(--ln);
+}
+
+.dot {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--ln2);
+}
+
+.line {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #f3eee9 25%, #faf6f2 50%, #f3eee9 75%);
+  background-size: 200% 100%;
+  animation: glint 1.4s linear infinite;
+}
+
+.line:last-child {
+  margin-left: auto;
+}
+
+@keyframes sweep {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(270%);
+  }
+}
+
+@keyframes glint {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 960px) {
+  .title {
+    font-size: 26px;
+  }
+}
+
+/* Still show that something is happening: a steady half-filled bar instead of a sweep. */
+@media (prefers-reduced-motion: reduce) {
+  .shimmer {
+    width: 50%;
+    animation: none;
+    background: var(--o);
+    opacity: 0.6;
+  }
+}

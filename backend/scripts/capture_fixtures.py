@@ -29,7 +29,7 @@ from app.config import Settings, load_settings
 from app.main import create_app
 from app.sources.uprera import selectors_for
 from app.tinyfish import LiveWebClient, SearchHit
-from app.uprera_links import rera_ids_in, summary_url
+from app.uprera_links import UPRERA_DOMAIN, rera_ids_in, summary_url
 from scripts.recorder import RecordingWebClient, scrub
 
 FIXTURES = Path(__file__).resolve().parents[1] / "tests" / "fixtures"
@@ -42,17 +42,37 @@ SEARCHES = {
     "search_supertech_eco_village.json": "Supertech Eco Village UP RERA project",
     "search_uprera_8334.json": "UPRERAPRJ8334 UP RERA project",
     "search_uprera_2634.json": "UPRERAPRJ2634 UP RERA project",
+    # A name whose up-rera.in pages carry no numbers, and a project outside UP.
+    "search_supertech_hues.json": "Supertech Hues UP RERA project",
+    "search_lodha_palava.json": "Lodha Palava Mumbai UP RERA project",
+}
+# The same kind of search limited to up-rera.in, as the resolver sends it.
+DOMAIN_SEARCHES = {
+    "search_up_gaur_city.json": "Gaur City UP RERA project",
+    "search_up_ats_pristine.json": "ATS Pristine UP RERA project",
+    "search_up_396176.json": "UPRERAPRJ396176 UP RERA project",
+    "search_up_188811.json": "UPRERAPRJ188811/08/2024 UP RERA project",
+    "search_up_supertech_hues.json": "Supertech Hues UP RERA project",
+    "search_up_lodha_palava.json": "Lodha Palava Mumbai UP RERA project",
+    # The two searches behind a promoter's other projects (app/track_record.py).
+    "search_up_supertech_limited.json": "SUPERTECH LIMITED UP RERA project",
+    "search_up_supertech_limited_promoter.json": "SUPERTECH LIMITED promoter UP RERA registration",
 }
 PAGES = {
     "uprera_8334.html": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
     "uprera_6742.html": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=6742",
+    "uprera_2875.html": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=2875",
+    # A number other sites print for "Supertech Hues"; it is a different project.
+    "uprera_6819.html": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=6819",
 }
 # Projectsummary pages have no stable address: (search fixture, RERA number) to find them.
 SUMMARY_PAGES = {
-    "uprera_summary_188811.html": ("search_gaur_city.json", "UPRERAPRJ188811/08/2024"),
+    "uprera_summary_188811.html": ("search_up_188811.json", "UPRERAPRJ188811/08/2024"),
     "uprera_summary_8334.html": ("search_uprera_8334.json", "UPRERAPRJ8334"),
     # Completed (certificate uploaded) and with one ordinary plus one COVID-19 extension.
     "uprera_summary_2634.html": ("search_uprera_2634.json", "UPRERAPRJ2634"),
+    # A six-digit number without a date suffix: it has no stable details page.
+    "uprera_summary_396176.html": ("search_up_396176.json", "UPRERAPRJ396176"),
 }
 
 
@@ -127,10 +147,16 @@ async def main(wanted: set[str]) -> None:
     )
     FIXTURES.mkdir(parents=True, exist_ok=True)
     try:
-        for name, query in SEARCHES.items():
+        searches = [(n, q, None) for n, q in SEARCHES.items()]
+        searches += [(n, q, UPRERA_DOMAIN) for n, q in DOMAIN_SEARCHES.items()]
+        for name, query, domains in searches:
             if chosen(name):
-                hits = await web.search(query, purpose=PURPOSE)
-                payload = {"query": query, "results": [hit.model_dump() for hit in hits]}
+                hits = await web.search(query, purpose=PURPOSE, include_domains=domains)
+                payload = {
+                    "query": query,
+                    "include_domains": domains,
+                    "results": [hit.model_dump() for hit in hits],
+                }
                 save(name, json.dumps(payload, indent=2, ensure_ascii=False), key)
 
         pages = PAGES | {
