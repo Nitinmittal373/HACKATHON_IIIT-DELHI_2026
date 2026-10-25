@@ -1,6 +1,8 @@
 import asyncio
+import json
 import uuid
 from datetime import UTC, date, datetime
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -121,6 +123,48 @@ def test_a_failed_run_is_an_error_with_the_reason() -> None:
 def test_a_run_without_a_final_event_is_an_error() -> None:
     with pytest.raises(SourceError, match="without an answer"):
         run([AgentProgress("Opening the page")])
+
+
+def test_a_run_that_ran_out_of_time_is_blocked_as_a_timeout_and_not_retried() -> None:
+    events, web = run([AgentDone(status="FAILED", result=None, error="Run exceeded max duration")])
+
+    assert [e for e in events if isinstance(e, Blocked)] == [Blocked("timeout")]
+    assert not any(isinstance(e, ChecksRead | FoundFinding) for e in events)
+    assert [call for call in web.calls if call[0] == "agent"] == [("agent", START_URL)]
+
+
+def test_a_long_agent_note_is_cut_to_one_line() -> None:
+    note = "Clicking the search box\nand typing the name " + "x" * 300
+    events, _ = run([AgentProgress(note), done({"status": "Active", "cin": "U1"})])
+
+    shown = next(e for e in events if isinstance(e, Progress) and e.text.startswith("Clicking"))
+    assert "\n" not in shown.text
+    assert len(shown.text) == 140
+    assert shown.text.endswith("…")
+
+
+def test_the_raw_answer_is_saved_for_debugging(tmp_path: Path) -> None:
+    web = FakeWebClient(agent_runs={START_URL: [done({"status": "Active", "cin": "U1"})]})
+    ctx = SourceContext(
+        project=PROJECT,
+        web=web,
+        today=date(2026, 10, 25),
+        now=datetime(2026, 10, 25, tzinfo=UTC),
+        check_id="abc123",
+        cache_dir=tmp_path,
+    )
+
+    async def collect() -> None:
+        _ = [event async for event in CompanyStatusSource().run(ctx)]
+
+    asyncio.run(collect())
+
+    saved = json.loads((tmp_path / "abc123" / "registry.json").read_text(encoding="utf-8"))
+    assert saved == {
+        "source": "registry",
+        "start_url": START_URL,
+        "result": {"status": "Active", "cin": "U1"},
+    }
 
 
 def test_every_run_is_told_never_to_bypass_a_captcha() -> None:

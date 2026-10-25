@@ -35,6 +35,7 @@ from app.tinyfish import AgentDone, AgentLiveUrl, AgentProgress
 
 CAPTCHA_FIELD = "captcha_seen"
 CAPTCHA_REASON = "This page asks for a CAPTCHA. We never bypass one"
+MAX_PROGRESS_CHARS = 140
 TIMEOUT_REASON = "timeout"
 TIMEOUT_HINTS = ("timeout", "timed out", "time limit", "max duration", "duration")
 CAPTCHA_RULE = (
@@ -93,7 +94,7 @@ class AgentSource(ABC):
             if isinstance(event, AgentLiveUrl):
                 yield LiveUrl(event.url)
             elif isinstance(event, AgentProgress):
-                yield Progress(event.text)
+                yield Progress(short(event.text))
             else:
                 done = event
 
@@ -116,6 +117,12 @@ class AgentSource(ABC):
         for finding in self.to_findings(result, ctx, task):
             yield FoundFinding(finding)
         yield ChecksRead(self.checks_read(result, ctx))
+
+
+def short(text: str) -> str:
+    """One calm line for the Agent Cam, however long the agent's note was."""
+    line = " ".join(text.split())
+    return line if len(line) <= MAX_PROGRESS_CHARS else line[: MAX_PROGRESS_CHARS - 1] + "…"
 
 
 def ran_out_of_time(error: str | None) -> bool:

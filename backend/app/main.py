@@ -19,6 +19,7 @@ from app.store import Store
 from app.tinyfish import LiveWebClient, WebClient
 
 DEFAULT_CACHE_DIR = BACKEND_DIR / "data" / "cache"
+SOURCE_TIMEOUT_GRACE_SECONDS = 30
 
 
 def create_app(
@@ -46,7 +47,8 @@ def create_app(
             app.state.hub,
             app.state.web,
             concurrency=settings.agent_concurrency,
-            source_timeout=settings.agent_timeout_seconds,
+            # The agent stops itself at agent_timeout_seconds; this is only the backstop.
+            source_timeout=settings.agent_timeout_seconds + SOURCE_TIMEOUT_GRACE_SECONDS,
             clock=clock,
             cache_dir=cache_dir,
         )
