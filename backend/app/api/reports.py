@@ -30,4 +30,11 @@ def assemble_report(store: Store, check: Check) -> Report | None:
     points = {driver.finding_id: driver.points for driver in score.drivers}
     findings.sort(key=lambda f: points.get(f.id, 0))
     timeline = sorted((f for f in findings if f.occurred_on), key=lambda f: f.occurred_on)
-    return Report(check=check, project=project, score=score, findings=findings, timeline=timeline)
+    return Report(
+        check=check,
+        project=project,
+        score=score,
+        findings=findings,
+        timeline=timeline,
+        score_v2=store.get_score_v2(check.id),
+    )

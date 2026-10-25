@@ -100,3 +100,66 @@ Supertech Eco Village-I Phase I-C (`UPRERAPRJ8334`), checked live on 25 Oct 2026
 Shown with no points: registration (ok), company status (Active), the insolvency admission of 25 Mar 2022, a news report that the insolvency covers the whole company (**unverified**: no court order was read, so it cannot cap the score), and the Supreme Court's NBCC order (context).
 
 Confidence is 71% (5 of 7 checks): land dues were not read because the authorities' lists could not be fetched, and e-Jagriti stopped at its CAPTCHA. Neither changes the score of 68.
+
+# NeevScore v2 (300–900)
+
+v2 is computed next to the classic 0–100 score, from the same findings, and returned in the report as `score_v2`. The classic score and its section above are unchanged. The code is in [`backend/app/scoring/v2/`](../backend/app/scoring/v2/).
+
+## Formula
+
+```text
+NeevScore v2 = clip(900 − 6 × Σ (weight × pillar penalty), 300, 900)
+```
+
+Each pillar penalty is 0–100 and capped (news at 60). The cap is spent on the largest penalties first, so the drivers and reason codes add up to the score. A **hard stop** forces the High band (value at most 449) and says why.
+
+## Why it follows CRISIL's split
+
+Credit ratings weigh business, financial, project and management risk separately instead of one blended number. v2 does the same with six pillars, so a buyer sees *which kind* of risk lowers the score. The weights are **transparent expert priors, to be calibrated on labelled stalled-project lists**; they are not fitted statistics.
+
+## Pillars and penalties
+
+| Pillar | Weight | Penalties |
+| --- | --: | --- |
+| P1 Regulatory compliance (RERA) | 30% | Registration lapsed or revoked 100 (**hard stop**); extended: 30 + 20 per extra; revised date more than 12 / 24 months after the promised one: 40 / 70; QPRs missed in the last 4 quarters: 15 each (max 60); penalty orders: 20 each |
+| P2 Delivery track record | 20% | Share of the group's RERA projects delayed over 12 months (0–100); any group project lapsed: 40 |
+| P3 Legal and insolvency | 25% | Promoter in CIRP 100 (**hard stop**, official NCLT/IBBI/MCA page only); sister company or other project in insolvency 50; RERA complaints about the project 10 each (max 100); pending cases 5 each (max 40) |
+| P4 Financial and corporate health | 15% | Company or director struck off or disqualified 40; recent charge 20; late MCA filings 20; SARFAESI auction notice 60 |
+| P5 Land authority and approvals | 5% | On a land authority defaulter list 70; failed package deposit 50; no OC/CC past due 30 |
+| P6 Sentiment and news | 5% | Credible delay or protest article in the last 12 months: 10 each (max 60). Secondary, shown for review |
+
+## Bands
+
+| Band | Range |
+| --- | --- |
+| Low risk | 750–900 |
+| Watch | 600–749 |
+| Elevated risk | 450–599 |
+| High risk | 300–449 |
+
+## Confidence
+
+The share of the six pillars with at least one source read. Below 50% the band is "Not enough evidence yet", as in v1, unless a hard stop from an official page applies.
+
+## Reason codes
+
+The report shows the four codes that cost the most points, like a credit report. Each links to its findings and sources.
+
+| Code | Meaning |
+| --- | --- |
+| R01 | Registration lapsed or revoked |
+| R02 | Completion extended N times |
+| R03 | Revised completion date N months after the promised one |
+| R04 | QPRs missed (n of the last 4) |
+| R05 | RERA complaints or penalty orders |
+| R06 | Promoter or sister company in insolvency |
+| R07 | Director linked to struck-off, disqualified or insolvent companies |
+| R08 | Land authority dues or approvals default |
+| R09 | Charges or SARFAESI action on assets |
+| R10 | Pending litigation (n cases) |
+| R11 | Adverse news or protests (n articles) |
+| R12 | Data unavailable (source down or CAPTCHA). **Never adds a penalty**; it only lowers confidence |
+| R13 | Other projects of the same group delayed or lapsed (added: P2 has no code in the first list) |
+| R14 | Late filings with the company registry (added for the same reason) |
+
+Findings that map to no v2 rule (a registration date, a court order, an unverified insolvency report) still appear in the evidence list with 0 v2 points. The v2 reason codes use only facts the code can read; a signal that cannot be read honestly stays unread and appears under R12.
