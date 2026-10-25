@@ -58,12 +58,17 @@ A broker's brochure says *"possession on time"*. The records may say the complet
 
 | | Feature | What the buyer gets |
 | :-: | --- | --- |
-| 🔎 | **Search first, no forms** | Type a project name or UP-RERA number. We show the matching phases and ask *"Is this the property you're looking for?"* before any agent runs. |
+| 🔎 | **Search first, no forms** | Type a project name, a promoter or any UP-RERA number (2017 or new format). We show the matching phases from the register and ask *"Is this the property you're looking for?"* before any agent runs. |
 | 🤖 | **Agent Cam** | Watch TinyFish browser agents open each official site, find the project and copy the exact record, live. |
 | 📊 | **NeevScore (0–100)** | One explained number. Every point lost links to the record behind it. |
 | 🗂️ | **Evidence Locker** | Every finding carries its source link and the minute it was read. *No source, no claim.* |
 | 🧬 | **Builder DNA** | Sister projects, insolvency scope and linked companies for the same promoter. |
 | ✅ | **Buyer Action Plan** | Four concrete things to check before paying more. |
+| ❓ | **Questions for the builder** | Five questions chosen from the findings, ready to copy into a message. |
+| 🏗️ | **Builder track record** | The promoter's other UP-RERA projects, each one click from its own check. |
+| 🗃️ | **My reports** | Every check you run is kept in your browser, with no account. Reopen, re-check or remove it. |
+| ⚖️ | **Compare** | Two or three projects side by side, row by row; it names the best only when the evidence allows. |
+| 💬 | **Share on WhatsApp** | A short message with the score and a link, for the family group. |
 | 🔔 | **Neev Sentinel** | Weekly re-checks; an alert only when a record actually changes. |
 | 🌐 | **English and हिंदी** | Plain-language reports for every family member. |
 
@@ -80,6 +85,13 @@ A broker's brochure says *"possession on time"*. The records may say the complet
 <tr>
 <td width="50%"><img src="docs/assets/screens/confirm.png" alt="Confirm step listing four Supertech Eco Village phases from the UP-RERA register"><br><sub><b>Confirm</b> — real phases from the UP-RERA register. Nothing runs until the buyer confirms.</sub></td>
 <td width="50%"><img src="docs/assets/screens/report.png" alt="Report page with NeevScore 76, reasons, evidence and a buyer action plan"><br><sub><b>Report</b> — score, reasons, evidence, timeline and next steps.</sub></td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="50%"><img src="docs/assets/screens/my-reports.png" alt="My reports listing two checks with their scores, bands and Open, Compare, Re-check and Remove buttons"><br><sub><b>My reports</b>: your checks, kept in this browser. No accounts.</sub></td>
+<td width="50%"><img src="docs/assets/screens/compare.png" alt="Compare page with two projects side by side and a note that there is not enough evidence to rank them"><br><sub><b>Compare</b>: row by row from the records. A thin check is never ranked.</sub></td>
 </tr>
 </table>
 
@@ -229,7 +241,7 @@ Full method and test cases: [`docs/scoring.md`](docs/scoring.md).
 ├── frontend/                Next.js app
 │   ├── e2e/                 Playwright tests against a recorded API
 │   └── src/
-│       ├── app/             routes: home, check, check/[id], report/[id], alerts
+│       ├── app/             routes: home, check, check/[id], report/[id], reports, compare, alerts
 │       ├── components/      Skyline, AgentCam, ScoreRing, EvidenceList …
 │       ├── lib/             API client, event hook, English and Hindi copy
 │       └── styles/          tokens, globals, app screens and print
