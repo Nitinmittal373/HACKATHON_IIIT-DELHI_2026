@@ -31,8 +31,11 @@ export function ReportActions({ reportId, project }: Props) {
   }
 
   return (
-    <div className={styles.actions}>
+    <div className={`${styles.actions} noPrint`}>
       <WatchButton project={project} />
+      <button type="button" className="btn2" onClick={() => window.print()}>
+        {t.report.download}
+      </button>
       <button type="button" className="btn2" onClick={share}>
         {t.report.share}
       </button>

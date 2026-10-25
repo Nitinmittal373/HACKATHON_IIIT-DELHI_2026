@@ -8,6 +8,7 @@ import { getLang } from "@/lib/i18n/server";
 import { LangProvider } from "@/lib/LangProvider";
 import "@/styles/tokens.css";
 import "@/styles/globals.css";
+import "@/styles/print.css";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist", display: "optional" });
 const geistMono = Geist_Mono({
@@ -26,6 +27,8 @@ const devanagari = Noto_Sans_Devanagari({
 });
 
 export const metadata: Metadata = {
+  // Share previews need absolute addresses; set NEXT_PUBLIC_SITE_URL to the deployed site.
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: "NeevCheck: know your builder before you book",
   description:
     "A risk check for under-construction homes in Uttar Pradesh. TinyFish agents read UP-RERA, company, insolvency and court records and give a NeevScore with proof for every point.",

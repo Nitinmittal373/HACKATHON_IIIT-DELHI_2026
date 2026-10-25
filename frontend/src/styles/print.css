@@ -1,0 +1,64 @@
+/* The report prints as a clean A4 page with every source address written out. */
+@media print {
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+
+  body {
+    background: #fff;
+    font-size: 11pt;
+  }
+
+  .noPrint,
+  header[class*="Header"],
+  footer,
+  [class*="Skyline_scene"],
+  dialog {
+    display: none !important;
+  }
+
+  .appMain {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    animation: none;
+  }
+
+  /* One column, and no card is split across two pages. */
+  [class*="report_grid"] {
+    display: block;
+  }
+
+  [class*="report_column"] {
+    display: block;
+  }
+
+  .card {
+    break-inside: avoid;
+    margin-bottom: 10mm;
+    border-color: #ccc;
+    box-shadow: none;
+  }
+
+  /* Evidence rows may break between rows, not inside one. */
+  [class*="EvidenceList_row"] {
+    break-inside: avoid;
+  }
+
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 8.5pt;
+    color: #555;
+    word-break: break-all;
+  }
+
+  a[href^="http"] svg {
+    display: none;
+  }
+
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

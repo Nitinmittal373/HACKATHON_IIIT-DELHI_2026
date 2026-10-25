@@ -5,7 +5,7 @@ import styles from "./SentinelCard.module.css";
 
 export function SentinelCard({ project, t }: { project: Project; t: Strings }) {
   return (
-    <section className={`card ${styles.card}`} aria-labelledby="sentinel-title">
+    <section className={`card ${styles.card} noPrint`} aria-labelledby="sentinel-title">
       <h2 id="sentinel-title" className={styles.title}>
         {t.report.sentinelTitle}
       </h2>

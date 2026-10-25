@@ -34,7 +34,7 @@ export function RecheckNote({ hours, project }: Props) {
   }
 
   return (
-    <p className={styles.note}>
+    <p className={`${styles.note} noPrint`}>
       <span>{t.report.checkedAgo(hours)}</span>
       <button type="button" className={styles.button} onClick={recheck} disabled={starting}>
         {t.report.recheck}
