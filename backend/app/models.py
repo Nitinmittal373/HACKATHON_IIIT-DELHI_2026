@@ -173,6 +173,31 @@ class Score(BaseModel):
     checks_unread: list[CheckKey]
 
 
+class CheckSummary(BaseModel):
+    """One line of a visitor's history: enough to list a check without loading its report."""
+
+    id: str
+    rera_id: str
+    # The page the check read, so "Re-check" can start the same check again.
+    details_url: str
+    project: str | None
+    promoter: str | None
+    status: CheckStatus
+    score: int | None = None
+    band: Band | None = None
+    confidence: float | None = None
+    created_at: datetime
+    completed_at: datetime | None = None
+
+
+class RecentCheck(CheckSummary):
+    """A finished check shown on the home page. Only public-record facts, never who asked."""
+
+    registered_on: date | None = None
+    sources_read: int = 0
+    drivers: list[Driver] = []
+
+
 class Report(BaseModel):
     check: Check
     project: Project

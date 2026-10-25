@@ -3,8 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { createCheck } from "@/lib/api";
 import { describeApiError } from "@/lib/apiMessages";
+import { startCheck } from "@/lib/history";
 import { useLang } from "@/lib/LangProvider";
 import type { Project } from "@/lib/types";
 import styles from "./RecheckNote.module.css";
@@ -25,7 +25,7 @@ export function RecheckNote({ hours, project }: Props) {
     setStarting(true);
     setProblem(null);
     try {
-      const check = await createCheck(project, { fresh: true });
+      const check = await startCheck(project, { fresh: true });
       router.push(`/check/${check.id}`);
     } catch (error) {
       setProblem(describeApiError(error, t));

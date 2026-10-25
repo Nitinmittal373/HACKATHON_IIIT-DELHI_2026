@@ -1,0 +1,34 @@
+.bar {
+  position: sticky;
+  bottom: 16px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 20px;
+  padding: 14px 16px 14px 20px;
+  box-shadow: var(--shadow-soft);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 14px;
+}
+
+.text span {
+  color: var(--mu);
+}
+
+@media (max-width: 520px) {
+  .bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .bar :global(.btn) {
+    justify-content: center;
+  }
+}

@@ -55,6 +55,41 @@ function readBody(req: import("node:http").IncomingMessage): Promise<string> {
   });
 }
 
+interface RecordedReport {
+  check: { id: string; rera_id: string; details_url: string; started_at: string; completed_at: string; sources: { status: string }[] };
+  project: { name: string; promoter: string; registered_on: string };
+  score: { value: number; band: string; confidence: number; drivers: unknown[] };
+}
+
+/** The recorded check as "My reports" lists it (GET /api/checks?ids=). */
+function recordedSummary() {
+  const { check, project, score } = json("report.json") as unknown as RecordedReport;
+  return {
+    id: check.id,
+    rera_id: check.rera_id,
+    details_url: check.details_url,
+    project: project.name,
+    promoter: project.promoter,
+    status: "completed",
+    score: score.value,
+    band: score.band,
+    confidence: score.confidence,
+    created_at: check.started_at,
+    completed_at: check.completed_at,
+  };
+}
+
+/** The recorded check as the home page shows it (GET /api/checks/recent). */
+function recordedRecent() {
+  const { check, project, score } = json("report.json") as unknown as RecordedReport;
+  return {
+    ...recordedSummary(),
+    registered_on: project.registered_on,
+    sources_read: check.sources.filter((run) => run.status === "completed").length,
+    drivers: score.drivers.slice(0, 3),
+  };
+}
+
 createServer(async (req, res) => {
   const url = new URL(req.url ?? "/", `http://localhost:${PORT}`);
   const path = url.pathname;
@@ -76,6 +111,13 @@ createServer(async (req, res) => {
     finished = false;
     return send(res, 202, json("check-created.json"));
   }
+
+  if (path === "/api/checks" && req.method === "GET") {
+    const ids = (url.searchParams.get("ids") ?? "").split(",");
+    return send(res, 200, ids.includes(recordedSummary().id) ? [recordedSummary()] : []);
+  }
+
+  if (path === "/api/checks/recent") return send(res, 200, [recordedRecent()]);
 
   const check = path.match(/^\/api\/checks\/([0-9a-f]{32})(\/events|\/report)?$/);
   if (check) {

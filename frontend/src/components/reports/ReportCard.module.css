@@ -1,0 +1,106 @@
+.card {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: center;
+  padding: 18px 20px;
+}
+
+.noRing {
+  width: 84px;
+  height: 84px;
+  border: 7px solid #f3eee9;
+  border-radius: 50%;
+}
+
+.main {
+  min-width: 0;
+}
+
+.name {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.id {
+  margin-top: 3px;
+  color: var(--fa);
+  font-size: 12.5px;
+  overflow-wrap: anywhere;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.status {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #f3eee9;
+  color: var(--ink2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Running is the one state worth noticing; done and failed stay quiet. */
+.status[data-status="running"] {
+  background: var(--oS);
+  color: var(--o-text);
+}
+
+.date {
+  color: var(--mu);
+}
+
+.hint {
+  margin-top: 8px;
+  color: var(--mu);
+  font-size: 13.5px;
+}
+
+.problem {
+  margin-top: 8px;
+  color: var(--critical);
+  font-size: 13.5px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  max-width: 440px;
+}
+
+.actions :global(.btn2) {
+  padding: 9px 14px;
+  font-size: 14px;
+}
+
+.actions :global(.btn2[aria-pressed="true"]) {
+  border-color: var(--o);
+  background: var(--soft);
+  color: var(--o-text);
+}
+
+.remove {
+  color: var(--mu);
+}
+
+@media (max-width: 760px) {
+  .card {
+    grid-template-columns: 84px minmax(0, 1fr);
+  }
+
+  .actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+    max-width: none;
+  }
+}

@@ -6,8 +6,8 @@ import { useId, useState } from "react";
 
 import { PageMessage } from "@/components/PageMessage";
 import { ProjectRow } from "@/components/confirm/ProjectRow";
-import { createCheck } from "@/lib/api";
 import { describeApiError } from "@/lib/apiMessages";
+import { startCheck } from "@/lib/history";
 import { useLang } from "@/lib/LangProvider";
 import type { Project } from "@/lib/types";
 import styles from "./ConfirmPicker.module.css";
@@ -28,7 +28,7 @@ export function ConfirmPicker({ projects }: { projects: Project[] }) {
     setStarting(true);
     setProblem(null);
     try {
-      const check = await createCheck(selected);
+      const check = await startCheck(selected);
       // A check of this project from the last 24 hours is shown instead of starting another.
       router.push(check.reused ? `/report/${check.id}` : `/check/${check.id}`);
     } catch (error) {

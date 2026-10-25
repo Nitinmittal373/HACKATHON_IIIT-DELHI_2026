@@ -101,9 +101,15 @@
 }
 
 .note {
+  min-height: 1.5em;
   margin-top: 28px;
   color: var(--fa);
   font-size: 12.5px;
+}
+
+.noteLink {
+  color: var(--o-text);
+  font-weight: 600;
 }
 
 @keyframes wordIn {

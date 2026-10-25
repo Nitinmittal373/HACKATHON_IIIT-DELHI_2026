@@ -6,17 +6,21 @@ import { Glow } from "@/components/Glow";
 import { ReportStage } from "@/components/ReportStage";
 import { SearchBar } from "@/components/SearchBar";
 import { Skyline } from "@/components/Skyline";
-import type { ExampleReport } from "@/lib/exampleReport";
+import { heroCard } from "@/lib/heroCard";
 import { useLang } from "@/lib/LangProvider";
+import { useRecentChecks } from "@/lib/useRecentChecks";
 import styles from "./Hero.module.css";
 
 const TRY_THESE = ["UPRERAPRJ8334", "Gaur City", "Supertech"];
 const WORD_STEP_SECONDS = 0.06;
 
-/** Search-first hero: headline, search, quick examples and the rising report card. */
-export function Hero({ report }: { report: ExampleReport }) {
+/** Search-first hero: headline, search, quick examples and the latest real report. */
+export function Hero() {
   const { lang, t } = useLang();
   const words = t.hero.headline;
+  const recent = useRecentChecks();
+  const latest = recent.status === "ready" ? recent.checks[0] : undefined;
+  const card = latest ? heroCard(latest, t, lang) : null;
 
   return (
     <section className={styles.hero}>
@@ -65,9 +69,17 @@ export function Hero({ report }: { report: ExampleReport }) {
           ))}
         </div>
 
-        <ReportStage report={report} t={t} />
+        <ReportStage card={card} t={t} />
         <p className={styles.note}>
-          {t.home.exampleNote(report.reraId, report.readOn)}
+          {card && (
+            <>
+              {t.home.report.latestNote(card.readOn)}{" "}
+              <Link href={`/report/${card.id}`} className={styles.noteLink}>
+                {t.home.report.open}
+              </Link>
+            </>
+          )}
+          {recent.status === "ready" && !card && t.home.report.skeletonNote}
         </p>
       </div>
     </section>

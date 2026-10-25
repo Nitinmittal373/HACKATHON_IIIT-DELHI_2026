@@ -1,12 +1,27 @@
 import type { home as en } from "@/lib/i18n/en/home";
 
 export const home: typeof en = {
-  exampleNote: (reraId: string, date: string) =>
-    `यह एक उदाहरण है, लाइव जाँच नहीं: सारे मान ${date} को पढ़ी गई ${reraId} की जाँच से हैं।`,
   marqueeLabel: "जिन स्रोतों को हम पढ़ते हैं",
   report: {
-    ariaLabel: (name: string) => `${name} की उदाहरण रिपोर्ट`,
-    kicker: (date: string) => `उदाहरण रिपोर्ट · पढ़ी गई ${date}`,
+    ariaLabel: (name: string, score: number, band: string) =>
+      `NeevCheck की ताज़ा रिपोर्ट: ${name}, NeevScore 100 में से ${score}, ${band}`,
+    kicker: (date: string) => `ताज़ा रिपोर्ट · पढ़ी गई ${date}`,
+    latestNote: (date: string) => `NeevCheck पर सबसे हाल की असली जाँच, ${date} को लाइव पढ़ी गई।`,
+    open: "यह रिपोर्ट खोलें",
+    registered: (date: string) => `पंजीकरण ${date}`,
+    sources: (count: number) => `${count} स्रोत पढ़े`,
+    confidence: "मुख्य जाँचें पढ़ी गईं",
+    skeletonLabel: "आपकी रिपोर्ट की जगह",
+    skeletonKicker: "NEEVCHECK रिपोर्ट",
+    skeletonTitle: "आपकी रिपोर्ट यहाँ दिखेगी",
+    skeletonBody: "ऊपर कोई प्रोजेक्ट खोजें। आपकी रिपोर्ट का हर अंक उस रिकॉर्ड से जुड़ा होता है जहाँ से वह आया।",
+    skeletonNote: "NeevCheck पर अभी कोई जाँच पूरी नहीं हुई है। पहली जाँच आपकी हो सकती है।",
+  },
+  recent: {
+    title: "NeevCheck पर हाल में जाँचे गए",
+    lead: "दूसरे खरीदारों की असली जाँचें। हर एक अपनी पूरी रिपोर्ट और हर स्रोत के साथ खुलती है।",
+    item: (name: string, score: number, band: string, date: string) =>
+      `${name}: NeevScore ${score}, ${band}, ${date} को जाँचा गया`,
   },
   problem: {
     eyebrow: "समस्या",

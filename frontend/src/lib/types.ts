@@ -157,3 +157,25 @@ export interface Alert {
   removed: AlertChange[];
   changed: AlertChange[];
 }
+
+/** One line of "My reports" (GET /api/checks?ids=). */
+export interface CheckSummary {
+  id: string;
+  rera_id: string;
+  details_url: string;
+  project: string | null;
+  promoter: string | null;
+  status: CheckStatus;
+  score: number | null;
+  band: Band | null;
+  confidence: number | null;
+  created_at: string;
+  completed_at: string | null;
+}
+
+/** A finished check shown on the home page (GET /api/checks/recent). */
+export interface RecentCheck extends CheckSummary {
+  registered_on: string | null;
+  sources_read: number;
+  drivers: Driver[];
+}

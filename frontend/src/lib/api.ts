@@ -1,4 +1,13 @@
-import type { Alert, Check, Project, Report, SearchResponse, Watch } from "@/lib/types";
+import type {
+  Alert,
+  Check,
+  CheckSummary,
+  Project,
+  RecentCheck,
+  Report,
+  SearchResponse,
+  Watch,
+} from "@/lib/types";
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -160,6 +169,24 @@ export function createWatch(
 
 export function getAlerts(email: string): Promise<Alert[]> {
   return request(`/api/sentinel/alerts?email=${encodeURIComponent(email)}`);
+}
+
+/** The checks a visitor started, for "My reports". Ids the server no longer has are left out. */
+export function listChecks(ids: string[]): Promise<CheckSummary[]> {
+  return request(`/api/checks?ids=${ids.join(",")}`, { timeoutMs: WAKE_TIMEOUT_MS });
+}
+
+const RECENT_FRESH_FOR_MS = 60_000;
+let recent: { at: number; checks: Promise<RecentCheck[]> } | null = null;
+
+/** The latest finished checks site-wide. The hero card and the strip below it share one request. */
+export function recentChecks(): Promise<RecentCheck[]> {
+  if (!recent || Date.now() - recent.at > RECENT_FRESH_FOR_MS) {
+    const checks = request<RecentCheck[]>("/api/checks/recent", { timeoutMs: WAKE_TIMEOUT_MS });
+    recent = { at: Date.now(), checks };
+    checks.catch(() => (recent = null));
+  }
+  return recent.checks;
 }
 
 export function getCheck(id: string): Promise<Check> {

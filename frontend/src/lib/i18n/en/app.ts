@@ -1,7 +1,7 @@
 export const app = {
   nav: {
     check: "Check a project",
-    sample: "Sample report",
+    reports: "My reports",
     how: "How it works",
     rwa: "For RWAs",
     alerts: "Alerts",
