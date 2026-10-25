@@ -273,3 +273,29 @@ a {
     transform: translateY(8px);
   }
 }
+
+/* Verdict colours for findings: set a tone class, then read --tone-bg and --tone-fg. */
+.tone-ok {
+  --tone-bg: #f1f8f4;
+  --tone-fg: var(--low-text);
+}
+
+.tone-review {
+  --tone-bg: #fdf7e8;
+  --tone-fg: var(--moderate);
+}
+
+.tone-fail {
+  --tone-bg: #fdf0e7;
+  --tone-fg: var(--high);
+}
+
+.tone-context {
+  --tone-bg: var(--soft);
+  --tone-fg: var(--o-text);
+}
+
+.tone-neutral {
+  --tone-bg: #f3eee9;
+  --tone-fg: var(--mu);
+}
