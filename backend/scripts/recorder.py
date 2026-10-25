@@ -21,7 +21,8 @@ from app.tinyfish import (
     WebError,
 )
 
-EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+")
+# Search snippets sometimes break an address as "name @host.com", so allow a space around the @.
+EMAIL = re.compile(r"[\w.+-]+\s?@\s?[\w-]+\.[\w.-]+")
 PHONE = re.compile(r"(?<!\d)(?:\+91[\s-]?)?[6-9]\d{9}(?!\d)")
 # The live browser address can carry a session token, so only its host is kept.
 LIVE_URL_PLACEHOLDER = "https://live.tinyfish.example/session"

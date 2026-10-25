@@ -43,3 +43,11 @@ def test_live_check_for_8334(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) ->
 
         report = client.get(f"/api/checks/{check_id}/report").json()
         assert "registration" in {f["kind"] for f in report["findings"]}
+
+        # What the other sources find changes from day to day; what must hold is the honesty rules.
+        sources = {run["source"]: run["status"] for run in report["check"]["sources"]}
+        assert sources["uprera"] == "completed"
+        assert report["score"]["confidence"] > 0.5
+        for finding in report["findings"]:
+            assert finding["source_url"].startswith("https://")
+            assert finding["read_on"] and finding["reliability"]
