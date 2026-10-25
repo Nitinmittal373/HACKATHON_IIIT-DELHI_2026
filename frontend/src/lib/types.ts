@@ -148,6 +148,7 @@ export interface Alert {
   id: string;
   watch_id: string;
   rera_id: string;
+  check_id: string;
   project_name: string | null;
   created_at: string;
   old_score: number | null;

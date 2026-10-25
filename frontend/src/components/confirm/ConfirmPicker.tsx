@@ -6,8 +6,8 @@ import { useId, useState } from "react";
 
 import { PageMessage } from "@/components/PageMessage";
 import { ProjectRow } from "@/components/confirm/ProjectRow";
-import { ApiError, createCheck } from "@/lib/api";
-import type { Strings } from "@/lib/i18n";
+import { createCheck } from "@/lib/api";
+import { describeApiError } from "@/lib/apiMessages";
 import { useLang } from "@/lib/LangProvider";
 import type { Project } from "@/lib/types";
 import styles from "./ConfirmPicker.module.css";
@@ -29,9 +29,10 @@ export function ConfirmPicker({ projects }: { projects: Project[] }) {
     setProblem(null);
     try {
       const check = await createCheck(selected);
-      router.push(`/check/${check.id}`);
+      // A check of this project from the last 24 hours is shown instead of starting another.
+      router.push(check.reused ? `/report/${check.id}` : `/check/${check.id}`);
     } catch (error) {
-      setProblem(describe(error, t));
+      setProblem(describeApiError(error, t));
       setStarting(false);
     }
   }
@@ -97,13 +98,4 @@ export function ConfirmPicker({ projects }: { projects: Project[] }) {
       )}
     </>
   );
-}
-
-function describe(error: unknown, t: Strings): string {
-  if (error instanceof ApiError) {
-    if (error.status === 429) return t.errors.rateLimited(error.retryAfter ?? 60);
-    if (error.status === 0) return t.errors.unreachableBody;
-    return error.message;
-  }
-  return t.errors.somethingBody;
 }

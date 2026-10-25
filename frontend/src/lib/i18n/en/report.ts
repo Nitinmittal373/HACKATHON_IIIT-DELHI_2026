@@ -38,8 +38,11 @@ export const report = {
   share: "Share",
   linkCopied: "Link copied",
   copyFailed: "Copy the link from the address bar",
-  checkedAgo: (hours: number) =>
-    hours < 1 ? "Checked less than an hour ago" : `Checked ${hours} h ago`,
+  checkedAgo: (hours: number) => {
+    if (hours < 1) return "Checked less than an hour ago";
+    if (hours < 48) return `Checked ${hours} h ago`;
+    return `Checked ${Math.floor(hours / 24)} days ago`;
+  },
   recheck: "Re-check now",
   outOf: "out of 100",
   scoreLabel: (value: number, band: string) => `NeevScore ${value} out of 100, ${band}`,

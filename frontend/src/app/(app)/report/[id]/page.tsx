@@ -7,6 +7,7 @@ import { PageMessage } from "@/components/PageMessage";
 import { ActionPlan } from "@/components/report/ActionPlan";
 import { DriversCard } from "@/components/report/DriversCard";
 import { EvidenceList } from "@/components/report/EvidenceList";
+import { SentinelCard } from "@/components/report/SentinelCard";
 import { ReportHeader } from "@/components/report/ReportHeader";
 import { ScoreCard } from "@/components/report/ScoreCard";
 import { Timeline } from "@/components/report/Timeline";
@@ -64,6 +65,7 @@ export default async function ReportPage({ params }: Props) {
         <aside className={styles.column}>
           <ActionPlan report={report} t={t} />
           <Timeline events={report.timeline} t={t} lang={lang} />
+          <SentinelCard project={report.project} t={t} />
           <p className={styles.disclaimer}>{t.report.disclaimer(readDate)}</p>
         </aside>
       </div>

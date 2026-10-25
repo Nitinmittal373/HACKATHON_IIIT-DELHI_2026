@@ -40,8 +40,11 @@ export const report: typeof en = {
   share: "साझा करें",
   linkCopied: "लिंक कॉपी हो गया",
   copyFailed: "एड्रेस बार से लिंक कॉपी करें",
-  checkedAgo: (hours: number) =>
-    hours < 1 ? "एक घंटे से कम पहले जाँचा गया" : `${hours} घंटे पहले जाँचा गया`,
+  checkedAgo: (hours: number) => {
+    if (hours < 1) return "एक घंटे से कम पहले जाँचा गया";
+    if (hours < 48) return `${hours} घंटे पहले जाँचा गया`;
+    return `${Math.floor(hours / 24)} दिन पहले जाँचा गया`;
+  },
   recheck: "अभी दोबारा जाँचें",
   outOf: "100 में से",
   scoreLabel: (value: number, band: string) => `NeevScore 100 में से ${value}, ${band}`,

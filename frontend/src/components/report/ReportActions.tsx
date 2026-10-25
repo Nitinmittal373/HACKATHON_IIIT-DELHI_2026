@@ -2,13 +2,20 @@
 
 import { useState } from "react";
 
+import { WatchButton } from "@/components/sentinel/WatchButton";
 import { useLang } from "@/lib/LangProvider";
+import type { Project } from "@/lib/types";
 import styles from "./ReportActions.module.css";
+
+interface Props {
+  reportId: string;
+  project: Pick<Project, "rera_id" | "details_url">;
+}
 
 type Feedback = "copied" | "failed" | null;
 
-/** Report header buttons. Sharing copies this page's link. */
-export function ReportActions({ reportId }: { reportId: string; reraId: string }) {
+/** Report header buttons: watch with Sentinel and share. Sharing copies this page's link. */
+export function ReportActions({ reportId, project }: Props) {
   const { t } = useLang();
   const [feedback, setFeedback] = useState<Feedback>(null);
 
@@ -25,6 +32,7 @@ export function ReportActions({ reportId }: { reportId: string; reraId: string }
 
   return (
     <div className={styles.actions}>
+      <WatchButton project={project} />
       <button type="button" className="btn2" onClick={share}>
         {t.report.share}
       </button>

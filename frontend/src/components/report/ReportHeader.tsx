@@ -1,5 +1,6 @@
+import { RecheckNote } from "@/components/report/RecheckNote";
 import { ReportActions } from "@/components/report/ReportActions";
-import { dayOf } from "@/lib/format";
+import { dayOf, hoursSince } from "@/lib/format";
 import type { Lang, Strings } from "@/lib/i18n";
 import type { Report } from "@/lib/types";
 import styles from "./ReportHeader.module.css";
@@ -27,8 +28,9 @@ export function ReportHeader({ report, t, lang }: Props) {
             {meta && `${meta} · `}
             <span className="mono">{project.rera_id}</span>
           </p>
+          <RecheckNote hours={hoursSince(check.completed_at ?? check.started_at)} project={project} />
         </div>
-        <ReportActions reportId={check.id} reraId={project.rera_id} />
+        <ReportActions reportId={check.id} project={project} />
       </div>
     </header>
   );
