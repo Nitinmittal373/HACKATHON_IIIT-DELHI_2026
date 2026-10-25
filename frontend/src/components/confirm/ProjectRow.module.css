@@ -1,0 +1,121 @@
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 28px 1.6fr 1fr 1fr 120px;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-top: 1px solid var(--ln);
+  background: #fff;
+  cursor: pointer;
+}
+
+.row:hover {
+  background: #fbfaf7;
+}
+
+.selected,
+.selected:hover {
+  background: #fff8f2;
+}
+
+/* The radio itself is hidden but stays focusable; its focus ring is drawn on the dot. */
+.input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.input:focus-visible ~ .radio {
+  outline: 2px solid var(--o);
+  outline-offset: 3px;
+}
+
+.radio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--ln2);
+  border-radius: 50%;
+}
+
+.radio span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.selected .radio {
+  border-color: var(--o);
+}
+
+.selected .radio span {
+  background: var(--o);
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.main b {
+  font-weight: 600;
+}
+
+.detail {
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--mu);
+}
+
+.cell {
+  font-size: 14px;
+  color: var(--mu);
+}
+
+.number {
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.badge {
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #fff1e6;
+  color: var(--o-text);
+}
+
+.mobileNumber,
+.mobileBadge {
+  display: none;
+}
+
+@media (max-width: 960px) {
+  .row {
+    grid-template-columns: 28px 1fr;
+  }
+
+  .cell {
+    display: none;
+  }
+
+  .mobileNumber {
+    display: block;
+    margin-top: 2px;
+    font-size: 12.5px;
+    color: var(--mu);
+  }
+
+  .mobileBadge {
+    display: inline-block;
+    margin-top: 6px;
+  }
+}

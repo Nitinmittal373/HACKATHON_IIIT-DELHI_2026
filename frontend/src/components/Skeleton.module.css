@@ -1,0 +1,12 @@
+.block {
+  border-radius: var(--r-sm);
+  background: linear-gradient(90deg, #f3eee9, #fbf7f3, #f3eee9);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}

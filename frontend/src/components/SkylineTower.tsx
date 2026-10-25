@@ -59,9 +59,10 @@ export function SkylineTower({ tower, windows, delay }: Props) {
             />
           );
         })}
-        {windows.map((w) => (
+        {windows.map((w, index) => (
           <rect
-            key={`${w.x}-${w.y}`}
+            // Two windows can share a spot, so the position alone is not a unique key.
+            key={`${w.x}-${w.y}-${index}`}
             className={styles.window}
             x={w.x}
             y={w.y}
