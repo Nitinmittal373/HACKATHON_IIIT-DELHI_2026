@@ -57,7 +57,7 @@
 
 .finished,
 .queued {
-  color: var(--fa);
+  color: var(--mu);
 }
 
 .rec {

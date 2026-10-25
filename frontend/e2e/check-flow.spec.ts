@@ -90,3 +90,10 @@ test.describe("on a phone", () => {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 });
+
+test("an unknown check or report says so calmly", async ({ page }) => {
+  for (const path of ["/report/" + "b".repeat(32), "/check/" + "b".repeat(32), "/report/not-an-id", "/nowhere"]) {
+    await page.goto(path);
+    await expect(page.getByRole("heading", { name: "We could not find this page" })).toBeVisible();
+  }
+});

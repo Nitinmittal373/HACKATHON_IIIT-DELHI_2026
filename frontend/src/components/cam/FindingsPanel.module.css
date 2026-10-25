@@ -33,8 +33,6 @@
   margin: 14px 0 0;
   padding: 0;
   list-style: none;
-  max-height: 440px;
-  overflow-y: auto;
 }
 
 .item {
@@ -73,7 +71,7 @@
   display: block;
   margin-top: 3px;
   font-size: 11.5px;
-  color: var(--fa);
+  color: var(--mu);
 }
 
 @keyframes chipIn {

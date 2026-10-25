@@ -10,7 +10,7 @@
   padding: 11px 18px;
   background: var(--soft);
   font-size: 11.5px;
-  color: var(--fa);
+  color: var(--mu);
 }
 
 /* Stays in view while a long list scrolls, so the question is never out of reach. */

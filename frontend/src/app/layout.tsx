@@ -8,6 +8,7 @@ import { getLang } from "@/lib/i18n/server";
 import { LangProvider } from "@/lib/LangProvider";
 import "@/styles/tokens.css";
 import "@/styles/globals.css";
+import "@/styles/app.css";
 import "@/styles/print.css";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist", display: "optional" });
