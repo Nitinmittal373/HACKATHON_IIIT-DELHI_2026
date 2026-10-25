@@ -12,7 +12,7 @@ from urllib.parse import urlsplit
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-SourceName = Literal["uprera", "registry", "insolvency", "land", "consumer", "news"]
+SourceName = Literal["uprera", "registry", "insolvency", "land", "consumer", "news", "group"]
 Area = Literal["rera", "execution", "legal", "financial", "builder_history", "news"]
 Reliability = Literal["primary", "secondary"]
 Verdict = Literal["ok", "fail", "red_flag", "review", "context", "not_found"]
@@ -142,6 +142,10 @@ class Finding(BaseModel):
     count: int | None = None
     months: int | None = None
     scope: InsolvencyScope | None = None
+    # Out of how many, for share-style facts such as "3 of 5 group projects delayed".
+    total: int | None = None
+    # The exact words on the page behind the claim, for the evidence ledger.
+    snippet: str | None = Field(default=None, max_length=300)
 
 
 class Driver(BaseModel):
@@ -198,12 +202,61 @@ class RecentCheck(CheckSummary):
     drivers: list[Driver] = []
 
 
+PillarId = Literal["P1", "P2", "P3", "P4", "P5", "P6"]
+BandV2 = Literal["Low", "Watch", "Elevated", "High", "insufficient_evidence"]
+
+
+class Pillar(BaseModel):
+    id: PillarId
+    name: str
+    weight: float
+    # 0-100, after the pillar's cap.
+    penalty: int
+    # Points lost on the 300-900 scale, negative like the v1 drivers.
+    points: float
+
+
+class DriverV2(BaseModel):
+    """One finding's share of the score, so the evidence ledger can show it."""
+
+    finding_id: str
+    pillar: PillarId
+    code: str
+    penalty: int
+    points: float
+
+
+class ReasonCode(BaseModel):
+    code: str
+    label: str
+    finding_ids: list[str]
+    points: float
+
+
+class ScoreV2(BaseModel):
+    value: int
+    band: BandV2
+    band_label: str
+    # True when too few pillars were read to rate the project; the value is shown but not banded.
+    provisional: bool
+    hard_stop: bool
+    hard_stop_reason: str | None = None
+    # Share of the six pillars with at least one source read.
+    confidence: float
+    pillars: list[Pillar]
+    reason_codes: list[ReasonCode]
+    drivers: list[DriverV2]
+    pillars_unread: list[PillarId]
+
+
 class Report(BaseModel):
     check: Check
     project: Project
     score: Score
     findings: list[Finding]
     timeline: list[Finding]
+    # The 300-900 score with pillars and reason codes; None for checks made before v2.
+    score_v2: ScoreV2 | None = None
 
 
 class Event(BaseModel):

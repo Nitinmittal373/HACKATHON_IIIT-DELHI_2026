@@ -95,6 +95,16 @@ class FindingRow(Base):
     points: Mapped[float | None] = mapped_column(Float)
 
 
+class FindingExtraRow(Base):
+    """Optional facts of a finding (snippet, totals), kept apart so older databases need no
+    column added to the findings table."""
+
+    __tablename__ = "finding_extras"
+
+    finding_id: Mapped[str] = mapped_column(ForeignKey("findings.id"), primary_key=True)
+    data: Mapped[dict[str, object]] = mapped_column(JSON)
+
+
 class ScoreRow(Base):
     __tablename__ = "scores"
 

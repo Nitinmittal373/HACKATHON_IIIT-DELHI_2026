@@ -8,7 +8,7 @@ from datetime import datetime
 from sqlalchemy import Row, Select, func, select
 from sqlalchemy.orm import Session, sessionmaker
 
-from app.db import CheckRow, FindingRow, ProjectRow, ScoreRow, SourceRunRow
+from app.db import CheckRow, FindingExtraRow, FindingRow, ProjectRow, ScoreRow, SourceRunRow
 from app.models import (
     Check,
     CheckStatus,
@@ -18,8 +18,12 @@ from app.models import (
     Project,
     RecentCheck,
     Score,
+    ScoreV2,
     SourceRun,
 )
+
+# Finding fields stored in finding_extras instead of the findings table.
+EXTRA_FIELDS = ("snippet", "total")
 
 # The home page card shows the three biggest reasons behind a score.
 RECENT_DRIVERS = 3
@@ -147,13 +151,30 @@ class Store:
             row.checks_read = list(run.checks_read)
 
     def add_finding(self, check_id: str, finding: Finding) -> None:
+        # No source, no claim: a finding without a link is never stored.
+        if not finding.source_url.strip():
+            raise ValueError(f"Finding {finding.kind!r} has no source_url")
+        fields = finding.model_dump()
+        extras = {name: fields.pop(name) for name in EXTRA_FIELDS if fields[name] is not None}
+        for name in EXTRA_FIELDS:
+            fields.pop(name, None)
         with self._sessions.begin() as session:
-            session.add(FindingRow(check_id=check_id, **finding.model_dump()))
+            session.add(FindingRow(check_id=check_id, **fields))
+            if extras:
+                session.add(FindingExtraRow(finding_id=finding.id, data=extras))
 
     def list_findings(self, check_id: str) -> list[Finding]:
         with self._sessions() as session:
             rows = session.scalars(select(FindingRow).where(FindingRow.check_id == check_id))
-            return [_finding(row) for row in rows]
+            extras = {
+                extra.finding_id: extra.data
+                for extra in session.scalars(
+                    select(FindingExtraRow).join(
+                        FindingRow, FindingRow.id == FindingExtraRow.finding_id
+                    ).where(FindingRow.check_id == check_id)
+                )
+            }
+            return [_finding(row, extras.get(row.id, {})) for row in rows]
 
     def save_score(self, check_id: str, score: Score) -> None:
         detail = score.model_dump(
@@ -182,6 +203,18 @@ class Store:
             for row in session.scalars(select(FindingRow).where(FindingRow.check_id == check_id)):
                 row.points = points.get(row.id, 0.0)
 
+    def save_score_v2(self, check_id: str, score: ScoreV2) -> None:
+        """Keep the v2 score inside the stored v1 detail, which has no fixed columns."""
+        with self._sessions.begin() as session:
+            row = session.get_one(ScoreRow, check_id)
+            row.detail = {**row.detail, "v2": score.model_dump(mode="json")}
+
+    def get_score_v2(self, check_id: str) -> ScoreV2 | None:
+        with self._sessions() as session:
+            row = session.get(ScoreRow, check_id)
+            stored = row.detail.get("v2") if row else None
+            return ScoreV2.model_validate(stored) if stored else None
+
     def get_score(self, check_id: str) -> Score | None:
         with self._sessions() as session:
             row = session.get(ScoreRow, check_id)
@@ -192,7 +225,7 @@ class Store:
                 band=row.band,  # type: ignore[arg-type]  # written only from Band
                 confidence=row.confidence,
                 hard_stop=row.hard_stop,
-                **row.detail,  # type: ignore[arg-type]
+                **{k: v for k, v in row.detail.items() if k != "v2"},  # type: ignore[arg-type]
             )
 
 
@@ -256,6 +289,6 @@ def _source_run(row: SourceRunRow) -> SourceRun:
     )
 
 
-def _finding(row: FindingRow) -> Finding:
-    fields = {name: getattr(row, name) for name in Finding.model_fields}
-    return Finding.model_validate(fields)
+def _finding(row: FindingRow, extras: dict[str, object]) -> Finding:
+    fields = {name: getattr(row, name) for name in Finding.model_fields if name not in EXTRA_FIELDS}
+    return Finding.model_validate({**fields, **extras})

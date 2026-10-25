@@ -17,8 +17,18 @@ from pathlib import Path
 from typing import Any
 
 from app.events import EventHub
-from app.models import Check, CheckKey, Event, EventType, Project, SourceName, SourceRun
+from app.models import (
+    Check,
+    CheckKey,
+    Event,
+    EventType,
+    Finding,
+    Project,
+    SourceName,
+    SourceRun,
+)
 from app.scoring.engine import score
+from app.scoring.v2 import pillars_read, score_v2
 from app.sources import build_sources
 from app.sources.base import (
     Blocked,
@@ -115,8 +125,10 @@ class Orchestrator:
                 *(self._run_source(check_id, s, ctx) for s in others)
             )
             read = set(primary_read).union(*(checks for _, checks in others_read))
-            result = score(self._store.list_findings(check_id), read)
+            findings = self._store.list_findings(check_id)
+            result = score(findings, read)
             self._store.save_score(check_id, result)
+            self._save_score_v2(check_id, findings, read)
             self._finish(
                 check_id, "completed", score=result.model_dump(mode="json", include=SUMMARY)
             )
@@ -188,6 +200,23 @@ class Orchestrator:
             )
             return ctx, read
 
+    def _save_score_v2(self, check_id: str, findings: list[Finding], read: set[CheckKey]) -> None:
+        """v2 sits next to v1; if it ever fails the v1 report must still be delivered."""
+        try:
+            check = self._store.get_check(check_id)
+            runs = check.sources if check else []
+            completed = [run.source for run in runs if run.status == "completed"]
+            unavailable = [
+                f"{UNAVAILABLE_LABELS[run.source]}"
+                + (f" ({run.message})" if run.message else "")
+                for run in runs
+                if run.status != "completed" and run.source in UNAVAILABLE_LABELS
+            ]
+            result = score_v2(findings, pillars_read(read, completed), unavailable)
+            self._store.save_score_v2(check_id, result)
+        except Exception:
+            logger.exception("v2 score failed for check %s", check_id)
+
     def _finish(self, check_id: str, status: str, **data: Any) -> None:
         self._store.set_check_status(check_id, status, self._clock())  # type: ignore[arg-type]
         self._emit(check_id, "check.completed", "check", status=status, **data)
@@ -205,6 +234,14 @@ class Orchestrator:
         self._hub.publish(event)
 
 
+UNAVAILABLE_LABELS: dict[SourceName, str] = {
+    "registry": "Company registry",
+    "insolvency": "Insolvency records",
+    "land": "Land authority lists",
+    "consumer": "Consumer cases (e-Jagriti)",
+    "news": "News",
+    "group": "Group companies",
+}
 SUMMARY = {"value", "band", "band_label", "confidence", "provisional", "hard_stop"}
 
 

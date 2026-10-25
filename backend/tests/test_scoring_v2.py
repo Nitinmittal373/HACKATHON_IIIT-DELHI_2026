@@ -1,0 +1,237 @@
+from datetime import date
+from itertools import count
+from pathlib import Path
+
+import pytest
+
+from app.models import Finding, InsolvencyScope, Reliability
+from app.scoring.v2 import band_for, clip, pillars_read, score_v2
+from app.scoring.v2.models import PillarId
+from tests.test_recorded_check import check
+
+_ids = count(1)
+URL = "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334"
+ALL: list[PillarId] = ["P1", "P2", "P3", "P4", "P5", "P6"]
+
+
+def finding(
+    kind: str,
+    *,
+    count: int | None = None,
+    months: int | None = None,
+    total: int | None = None,
+    scope: InsolvencyScope | None = None,
+    reliability: Reliability = "primary",
+) -> Finding:
+    return Finding(
+        id=f"f{next(_ids)}",
+        source="uprera",
+        kind=kind,
+        title=kind.replace("_", " "),
+        verdict="review",
+        reliability=reliability,
+        source_url=URL,
+        read_on=date(2026, 10, 25),
+        count=count,
+        months=months,
+        total=total,
+        scope=scope,
+    )
+
+
+def penalty_of(kind: str, pillar: str, **facts: object) -> int:
+    result = score_v2([finding(kind, **facts)], ALL)  # type: ignore[arg-type]
+    return next(p.penalty for p in result.pillars if p.id == pillar)
+
+
+def test_nothing_found_scores_900_and_never_adds_points() -> None:
+    result = score_v2([], ALL)
+
+    assert (result.value, result.band) == (900, "Low")
+    assert result.reason_codes == []
+
+
+@pytest.mark.parametrize(
+    ("kind", "pillar", "facts", "expected"),
+    [
+        ("completion_extended", "P1", {"count": 1}, 30),
+        ("completion_extended", "P1", {"count": 3}, 70),
+        ("delay_vs_promised", "P1", {"months": 12}, 0),
+        ("delay_vs_promised", "P1", {"months": 13}, 40),
+        ("delay_vs_promised", "P1", {"months": 25}, 70),
+        ("qpr_missed", "P1", {"count": 2}, 30),
+        ("qpr_missed", "P1", {"count": 4}, 60),
+        ("rera_penalty_order", "P1", {"count": 2}, 40),
+        ("group_delay_share", "P2", {"count": 1, "total": 4}, 25),
+        ("group_project_lapsed", "P2", {}, 40),
+        ("group_company_insolvent", "P3", {}, 50),
+        ("project_complaints", "P3", {"count": 3}, 30),
+        ("project_complaints", "P3", {"count": 30}, 100),
+        ("consumer_cases", "P3", {"count": 3}, 15),
+        ("consumer_cases", "P3", {"count": 20}, 40),
+        ("company_struck_off", "P4", {}, 40),
+        ("director_disqualified", "P4", {}, 40),
+        ("charge_created", "P4", {}, 20),
+        ("mca_late_filing", "P4", {}, 20),
+        ("sarfaesi_notice", "P4", {}, 60),
+        ("land_dues", "P5", {}, 70),
+        ("land_package_default", "P5", {}, 50),
+        ("oc_cc_past_due", "P5", {}, 30),
+        ("news_story", "P6", {}, 10),
+    ],
+)
+def test_each_rule(kind: str, pillar: str, facts: dict[str, object], expected: int) -> None:
+    assert penalty_of(kind, pillar, **facts) == expected
+
+
+def test_news_is_capped_at_60_and_a_pillar_at_100() -> None:
+    news = [finding("news_story") for _ in range(9)]
+    rera = [finding("completion_extended", count=5), finding("qpr_missed", count=4)]
+
+    result = score_v2([*news, *rera], ALL)
+
+    penalties = {p.id: p.penalty for p in result.pillars}
+    assert penalties["P6"] == 60
+    assert penalties["P1"] == 100
+
+
+def test_unknown_kinds_cost_nothing() -> None:
+    assert score_v2([finding("court_order"), finding("completion_date")], ALL).value == 900
+
+
+def test_formula_and_driver_points_add_up() -> None:
+    result = score_v2([finding("completion_extended", count=2)], ALL)  # P1 penalty 50
+
+    assert result.value == 900 - round(6 * 0.30 * 50)
+    assert result.reason_codes[0].code == "R02"
+    assert result.reason_codes[0].points == -90.0
+    assert result.drivers[0].points == -90.0
+
+
+def test_clip_keeps_the_scale() -> None:
+    assert clip(1000) == 900
+    assert clip(299) == 300
+    assert clip(300) == 300
+    assert clip(0) == 300
+
+
+@pytest.mark.parametrize(
+    ("value", "band"),
+    [
+        (300, "High"),
+        (449, "High"),
+        (450, "Elevated"),
+        (599, "Elevated"),
+        (600, "Watch"),
+        (749, "Watch"),
+        (750, "Low"),
+        (900, "Low"),
+    ],
+)
+def test_band_edges(value: int, band: str) -> None:
+    assert band_for(value) == band
+
+
+def test_the_score_never_falls_below_300() -> None:
+    worst = [
+        finding("registration_revoked"),
+        finding("group_project_lapsed"),
+        finding("sarfaesi_notice"),
+        finding("land_dues"),
+        finding("insolvency_scope", scope="company"),
+    ]
+
+    assert score_v2(worst, ALL).value >= 300
+
+
+def test_revoked_registration_is_a_hard_stop_in_the_high_band() -> None:
+    result = score_v2([finding("registration_revoked")], ALL)
+
+    assert result.hard_stop
+    assert result.band == "High"
+    assert result.value <= 449
+    assert result.hard_stop_reason == "UP-RERA registration lapsed or revoked"
+    assert result.reason_codes[0].code == "R01"
+
+
+def test_cirp_from_an_official_page_is_a_hard_stop() -> None:
+    result = score_v2([finding("insolvency_scope", scope="company")], ALL)
+
+    assert result.hard_stop
+    assert result.band == "High"
+    assert result.reason_codes[0].code == "R06"
+
+
+def test_cirp_from_a_secondary_page_is_not_a_hard_stop() -> None:
+    secondary = finding("insolvency_scope", scope="company", reliability="secondary")
+
+    result = score_v2([secondary], ALL)
+
+    assert not result.hard_stop
+    assert result.pillars[2].penalty == 50
+
+
+def test_a_hard_stop_is_banded_even_with_little_evidence() -> None:
+    result = score_v2([finding("registration_revoked")], ["P1"])
+
+    assert result.provisional is False
+    assert result.band == "High"
+
+
+def test_too_few_pillars_gives_no_band() -> None:
+    result = score_v2([finding("completion_extended", count=1)], ["P1", "P3"])
+
+    assert result.confidence == 0.33
+    assert result.provisional
+    assert result.band == "insufficient_evidence"
+    assert result.band_label == "Not enough evidence yet"
+
+
+def test_half_the_pillars_is_enough_for_a_band() -> None:
+    assert not score_v2([], ["P1", "P2", "P3"]).provisional
+
+
+def test_unread_data_is_r12_with_no_penalty() -> None:
+    clean = score_v2([], ["P1", "P2", "P3", "P4"])
+    result = score_v2([], ["P1", "P2", "P3", "P4"], ["Consumer cases (e-Jagriti) (CAPTCHA)"])
+
+    assert clean.value == result.value == 900
+    r12 = result.reason_codes[-1]
+    assert r12.code == "R12"
+    assert r12.points == 0
+    assert "e-Jagriti" in r12.label
+    assert "Land authority" in r12.label
+
+
+def test_reason_codes_are_ordered_by_points_lost() -> None:
+    findings = [finding("news_story"), finding("completion_extended", count=3)]
+
+    codes = [c.code for c in score_v2(findings, ALL).reason_codes]
+
+    assert codes == ["R02", "R11"]
+
+
+def test_pillars_read_from_checks_and_sources() -> None:
+    assert pillars_read(["registration", "company_status"], ["news", "group"]) == [
+        "P1",
+        "P2",
+        "P4",
+        "P6",
+    ]
+    assert pillars_read([], []) == []
+
+
+def test_recorded_8334_check_has_a_v2_score(tmp_path: Path) -> None:
+    report = check(tmp_path)["report"]
+
+    v2 = report["score_v2"]
+    assert report["score"]["value"] == 68  # v1 is untouched
+    assert (v2["value"], v2["band"], v2["confidence"]) == (741, "Watch", 0.67)
+    assert v2["pillars_unread"] == ["P2", "P5"]
+    assert [p["id"] for p in v2["pillars"]] == ALL
+    codes = [c["code"] for c in v2["reason_codes"]]
+    assert codes == ["R05", "R11", "R12"]
+    assert v2["reason_codes"][0]["label"] == "15 RERA complaints"
+    assert all(c["finding_ids"] or c["code"] == "R12" for c in v2["reason_codes"])
+    finding_ids = {f["id"] for f in report["findings"]}
+    assert {i for c in v2["reason_codes"] for i in c["finding_ids"]} <= finding_ids
