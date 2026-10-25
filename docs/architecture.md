@@ -106,6 +106,7 @@ Interactive docs are served at `/docs`.
 | `POST /api/checks` `{rera_id, details_url?, fresh?}` | `202` check, `Location` header; `200` with `reused: true` when a check of the same project finished in the last 24 hours (send `fresh: true` to re-check) | `422` bad input, `429` over `RATE_LIMIT_PER_MINUTE` or over `MAX_CHECKS_PER_DAY` (`detail.code` is `daily_cap`; both send `Retry-After`) |
 | `GET /api/checks?ids=a,b,c` | `200` a summary of each known check (`id`, `rera_id`, `details_url`, `project`, `promoter`, `status`, `score`, `band`, `confidence`, `created_at`, `completed_at`), in the order asked; ids the server does not have are left out | `422` more than 50 ids or a malformed one |
 | `GET /api/checks/recent` | `200` the latest finished check of up to 12 projects, newest first, each with its top three drivers, registration date and sources read. No emails or IP addresses | |
+| `GET /api/checks/compare?ids=a,b,c` | `200` two or three finished checks side by side: score, band, confidence, points lost per area, months past the completion date, complaint counts, insolvency, company status, unread checks and top three findings with links (`null` where a check could not read something), plus `best` and `reason` (`best_score`, `tie`, `not_enough_evidence`) | `422` not two or three valid ids, `404` unknown check, `409` a check with no score |
 | `GET /api/checks/{id}` | `200` check with each source's status | `404`, `422` malformed id |
 | `GET /api/checks/{id}/events` | `200 text/event-stream` | `404` |
 | `GET /api/checks/{id}/report` | `200` score, drivers, findings, timeline | `404`, `409` still running or failed |
@@ -210,3 +211,7 @@ The API runs on Render's free plan, which sleeps after 15 idle minutes and takes
 ## My reports, without accounts
 
 NeevCheck has no sign-in. The app keeps the ids of the checks a visitor starts in `localStorage` (`neevcheck-reports`, newest first, at most 50) and asks `GET /api/checks?ids=` for their state, so the list is private to that browser. Ids the server no longer knows (for example after its database was reset) are dropped from the list with a note. The home page's report card and its "Recently checked" strip come from `GET /api/checks/recent`, fetched in the browser after the page loads; before any check has finished, the card is an empty frame that says "Your report appears here", never sample numbers.
+
+## Compare
+
+`app/compare.py` builds the comparison from each check's report. A value a check could not read is `null`, never zero. "Best on the records" is the highest score among checks that read at least half of their key records (the same bar a score needs for a risk band); with fewer than two such checks the answer is "not enough evidence to rank", and equal scores are a tie. The app tints the better value of each row in orange only when every column has a value, and compares the six scoring areas only when every check has enough evidence, because zero points lost can mean nothing was found or nothing was read. Picks are kept in `localStorage` (`neevcheck-compare`, at most three), shared by My reports and each report's **Add to compare** button.

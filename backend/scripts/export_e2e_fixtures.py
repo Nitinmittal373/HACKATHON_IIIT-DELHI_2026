@@ -3,9 +3,13 @@
 It runs the recorded check of UPRERAPRJ8334 through the real app, with no network, and saves
 what the API said: the search result, the new check, the event stream, the finished check and
 the report. Run from backend/:  python -m scripts.export_e2e_fixtures
+
+`python -m scripts.export_e2e_fixtures compare` writes only the comparison of that check with
+the recorded UP-RERA page of UPRERAPRJ6742, keeping the check id the other fixtures use.
 """
 
 import json
+import sys
 import tempfile
 from pathlib import Path
 
@@ -46,5 +50,27 @@ def main() -> None:
             save_json("report.json", client.get(f"/api/checks/{check['id']}/report").json())
 
 
+def export_compare() -> None:
+    """compare.json and summary-6742.json, from the real compare and list endpoints."""
+    e2e_id = json.loads((OUT / "check-created.json").read_text(encoding="utf-8"))["id"]
+    web = make_web().replay(load_recording("check_8334.json"))
+    with tempfile.TemporaryDirectory() as folder:
+        settings = make_settings(Path(folder))
+        app = create_app(settings, web=web, clock=lambda: FIXED_NOW, cache_dir=None)
+        with TestClient(app) as client:
+            ids = []
+            for rera_id in ("UPRERAPRJ8334", "UPRERAPRJ6742"):
+                check_id = client.post("/api/checks", json={"rera_id": rera_id}).json()["id"]
+                with client.stream("GET", f"/api/checks/{check_id}/events") as response:
+                    response.read()
+                ids.append(check_id)
+            comparison = client.get("/api/checks/compare", params={"ids": ",".join(ids)}).json()
+            summary = client.get("/api/checks", params={"ids": ids[1]}).json()[0]
+    # The 8334 check here is a replay of the one the other fixtures hold; use that one's id.
+    text = json.dumps(comparison, indent=2, ensure_ascii=False).replace(ids[0], e2e_id)
+    save("compare.json", text + "\n")
+    save_json("summary-6742.json", summary)
+
+
 if __name__ == "__main__":
-    main()
+    export_compare() if sys.argv[1:] == ["compare"] else main()

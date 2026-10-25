@@ -114,7 +114,17 @@ createServer(async (req, res) => {
 
   if (path === "/api/checks" && req.method === "GET") {
     const ids = (url.searchParams.get("ids") ?? "").split(",");
-    return send(res, 200, ids.includes(recordedSummary().id) ? [recordedSummary()] : []);
+    const known = [recordedSummary(), json("summary-6742.json")];
+    return send(res, 200, ids.flatMap((id) => known.filter((check) => check.id === id)));
+  }
+
+  if (path === "/api/checks/compare") {
+    // The recorded comparison of the 8334 check with the 6742 page, in the order asked.
+    const ids = (url.searchParams.get("ids") ?? "").split(",");
+    const comparison = json("compare.json") as { projects: { check_id: string }[] };
+    const projects = ids.flatMap((id) => comparison.projects.filter((p) => p.check_id === id));
+    if (projects.length < 2) return send(res, 404, { detail: "No check with this id" });
+    return send(res, 200, { ...comparison, projects });
   }
 
   if (path === "/api/checks/recent") return send(res, 200, [recordedRecent()]);

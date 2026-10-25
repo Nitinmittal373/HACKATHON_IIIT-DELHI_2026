@@ -10,3 +10,8 @@
   color: var(--mu);
   font-size: 13px;
 }
+
+.compareLink {
+  color: var(--o-text);
+  font-weight: 600;
+}

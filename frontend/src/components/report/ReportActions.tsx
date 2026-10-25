@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { AddToCompare } from "@/components/report/AddToCompare";
 import { WatchButton } from "@/components/sentinel/WatchButton";
 import { useLang } from "@/lib/LangProvider";
 import type { Project } from "@/lib/types";
@@ -33,6 +34,7 @@ export function ReportActions({ reportId, project }: Props) {
   return (
     <div className={`${styles.actions} noPrint`}>
       <WatchButton project={project} />
+      <AddToCompare reportId={reportId} />
       <button type="button" className="btn2" onClick={() => window.print()}>
         {t.report.download}
       </button>

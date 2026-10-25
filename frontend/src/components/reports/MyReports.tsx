@@ -8,7 +8,7 @@ import { Skeleton } from "@/components/Skeleton";
 import { CompareBar } from "@/components/reports/CompareBar";
 import { ReportCard } from "@/components/reports/ReportCard";
 import { listChecks } from "@/lib/api";
-import { forgetChecks, useHistory } from "@/lib/history";
+import { addToCompare, forgetChecks, removeFromCompare, useCompareTray, useHistory } from "@/lib/history";
 import { useLang } from "@/lib/LangProvider";
 import type { CheckSummary } from "@/lib/types";
 import styles from "./MyReports.module.css";
@@ -24,7 +24,7 @@ export function MyReports() {
   const ids = useHistory();
   const [loaded, setLoaded] = useState<Loaded>({ status: "loading" });
   const [pruned, setPruned] = useState(0);
-  const [picked, setPicked] = useState<string[]>([]);
+  const picked = useCompareTray() ?? [];
   const [attempt, setAttempt] = useState(0);
   const key = ids?.join(",") ?? "";
 
@@ -61,14 +61,12 @@ export function MyReports() {
   }, [key, attempt]);
 
   function togglePicked(id: string) {
-    setPicked((current) => {
-      if (current.includes(id)) return current.filter((known) => known !== id);
-      return current.length >= MAX_COMPARED ? current : [...current, id];
-    });
+    if (picked.includes(id)) removeFromCompare([id]);
+    else if (picked.length < MAX_COMPARED) addToCompare(id);
   }
 
   function remove(id: string) {
-    setPicked((current) => current.filter((known) => known !== id));
+    removeFromCompare([id]);
     forgetChecks([id]);
   }
 

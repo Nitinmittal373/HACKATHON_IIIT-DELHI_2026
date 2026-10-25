@@ -2,6 +2,7 @@ import type {
   Alert,
   Check,
   CheckSummary,
+  Comparison,
   Project,
   RecentCheck,
   Report,
@@ -174,6 +175,11 @@ export function getAlerts(email: string): Promise<Alert[]> {
 /** The checks a visitor started, for "My reports". Ids the server no longer has are left out. */
 export function listChecks(ids: string[]): Promise<CheckSummary[]> {
   return request(`/api/checks?ids=${ids.join(",")}`, { timeoutMs: WAKE_TIMEOUT_MS });
+}
+
+/** Two or three finished checks side by side. */
+export function compareChecks(ids: string[]): Promise<Comparison> {
+  return request(`/api/checks/compare?ids=${ids.join(",")}`, { timeoutMs: WAKE_TIMEOUT_MS });
 }
 
 const RECENT_FRESH_FOR_MS = 60_000;

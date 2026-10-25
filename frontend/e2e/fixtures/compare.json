@@ -1,0 +1,157 @@
+{
+  "projects": [
+    {
+      "check_id": "4ad9752355f9455aa9d242c93950ea04",
+      "project": {
+        "rera_id": "UPRERAPRJ8334",
+        "name": "SUPERTECH ECO VILLAGE-I PHASE I-C",
+        "promoter": "SUPERTECH LIMITED",
+        "registered_on": "2017-08-09",
+        "district": "Gautam Buddha Nagar",
+        "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334"
+      },
+      "score": 68,
+      "band": "Moderate",
+      "confidence": 0.71,
+      "hard_stop": false,
+      "areas": [
+        {
+          "area": "rera",
+          "label": "UP-RERA compliance",
+          "lost": 0.0,
+          "max": 25.0
+        },
+        {
+          "area": "execution",
+          "label": "Project execution",
+          "lost": 14.0,
+          "max": 20.0
+        },
+        {
+          "area": "legal",
+          "label": "Legal and courts",
+          "lost": 6.0,
+          "max": 15.0
+        },
+        {
+          "area": "financial",
+          "label": "Financial and insolvency",
+          "lost": 0.0,
+          "max": 15.0
+        },
+        {
+          "area": "builder_history",
+          "label": "Builder history",
+          "lost": 9.0,
+          "max": 15.0
+        },
+        {
+          "area": "news",
+          "label": "News",
+          "lost": 3.0,
+          "max": 10.0
+        }
+      ],
+      "delay_months": 105,
+      "project_complaints": 15,
+      "promoter_complaints": 2803,
+      "insolvency": "unverified",
+      "company_status": "Active",
+      "unread": [
+        "land_dues",
+        "consumer_cases"
+      ],
+      "top_findings": [
+        {
+          "title": "Completion date on record (30 Dec 2017) passed 105 months ago; project still listed as Ongoing",
+          "source_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
+          "points": -14.0
+        },
+        {
+          "title": "2803 complaints on UP-RERA against the promoter, across all its projects",
+          "source_url": "https://up-rera.in/Projectsummary?UI0aPA1ISD=fwOn88bfRpA=&hfFlag=9emr4VdBw22M7BGjKtJWMPDI4s5cHQZP&NPJ6RAme=gUoAr6nOB9CeG4WCZ3sI8xdst3G+GkrZUR6kve89n8F2pfuywUDJcw==&PaURJEMAN4=ZL9MNERkNdZ1OH5DIB2u4Q==&IRSAHEB=D6PY3lyims8=",
+          "points": -9.0
+        },
+        {
+          "title": "15 complaints on UP-RERA about this project",
+          "source_url": "https://up-rera.in/Projectsummary?UI0aPA1ISD=fwOn88bfRpA=&hfFlag=9emr4VdBw22M7BGjKtJWMPDI4s5cHQZP&NPJ6RAme=gUoAr6nOB9CeG4WCZ3sI8xdst3G+GkrZUR6kve89n8F2pfuywUDJcw==&PaURJEMAN4=ZL9MNERkNdZ1OH5DIB2u4Q==&IRSAHEB=D6PY3lyims8=",
+          "points": -6.0
+        }
+      ]
+    },
+    {
+      "check_id": "6b049a9df6d148fc9f216d7f079419d1",
+      "project": {
+        "rera_id": "UPRERAPRJ6742",
+        "name": "14th Avenue (Group Housing) - Gaur City",
+        "promoter": "Gaursons Promoters Private Limited",
+        "registered_on": "2017-07-31",
+        "district": "Gautam Buddha Nagar",
+        "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=6742"
+      },
+      "score": 86,
+      "band": "insufficient_evidence",
+      "confidence": 0.29,
+      "hard_stop": false,
+      "areas": [
+        {
+          "area": "rera",
+          "label": "UP-RERA compliance",
+          "lost": 0.0,
+          "max": 25.0
+        },
+        {
+          "area": "execution",
+          "label": "Project execution",
+          "lost": 14.0,
+          "max": 20.0
+        },
+        {
+          "area": "legal",
+          "label": "Legal and courts",
+          "lost": 0.0,
+          "max": 15.0
+        },
+        {
+          "area": "financial",
+          "label": "Financial and insolvency",
+          "lost": 0.0,
+          "max": 15.0
+        },
+        {
+          "area": "builder_history",
+          "label": "Builder history",
+          "lost": 0.0,
+          "max": 15.0
+        },
+        {
+          "area": "news",
+          "label": "News",
+          "lost": 0.0,
+          "max": 10.0
+        }
+      ],
+      "delay_months": 42,
+      "project_complaints": null,
+      "promoter_complaints": null,
+      "insolvency": null,
+      "company_status": null,
+      "unread": [
+        "extensions",
+        "company_status",
+        "insolvency",
+        "land_dues",
+        "consumer_cases"
+      ],
+      "top_findings": [
+        {
+          "title": "Completion date on record (26 Mar 2023) passed 42 months ago; project still listed as Ongoing",
+          "source_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=6742",
+          "points": -14.0
+        }
+      ]
+    }
+  ],
+  "best": null,
+  "reason": "not_enough_evidence"
+}

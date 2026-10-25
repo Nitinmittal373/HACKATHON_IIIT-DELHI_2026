@@ -179,3 +179,48 @@ export interface RecentCheck extends CheckSummary {
   sources_read: number;
   drivers: Driver[];
 }
+
+export type InsolvencyStatus =
+  | "none_found"
+  | "admitted"
+  | "other_project"
+  | "this_project"
+  | "company"
+  | "unverified";
+
+export interface AreaPoints {
+  area: Area;
+  label: string;
+  lost: number;
+  max: number;
+}
+
+export interface FindingLine {
+  title: string;
+  source_url: string;
+  points: number;
+}
+
+/** One column of a comparison. null means the check could not read it, never "clean". */
+export interface ComparedProject {
+  check_id: string;
+  project: Project;
+  score: number;
+  band: Band;
+  confidence: number;
+  hard_stop: boolean;
+  areas: AreaPoints[];
+  delay_months: number | null;
+  project_complaints: number | null;
+  promoter_complaints: number | null;
+  insolvency: InsolvencyStatus | null;
+  company_status: string | null;
+  unread: CheckKey[];
+  top_findings: FindingLine[];
+}
+
+export interface Comparison {
+  projects: ComparedProject[];
+  best: string | null;
+  reason: "best_score" | "tie" | "not_enough_evidence";
+}

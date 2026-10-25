@@ -9,7 +9,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import checks, events, health, projects, reports, sentinel
+from app.api import checks, compare, events, health, projects, reports, sentinel
 from app.config import BACKEND_DIR, Settings, load_settings
 from app.db import make_engine, make_session_factory
 from app.events import EventHub
@@ -89,7 +89,8 @@ def create_app(
         # Without this the browser hides Retry-After and cannot tell a visitor how long to wait.
         expose_headers=["Retry-After"],
     )
-    for module in (health, projects, checks, events, reports, sentinel):
+    # compare before checks: /api/checks/compare must not be read as a check id.
+    for module in (health, projects, compare, checks, events, reports, sentinel):
         app.include_router(module.router)
     return app
 

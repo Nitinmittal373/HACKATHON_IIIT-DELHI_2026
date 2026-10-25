@@ -18,7 +18,7 @@ export function CompareBar({ picked, max }: { picked: string[]; max: number }) {
         <span>{picked.length >= max ? t.reports.compareFull : t.reports.compareHint}</span>
       </p>
       {ready ? (
-        <Link href={`/compare?ids=${picked.join(",")}`} className="btn">
+        <Link href={`/compare?ids=${[...picked].reverse().join(",")}`} className="btn">
           {t.reports.compareGo}
         </Link>
       ) : (
