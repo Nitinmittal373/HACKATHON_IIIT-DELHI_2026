@@ -4,8 +4,9 @@ It runs the recorded check of UPRERAPRJ8334 through the real app, with no networ
 what the API said: the search result, the new check, the event stream, the finished check and
 the report. Run from backend/:  python -m scripts.export_e2e_fixtures
 
-`python -m scripts.export_e2e_fixtures compare` writes only the comparison of that check with
-the recorded UP-RERA page of UPRERAPRJ6742, keeping the check id the other fixtures use.
+`python -m scripts.export_e2e_fixtures extras` writes only the newer answers, keeping the check
+id the other fixtures use: the comparison of that check with the recorded UP-RERA page of
+UPRERAPRJ6742, and the promoter's other projects from the recorded up-rera.in searches.
 """
 
 import json
@@ -17,7 +18,7 @@ from fastapi.testclient import TestClient
 
 from app.main import create_app
 from tests.conftest import FIXED_NOW, make_settings, make_web
-from tests.fakes import load_recording
+from tests.fakes import FakeWebClient, load_recording, recorded_searches
 
 OUT = Path(__file__).resolve().parents[2] / "frontend" / "e2e" / "fixtures"
 SEARCH_QUERY = "Supertech Eco Village"
@@ -72,5 +73,21 @@ def export_compare() -> None:
     save_json("summary-6742.json", summary)
 
 
+def export_track_record() -> None:
+    """track-record.json: what GET /api/promoters/projects answers for the recorded searches."""
+    searches = ("search_up_supertech_limited.json", "search_up_supertech_limited_promoter.json")
+    web = FakeWebClient(searches=recorded_searches(*searches))
+    with tempfile.TemporaryDirectory() as folder:
+        app = create_app(make_settings(Path(folder)), web=web, clock=lambda: FIXED_NOW)
+        with TestClient(app) as client:
+            params = {"name": "SUPERTECH LIMITED", "exclude": "UPRERAPRJ8334"}
+            record = client.get("/api/promoters/projects", params=params).json()
+    save_json("track-record.json", record)
+
+
 if __name__ == "__main__":
-    export_compare() if sys.argv[1:] == ["compare"] else main()
+    if sys.argv[1:] == ["extras"]:
+        export_compare()
+        export_track_record()
+    else:
+        main()

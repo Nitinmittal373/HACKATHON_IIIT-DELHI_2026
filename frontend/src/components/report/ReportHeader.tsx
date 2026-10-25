@@ -30,7 +30,7 @@ export function ReportHeader({ report, t, lang }: Props) {
           </p>
           <RecheckNote hours={hoursSince(check.completed_at ?? check.started_at)} project={project} />
         </div>
-        <ReportActions reportId={check.id} project={project} />
+        <ReportActions reportId={check.id} project={project} score={report.score.value} band={report.score.band} />
       </div>
     </header>
   );

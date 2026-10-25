@@ -5,18 +5,20 @@ import { useState } from "react";
 import { AddToCompare } from "@/components/report/AddToCompare";
 import { WatchButton } from "@/components/sentinel/WatchButton";
 import { useLang } from "@/lib/LangProvider";
-import type { Project } from "@/lib/types";
+import type { Band, Project } from "@/lib/types";
 import styles from "./ReportActions.module.css";
 
 interface Props {
   reportId: string;
-  project: Pick<Project, "rera_id" | "details_url">;
+  project: Pick<Project, "rera_id" | "details_url" | "name">;
+  score: number;
+  band: Band;
 }
 
 type Feedback = "copied" | "failed" | null;
 
 /** Report header buttons: watch with Sentinel and share. Sharing copies this page's link. */
-export function ReportActions({ reportId, project }: Props) {
+export function ReportActions({ reportId, project, score, band }: Props) {
   const { t } = useLang();
   const [feedback, setFeedback] = useState<Feedback>(null);
 
@@ -31,6 +33,13 @@ export function ReportActions({ reportId, project }: Props) {
     window.setTimeout(() => setFeedback(null), 3000);
   }
 
+  function shareOnWhatsApp() {
+    const link = `${window.location.origin}/report/${reportId}`;
+    const name = project.name ?? project.rera_id;
+    const text = t.insights.whatsapp.text(name, score, t.report.bands[band], link);
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener,noreferrer");
+  }
+
   return (
     <div className={`${styles.actions} noPrint`}>
       <WatchButton project={project} />
@@ -40,6 +49,9 @@ export function ReportActions({ reportId, project }: Props) {
       </button>
       <button type="button" className="btn2" onClick={share}>
         {t.report.share}
+      </button>
+      <button type="button" className="btn2" onClick={shareOnWhatsApp}>
+        {t.insights.whatsapp.button}
       </button>
       <span className={styles.status} role="status">
         {feedback === "copied" && t.report.linkCopied}

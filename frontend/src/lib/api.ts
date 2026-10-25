@@ -7,6 +7,7 @@ import type {
   RecentCheck,
   Report,
   SearchResponse,
+  TrackRecord,
   Watch,
 } from "@/lib/types";
 
@@ -180,6 +181,12 @@ export function listChecks(ids: string[]): Promise<CheckSummary[]> {
 /** Two or three finished checks side by side. */
 export function compareChecks(ids: string[]): Promise<Comparison> {
   return request(`/api/checks/compare?ids=${ids.join(",")}`, { timeoutMs: WAKE_TIMEOUT_MS });
+}
+
+/** A promoter's other UP-RERA projects, found with Search on up-rera.in. */
+export function promoterProjects(promoter: string, exclude: string): Promise<TrackRecord> {
+  const query = `name=${encodeURIComponent(promoter)}&exclude=${encodeURIComponent(exclude)}`;
+  return request(`/api/promoters/projects?${query}`, { timeoutMs: WAKE_TIMEOUT_MS });
 }
 
 const RECENT_FRESH_FOR_MS = 60_000;

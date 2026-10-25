@@ -129,6 +129,8 @@ createServer(async (req, res) => {
 
   if (path === "/api/checks/recent") return send(res, 200, [recordedRecent()]);
 
+  if (path === "/api/promoters/projects") return send(res, 200, json("track-record.json"));
+
   const check = path.match(/^\/api\/checks\/([0-9a-f]{32})(\/events|\/report)?$/);
   if (check) {
     const [, id, tail] = check;

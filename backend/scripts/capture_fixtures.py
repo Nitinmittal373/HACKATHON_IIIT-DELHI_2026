@@ -54,6 +54,9 @@ DOMAIN_SEARCHES = {
     "search_up_188811.json": "UPRERAPRJ188811/08/2024 UP RERA project",
     "search_up_supertech_hues.json": "Supertech Hues UP RERA project",
     "search_up_lodha_palava.json": "Lodha Palava Mumbai UP RERA project",
+    # The two searches behind a promoter's other projects (app/track_record.py).
+    "search_up_supertech_limited.json": "SUPERTECH LIMITED UP RERA project",
+    "search_up_supertech_limited_promoter.json": "SUPERTECH LIMITED promoter UP RERA registration",
 }
 PAGES = {
     "uprera_8334.html": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",

@@ -224,3 +224,10 @@ export interface Comparison {
   best: string | null;
   reason: "best_score" | "tie" | "not_enough_evidence";
 }
+
+/** A promoter's other UP-RERA projects, from Search on up-rera.in (GET /api/promoters/projects). */
+export interface TrackRecord {
+  promoter: string;
+  projects: Project[];
+  searched_at: string;
+}
