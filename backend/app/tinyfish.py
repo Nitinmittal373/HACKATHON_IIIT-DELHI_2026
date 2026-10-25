@@ -17,6 +17,7 @@ from tinyfish import (
     APITimeoutError,
     AsyncTinyFish,
     AuthenticationError,
+    BadRequestError,
     CompleteEvent,
     PaymentRequiredError,
     ProgressEvent,
@@ -92,10 +93,18 @@ class WebClient(Protocol):
 
 
 class LiveWebClient:
-    def __init__(self, api_key: SecretStr, *, fetch_timeout: float, agent_timeout: float) -> None:
+    def __init__(
+        self,
+        api_key: SecretStr,
+        *,
+        fetch_timeout: float,
+        agent_timeout: float,
+        send_max_steps: bool = False,
+    ) -> None:
         self._key = api_key
         self._fetch_timeout = fetch_timeout
         self._agent_timeout = agent_timeout
+        self._send_max_steps = send_max_steps
         self._sdk = AsyncTinyFish(api_key=api_key.get_secret_value(), timeout=fetch_timeout)
         self._http = httpx.AsyncClient(timeout=fetch_timeout + 15)
 
@@ -154,7 +163,10 @@ class LiveWebClient:
     async def run_agent(
         self, *, url: str, goal: str, output_schema: dict[str, Any], max_steps: int
     ) -> AsyncIterator[AgentEvent]:
-        config = AgentConfig(max_steps=max_steps, max_duration_seconds=int(self._agent_timeout))
+        config = AgentConfig(
+            max_steps=max_steps if self._send_max_steps else None,
+            max_duration_seconds=int(self._agent_timeout),
+        )
         try:
             async with self._sdk.agent.stream(
                 goal=goal, url=url, output_schema=output_schema, agent_config=config
@@ -180,6 +192,9 @@ def describe(error: APIError) -> str:
         return "TinyFish rejected the API key (check TINYFISH_API_KEY)"
     if isinstance(error, PaymentRequiredError):
         return "the TinyFish account has no credit left"
+    if isinstance(error, BadRequestError):
+        # The reason is about our request (for example the output schema), never the key.
+        return f"TinyFish rejected the request: {str(error)[:200]}"
     if isinstance(error, RateLimitError):
         return "TinyFish rate limit reached, try again shortly"
     if isinstance(error, APITimeoutError):

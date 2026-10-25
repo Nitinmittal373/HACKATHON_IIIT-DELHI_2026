@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     database_url: str = DEFAULT_DATABASE_URL
     fetch_timeout_seconds: float = Field(default=60, gt=0)
     agent_timeout_seconds: float = Field(default=300, gt=0)
+    # TinyFish only accepts a step limit on accounts in its beta; every run is still capped
+    # by agent_timeout_seconds. Turn this on once the account is enabled.
+    agent_send_max_steps: bool = False
 
     @field_validator("tinyfish_api_key")
     @classmethod

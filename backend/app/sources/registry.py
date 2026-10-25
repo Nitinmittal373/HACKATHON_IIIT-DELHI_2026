@@ -18,8 +18,13 @@ from app.sources.findings import build_finding
 from app.tinyfish import SearchHit
 
 SEARCH_PURPOSE = "Find the public company-registry page of a builder's legal entity"
-# Host -> how far the page can be trusted. Zaubacorp republishes MCA data.
-REGISTRY_HOSTS: dict[str, Reliability] = {"zaubacorp.com": "secondary", "mca.gov.in": "primary"}
+# Host -> how far the page can be trusted, most readable first. Zaubacorp shows browsers a
+# CAPTCHA, so a mirror that does not (Economic Times) is tried before it.
+REGISTRY_HOSTS: dict[str, Reliability] = {
+    "mca.gov.in": "primary",
+    "economictimes.indiatimes.com": "secondary",
+    "zaubacorp.com": "secondary",
+}
 IN_INSOLVENCY = re.compile(r"cirp|insolvency|liquidat|resolution process", re.IGNORECASE)
 
 GOAL = (
@@ -32,9 +37,9 @@ GOAL = (
 OUTPUT_SCHEMA: dict[str, Any] = {
     "type": "object",
     "properties": {
-        "legal_name": {"type": ["string", "null"]},
-        "cin": {"type": ["string", "null"]},
-        "status": {"type": ["string", "null"]},
+        "legal_name": {"type": "string", "nullable": True},
+        "cin": {"type": "string", "nullable": True},
+        "status": {"type": "string", "nullable": True},
     },
     "required": ["legal_name", "cin", "status"],
 }
@@ -72,16 +77,18 @@ class RegistrySource(AgentSource):
 
 
 def pick_company_page(hits: list[SearchHit], promoter: str) -> SearchHit | None:
-    """The first registry page whose title, address or text holds the exact legal name."""
-    for hit in hits:
-        if registry_reliability(hit.url) and legal_name_in(promoter, blob(hit)):
-            return hit
-    return None
+    """The most readable registry page whose title, address or text holds the exact legal name."""
+    hosts = list(REGISTRY_HOSTS)
+    named = [h for h in hits if registry_reliability(h.url) and legal_name_in(promoter, blob(h))]
+    return min(named, key=lambda hit: hosts.index(registry_host(hit.url)), default=None)
+
+
+def registry_host(url: str) -> str:
+    return (urlsplit(url).hostname or "").removeprefix("www.")
 
 
 def registry_reliability(url: str) -> Reliability | None:
-    host = (urlsplit(url).hostname or "").removeprefix("www.")
-    return REGISTRY_HOSTS.get(host)
+    return REGISTRY_HOSTS.get(registry_host(url))
 
 
 def is_this_company(result: dict[str, Any], promoter: str | None) -> bool:

@@ -25,15 +25,15 @@ GOAL = (
 OUTPUT_SCHEMA: dict[str, Any] = {
     "type": "object",
     "properties": {
-        "total_cases": {"type": ["integer", "null"]},
+        "total_cases": {"type": "integer", "nullable": True},
         "cases": {
             "type": "array",
             "items": {
                 "type": "object",
                 "properties": {
-                    "case_number": {"type": ["string", "null"]},
-                    "forum": {"type": ["string", "null"]},
-                    "opposite_party": {"type": ["string", "null"]},
+                    "case_number": {"type": "string", "nullable": True},
+                    "forum": {"type": "string", "nullable": True},
+                    "opposite_party": {"type": "string", "nullable": True},
                 },
             },
         },

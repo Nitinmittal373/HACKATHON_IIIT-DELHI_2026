@@ -42,11 +42,11 @@ GOAL = (
 OUTPUT_SCHEMA: dict[str, Any] = {
     "type": "object",
     "properties": {
-        "admitted": {"type": ["boolean", "null"]},
-        "admitted_on": {"type": ["string", "null"]},
-        "covers_whole_company": {"type": ["boolean", "null"]},
+        "admitted": {"type": "boolean", "nullable": True},
+        "admitted_on": {"type": "string", "nullable": True},
+        "covers_whole_company": {"type": "boolean", "nullable": True},
         "projects_named": {"type": "array", "items": {"type": "string"}},
-        "order_url": {"type": ["string", "null"]},
+        "order_url": {"type": "string", "nullable": True},
     },
     "required": ["admitted", "admitted_on", "covers_whole_company", "projects_named", "order_url"],
 }

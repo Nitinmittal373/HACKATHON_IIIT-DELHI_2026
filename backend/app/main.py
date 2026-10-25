@@ -37,6 +37,7 @@ def create_app(
             settings.tinyfish_api_key,
             fetch_timeout=settings.fetch_timeout_seconds,
             agent_timeout=settings.agent_timeout_seconds,
+            send_max_steps=settings.agent_send_max_steps,
         )
         engine = make_engine(settings.database_url)
         app.state.store = Store(make_session_factory(engine))
