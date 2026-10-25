@@ -1,0 +1,12 @@
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.status {
+  min-width: 0;
+  color: var(--mu);
+  font-size: 13px;
+}

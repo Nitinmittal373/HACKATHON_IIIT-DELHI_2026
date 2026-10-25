@@ -112,6 +112,10 @@ export const report = {
       bold: "Match the registration number",
       rest: "on your agreement with the one on the UP-RERA project page.",
     },
+    agreement: {
+      bold: "Read the agreement before you sign",
+      rest: "and compare its possession date, penalty clauses and payment schedule with the UP-RERA page.",
+    },
     pay: {
       bold: "Pay only to the RERA collection account",
       rest: "named on the project's UP-RERA page. Never pay a broker or a personal account.",

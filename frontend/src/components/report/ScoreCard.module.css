@@ -1,0 +1,77 @@
+.card {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 30px;
+  align-items: center;
+  padding: 26px;
+}
+
+.band {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #f3eee9;
+  color: var(--mu);
+  font-weight: 600;
+}
+
+.band[data-band="Low"] {
+  background: var(--low-bg);
+  color: var(--low-text);
+}
+
+.band[data-band="Moderate"] {
+  background: var(--moderate-bg);
+  color: var(--moderate);
+}
+
+.band[data-band="High"] {
+  background: var(--high-bg);
+  color: var(--high);
+}
+
+.band[data-band="Critical"] {
+  background: var(--critical-bg);
+  color: var(--critical);
+}
+
+.provisional {
+  margin-left: 8px;
+  padding: 5px 10px;
+  border: 1px dashed var(--ln2);
+  border-radius: 999px;
+  color: var(--mu);
+  font-size: 12.5px;
+}
+
+.summary {
+  margin-top: 14px;
+  color: var(--ink2);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.hardStop {
+  margin-top: 10px;
+  color: var(--critical);
+  font-size: 14px;
+}
+
+.facts {
+  display: flex;
+  gap: 8px 18px;
+  flex-wrap: wrap;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--mu);
+  font-size: 13.5px;
+}
+
+@media (max-width: 960px) {
+  .card {
+    grid-template-columns: 1fr;
+    justify-items: start;
+    gap: 20px;
+  }
+}
