@@ -11,4 +11,10 @@ updates:
     groups:
       backend:
         patterns: ["*"]
-# The npm (/frontend) entry is added back when that folder lands.
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: monthly
+    groups:
+      frontend:
+        patterns: ["*"]

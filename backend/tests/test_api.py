@@ -56,7 +56,7 @@ def test_report_for_8334_is_scored_from_the_recorded_page(client: TestClient) ->
         "value": 71,
         "band": "insufficient_evidence",
         "band_label": "Not enough evidence yet",
-        "confidence": 0.29,
+        "confidence": 0.43,
         "provisional": True,
         "hard_stop": False,
     }
@@ -93,11 +93,11 @@ def test_check_shows_every_source_and_why_it_was_not_read(client: TestClient) ->
     statuses = {run["source"]: run["status"] for run in check["sources"]}
     assert statuses == {
         "uprera": "completed",
-        "registry": "unavailable",
-        "insolvency": "unavailable",
-        "land": "unavailable",
-        "consumer": "unavailable",
-        "news": "unavailable",
+        "registry": "completed",
+        "insolvency": "completed",
+        "land": "completed",
+        "consumer": "failed",  # the fake web client gives the agent nothing to answer with
+        "news": "completed",
     }
 
 

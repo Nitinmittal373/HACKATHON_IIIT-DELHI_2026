@@ -50,22 +50,37 @@ Each source is one small module with the same shape: it reads one kind of public
 
 | Source | Site | How it reads | Extracts |
 | --- | --- | --- | --- |
-| `uprera` | up-rera.in | TinyFish **Fetch** + deterministic Python parser; the summary page is found with Search | name, number, registration date, promoter, type, district, start and end dates, permits, documents, complaint counts |
-| `registry` | zaubacorp.com / mca.gov.in | TinyFish agent *(Phase 2)* | company status, CIN |
-| `insolvency` | NCLT / NCLAT orders, IBBI | Search + agent *(Phase 2)* | admitted cases and which projects they cover |
-| `land` | Noida, Greater Noida, YEIDA | agent *(Phase 2)* | dues or defaulter entries |
-| `consumer` | e-Jagriti | agent *(Phase 2)*, usually stops at a CAPTCHA | cases against the promoter |
-| `news` | news sites | Search (news) *(Phase 2)* | up to three delay stories, secondary |
+| `uprera` | up-rera.in | **Fetch** + deterministic Python parser; the summary page is found with Search | name, number, registration date, promoter, type, district, start and end dates, extensions granted, completion certificate date, permits, documents, complaint counts |
+| `registry` | MCA, Economic Times, zaubacorp | Search finds the page; **Fetch** + parser reads the details table, an **agent** reads it when Fetch cannot | company name, CIN and status |
+| `insolvency` | NCLT / NCLAT orders and reports, IBBI | Search finds a page about the promoter's case; an **agent** reads it | whether the case was admitted, when, and which projects it covers |
+| `land` | Noida, Greater Noida and Yamuna Expressway authorities | Search + **Fetch** of the published dues list (usually a PDF), searched in Python | whether the promoter is on a dues list |
+| `consumer` | e-Jagriti | an **agent** opens the case search and stops at its CAPTCHA | cases against the promoter, when the portal lets it through |
+| `news` | news sites, Supreme Court | Search (news) and Fetch of a court order | up to three delay stories, and whether the NBCC order names the project |
 
 UP-RERA runs first: it confirms the project exists and names the promoter the other sources look for. If it cannot be read, the check fails and no score is shown. The other sources run in parallel, at most `AGENT_CONCURRENCY` at a time, each within `AGENT_TIMEOUT_SECONDS`.
 
-Agent sources share one runner (`app/sources/agent.py`). It streams the live browser URL to the Agent Cam, tells every agent never to solve or get around a CAPTCHA, and marks the source `blocked` when one appears. A run that fails, times out or returns only empty fields leaves the source **unread**, which lowers confidence and never changes the score. Agents are opened on deep pages, never on a large homepage.
+### Fetch or agent?
 
-UP-RERA pages are fetched with CSS selectors for only the sections the parser uses, so bank details and phone numbers on the page are never stored.
+Fetch and Search are cheap, fast and repeatable, so a page that Fetch can turn into text is read in Python. An agent (a real browser driven by a goal in plain English) is only used where a person would have to click: a search form, a page that renders in the browser, an article whose scope has to be read. Each agent source is a module with a `GOAL`, an `OUTPUT_SCHEMA` and a pure `to_findings()` that turns the agent's JSON into findings. Python, not the agent, decides what the facts mean: for example, whether an insolvency covers this project is decided by matching project names word for word, so Eco Village-I is never matched to Eco Village-II.
+
+### Live view and progress
+
+Agent sources share one runner (`app/sources/agent.py`). It maps the agent's stream onto the event stream the Agent Cam reads:
+
+| TinyFish event | NeevCheck event |
+| --- | --- |
+| started | `source.started` (sent by the orchestrator when the source begins) |
+| streaming URL | `source.live_url`, the address of the live browser view |
+| progress | `source.progress`, the agent's note cut to one line of at most 140 characters |
+| complete | `finding.added` for each finding, then `source.completed` |
+
+The runner tells every agent never to solve or get around a CAPTCHA, and marks the source `blocked` when one appears. A run that fails or returns only empty fields leaves the source **unread**, which lowers confidence and never changes the score. A run that runs out of time is `blocked` with the reason `timeout` and is not retried. Agents are opened on deep pages, never on a large homepage, and every run is capped by `AGENT_TIMEOUT_SECONDS`. The raw answer of each agent is saved under `backend/data/cache/{check_id}/{source}.json` (git-ignored) so a surprising finding can be traced back to what the agent returned.
+
+At most `AGENT_CONCURRENCY` (2) agents run at once. TinyFish accepts a step limit only on beta accounts; set `AGENT_SEND_MAX_STEPS=true` once yours is enabled.
 
 ## Testing without the network
 
-Tests never call TinyFish. `scripts/capture_fixtures.py` records real responses (UP-RERA pages, search results) into `backend/tests/fixtures/` through the same client and selectors the app uses, and refuses to save a file that contains the API key. Tests replay them through a fake `WebClient`. One optional test, `pytest -m live`, runs a real check when `TINYFISH_API_KEY` is set; it is deselected by default and skipped in CI.
+Tests never call TinyFish. `scripts/capture_fixtures.py` records real responses (UP-RERA pages, search results) into `backend/tests/fixtures/` through the same client and selectors the app uses, and refuses to save a file that contains the API key. `python -m scripts.capture_fixtures check_8334.json` runs one complete live check of `UPRERAPRJ8334` and records every search, document and agent answer, scrubbed of emails, phone numbers and live-view addresses. Tests replay them through a fake `WebClient`, with the clock fixed to the day of the recording, so the score is stable. One optional test, `pytest -m live`, runs a real check when `TINYFISH_API_KEY` is set; it is deselected by default and skipped in CI.
 
 ## API
 

@@ -18,7 +18,7 @@ A risk check for under-construction homes in Uttar Pradesh. NeevCheck sends **Ti
 
 <br>
 
-<img src="docs/assets/hero.gif" width="860" alt="NeevCheck home page: search bar, a report card scoring Supertech Eco Village-I Phase I-C at 76 out of 100, and an animated construction skyline">
+<img src="docs/assets/hero.gif" width="860" alt="NeevCheck home page: search bar, a report card scoring Supertech Eco Village-I Phase I-C at 68 out of 100, and an animated construction skyline">
 
 </div>
 
@@ -93,29 +93,32 @@ A broker's brochure says *"possession on time"*. The records may say the complet
 
 ## A real check: Supertech Eco Village-I Phase I-C
 
-Every value below comes from a public record. Read on 24 Oct 2026.
+A live check of `UPRERAPRJ8334`, read on 25 Oct 2026. Every value comes from a public record; each row links to where it was read. The check is recorded in [`backend/tests/fixtures/check_8334.json`](backend/tests/fixtures/check_8334.json) and replayed by the tests.
 
 | Record | Value | Source |
 | --- | --- | --- |
 | UP-RERA registration | `UPRERAPRJ8334`, registered 09 Aug 2017 | [UP-RERA](https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334) |
-| Completion date on record | 30 Dec 2017, extended three times since | UP-RERA project page |
-| Promoter | SUPERTECH LIMITED · 27 projects on UP-RERA | UP-RERA promoter record |
-| Insolvency | NCLT admitted 25 Mar 2022 over **Eco Village-II**; NCLAT limited the process to that project on 10 Jun 2022 | [LiveLaw](https://www.livelaw.in/news-updates/nclat-supertech-insolvency-and-bankruptcy-code-corporate-insolvency-resolution-process-irp-corporate-debtor-201387) |
-| Completion order | Supreme Court upheld NBCC completing 16 stalled Supertech projects, 5 Feb 2026 | [LiveLaw](https://www.livelaw.in/top-stories/supreme-court-upholds-nclat-order-directing-nbcc-to-complete-stalled-supertech-housing-projects-522030) |
-| Consumer cases | Not checked: e-Jagriti shows a CAPTCHA, which we never bypass | [e-Jagriti](https://e-jagriti.gov.in/) |
+| Completion date on record | 30 Dec 2017, 105 months ago; project still listed as Ongoing; no extension orders on the register | UP-RERA project page |
+| Promoter | SUPERTECH LIMITED · 2,803 complaints on UP-RERA across its projects, 15 about this project | UP-RERA project summary |
+| Company status | Active, CIN U74899DL1995PLC074422 | [Economic Times company page](https://economictimes.indiatimes.com/company/supertech-limited/U74899DL1995PLC074422) |
+| Insolvency | NCLT admitted an application on 25 Mar 2022. A news report says the order covers the whole company; no court order was read, so this is **not scored** and needs checking against the NCLT and NCLAT orders | [Fortune India](https://www.fortuneindia.com/enterprise/nclt-declares-supertech-insolvent-whats-the-future-of-25000-homebuyers/107553) |
+| Completion order | Supreme Court order of 5 Feb 2026 names Eco Village-1 among the 16 stalled Supertech projects the NBCC is to complete | [Supreme Court](https://api.sci.gov.in/supremecourt/2025/5007/5007_2025_1_18_68404_Order_05-Feb-2026.pdf) |
+| Consumer cases | 1 case against SUPERTECH LIMITED on the first page of results (NCDRC) | [e-Jagriti](https://e-jagriti.gov.in/advance-case-search) |
+| Land authority dues | Not read: the authorities' dues lists could not be fetched | |
 
-**NeevScore 76 / 100 · Moderate risk**
+**NeevScore 68 / 100 · Moderate risk**
 
 ```text
 100  starting score
--14  completion date extended 3 times          (UP-RERA)
- -9  insolvency limited to another project      (NCLAT order, needs review)
- -1  one news story on delays                   (secondary source)
+-14  completion date passed 105 months ago; still Ongoing   (UP-RERA)
+ -9  2,803 complaints on UP-RERA against the promoter       (UP-RERA)
+ -6  15 complaints on UP-RERA about this project            (UP-RERA)
+ -3  three news stories on delays                           (secondary)
  ──
- 76  Moderate · confidence 71% · no hard stop
+ 68  Moderate · confidence 86% (6 of 7 key checks) · no hard stop
 ```
 
-**What the buyer should do next:** check whether this phase is on NBCC's list of 16 projects, read the NCLAT order, get the current possession date in writing and search e-Jagriti for consumer cases.
+**What the buyer should do next:** read the NCLT and NCLAT orders on the insolvency, ask the builder for the current possession date in writing, check whether this phase is on NBCC's list of 16 projects, and ask the Greater Noida authority for the project's dues position.
 
 ## How it works
 
@@ -210,7 +213,7 @@ Full method and test cases: [`docs/scoring.md`](docs/scoring.md).
 
 ```text
 .
-├── backend/                 FastAPI service (added in Phase 1)
+├── backend/                 FastAPI service
 │   ├── app/
 │   │   ├── api/             routes: search, checks, events (SSE), reports
 │   │   ├── sources/         one module per public source, plus the shared agent runner
@@ -222,7 +225,7 @@ Full method and test cases: [`docs/scoring.md`](docs/scoring.md).
 │   │   └── main.py
 │   ├── scripts/             capture_fixtures.py records real responses for tests
 │   └── tests/               pytest, with recorded TinyFish responses in fixtures/
-├── frontend/                Next.js app (added in Phase 3)
+├── frontend/                Next.js app (home page so far)
 │   └── src/
 │       ├── app/             routes: home, check/[id], report/[id]
 │       ├── components/      Skyline, AgentCam, ScoreRing, EvidenceList …
@@ -233,7 +236,7 @@ Full method and test cases: [`docs/scoring.md`](docs/scoring.md).
 
 ## Getting started
 
-> The app is being rebuilt in phases on the final design. The backend works from **v0.1** (end of Phase 1); the frontend arrives in Phase 3. Every check is live, so you need a [TinyFish API key](https://agent.tinyfish.ai/api-keys).
+> The app is being rebuilt in phases on the final design. The backend runs live checks from **v0.2** (end of Phase 2); the frontend has its home page from Phase 3, and the check flow follows in Phase 4. Every check is live, so you need a [TinyFish API key](https://agent.tinyfish.ai/api-keys).
 
 ```bash
 git clone https://github.com/Nitinmittal373/HACKATHON_IIIT-DELHI_2026.git neevcheck
@@ -270,8 +273,8 @@ The full API is described in [`docs/architecture.md`](docs/architecture.md#api).
 
 - [x] **Phase 0 · Foundation** — repo structure, CI, security policy, contribution guide, final design approved
 - [x] **Phase 1 · Backend core** — API, data models, NeevScore engine, live UP-RERA source, event stream, shared agent runner
-- [ ] **Phase 2 · TinyFish agents** — five source agents, live view streaming, CAPTCHA handling
-- [ ] **Phase 3 · Frontend foundation** — design tokens, layout, animated skyline, home page
+- [x] **Phase 2 · TinyFish agents** — five source agents, live view streaming, CAPTCHA handling
+- [x] **Phase 3 · Frontend foundation** — design tokens, layout, animated skyline, home page
 - [ ] **Phase 4 · Check flow** — search, confirm, Agent Cam, report
 - [ ] **Phase 5 · Sentinel and sharing** — weekly re-checks, alerts, PDF, Hindi
 - [ ] **Phase 6 · Launch** — accessibility, end-to-end tests, deployment, v1.0

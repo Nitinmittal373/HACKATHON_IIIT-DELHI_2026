@@ -17,6 +17,7 @@ from tinyfish import (
     APITimeoutError,
     AsyncTinyFish,
     AuthenticationError,
+    BadRequestError,
     CompleteEvent,
     PaymentRequiredError,
     ProgressEvent,
@@ -37,12 +38,22 @@ class SearchHit(BaseModel):
     url: str
     snippet: str
     site_name: str = ""
+    # Publication date as the search engine reports it (news results); free-form text.
+    date: str | None = None
 
 
 class FetchedPage(BaseModel):
     url: str
     final_url: str
     html: str
+
+
+class FetchedText(BaseModel):
+    """A page or PDF turned into plain text by Fetch."""
+
+    url: str
+    final_url: str
+    text: str
 
 
 @dataclass(frozen=True)
@@ -72,6 +83,8 @@ class WebClient(Protocol):
 
     async def fetch_html(self, url: str, *, selectors: list[str], purpose: str) -> FetchedPage: ...
 
+    async def fetch_text(self, url: str, *, purpose: str) -> FetchedText: ...
+
     def run_agent(
         self, *, url: str, goal: str, output_schema: dict[str, Any], max_steps: int
     ) -> AsyncIterator[AgentEvent]: ...
@@ -80,10 +93,18 @@ class WebClient(Protocol):
 
 
 class LiveWebClient:
-    def __init__(self, api_key: SecretStr, *, fetch_timeout: float, agent_timeout: float) -> None:
+    def __init__(
+        self,
+        api_key: SecretStr,
+        *,
+        fetch_timeout: float,
+        agent_timeout: float,
+        send_max_steps: bool = False,
+    ) -> None:
         self._key = api_key
         self._fetch_timeout = fetch_timeout
         self._agent_timeout = agent_timeout
+        self._send_max_steps = send_max_steps
         self._sdk = AsyncTinyFish(api_key=api_key.get_secret_value(), timeout=fetch_timeout)
         self._http = httpx.AsyncClient(timeout=fetch_timeout + 15)
 
@@ -103,14 +124,27 @@ class LiveWebClient:
         return [SearchHit.model_validate(hit.model_dump()) for hit in response.results]
 
     async def fetch_html(self, url: str, *, selectors: list[str], purpose: str) -> FetchedPage:
-        body = {
+        body = self._fetch_body(url, "html", purpose) | {
+            "include_selectors": [",".join(selectors)]
+        }
+        final_url, html = await self._fetch(body)
+        return FetchedPage(url=url, final_url=final_url or url, html=html)
+
+    async def fetch_text(self, url: str, *, purpose: str) -> FetchedText:
+        """Plain text of a page or PDF, for lists that are published as documents."""
+        final_url, text = await self._fetch(self._fetch_body(url, "markdown", purpose))
+        return FetchedText(url=url, final_url=final_url or url, text=text)
+
+    def _fetch_body(self, url: str, fmt: str, purpose: str) -> dict[str, Any]:
+        return {
             "urls": [url],
-            "format": "html",
-            "include_selectors": [",".join(selectors)],
+            "format": fmt,
             "ttl": 0,
             "per_url_timeout_ms": int(self._fetch_timeout * 1000),
             "purpose": purpose,
         }
+
+    async def _fetch(self, body: dict[str, Any]) -> tuple[str, str]:
         headers = {"X-API-Key": self._key.get_secret_value()}
         try:
             response = await self._http.post(FETCH_URL, json=body, headers=headers)
@@ -124,13 +158,15 @@ class LiveWebClient:
         results = payload.get("results") or []
         if payload.get("errors") or not results or not results[0].get("text"):
             raise WebError("Fetch failed: the page could not be read")
-        result = results[0]
-        return FetchedPage(url=url, final_url=result.get("final_url") or url, html=result["text"])
+        return results[0].get("final_url") or "", results[0]["text"]
 
     async def run_agent(
         self, *, url: str, goal: str, output_schema: dict[str, Any], max_steps: int
     ) -> AsyncIterator[AgentEvent]:
-        config = AgentConfig(max_steps=max_steps, max_duration_seconds=int(self._agent_timeout))
+        config = AgentConfig(
+            max_steps=max_steps if self._send_max_steps else None,
+            max_duration_seconds=int(self._agent_timeout),
+        )
         try:
             async with self._sdk.agent.stream(
                 goal=goal, url=url, output_schema=output_schema, agent_config=config
@@ -156,6 +192,9 @@ def describe(error: APIError) -> str:
         return "TinyFish rejected the API key (check TINYFISH_API_KEY)"
     if isinstance(error, PaymentRequiredError):
         return "the TinyFish account has no credit left"
+    if isinstance(error, BadRequestError):
+        # The reason is about our request (for example the output schema), never the key.
+        return f"TinyFish rejected the request: {str(error)[:200]}"
     if isinstance(error, RateLimitError):
         return "TinyFish rate limit reached, try again shortly"
     if isinstance(error, APITimeoutError):

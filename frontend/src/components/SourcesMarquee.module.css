@@ -1,0 +1,54 @@
+.rail {
+  overflow: hidden;
+  border-top: 1px solid var(--ln);
+  border-bottom: 1px solid var(--ln);
+  background: #fff;
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  margin: 0;
+  padding: 22px 0;
+  list-style: none;
+  animation: slide 34s linear infinite;
+}
+
+.track:hover {
+  animation-play-state: paused;
+}
+
+.item {
+  padding: 0 12px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 8px 14px;
+  border: 1px solid var(--ln);
+  border-radius: 10px;
+  background: #fffcfa;
+  color: var(--ink2);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+}
+
+@keyframes slide {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Without motion the tags simply wrap, and the repeated copy is hidden. */
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    width: auto;
+    flex-wrap: wrap;
+    justify-content: center;
+    animation: none;
+  }
+
+  .item[aria-hidden="true"] {
+    display: none;
+  }
+}

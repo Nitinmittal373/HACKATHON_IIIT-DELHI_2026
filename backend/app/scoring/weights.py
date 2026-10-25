@@ -63,7 +63,7 @@ EXTENSION_EACH_MORE = 20
 # (more than this many months past the latest approved end date, penalty), largest first.
 DELAY_STEPS: list[tuple[int, int]] = [(24, 70), (12, 40)]
 INSOLVENCY_OTHER_PROJECT = 60
-LAND_DUES = 70
+LAND_DUES = 50
 NEWS_PER_STORY = 10
 # (at least this many complaints on UP-RERA, penalty), largest first.
 PROMOTER_COMPLAINT_STEPS: list[tuple[int, int]] = [(500, 60), (100, 40), (20, 20)]

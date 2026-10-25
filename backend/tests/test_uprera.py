@@ -20,8 +20,8 @@ from app.sources.uprera import (
     SUMMARY_SELECTORS,
     UpreraSource,
     complaint_findings,
+    extension_findings,
     findings_from_record,
-    is_completed,
     months_between,
     selectors_for,
 )
@@ -192,7 +192,7 @@ def test_source_reads_the_details_and_summary_pages() -> None:
     assert details.project.promoter == "SUPERTECH LIMITED"
     kinds = [e.finding.kind for e in events if isinstance(e, FoundFinding)]
     assert kinds == ["registration", "past_end_date", "promoter_complaints", "project_complaints"]
-    assert events[-1] == ChecksRead(("registration", "completion_date"))
+    assert events[-1] == ChecksRead(("registration", "completion_date", "extensions"))
 
 
 def test_source_carries_on_when_the_summary_page_is_not_found() -> None:
@@ -237,14 +237,59 @@ def test_a_completed_project_past_its_date_has_no_delay() -> None:
 
 
 @pytest.mark.parametrize(
-    ("status", "completed"),
+    ("project_type", "uploaded_on", "completed"),
     [
-        ("Ongoing", False),
-        ("New", False),
-        (None, False),
-        ("Completed", True),
-        ("Project Complete", True),
+        ("Ongoing", None, False),
+        ("New", None, False),
+        (None, None, False),
+        ("Completed", None, True),
+        # UP-RERA keeps "Ongoing" after completion; the certificate block is the signal.
+        ("Ongoing", date(2023, 7, 26), True),
     ],
 )
-def test_is_completed(status: str | None, completed: bool) -> None:
-    assert is_completed(status) is completed
+def test_is_completed(project_type: str | None, uploaded_on: date | None, completed: bool) -> None:
+    record = replace(
+        parse_uprera_page(load_page("uprera_summary_8334.html")),
+        project_type=project_type,
+        completion_uploaded_on=uploaded_on,
+    )
+    assert record.is_completed is completed
+
+
+def test_a_completed_project_from_the_register_has_its_certificate_date() -> None:
+    record = parse_uprera_page(load_page("uprera_summary_2634.html"))
+
+    assert record.rera_id == "UPRERAPRJ2634"
+    assert record.project_type == "Ongoing"
+    assert record.completion_uploaded_on == date(2023, 7, 26)
+    assert record.is_completed
+    kinds = [f.kind for f in findings_from_record(record, "https://up-rera.in/x", TODAY, NOW)]
+    assert "past_end_date" not in kinds
+    assert "completion_certificate" in kinds
+
+
+def test_extensions_are_read_and_covid_ones_are_set_apart() -> None:
+    record = parse_uprera_page(load_page("uprera_summary_2634.html"))
+
+    assert [(e.extended_from, e.extended_to, e.is_covid) for e in record.extensions] == [
+        (date(2019, 12, 31), date(2020, 12, 30), False),
+        (date(2020, 12, 30), date(2021, 6, 29), True),
+    ]
+    # Delay is measured from the latest approved date, so the COVID extension counts there.
+    assert record.latest_end_date == date(2021, 6, 29)
+
+
+def test_one_extension_costs_the_first_step_and_covid_is_not_counted() -> None:
+    record = parse_uprera_page(load_page("uprera_summary_2634.html"))
+
+    [finding] = extension_findings(record, "https://up-rera.in/x", TODAY, NOW)
+
+    assert finding.kind == "completion_extended"
+    assert finding.count == 1
+    assert finding.title == "Completion date extended once by UP-RERA, most recently to 30 Dec 2020"
+    assert score([finding], ["extensions"]).drivers[0].points == -6.0
+
+
+def test_a_project_with_no_extension_table_has_no_extension_finding() -> None:
+    record = parse_uprera_page(load_page("uprera_summary_8334.html"))
+    assert extension_findings(record, "https://up-rera.in/x", TODAY, NOW) == []

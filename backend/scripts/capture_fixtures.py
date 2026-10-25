@@ -5,8 +5,12 @@ goes through the app's own client and selectors, so fixtures match what a
 live check reads. Run it by hand from backend/ when a parser needs a fresh
 page:
 
-    python -m scripts.capture_fixtures                          # everything
+    python -m scripts.capture_fixtures                          # pages and searches
     python -m scripts.capture_fixtures uprera_summary_8334.html  # named files only
+    python -m scripts.capture_fixtures check_8334.json          # one full live check
+
+The full check runs every source of UPRERAPRJ8334 for real, so it uses paid
+agent runs. It is never part of the default run: ask for it by name.
 
 Pages found through search are captured after their search, which they
 read from the saved fixture. The script reads TINYFISH_API_KEY like the app
@@ -16,20 +20,28 @@ does and refuses to write a file that contains the key.
 import asyncio
 import json
 import sys
+import tempfile
 from pathlib import Path
 
-from app.config import load_settings
+from fastapi.testclient import TestClient
+
+from app.config import Settings, load_settings
+from app.main import create_app
 from app.sources.uprera import selectors_for
 from app.tinyfish import LiveWebClient, SearchHit
 from app.uprera_links import rera_ids_in, summary_url
+from scripts.recorder import RecordingWebClient, scrub
 
 FIXTURES = Path(__file__).resolve().parents[1] / "tests" / "fixtures"
 PURPOSE = "Record a UP-RERA response as a parser test fixture"
+CHECK_FIXTURE = "check_8334.json"
+CHECKED_RERA_ID = "UPRERAPRJ8334"
 
 SEARCHES = {
     "search_gaur_city.json": "Gaur City UP RERA project",
     "search_supertech_eco_village.json": "Supertech Eco Village UP RERA project",
     "search_uprera_8334.json": "UPRERAPRJ8334 UP RERA project",
+    "search_uprera_2634.json": "UPRERAPRJ2634 UP RERA project",
 }
 PAGES = {
     "uprera_8334.html": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
@@ -39,6 +51,8 @@ PAGES = {
 SUMMARY_PAGES = {
     "uprera_summary_188811.html": ("search_gaur_city.json", "UPRERAPRJ188811/08/2024"),
     "uprera_summary_8334.html": ("search_uprera_8334.json", "UPRERAPRJ8334"),
+    # Completed (certificate uploaded) and with one ordinary plus one COVID-19 extension.
+    "uprera_summary_2634.html": ("search_uprera_2634.json", "UPRERAPRJ2634"),
 }
 
 
@@ -57,6 +71,47 @@ def summary_link(search_fixture: str, rera_id: str) -> str:
         if (url := summary_url(hit.url)) and rera_id in rera_ids_in(hit):
             return url
     sys.exit(f"No Projectsummary link for {rera_id} in {search_fixture}")
+
+
+def capture_check(settings: Settings) -> None:
+    """Run every source for one project against the real sites and record what they answered."""
+    key = settings.tinyfish_api_key.get_secret_value()
+    recorder = RecordingWebClient(
+        LiveWebClient(
+            settings.tinyfish_api_key,
+            fetch_timeout=settings.fetch_timeout_seconds,
+            agent_timeout=settings.agent_timeout_seconds,
+            send_max_steps=settings.agent_send_max_steps,
+        )
+    )
+    with tempfile.TemporaryDirectory() as folder:
+        database = f"sqlite:///{Path(folder, 'capture.db').as_posix()}"
+        app = create_app(settings.model_copy(update={"database_url": database}), web=recorder)
+        with TestClient(app) as client:
+            check_id = client.post("/api/checks", json={"rera_id": CHECKED_RERA_ID}).json()["id"]
+            events = follow_events(client, check_id)
+            report = client.get(f"/api/checks/{check_id}/report").json()
+    payload = {
+        "rera_id": CHECKED_RERA_ID,
+        "captured_at": events[0]["ts"],
+        **recorder.recording(),
+        "outcome": {
+            "score": report["score"]["value"],
+            "band": report["score"]["band"],
+            "confidence": report["score"]["confidence"],
+            "sources": {run["source"]: run["status"] for run in report["check"]["sources"]},
+        },
+    }
+    save(CHECK_FIXTURE, scrub(json.dumps(payload, indent=2, ensure_ascii=False)), key)
+
+
+def follow_events(client: TestClient, check_id: str) -> list[dict[str, str]]:
+    events = []
+    with client.stream("GET", f"/api/checks/{check_id}/events") as response:
+        for line in response.iter_lines():
+            if line.startswith("data: "):
+                events.append(json.loads(line.removeprefix("data: ")))
+    return events
 
 
 async def main(wanted: set[str]) -> None:
@@ -90,4 +145,10 @@ async def main(wanted: set[str]) -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main(set(sys.argv[1:])))
+    names = set(sys.argv[1:])
+    if CHECK_FIXTURE in names:
+        capture_check(load_settings())
+        names.discard(CHECK_FIXTURE)
+        if not names:
+            sys.exit(0)
+    asyncio.run(main(names))

@@ -1,0 +1,329 @@
+.demo {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 56px;
+  align-items: center;
+}
+
+.title {
+  margin: 14px 0 0;
+  font-size: 48px;
+}
+
+.lead {
+  max-width: 440px;
+  margin: 18px 0 0;
+  color: var(--mu);
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 26px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.steps li {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: var(--r-sm);
+  color: var(--mu);
+  font-size: 15px;
+  animation: stepOn 12s calc(var(--i) * 3s) infinite;
+}
+
+.steps li span {
+  color: var(--fa);
+  font-size: 12px;
+}
+
+.cta {
+  margin-top: 26px;
+}
+
+.figure {
+  margin: 0;
+}
+
+.window {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--ln);
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 50px 100px -50px rgba(17, 17, 17, 0.4);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--ln);
+  background: #fafafa;
+}
+
+.bar > span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #e5e5e5;
+}
+
+.bar em {
+  flex: 1;
+  margin-left: 10px;
+  padding: 5px 10px;
+  border: 1px solid var(--ln);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--mu);
+  font-size: 12px;
+  font-style: normal;
+}
+
+.bar b {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #c2410c;
+  font-size: 11px;
+}
+
+.rec {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--dot-bad);
+  animation: blink 1s steps(2) infinite;
+}
+
+.page {
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.head {
+  height: 37px;
+  padding: 0 18px;
+  background: #2d3e50;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 37px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  align-items: center;
+  height: 41px;
+  padding: 0 18px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 13px;
+}
+
+.row span {
+  color: #666;
+}
+
+.row b {
+  font-weight: 500;
+}
+
+.highlight {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  height: 40px;
+  border: 2px solid var(--o);
+  border-radius: 8px;
+  background: rgba(242, 107, 29, 0.07);
+  box-shadow: 0 0 0 4px var(--o-glow);
+  animation: move 12s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.cursor {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  animation: point 12s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.found {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 46px;
+  padding: 14px;
+  border-top: 1px solid var(--ln);
+  background: #fffcfa;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 11px;
+  border: 1px solid var(--ln);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  opacity: 0;
+  animation: chip 12s infinite;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 50%;
+}
+
+.ok {
+  background: var(--dot-ok);
+}
+
+.warn {
+  background: var(--dot-warn);
+}
+
+.caption {
+  margin-top: 14px;
+  color: var(--fa);
+  font-size: 12.5px;
+}
+
+@keyframes stepOn {
+  0%,
+  24% {
+    background: #fff1e6;
+    color: var(--ink);
+    box-shadow: inset 3px 0 0 var(--o);
+  }
+
+  25%,
+  100% {
+    background: transparent;
+    color: var(--mu);
+    box-shadow: none;
+  }
+}
+
+@keyframes move {
+  0%,
+  20% {
+    top: 37px;
+  }
+
+  25%,
+  45% {
+    top: 119px;
+  }
+
+  50%,
+  70% {
+    top: 160px;
+  }
+
+  75%,
+  100% {
+    top: 201px;
+  }
+}
+
+@keyframes point {
+  0%,
+  20% {
+    left: 66%;
+    top: 58px;
+  }
+
+  25%,
+  45% {
+    left: 44%;
+    top: 140px;
+  }
+
+  50%,
+  70% {
+    left: 44%;
+    top: 181px;
+  }
+
+  75%,
+  100% {
+    left: 40%;
+    top: 222px;
+  }
+}
+
+@keyframes chip {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  4%,
+  85% {
+    opacity: 1;
+    transform: none;
+  }
+
+  95%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 960px) {
+  .demo {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+
+  .title {
+    font-size: 34px;
+  }
+
+  .row {
+    grid-template-columns: 120px 1fr;
+  }
+}
+
+/* Show the finished picture: every record read, every chip visible. */
+@media (prefers-reduced-motion: reduce) {
+  .steps li,
+  .highlight,
+  .cursor,
+  .rec {
+    animation: none;
+  }
+
+  .highlight {
+    top: 201px;
+  }
+
+  .cursor {
+    left: 40%;
+    top: 222px;
+  }
+
+  .chip {
+    opacity: 1;
+    animation: none;
+  }
+}

@@ -52,11 +52,13 @@ class EJagritiLikeSource(AgentSource):
     name = "consumer"
     checks: tuple[CheckKey, ...] = ("consumer_cases",)
 
-    def task(self, ctx: SourceContext) -> AgentTask:
+    async def task(self, ctx: SourceContext) -> AgentTask | None:
         schema = {"type": "object", "properties": {"cases": {"type": "integer", "nullable": True}}}
         return AgentTask(url="https://e-jagriti.gov.in/", goal="Count cases.", output_schema=schema)
 
-    def to_findings(self, result: dict[str, Any], ctx: SourceContext) -> list[Finding]:
+    def to_findings(
+        self, result: dict[str, Any], ctx: SourceContext, task: AgentTask
+    ) -> list[Finding]:
         return []
 
 

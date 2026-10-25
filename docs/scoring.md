@@ -37,7 +37,7 @@ Penalties come only from parsed facts, never from rules written for one builder.
 | Completion date on record passed more than 24 months ago, project not listed as completed | Project execution | 70 |
 | Insolvency limited to another project | Financial and insolvency | 60 |
 | Insolvency of the company or this project | Financial and insolvency | 100 and hard stop |
-| Listed for unpaid land authority dues | Financial and insolvency | 70 |
+| Listed for unpaid land authority dues | Financial and insolvency | 50 |
 | UP-RERA registration lapsed or revoked | UP-RERA compliance | 100 and hard stop |
 | One news story on delays (secondary) | News | 10 each |
 | Complaints on UP-RERA against the promoter, all projects: at least 20 / 100 / 500 | Builder history | 20 / 40 / 60 |
@@ -45,7 +45,9 @@ Penalties come only from parsed facts, never from rules written for one builder.
 
 Any project whose UP-RERA type is not a completed one (Ongoing, New and so on) is late once that date has passed.
 
-The completion date on record is the latest date UP-RERA shows for the project. Until extension orders are read (Phase 2), the delay rule is applied to that date. Complaint counts come from the project's UP-RERA summary page, and each finding links to it.
+The completion date on record is the latest date UP-RERA shows for the project: the original or revised date, a permit's end date, or the end of the latest extension in the "Extension Granted" table on the project summary page. The delay rule is applied to that date. COVID-19 force-majeure rows in that table are not counted as extensions but do move the date.
+
+UP-RERA keeps the type "Ongoing" after a project is finished. A project counts as completed when its summary page shows a completion certificate upload date (or the type reads exactly "Completed"). Complaint counts come from the project's UP-RERA summary page, and each finding links to it.
 
 Everything else in a report (registration date, a completion date not yet passed, an insolvency admission whose scope is decided by a later order, court orders such as the Supreme Court's NBCC ruling) is shown as evidence with 0 points.
 
@@ -56,6 +58,8 @@ Everything else in a report (registration date, a completion date not yet passed
 | Absence of a record never adds points | "Nothing found" may only mean a site was unreadable |
 | An unreadable source lowers confidence, not the score | We never punish a project for a CAPTCHA |
 | Insolvency counts fully only when it covers the company or this project | Supertech's process was limited to Eco Village-II by NCLAT |
+| A hard stop needs an official page | A news report that says an insolvency covers the company or this project is shown as "unverified" for review with 0 points; only an NCLT, NCLAT, IBBI or Supreme Court page can cap the score at Critical |
+| A company whose registry status is under CIRP or liquidation is a hard stop | The promoter company itself is in insolvency. "Active" is shown as context and costs nothing |
 | An admission and the order that sets its scope are two findings; only the scope is scored | The same case is never counted twice |
 | A petition that is not yet admitted is a "review" finding | Filing is not the same as admission |
 | News is a secondary source | It can only add small penalties and is marked for review |
@@ -67,7 +71,7 @@ Everything else in a report (registration date, a completion date not yet passed
 
 ## Confidence
 
-Confidence is the share of seven key checks that were actually read: registration, completion date, extensions, company status, insolvency, land dues and consumer cases. A blocked, failed or not-yet-connected source leaves its checks unread. If UP-RERA itself cannot be read, the check fails and no score is shown.
+Confidence is the share of seven key checks that were actually read: registration, completion date, extensions, company status, insolvency, land dues and consumer cases. A blocked, failed or unreadable source leaves its checks unread. "Extensions" counts as read when the project's summary page was read, because that page lists the extensions granted (or none). "Insolvency" counts as read only when a page actually reported the case; finding no page proves nothing. "Land dues" counts as read only when every land authority list for the project's district was read. If UP-RERA itself cannot be read, the check fails and no score is shown.
 
 ## Bands
 
@@ -83,24 +87,16 @@ A hard stop is always Critical, however little else was read: one verified serio
 
 ## Worked example
 
-Supertech Eco Village-I Phase I-C (`UPRERAPRJ8334`) with every source read, as recorded on 24 Oct 2026. The same numbers are a test in `backend/tests/test_scoring.py`.
-
-| Finding | Area | Penalty | Points |
-| --- | --- | --: | --: |
-| Completion date extended 3 times | Project execution (20%) | 70 | −14 |
-| Insolvency limited to another project | Financial and insolvency (15%) | 60 | −9 |
-| One news story on delays | News (10%) | 10 | −1 |
-| **NeevScore** | | | **76 · Moderate** |
-
-Confidence is 71% (5 of 7 checks) because consumer cases (e-Jagriti, CAPTCHA) and the completion date could not be read.
-
-Until the Phase 2 agents land, a live check reads UP-RERA only. On 25 Oct 2026 that gave:
+Supertech Eco Village-I Phase I-C (`UPRERAPRJ8334`), checked live on 25 Oct 2026. Every source was read except the land authority lists. The same numbers are a test in `backend/tests/test_recorded_check.py`, replayed from the recording.
 
 | Finding | Area | Penalty | Points |
 | --- | --- | --: | --: |
 | Completion date on record (30 Dec 2017) passed 105 months ago; project still listed as Ongoing | Project execution (20%) | 70 | −14 |
 | 2,803 complaints on UP-RERA against the promoter | Builder history (15%) | 60 | −9 |
 | 15 complaints on UP-RERA about this project | Legal and courts (15%) | 40 | −6 |
-| **NeevScore** | | | **71 · Not enough evidence yet** |
+| Three news stories on delays (10 each, secondary) | News (10%) | 30 | −3 |
+| **NeevScore** | | | **68 · Moderate** |
 
-Confidence is 29% (registration and completion date, 2 of 7 checks), so the score is provisional and gets no band until the other sources are read.
+Shown with no points: registration (ok), company status (Active), the insolvency admission of 25 Mar 2022, a news report that the insolvency covers the whole company (**unverified**: no court order was read, so it cannot cap the score), one consumer case on e-Jagriti, and the Supreme Court's NBCC order (context).
+
+Confidence is 86% (6 of 7 checks): land dues were not read because the authorities' lists could not be fetched. If a CAPTCHA had stopped e-Jagriti, confidence would be 71% and the score would stay 68.
