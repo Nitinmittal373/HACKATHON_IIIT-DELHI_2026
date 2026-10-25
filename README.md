@@ -188,6 +188,7 @@ Every project starts at **100**. Points come off only for records we find, weigh
 | 🟡 Moderate | 60–79 |
 | 🟠 High | 40–59 |
 | 🔴 Critical | 0–39 · any hard stop (for example, this project in insolvency) caps the score here |
+| ⚪ Not enough evidence yet | shown instead of a band while fewer than half the key checks are read; the score is provisional |
 
 Full method and test cases: [`docs/scoring.md`](docs/scoring.md).
 
@@ -211,13 +212,16 @@ Full method and test cases: [`docs/scoring.md`](docs/scoring.md).
 .
 ├── backend/                 FastAPI service (added in Phase 1)
 │   ├── app/
-│   │   ├── api/             routes: checks, events (SSE), reports, sentinel
-│   │   ├── agents/          one TinyFish agent per source
+│   │   ├── api/             routes: search, checks, events (SSE), reports
+│   │   ├── sources/         one module per public source, plus the shared agent runner
+│   │   ├── parsers/         deterministic page parsers (UP-RERA)
 │   │   ├── scoring/         NeevScore engine and weights
+│   │   ├── orchestrator.py  runs a check and streams its events
+│   │   ├── tinyfish.py      the only module that calls TinyFish
 │   │   ├── models.py        Pydantic models shared by the API
 │   │   └── main.py
-│   ├── demo/                recorded real check used in demo mode
-│   └── tests/
+│   ├── scripts/             capture_fixtures.py records real responses for tests
+│   └── tests/               pytest, with recorded TinyFish responses in fixtures/
 ├── frontend/                Next.js app (added in Phase 3)
 │   └── src/
 │       ├── app/             routes: home, check/[id], report/[id]
@@ -229,18 +233,19 @@ Full method and test cases: [`docs/scoring.md`](docs/scoring.md).
 
 ## Getting started
 
-> The app is being rebuilt in phases on the final design. These commands work from **v0.1** (end of Phase 1). Demo mode replays a recorded real check, so **no API key is needed** to try it.
+> The app is being rebuilt in phases on the final design. The backend works from **v0.1** (end of Phase 1); the frontend arrives in Phase 3. Every check is live, so you need a [TinyFish API key](https://agent.tinyfish.ai/api-keys).
 
 ```bash
 git clone https://github.com/Nitinmittal373/HACKATHON_IIIT-DELHI_2026.git neevcheck
 cd neevcheck
-cp .env.example .env            # keep DEMO_MODE=true to run without a key
+cp .env.example .env            # then set TINYFISH_API_KEY in .env
 
 # backend
 cd backend
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements-dev.txt
 uvicorn app.main:app --reload    # http://localhost:8000/docs
+ruff check . && pytest -q        # tests replay recorded responses, no key needed
 
 # frontend (new terminal)
 cd frontend
@@ -248,12 +253,23 @@ npm install
 npm run dev                      # http://localhost:3000
 ```
 
-To run live checks, set `TINYFISH_API_KEY` and `DEMO_MODE=false` in `.env`. The key never leaves your machine; `.env` is git-ignored.
+The key never leaves your machine: `.env` is git-ignored and the app never logs it. A `TINYFISH_API_KEY` set in your shell takes precedence over `.env`.
+
+Try a check from the terminal once the backend is running:
+
+```bash
+curl "localhost:8000/api/projects/search?q=UPRERAPRJ8334"
+curl -X POST localhost:8000/api/checks -H "Content-Type: application/json"      -d '{"rera_id": "UPRERAPRJ8334"}'                       # returns {"id": ...}
+curl -N localhost:8000/api/checks/<id>/events               # live event stream
+curl localhost:8000/api/checks/<id>/report
+```
+
+The full API is described in [`docs/architecture.md`](docs/architecture.md#api).
 
 ## Roadmap
 
 - [x] **Phase 0 · Foundation** — repo structure, CI, security policy, contribution guide, final design approved
-- [ ] **Phase 1 · Backend core** — API, data models, NeevScore engine, demo mode with a recorded real check
+- [x] **Phase 1 · Backend core** — API, data models, NeevScore engine, live UP-RERA source, event stream, shared agent runner
 - [ ] **Phase 2 · TinyFish agents** — five source agents, live view streaming, CAPTCHA handling
 - [ ] **Phase 3 · Frontend foundation** — design tokens, layout, animated skyline, home page
 - [ ] **Phase 4 · Check flow** — search, confirm, Agent Cam, report

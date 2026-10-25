@@ -32,9 +32,8 @@ jobs:
         run: ruff check .
       - if: steps.present.outputs.yes == 'true'
         working-directory: backend
+        # Tests replay recorded TinyFish responses, so no key is needed.
         run: pytest -q
-        env:
-          DEMO_MODE: "true"
 
   frontend:
     name: Frontend · lint, types and build

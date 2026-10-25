@@ -4,4 +4,11 @@ updates:
     directory: /
     schedule:
       interval: monthly
-# pip (/backend) and npm (/frontend) entries are added back when those folders land.
+  - package-ecosystem: pip
+    directory: /backend
+    schedule:
+      interval: monthly
+    groups:
+      backend:
+        patterns: ["*"]
+# The npm (/frontend) entry is added back when that folder lands.

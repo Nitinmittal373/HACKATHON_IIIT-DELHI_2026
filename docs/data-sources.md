@@ -4,8 +4,8 @@ NeevCheck reads only public records. Each source has a reliability level that de
 
 | Source | Site | What we read | Reliability |
 | --- | --- | --- | --- |
-| UP-RERA | [up-rera.in](https://www.up-rera.in) | Registration, promoter, completion date, extensions, filings | Primary |
-| Company registry | [mca.gov.in](https://www.mca.gov.in) | Company status, CIN | Primary (mirrors are secondary) |
+| UP-RERA | [up-rera.in](https://www.up-rera.in) | Registration, promoter, completion date, documents, complaint counts (extensions in Phase 2) | Primary |
+| Company registry | [mca.gov.in](https://www.mca.gov.in), [zaubacorp.com](https://www.zaubacorp.com) | Company status, CIN | Primary (mirrors such as zaubacorp are secondary) |
 | Insolvency | [ibbi.gov.in](https://ibbi.gov.in), NCLT / NCLAT orders | Admitted cases and their scope | Primary |
 | Land authorities | Noida, Greater Noida, YEIDA | Published dues and defaulter lists | Primary |
 | Consumer cases | [e-Jagriti](https://e-jagriti.gov.in) | Cases against the promoter | Primary, often behind a CAPTCHA |
@@ -13,7 +13,8 @@ NeevCheck reads only public records. Each source has a reliability level that de
 
 ## How we read them
 
-- A **TinyFish browser agent** opens the site, searches for the project or promoter and returns the exact fields we ask for.
+- **UP-RERA** pages are read with **TinyFish Fetch** and parsed by deterministic Python code, so the same page always gives the same fields. Only the sections we use are requested, so the bank details and phone numbers on the page are never stored.
+- For the other sources a **TinyFish browser agent** opens a deep page on the site, searches for the project or promoter and returns the exact fields we ask for as structured JSON.
 - Every finding is saved with the **source URL**, the **time it was read** and its **reliability**.
 - If a site shows a **CAPTCHA**, the agent stops. The source is marked *Unable to verify* and the report tells the buyer how to check it themselves.
 - We respect each site's rate limits and run at most `AGENT_CONCURRENCY` agents at once.
