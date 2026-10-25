@@ -100,7 +100,7 @@ class ScoreRow(Base):
 
     check_id: Mapped[str] = mapped_column(ForeignKey("checks.id"), primary_key=True)
     value: Mapped[int] = mapped_column(Integer)
-    band: Mapped[str] = mapped_column(String(20))
+    band: Mapped[str] = mapped_column(String(30))
     confidence: Mapped[float] = mapped_column(Float)
     hard_stop: Mapped[bool]
     # Drivers, areas and unread checks, exactly as the engine returned them.

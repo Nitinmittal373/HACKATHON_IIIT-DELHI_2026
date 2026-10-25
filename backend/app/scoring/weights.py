@@ -25,7 +25,16 @@ AREA_CAPS: dict[Area, int] = {area: 100 for area in AREA_WEIGHTS} | {"news": 60}
 
 # Lower bound of each band, highest first.
 BANDS: list[tuple[int, Band]] = [(80, "Low"), (60, "Moderate"), (40, "High"), (0, "Critical")]
+BAND_LABELS: dict[Band, str] = {
+    "Low": "Low",
+    "Moderate": "Moderate",
+    "High": "High",
+    "Critical": "Critical",
+    "insufficient_evidence": "Not enough evidence yet",
+}
 HARD_STOP_CAP = 39
+# Below this share of key checks read, a score is provisional and gets no risk band.
+MIN_CONFIDENCE_FOR_BAND = 0.5
 
 KEY_CHECKS: tuple[CheckKey, ...] = (
     "registration",

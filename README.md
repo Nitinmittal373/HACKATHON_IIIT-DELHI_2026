@@ -188,6 +188,7 @@ Every project starts at **100**. Points come off only for records we find, weigh
 | 🟡 Moderate | 60–79 |
 | 🟠 High | 40–59 |
 | 🔴 Critical | 0–39 · any hard stop (for example, this project in insolvency) caps the score here |
+| ⚪ Not enough evidence yet | shown instead of a band while fewer than half the key checks are read; the score is provisional |
 
 Full method and test cases: [`docs/scoring.md`](docs/scoring.md).
 

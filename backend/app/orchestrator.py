@@ -186,7 +186,7 @@ class Orchestrator:
         self._hub.publish(event)
 
 
-SUMMARY = {"value", "band", "confidence", "hard_stop"}
+SUMMARY = {"value", "band", "band_label", "confidence", "provisional", "hard_stop"}
 
 
 def _merge(known: Project | None, new: Project) -> Project:

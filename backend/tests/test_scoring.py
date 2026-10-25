@@ -77,9 +77,35 @@ def test_insolvency_of_this_project_is_a_hard_stop() -> None:
 def test_no_findings_score_100_with_no_confidence() -> None:
     result = score([], [])
     assert result.value == 100
-    assert result.band == "Low"
     assert result.confidence == 0.0
+    assert result.band == "insufficient_evidence"
     assert result.checks_unread == list(KEY_CHECKS)
+
+
+def test_low_confidence_gives_no_band_but_keeps_the_score() -> None:
+    findings = [finding("past_end_date", months=105)]
+    result = score(findings, ["registration", "completion_date", "extensions"])
+
+    assert result.confidence == 0.43
+    assert result.value == 86
+    assert result.band == "insufficient_evidence"
+    assert result.band_label == "Not enough evidence yet"
+    assert result.provisional
+
+
+def test_half_the_key_checks_is_enough_for_a_band() -> None:
+    read: list[CheckKey] = ["registration", "completion_date", "extensions", "company_status"]
+    result = score([finding("past_end_date", months=105)], read)
+    assert result.confidence == 0.57
+    assert result.band == "Low"
+    assert result.band_label == "Low"
+    assert not result.provisional
+
+
+def test_a_hard_stop_is_critical_even_with_little_evidence() -> None:
+    result = score([finding("insolvency_scope", scope="this_project")], ["insolvency"])
+    assert result.band == "Critical"
+    assert not result.provisional
 
 
 @pytest.mark.parametrize(

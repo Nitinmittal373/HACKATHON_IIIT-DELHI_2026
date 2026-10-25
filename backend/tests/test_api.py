@@ -51,11 +51,13 @@ def test_report_for_8334_is_scored_from_the_recorded_page(client: TestClient) ->
     assert report["project"]["name"] == "SUPERTECH ECO VILLAGE-I PHASE I-C"
     assert report["project"]["promoter"] == "SUPERTECH LIMITED"
     assert report["project"]["district"] == "Gautam Buddha Nagar"
-    keys = ("value", "band", "confidence", "hard_stop")
+    keys = ("value", "band", "band_label", "confidence", "provisional", "hard_stop")
     assert {k: report["score"][k] for k in keys} == {
         "value": 71,
-        "band": "Moderate",
+        "band": "insufficient_evidence",
+        "band_label": "Not enough evidence yet",
         "confidence": 0.29,
+        "provisional": True,
         "hard_stop": False,
     }
     points = {f["kind"]: f for f in report["findings"]}

@@ -94,7 +94,7 @@ Every event is sent as `event: <type>` with JSON `data` holding `type`, `check_i
 | `finding.added` | `finding` (with `source_url`, `read_on`, `read_at`) |
 | `source.blocked` | `reason` (for example a CAPTCHA) |
 | `source.completed` | `status` (`completed`, `blocked`, `failed`, `unavailable`), `message`, `checks_read` |
-| `check.completed` | `status` (`completed` or `failed`), `score` summary (`value`, `band`, `confidence`, `hard_stop`) or `message`; `source` is `check` |
+| `check.completed` | `status` (`completed` or `failed`), `score` summary (`value`, `band`, `band_label`, `confidence`, `provisional`, `hard_stop`) or `message`; `source` is `check` |
 
 ## Data model
 

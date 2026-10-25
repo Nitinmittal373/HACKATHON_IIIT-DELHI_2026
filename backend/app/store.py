@@ -87,7 +87,15 @@ class Store:
 
     def save_score(self, check_id: str, score: Score) -> None:
         detail = score.model_dump(
-            mode="json", include={"hard_stop_reason", "drivers", "areas", "checks_unread"}
+            mode="json",
+            include={
+                "band_label",
+                "provisional",
+                "hard_stop_reason",
+                "drivers",
+                "areas",
+                "checks_unread",
+            },
         )
         points = {driver.finding_id: driver.points for driver in score.drivers}
         with self._sessions.begin() as session:

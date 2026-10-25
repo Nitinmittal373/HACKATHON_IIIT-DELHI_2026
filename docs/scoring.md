@@ -61,6 +61,7 @@ Everything else in a report (registration date, a completion date not yet passed
 | Delay is measured from the latest approved end date, not the original one | Extensions already count once; the delay must not count them again |
 | A completion or occupancy certificate on record skips the delay penalty | The certificate is shown as a "review" finding: verify possession before relying on it |
 | A "Proforma of Completion Certificate" is not a certificate | It is the blank template every project uploads at registration; it never skips the delay penalty and is not shown |
+| Too little evidence gives no band | Below 50% confidence the band is "Not enough evidence yet"; the score is still shown, marked provisional |
 
 ## Confidence
 
@@ -74,6 +75,9 @@ Confidence is the share of seven key checks that were actually read: registratio
 | Moderate | 60–79 |
 | High | 40–59 |
 | Critical | 0–39 |
+| Not enough evidence yet (`insufficient_evidence`) | any score, when confidence is below 50% and there is no hard stop |
+
+A hard stop is always Critical, however little else was read: one verified serious record is enough.
 
 ## Worked example
 
@@ -95,6 +99,6 @@ Until the Phase 2 agents land, a live check reads UP-RERA only. On 25 Oct 2026 t
 | Completion date on record (30 Dec 2017) passed 105 months ago; project still listed as Ongoing | Project execution (20%) | 70 | −14 |
 | 2,803 complaints on UP-RERA against the promoter | Builder history (15%) | 60 | −9 |
 | 15 complaints on UP-RERA about this project | Legal and courts (15%) | 40 | −6 |
-| **NeevScore** | | | **71 · Moderate** |
+| **NeevScore** | | | **71 · Not enough evidence yet** |
 
-Confidence is 29% (registration and completion date, 2 of 7 checks): most of the record is still unread.
+Confidence is 29% (registration and completion date, 2 of 7 checks), so the score is provisional and gets no band until the other sources are read.

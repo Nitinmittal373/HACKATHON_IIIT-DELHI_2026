@@ -36,6 +36,7 @@ def test_stream_covers_every_source_and_ends_with_check_completed(client: TestCl
     assert last["type"] == "check.completed"
     assert last["data"]["status"] == "completed"
     assert last["data"]["score"]["value"] == 71
+    assert last["data"]["score"]["provisional"] is True
 
 
 def test_a_late_listener_still_gets_the_whole_run(client: TestClient) -> None:

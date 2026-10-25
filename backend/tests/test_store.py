@@ -61,8 +61,10 @@ def test_score_sets_points_on_findings(tmp_path: Path) -> None:
     store.add_finding("d" * 32, finding)
     score = Score(
         value=86,
-        band="Low",
+        band="insufficient_evidence",
+        band_label="Not enough evidence yet",
         confidence=0.29,
+        provisional=True,
         hard_stop=False,
         drivers=[
             Driver(finding_id="f1", title=finding.title, area="execution", penalty=70, points=-14)

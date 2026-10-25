@@ -16,7 +16,7 @@ SourceName = Literal["uprera", "registry", "insolvency", "land", "consumer", "ne
 Area = Literal["rera", "execution", "legal", "financial", "builder_history", "news"]
 Reliability = Literal["primary", "secondary"]
 Verdict = Literal["ok", "fail", "red_flag", "review", "context", "not_found"]
-Band = Literal["Low", "Moderate", "High", "Critical"]
+Band = Literal["Low", "Moderate", "High", "Critical", "insufficient_evidence"]
 InsolvencyScope = Literal["company", "this_project", "other_project"]
 CheckStatus = Literal["queued", "running", "completed", "failed"]
 RunStatus = Literal["running", "completed", "blocked", "failed", "unavailable"]
@@ -156,7 +156,10 @@ class AreaScore(BaseModel):
 class Score(BaseModel):
     value: int
     band: Band
+    band_label: str
     confidence: float
+    # True when too little was read to rate the project; the value is shown but not banded.
+    provisional: bool
     hard_stop: bool
     hard_stop_reason: str | None = None
     drivers: list[Driver]

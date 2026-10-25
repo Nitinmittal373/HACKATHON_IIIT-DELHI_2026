@@ -9,7 +9,7 @@ Driver that points back at the finding behind it.
 import math
 from collections.abc import Iterable
 
-from app.models import Area, AreaScore, CheckKey, Driver, Finding, Score
+from app.models import Area, AreaScore, Band, CheckKey, Driver, Finding, Score
 from app.scoring import weights as w
 
 
@@ -24,10 +24,21 @@ def score(findings: list[Finding], checks_read: Iterable[CheckKey]) -> Score:
         value = min(value, w.HARD_STOP_CAP)
 
     read = set(checks_read)
+    confidence = round(len(read & set(w.KEY_CHECKS)) / len(w.KEY_CHECKS), 2)
+    # A verified hard stop is Critical however little else was read; otherwise a score
+    # built on too few records must not look like a reassuring band.
+    provisional = confidence < w.MIN_CONFIDENCE_FOR_BAND and not hard_stop_reason
+    band: Band = (
+        "insufficient_evidence"
+        if provisional
+        else next(band for floor, band in w.BANDS if value >= floor)
+    )
     return Score(
         value=value,
-        band=next(band for floor, band in w.BANDS if value >= floor),
-        confidence=round(len(read & set(w.KEY_CHECKS)) / len(w.KEY_CHECKS), 2),
+        band=band,
+        band_label=w.BAND_LABELS[band],
+        confidence=confidence,
+        provisional=provisional,
         hard_stop=hard_stop_reason is not None,
         hard_stop_reason=hard_stop_reason,
         drivers=sorted(drivers, key=lambda driver: driver.points),

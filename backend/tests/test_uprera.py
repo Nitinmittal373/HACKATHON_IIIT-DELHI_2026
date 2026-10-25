@@ -126,7 +126,8 @@ def test_findings_and_score_for_8334_from_the_recorded_pages() -> None:
     assert [d.points for d in result.drivers] == [-14.0, -9.0, -6.0]
     assert result.value == 71
     assert result.confidence == 0.29
-    assert result.band == "Moderate"
+    assert result.band == "insufficient_evidence"
+    assert result.provisional
 
 
 def test_findings_and_score_for_6742_count_the_delay() -> None:
