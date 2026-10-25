@@ -8,18 +8,20 @@ import { LangProvider } from "@/lib/LangProvider";
 import "@/styles/tokens.css";
 import "@/styles/globals.css";
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-geist", display: "swap" });
+const geist = Geist({ subsets: ["latin"], variable: "--font-geist", display: "optional" });
 const geistMono = Geist_Mono({
   subsets: ["latin"],
   weight: ["400", "500"],
   variable: "--font-geist-mono",
   display: "swap",
+  preload: false,
 });
 const devanagari = Noto_Sans_Devanagari({
   subsets: ["devanagari"],
   weight: ["500", "600", "700"],
   variable: "--font-devanagari",
   display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {

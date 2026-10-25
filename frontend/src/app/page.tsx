@@ -1,7 +1,11 @@
+import { Hero } from "@/components/Hero";
+import { EXAMPLE_REPORT } from "@/lib/example8334";
+
+/** The home page fetches nothing: its examples are a recorded real check, labelled as such. */
 export default function HomePage() {
   return (
-    <main className="wrap section">
-      <h1 className="h2">NeevCheck</h1>
+    <main>
+      <Hero report={EXAMPLE_REPORT} />
     </main>
   );
 }

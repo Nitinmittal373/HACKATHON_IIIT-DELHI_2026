@@ -53,6 +53,8 @@ a {
 }
 
 .wrap {
+  /* Content-box on purpose: the content is 1240px wide and the padding sits outside it. */
+  box-sizing: content-box;
   max-width: 1240px;
   margin: 0 auto;
   padding: 0 32px;
