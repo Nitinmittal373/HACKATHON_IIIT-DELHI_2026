@@ -3,7 +3,6 @@
   z-index: 2;
   border-top: 1px solid var(--ln);
   background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(8px);
 }
 
 .row {

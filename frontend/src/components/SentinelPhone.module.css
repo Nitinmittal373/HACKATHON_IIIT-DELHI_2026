@@ -1,0 +1,187 @@
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 56px;
+  align-items: center;
+  /* The phone's glow is wider than a phone-sized screen. */
+  overflow-x: clip;
+}
+
+.title {
+  margin: 14px 0 0;
+  font-size: 48px;
+}
+
+.lead {
+  max-width: 460px;
+  margin: 18px 0 0;
+  color: var(--mu);
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  margin: 28px 0 0;
+}
+
+.stats div {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.stats dd {
+  margin: 0;
+  color: var(--o-text);
+  font-size: 40px;
+  font-weight: 650;
+  letter-spacing: -0.04em;
+}
+
+.stats dt {
+  color: var(--mu);
+  font-size: 14px;
+}
+
+.phoneWrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+}
+
+.phoneWrap::before {
+  content: "";
+  position: absolute;
+  top: 40px;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(242, 107, 29, 0.28), transparent 70%);
+  filter: blur(30px);
+}
+
+.phone {
+  position: relative;
+  width: 300px;
+  height: 600px;
+  padding: 18px;
+  overflow: hidden;
+  border: 10px solid #111;
+  border-radius: 46px;
+  background: linear-gradient(160deg, #2b1a10, #120c08 60%);
+  box-shadow: 0 60px 100px -40px rgba(17, 17, 17, 0.6);
+  color: #fff;
+}
+
+.top {
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.time {
+  margin-top: 30px;
+  text-align: center;
+  font-size: 64px;
+  font-weight: 300;
+  letter-spacing: -0.04em;
+}
+
+.date {
+  text-align: center;
+  font-size: 14px;
+  opacity: 0.75;
+}
+
+.card {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(16px);
+  opacity: 0;
+  animation: notify 8s infinite;
+}
+
+.first {
+  animation-delay: 1s;
+}
+
+.second {
+  animation-delay: 3s;
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.cardHead em {
+  margin-left: auto;
+  font-style: normal;
+  opacity: 0.7;
+}
+
+.appIcon {
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  background: var(--o);
+}
+
+.cardBody {
+  margin-top: 6px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.caption {
+  position: relative;
+  margin-top: 18px;
+  color: var(--fa);
+  font-size: 12.5px;
+}
+
+@keyframes notify {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.96);
+  }
+
+  6%,
+  80% {
+    opacity: 1;
+    transform: none;
+  }
+
+  90%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 960px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .title {
+    font-size: 34px;
+  }
+}
+
+/* Both alerts stay on screen instead of cycling. */
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    opacity: 1;
+    animation: none;
+  }
+}
