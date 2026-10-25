@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Noto_Sans_Devanagari } from "next/font/google";
 import type { ReactNode } from "react";
 
+import { Footer } from "@/components/Footer";
+import { Header } from "@/components/Header";
+import { LangProvider } from "@/lib/LangProvider";
 import "@/styles/tokens.css";
 import "@/styles/globals.css";
 
@@ -30,7 +33,13 @@ export const viewport: Viewport = { themeColor: "#ffffff" };
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`${geist.variable} ${geistMono.variable} ${devanagari.variable}`}>
-      <body>{children}</body>
+      <body>
+        <LangProvider>
+          <Header />
+          {children}
+          <Footer />
+        </LangProvider>
+      </body>
     </html>
   );
 }
