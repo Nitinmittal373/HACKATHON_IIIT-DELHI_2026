@@ -87,24 +87,16 @@ A hard stop is always Critical, however little else was read: one verified serio
 
 ## Worked example
 
-Supertech Eco Village-I Phase I-C (`UPRERAPRJ8334`) with every source read, as recorded on 24 Oct 2026. The same numbers are a test in `backend/tests/test_scoring.py`.
-
-| Finding | Area | Penalty | Points |
-| --- | --- | --: | --: |
-| Completion date extended 3 times | Project execution (20%) | 70 | −14 |
-| Insolvency limited to another project | Financial and insolvency (15%) | 60 | −9 |
-| One news story on delays | News (10%) | 10 | −1 |
-| **NeevScore** | | | **76 · Moderate** |
-
-Confidence is 71% (5 of 7 checks) because consumer cases (e-Jagriti, CAPTCHA) and the completion date could not be read.
-
-Until the Phase 2 agents land, a live check reads UP-RERA only. On 25 Oct 2026 that gave:
+Supertech Eco Village-I Phase I-C (`UPRERAPRJ8334`), checked live on 25 Oct 2026. Every source was read except the land authority lists. The same numbers are a test in `backend/tests/test_recorded_check.py`, replayed from the recording.
 
 | Finding | Area | Penalty | Points |
 | --- | --- | --: | --: |
 | Completion date on record (30 Dec 2017) passed 105 months ago; project still listed as Ongoing | Project execution (20%) | 70 | −14 |
 | 2,803 complaints on UP-RERA against the promoter | Builder history (15%) | 60 | −9 |
 | 15 complaints on UP-RERA about this project | Legal and courts (15%) | 40 | −6 |
-| **NeevScore** | | | **71 · Not enough evidence yet** |
+| Three news stories on delays (10 each, secondary) | News (10%) | 30 | −3 |
+| **NeevScore** | | | **68 · Moderate** |
 
-Confidence is 29% (registration and completion date, 2 of 7 checks), so the score is provisional and gets no band until the other sources are read.
+Shown with no points: registration (ok), company status (Active), the insolvency admission of 25 Mar 2022, a news report that the insolvency covers the whole company (**unverified**: no court order was read, so it cannot cap the score), one consumer case on e-Jagriti, and the Supreme Court's NBCC order (context).
+
+Confidence is 86% (6 of 7 checks): land dues were not read because the authorities' lists could not be fetched. If a CAPTCHA had stopped e-Jagriti, confidence would be 71% and the score would stay 68.
