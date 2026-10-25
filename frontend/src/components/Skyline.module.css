@@ -1,0 +1,174 @@
+.hero {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 440px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.scene {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.app {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 440px;
+  opacity: 0.75;
+}
+
+.far {
+  animation: drift 40s ease-in-out infinite alternate;
+}
+
+.tower {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: rise 2.2s steps(14, end) both;
+}
+
+.window {
+  opacity: 0.05;
+  animation: lightUp 4s ease-in-out infinite;
+}
+
+.slab {
+  transform-box: fill-box;
+  opacity: 0;
+  animation: slab 4.5s ease-out infinite;
+}
+
+.jib {
+  animation: slew 10s ease-in-out infinite alternate;
+}
+
+.hook {
+  animation: bob 3.5s ease-in-out infinite alternate;
+}
+
+.beacon {
+  animation: beacon 1.2s steps(2) infinite;
+}
+
+.neevRun {
+  stroke-dasharray: 140 1300;
+  animation: run 5s linear infinite;
+}
+
+/* A wider, fainter copy of the running light gives the glow without an animated filter. */
+.neevGlow {
+  stroke-dasharray: 140 1300;
+  animation: run 5s linear infinite;
+}
+
+@keyframes drift {
+  to {
+    transform: translateX(-70px);
+  }
+}
+
+@keyframes rise {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes lightUp {
+  0%,
+  35% {
+    opacity: 0.05;
+  }
+
+  55%,
+  80% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 0.05;
+  }
+}
+
+@keyframes slab {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  15%,
+  75% {
+    opacity: 1;
+    transform: none;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes slew {
+  0% {
+    transform: scaleX(1);
+  }
+
+  50% {
+    transform: scaleX(0.45);
+  }
+
+  100% {
+    transform: scaleX(-0.55);
+  }
+}
+
+@keyframes bob {
+  to {
+    transform: translateY(24px);
+  }
+}
+
+@keyframes beacon {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes run {
+  from {
+    stroke-dashoffset: 1440;
+  }
+
+  to {
+    stroke-dashoffset: -1440;
+  }
+}
+
+/* A still skyline: finished towers, some lit windows, the slabs drawn in. */
+@media (prefers-reduced-motion: reduce) {
+  .far,
+  .jib,
+  .hook,
+  .beacon,
+  .neevRun,
+  .neevGlow {
+    animation: none;
+  }
+
+  .window {
+    animation: none;
+    opacity: 0.35;
+  }
+
+  .slab {
+    animation: none;
+    opacity: 0.8;
+  }
+}
+.hero { display: none; }
