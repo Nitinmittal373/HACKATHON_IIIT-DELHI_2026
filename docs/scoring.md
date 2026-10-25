@@ -37,7 +37,7 @@ Penalties come only from parsed facts, never from rules written for one builder.
 | Completion date on record passed more than 24 months ago, project not listed as completed | Project execution | 70 |
 | Insolvency limited to another project | Financial and insolvency | 60 |
 | Insolvency of the company or this project | Financial and insolvency | 100 and hard stop |
-| Listed for unpaid land authority dues | Financial and insolvency | 70 |
+| Listed for unpaid land authority dues | Financial and insolvency | 50 |
 | UP-RERA registration lapsed or revoked | UP-RERA compliance | 100 and hard stop |
 | One news story on delays (secondary) | News | 10 each |
 | Complaints on UP-RERA against the promoter, all projects: at least 20 / 100 / 500 | Builder history | 20 / 40 / 60 |
@@ -58,6 +58,8 @@ Everything else in a report (registration date, a completion date not yet passed
 | Absence of a record never adds points | "Nothing found" may only mean a site was unreadable |
 | An unreadable source lowers confidence, not the score | We never punish a project for a CAPTCHA |
 | Insolvency counts fully only when it covers the company or this project | Supertech's process was limited to Eco Village-II by NCLAT |
+| A hard stop needs an official page | A news report that says an insolvency covers the company or this project is shown as "unverified" for review with 0 points; only an NCLT, NCLAT, IBBI or Supreme Court page can cap the score at Critical |
+| A company whose registry status is under CIRP or liquidation is a hard stop | The promoter company itself is in insolvency. "Active" is shown as context and costs nothing |
 | An admission and the order that sets its scope are two findings; only the scope is scored | The same case is never counted twice |
 | A petition that is not yet admitted is a "review" finding | Filing is not the same as admission |
 | News is a secondary source | It can only add small penalties and is marked for review |
@@ -69,7 +71,7 @@ Everything else in a report (registration date, a completion date not yet passed
 
 ## Confidence
 
-Confidence is the share of seven key checks that were actually read: registration, completion date, extensions, company status, insolvency, land dues and consumer cases. A blocked, failed or not-yet-connected source leaves its checks unread. If UP-RERA itself cannot be read, the check fails and no score is shown.
+Confidence is the share of seven key checks that were actually read: registration, completion date, extensions, company status, insolvency, land dues and consumer cases. A blocked, failed or unreadable source leaves its checks unread. "Extensions" counts as read when the project's summary page was read, because that page lists the extensions granted (or none). "Insolvency" counts as read only when a page actually reported the case; finding no page proves nothing. "Land dues" counts as read only when every land authority list for the project's district was read. If UP-RERA itself cannot be read, the check fails and no score is shown.
 
 ## Bands
 

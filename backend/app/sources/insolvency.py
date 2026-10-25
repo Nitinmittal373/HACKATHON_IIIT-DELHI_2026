@@ -35,9 +35,10 @@ GOAL = (
     "covers_whole_company: true only if the page says the whole company is under the "
     "insolvency process and does not say it was limited to particular projects. "
     "projects_named: the names of the projects the insolvency process is limited to or "
-    "concerns, exactly as written (empty if none are named). order_url: the address of an "
-    "NCLT, NCLAT or Supreme Court order linked on the page, if any. Return null for anything "
-    "the page does not state."
+    "concerns, exactly as written (empty if none are named). scope_quote: the sentence on "
+    "the page that says what the process covers, copied word for word. order_url: the "
+    "address of an NCLT, NCLAT or Supreme Court order linked on the page, if any. Return "
+    "null for anything the page does not state."
 )
 OUTPUT_SCHEMA: dict[str, Any] = {
     "type": "object",
@@ -46,9 +47,17 @@ OUTPUT_SCHEMA: dict[str, Any] = {
         "admitted_on": {"type": "string", "nullable": True},
         "covers_whole_company": {"type": "boolean", "nullable": True},
         "projects_named": {"type": "array", "items": {"type": "string"}},
+        "scope_quote": {"type": "string", "nullable": True},
         "order_url": {"type": "string", "nullable": True},
     },
-    "required": ["admitted", "admitted_on", "covers_whole_company", "projects_named", "order_url"],
+    "required": [
+        "admitted",
+        "admitted_on",
+        "covers_whole_company",
+        "projects_named",
+        "scope_quote",
+        "order_url",
+    ],
 }
 
 
@@ -164,13 +173,28 @@ def to_findings(
     ]
     scope = decide_scope(result, project)
     named = ", ".join(n for n in result.get("projects_named") or [] if n)
+    quote = quoted(result.get("scope_quote"))
     if scope == "other_project":
         title = f"Insolvency is limited to another project ({named}); this project is not named"
-        findings.append(make("insolvency_scope", title, "review", scope=scope))
-    elif scope == "this_project":
-        title = f"Insolvency covers this project (named: {named})"
-        findings.append(make("insolvency_scope", title, "red_flag", scope=scope))
-    elif scope == "company":
-        title = "Insolvency covers the whole company"
-        findings.append(make("insolvency_scope", title, "red_flag", scope=scope))
+        findings.append(make("insolvency_scope", title + quote, "review", scope=scope))
+    elif scope in ("this_project", "company"):
+        covered = "this project" if scope == "this_project" else "the whole company"
+        if reliability == "primary":
+            title = f"Insolvency covers {covered}{quote}"
+            findings.append(make("insolvency_scope", title, "red_flag", scope=scope))
+        else:
+            # A hard stop caps the score at Critical, so a news report alone is not enough.
+            title = (
+                f"A news report says the insolvency covers {covered}{quote}. "
+                "No court order was read, so this is not scored; check the NCLT and NCLAT orders"
+            )
+            findings.append(make("insolvency_scope_unverified", title, "review", scope=scope))
     return findings
+
+
+def quoted(text: str | None) -> str:
+    """The page's own words about the scope, shortened, so a reader can judge the reading."""
+    line = " ".join((text or "").split())
+    if not line:
+        return ""
+    return f' (page says: "{line[:157] + "..." if len(line) > 160 else line}")'

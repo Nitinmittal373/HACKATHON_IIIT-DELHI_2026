@@ -1,9 +1,10 @@
 """Company registry: is the promoter's legal entity active, or in insolvency itself?
 
-Search finds the company's page on zaubacorp (a mirror of MCA data) or MCA.
-An agent opens that one page and reads the name, CIN and status. The page is
-kept only if it carries the promoter's exact legal name: "Supertech Limited"
-is not "Supertech Realtors Limited", and a wrong-company claim is worse than none.
+Search finds the company's page on MCA or a mirror of its data (Economic Times, zaubacorp).
+Where plain Fetch can read the details table it is parsed in Python, which is free and gives
+the same answer every time; otherwise a TinyFish agent reads the page. Either way the page is
+kept only if it carries the promoter's exact legal name: "Supertech Limited" is not
+"Supertech Realtors Limited", and a wrong-company claim is worse than none.
 """
 
 import re
@@ -15,9 +16,10 @@ from app.models import CheckKey, Finding, Reliability, Verdict
 from app.sources.agent import AgentSource, AgentTask
 from app.sources.base import SourceContext
 from app.sources.findings import build_finding
-from app.tinyfish import SearchHit
+from app.tinyfish import SearchHit, WebError
 
 SEARCH_PURPOSE = "Find the public company-registry page of a builder's legal entity"
+FETCH_PURPOSE = "Read the public company-registry page of a builder's legal entity"
 # Host -> how far the page can be trusted, most readable first. Zaubacorp shows browsers a
 # CAPTCHA, so a mirror that does not (Economic Times) is tried before it.
 REGISTRY_HOSTS: dict[str, Reliability] = {
@@ -25,6 +27,8 @@ REGISTRY_HOSTS: dict[str, Reliability] = {
     "economictimes.indiatimes.com": "secondary",
     "zaubacorp.com": "secondary",
 }
+CIN = re.compile(r"[LU]\d{5}[A-Z]{2}\d{4}[A-Z]{3}\d{6}")
+PAGE_URL = "page_url"  # set when the answer came from a page other than the one searched
 IN_INSOLVENCY = re.compile(r"cirp|insolvency|liquidat|resolution process", re.IGNORECASE)
 
 GOAL = (
@@ -66,14 +70,56 @@ class RegistrySource(AgentSource):
             max_steps=15,
         )
 
+    async def read_directly(self, task: AgentTask, ctx: SourceContext) -> dict[str, Any] | None:
+        for url in readable_pages(task.url, ctx.project.promoter):
+            try:
+                page = await ctx.web.fetch_text(url, purpose=FETCH_PURPOSE)
+            except WebError:
+                continue
+            found = parse_company_table(page.text)
+            # Only a page that names exactly this company counts, wherever the address came from.
+            if found["status"] and is_this_company(found, ctx.project.promoter):
+                return {**found, PAGE_URL: url}
+        return None
+
     def to_findings(
         self, result: dict[str, Any], ctx: SourceContext, task: AgentTask
     ) -> list[Finding]:
-        return to_findings(result, ctx.project.promoter, task.url, ctx)
+        url = result.get(PAGE_URL) or task.url
+        return to_findings(result, ctx.project.promoter, url, ctx)
 
     def checks_read(self, result: dict[str, Any], ctx: SourceContext) -> tuple[CheckKey, ...]:
         usable = is_this_company(result, ctx.project.promoter) and bool(result.get("status"))
         return self.checks if usable else ()
+
+
+def readable_pages(url: str, promoter: str | None) -> list[str]:
+    """The chosen page, then the same company's page on a mirror that does not show a CAPTCHA.
+
+    Zaubacorp addresses end in the CIN, and Economic Times pages are named by company and CIN,
+    so the mirror can be worked out. It is only used if it names exactly the same company.
+    """
+    pages = [url]
+    cin = CIN.search(url)
+    slug = re.sub(r"[^a-z0-9]+", "-", normalize(promoter)).strip("-")
+    if cin and slug and registry_host(url) == "zaubacorp.com":
+        pages.insert(0, f"https://economictimes.indiatimes.com/company/{slug}/{cin.group(0)}")
+    return pages
+
+
+def parse_company_table(text: str) -> dict[str, str | None]:
+    """Name, CIN and status from a company page's details table (as Fetch turns it into text)."""
+
+    def cell(label: str, value: str) -> str | None:
+        found = re.search(rf"\|\s*{label}\s*\|\s*({value})\s*\|", text)
+        return found.group(1).strip() if found else None
+
+    heading = re.search(r"^#+\s*(.+?)\s+Details\s*$", text, re.MULTILINE)
+    return {
+        "legal_name": heading.group(1).strip() if heading else None,
+        "cin": cell("CIN", r"[A-Z0-9]{21}"),
+        "status": cell("Status", r"[^|]+?"),
+    }
 
 
 def pick_company_page(hits: list[SearchHit], promoter: str) -> SearchHit | None:

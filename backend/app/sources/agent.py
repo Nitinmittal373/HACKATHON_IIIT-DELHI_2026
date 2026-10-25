@@ -72,9 +72,14 @@ class AgentSource(ABC):
     ) -> list[Finding]:
         """Turn the agent's JSON into findings; every one needs its own source URL."""
 
-    def checks_read(
-        self, result: dict[str, Any], ctx: SourceContext
-    ) -> tuple[CheckKey, ...]:
+    async def read_directly(self, task: AgentTask, ctx: SourceContext) -> dict[str, Any] | None:
+        """Read the page without a browser when plain Fetch is enough (free and repeatable).
+
+        Return the same shape the agent would, or None to let the agent do it.
+        """
+        return None
+
+    def checks_read(self, result: dict[str, Any], ctx: SourceContext) -> tuple[CheckKey, ...]:
         """The key checks this answer actually settles; the default is all of them."""
         return self.checks
 
@@ -84,19 +89,24 @@ class AgentSource(ABC):
             yield Progress(self.no_task_message)
             return
         yield Progress(f"Opening {urlsplit(task.url).hostname}")
+        direct = await self.read_directly(task, ctx)
         done: AgentDone | None = None
-        async for event in ctx.web.run_agent(
-            url=task.url,
-            goal=task.goal + CAPTCHA_RULE,
-            output_schema=with_captcha_field(task.output_schema),
-            max_steps=task.max_steps,
-        ):
-            if isinstance(event, AgentLiveUrl):
-                yield LiveUrl(event.url)
-            elif isinstance(event, AgentProgress):
-                yield Progress(short(event.text))
-            else:
-                done = event
+        if direct is not None:
+            yield Progress("Read the page directly, no browser needed")
+            done = AgentDone(status="COMPLETED", result=direct)
+        else:
+            async for event in ctx.web.run_agent(
+                url=task.url,
+                goal=task.goal + CAPTCHA_RULE,
+                output_schema=with_captcha_field(task.output_schema),
+                max_steps=task.max_steps,
+            ):
+                if isinstance(event, AgentLiveUrl):
+                    yield LiveUrl(event.url)
+                elif isinstance(event, AgentProgress):
+                    yield Progress(short(event.text))
+                else:
+                    done = event
 
         if done is None:
             raise SourceError("The agent stopped without an answer")

@@ -18,6 +18,7 @@ START_URL = "https://e-jagriti.gov.in/advance-case-search"
 GOAL = (
     "This is the e-Jagriti consumer case search. Search by party name: choose the option to "
     "search by opposite party (respondent) name, type {promoter}, and submit. Do not log in. "
+    "The moment you see a CAPTCHA on the form, stop; do not keep looking for a way past it. "
     "Read the first page of results only. total_cases: the number of cases the results "
     "report. cases: up to 10 rows, each with the case number, the commission (forum) and "
     "the opposite party name exactly as shown. Return null for anything not shown."
@@ -74,7 +75,8 @@ def to_findings(
         return []
     count = len(ours)
     if count:
-        title = f"{count} consumer cases against {promoter} on the first page of e-Jagriti results"
+        noun = "case" if count == 1 else "cases"
+        title = f"{count} consumer {noun} against {promoter} on the first page of e-Jagriti results"
         verdict = "review"
     else:
         title = f"No consumer case naming {promoter} on the first page of e-Jagriti results"
