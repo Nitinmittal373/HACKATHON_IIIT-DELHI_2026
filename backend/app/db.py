@@ -135,8 +135,16 @@ class AlertRow(Base):
     emailed: Mapped[bool] = mapped_column(default=False)
 
 
+def normalize_database_url(database_url: str) -> str:
+    """Hosts give postgres:// or postgresql:// links; SQLAlchemy needs the driver named."""
+    for prefix in ("postgres://", "postgresql://"):
+        if database_url.startswith(prefix):
+            return "postgresql+psycopg://" + database_url.removeprefix(prefix)
+    return database_url
+
+
 def make_engine(database_url: str) -> Engine:
-    url = make_url(database_url)
+    url = make_url(normalize_database_url(database_url))
     if url.get_backend_name() == "sqlite":
         if url.database and url.database != ":memory:":
             Path(url.database).parent.mkdir(parents=True, exist_ok=True)

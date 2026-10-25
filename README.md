@@ -215,28 +215,32 @@ Full method and test cases: [`docs/scoring.md`](docs/scoring.md).
 .
 ├── backend/                 FastAPI service
 │   ├── app/
-│   │   ├── api/             routes: search, checks, events (SSE), reports
+│   │   ├── api/             routes: search, checks, events (SSE), reports, sentinel
 │   │   ├── sources/         one module per public source, plus the shared agent runner
 │   │   ├── parsers/         deterministic page parsers (UP-RERA)
 │   │   ├── scoring/         NeevScore engine and weights
+│   │   ├── sentinel/        watches, change detection, alerts, email
 │   │   ├── orchestrator.py  runs a check and streams its events
 │   │   ├── tinyfish.py      the only module that calls TinyFish
 │   │   ├── models.py        Pydantic models shared by the API
 │   │   └── main.py
 │   ├── scripts/             capture_fixtures.py records real responses for tests
 │   └── tests/               pytest, with recorded TinyFish responses in fixtures/
-├── frontend/                Next.js app (home page so far)
+├── frontend/                Next.js app
+│   ├── e2e/                 Playwright tests against a recorded API
 │   └── src/
-│       ├── app/             routes: home, check/[id], report/[id]
+│       ├── app/             routes: home, check, check/[id], report/[id], alerts
 │       ├── components/      Skyline, AgentCam, ScoreRing, EvidenceList …
-│       └── styles/          tokens.css and globals.css
-├── docs/                    architecture, scoring, data sources, assets
+│       ├── lib/             API client, event hook, English and Hindi copy
+│       └── styles/          tokens, globals, app screens and print
+├── docs/                    architecture, scoring, data sources, deployment, assets
+├── render.yaml              Render Blueprint for the API
 └── .github/                 CI, issue forms, pull request template
 ```
 
 ## Getting started
 
-> The app is being rebuilt in phases on the final design. The backend runs live checks from **v0.2** (end of Phase 2); the frontend has its home page from Phase 3, and the check flow follows in Phase 4. Every check is live, so you need a [TinyFish API key](https://agent.tinyfish.ai/api-keys).
+> Every check is live, so you need a [TinyFish API key](https://agent.tinyfish.ai/api-keys). To put NeevCheck online, follow [`docs/deployment.md`](docs/deployment.md) (Render for the API, Vercel for the web app).
 
 ```bash
 git clone https://github.com/Nitinmittal373/HACKATHON_IIIT-DELHI_2026.git neevcheck
@@ -254,6 +258,8 @@ ruff check . && pytest -q        # tests replay recorded responses, no key neede
 cd frontend
 npm install
 npm run dev                      # http://localhost:3000
+npm run lint && npm run typecheck && npm run build
+npm run e2e                      # browser tests; need `npx playwright install chromium` once
 ```
 
 The key never leaves your machine: `.env` is git-ignored and the app never logs it. A `TINYFISH_API_KEY` set in your shell takes precedence over `.env`.
@@ -275,8 +281,8 @@ The full API is described in [`docs/architecture.md`](docs/architecture.md#api).
 - [x] **Phase 1 · Backend core** — API, data models, NeevScore engine, live UP-RERA source, event stream, shared agent runner
 - [x] **Phase 2 · TinyFish agents** — five source agents, live view streaming, CAPTCHA handling
 - [x] **Phase 3 · Frontend foundation** — design tokens, layout, animated skyline, home page
-- [ ] **Phase 4 · Check flow** — search, confirm, Agent Cam, report
-- [ ] **Phase 5 · Sentinel and sharing** — weekly re-checks, alerts, PDF, Hindi
+- [x] **Phase 4 · Check flow** — search, confirm, Agent Cam, report
+- [x] **Phase 5 · Sentinel and sharing** — weekly re-checks, alerts, PDF, Hindi
 - [ ] **Phase 6 · Launch** — accessibility, end-to-end tests, deployment, v1.0
 
 ## Responsible use of public data

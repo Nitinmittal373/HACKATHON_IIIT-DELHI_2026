@@ -1,0 +1,47 @@
+# Render Blueprint for the NeevCheck API. Only names are listed here; every value is set in
+# the Render dashboard (see docs/deployment.md), so no secret ever reaches the repository.
+services:
+  - type: web
+    name: neevcheck-api
+    runtime: python
+    rootDir: backend
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      # Render puts the service behind a proxy, so the client address is in X-Forwarded-For.
+      - key: TRUST_FORWARDED_FOR
+        value: "true"
+      # Secrets and addresses: paste these in the dashboard.
+      - key: TINYFISH_API_KEY
+        sync: false
+      - key: FRONTEND_ORIGINS
+        sync: false
+      - key: WEBHOOK_SECRET
+        sync: false
+      # Optional. Without it the API uses SQLite on the service's own disk, which Render clears
+      # on every deploy. Paste the Internal Database URL of a Render Postgres to keep data.
+      - key: DATABASE_URL
+        sync: false
+      # Cost guards; the defaults are fine, change them in the dashboard if needed.
+      - key: MAX_CHECKS_PER_DAY
+        value: "30"
+      - key: RATE_LIMIT_PER_MINUTE
+        value: "6"
+      - key: AGENT_CONCURRENCY
+        value: "2"
+      - key: SENTINEL_INTERVAL_HOURS
+        value: "168"
+      # Optional email for alerts.
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_FROM
+        sync: false
