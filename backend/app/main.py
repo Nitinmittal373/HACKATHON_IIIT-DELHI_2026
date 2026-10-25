@@ -1,5 +1,6 @@
 """FastAPI app factory. Run with: uvicorn app.main:app --reload"""
 
+import asyncio
 from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 from datetime import datetime
@@ -8,13 +9,15 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import checks, events, health, projects, reports
+from app.api import checks, events, health, projects, reports, sentinel
 from app.config import BACKEND_DIR, Settings, load_settings
 from app.db import make_engine, make_session_factory
 from app.events import EventHub
 from app.orchestrator import Orchestrator, utc_now
 from app.ratelimit import RateLimiter
 from app.security import add_security_headers
+from app.sentinel.service import Sentinel
+from app.sentinel.store import SentinelStore
 from app.store import Store
 from app.tinyfish import LiveWebClient, WebClient
 
@@ -53,15 +56,29 @@ def create_app(
             clock=clock,
             cache_dir=cache_dir,
         )
+        app.state.sentinel_store = SentinelStore(make_session_factory(engine))
+        app.state.sentinel = Sentinel(
+            app.state.store,
+            app.state.sentinel_store,
+            app.state.orchestrator,
+            settings,
+            clock,
+        )
+        schedule = None
+        if settings.sentinel_interval_hours > 0:
+            schedule = asyncio.create_task(app.state.sentinel.loop())
         try:
             yield
         finally:
+            if schedule:
+                schedule.cancel()
             await app.state.orchestrator.shutdown()
             await app.state.web.aclose()
             engine.dispose()
 
     app = FastAPI(title="NeevCheck API", version="0.1.0", lifespan=lifespan)
     app.state.settings = settings
+    app.state.clock = clock
 
     app.middleware("http")(add_security_headers)
     app.add_middleware(
@@ -72,7 +89,7 @@ def create_app(
         # Without this the browser hides Retry-After and cannot tell a visitor how long to wait.
         expose_headers=["Retry-After"],
     )
-    for module in (health, projects, checks, events, reports):
+    for module in (health, projects, checks, events, reports, sentinel):
         app.include_router(module.router)
     return app
 

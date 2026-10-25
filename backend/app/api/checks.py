@@ -1,3 +1,5 @@
+from collections.abc import Callable
+from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
@@ -6,11 +8,13 @@ from app.api.deps import (
     CheckId,
     client_ip,
     find_check,
+    get_clock,
     get_limiter,
     get_orchestrator,
     get_settings,
     get_store,
 )
+from app.budget import REUSE_WINDOW, seconds_until_cap_resets
 from app.config import Settings
 from app.models import Check, CheckCreate, Project
 from app.orchestrator import Orchestrator
@@ -35,12 +39,38 @@ def rate_limit(
         )
 
 
-@router.post("/api/checks", status_code=202, dependencies=[Depends(rate_limit)])
+@router.post(
+    "/api/checks",
+    status_code=202,
+    dependencies=[Depends(rate_limit)],
+    responses={200: {"description": "A check from the last 24 hours was reused"}},
+)
 async def create_check(
     body: CheckCreate,
     response: Response,
     orchestrator: Annotated[Orchestrator, Depends(get_orchestrator)],
+    store: Annotated[Store, Depends(get_store)],
+    settings: Annotated[Settings, Depends(get_settings)],
+    clock: Annotated[Callable[[], datetime], Depends(get_clock)],
 ) -> Check:
+    now = clock()
+    if not body.fresh:
+        recent = store.latest_completed_check(body.rera_id, since=now - REUSE_WINDOW)
+        if recent:
+            response.status_code = 200
+            response.headers["Location"] = f"/api/checks/{recent.id}"
+            return recent.model_copy(update={"reused": True})
+
+    wait = seconds_until_cap_resets(store, settings.max_checks_per_day, now)
+    if wait is not None:
+        raise HTTPException(
+            status_code=429,
+            detail={
+                "code": "daily_cap",
+                "message": "NeevCheck has reached its limit of live checks for today",
+            },
+            headers={"Retry-After": str(wait)},
+        )
     # Old-format numbers always use their canonical page, whatever link was sent.
     details_url = details_url_for(body.rera_id) or body.details_url
     assert details_url is not None  # CheckCreate requires a link for new-format numbers

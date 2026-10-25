@@ -79,6 +79,8 @@ class CheckCreate(BaseModel):
     rera_id: str = Field(max_length=40, examples=["UPRERAPRJ8334"])
     # Needed only for new-format numbers, whose pages have no stable address.
     details_url: str | None = Field(default=None, max_length=500)
+    # Skip the 24-hour reuse of a recent check ("Re-check now"). The daily cap still applies.
+    fresh: bool = False
 
     @field_validator("rera_id")
     @classmethod
@@ -118,6 +120,8 @@ class Check(BaseModel):
     started_at: datetime
     completed_at: datetime | None = None
     sources: list[SourceRun] = []
+    # True when an earlier finished check of the same project was returned instead of a new one.
+    reused: bool = False
 
 
 class Finding(BaseModel):
