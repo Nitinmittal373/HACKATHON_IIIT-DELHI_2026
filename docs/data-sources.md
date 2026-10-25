@@ -4,7 +4,7 @@ NeevCheck reads only public records. Each source has a reliability level that de
 
 | Source | Site | What we read | Reliability |
 | --- | --- | --- | --- |
-| UP-RERA | [up-rera.in](https://www.up-rera.in) | Registration, promoter, completion date, documents, complaint counts (extensions in Phase 2) | Primary |
+| UP-RERA | [up-rera.in](https://www.up-rera.in) | Registration, promoter, completion date, extensions granted, completion certificate, documents, complaint counts | Primary |
 | Company registry | [mca.gov.in](https://www.mca.gov.in), [zaubacorp.com](https://www.zaubacorp.com) | Company status, CIN | Primary (mirrors such as zaubacorp are secondary) |
 | Insolvency | [ibbi.gov.in](https://ibbi.gov.in), NCLT / NCLAT orders | Admitted cases and their scope | Primary |
 | Land authorities | Noida, Greater Noida, YEIDA | Published dues and defaulter lists | Primary |

@@ -53,6 +53,8 @@ SUMMARY_SELECTORS = [
         "Lblpromotername",
         "lbltotalcomplaint",
         "lblprojectwisecomplaint",
+        "grd_extension",
+        "lblDateOfUploadingCC",
         "grvdocumentdetails",
     )
 ]
@@ -92,7 +94,6 @@ def with_record(project: Project, record: UpreraRecord) -> Project:
 
 class UpreraSource:
     name = "uprera"
-    # Extension orders are not listed on these pages, so "extensions" stays unread for now.
     checks: tuple[CheckKey, ...] = ("registration", "completion_date", "extensions")
 
     async def run(self, ctx: SourceContext) -> AsyncIterator[SourceEvent]:
@@ -112,15 +113,21 @@ class UpreraSource:
 
         yield Progress("Reading complaint counts on the UP-RERA summary page")
         summary, url = await self._summary(project, record, ctx.web)
+        extensions_read = False
         if summary and url:
+            for finding in extension_findings(summary, url, ctx.today, ctx.now):
+                yield FoundFinding(finding)
             for finding in complaint_findings(summary, url, ctx.today, ctx.now):
                 yield FoundFinding(finding)
+            extensions_read = True
         else:
             yield Progress("The UP-RERA summary page was not found, so complaints were not read")
 
         read: list[CheckKey] = ["registration"]
         if record.latest_end_date:
             read.append("completion_date")
+        if extensions_read:
+            read.append("extensions")
         yield ChecksRead(tuple(read))
 
     async def _summary(
@@ -158,6 +165,20 @@ def findings_from_record(
     ]
 
     certificate = record.completion_certificate
+    if record.completion_uploaded_on and not certificate:
+        findings.append(
+            _finding(
+                "completion_certificate",
+                "execution",
+                f"Completion certificate uploaded on {_day(record.completion_uploaded_on)}. "
+                "Verify possession status",
+                "review",
+                url,
+                today,
+                now,
+                occurred_on=record.completion_uploaded_on,
+            )
+        )
     if certificate:
         uploaded = f", uploaded {_day(certificate.uploaded_on)}" if certificate.uploaded_on else ""
         findings.append(
@@ -177,7 +198,7 @@ def findings_from_record(
     if latest is None:
         return findings
     months = months_between(latest, today)
-    if months > 0 and not is_completed(record.project_type) and not certificate:
+    if months > 0 and not record.is_completed and not certificate:
         findings.append(
             _finding(
                 "past_end_date",
@@ -206,6 +227,31 @@ def findings_from_record(
             )
         )
     return findings
+
+
+def extension_findings(
+    summary: UpreraRecord, url: str, today: date, now: datetime
+) -> list[Finding]:
+    """Extensions the authority granted, without the COVID-19 ones given to every project."""
+    own = [e for e in summary.extensions if not e.is_covid]
+    if not own:
+        return []
+    latest = max((e.extended_to for e in own if e.extended_to), default=None)
+    until = f", most recently to {_day(latest)}" if latest else ""
+    times = "once" if len(own) == 1 else f"{len(own)} times"
+    return [
+        _finding(
+            "completion_extended",
+            "execution",
+            f"Completion date extended {times} by UP-RERA{until}",
+            "fail",
+            url,
+            today,
+            now,
+            occurred_on=latest,
+            count=len(own),
+        )
+    ]
 
 
 def complaint_findings(
@@ -269,14 +315,6 @@ def _finding(
             **facts,
         }
     )
-
-
-COMPLETED_STATUSES = ("complete", "finished")
-
-
-def is_completed(project_type: str | None) -> bool:
-    """Only a completed project escapes the delay rule; UP-RERA also lists Ongoing, New, etc."""
-    return any(word in (project_type or "").lower() for word in COMPLETED_STATUSES)
 
 
 def months_between(start: date, end: date) -> int:

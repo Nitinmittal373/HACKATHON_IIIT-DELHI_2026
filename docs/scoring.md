@@ -45,7 +45,9 @@ Penalties come only from parsed facts, never from rules written for one builder.
 
 Any project whose UP-RERA type is not a completed one (Ongoing, New and so on) is late once that date has passed.
 
-The completion date on record is the latest date UP-RERA shows for the project. Until extension orders are read (Phase 2), the delay rule is applied to that date. Complaint counts come from the project's UP-RERA summary page, and each finding links to it.
+The completion date on record is the latest date UP-RERA shows for the project: the original or revised date, a permit's end date, or the end of the latest extension in the "Extension Granted" table on the project summary page. The delay rule is applied to that date. COVID-19 force-majeure rows in that table are not counted as extensions but do move the date.
+
+UP-RERA keeps the type "Ongoing" after a project is finished. A project counts as completed when its summary page shows a completion certificate upload date (or the type reads exactly "Completed"). Complaint counts come from the project's UP-RERA summary page, and each finding links to it.
 
 Everything else in a report (registration date, a completion date not yet passed, an insolvency admission whose scope is decided by a later order, court orders such as the Supreme Court's NBCC ruling) is shown as evidence with 0 points.
 

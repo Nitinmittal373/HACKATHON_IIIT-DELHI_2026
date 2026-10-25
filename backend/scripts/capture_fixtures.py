@@ -30,6 +30,7 @@ SEARCHES = {
     "search_gaur_city.json": "Gaur City UP RERA project",
     "search_supertech_eco_village.json": "Supertech Eco Village UP RERA project",
     "search_uprera_8334.json": "UPRERAPRJ8334 UP RERA project",
+    "search_uprera_2634.json": "UPRERAPRJ2634 UP RERA project",
 }
 PAGES = {
     "uprera_8334.html": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
@@ -39,6 +40,8 @@ PAGES = {
 SUMMARY_PAGES = {
     "uprera_summary_188811.html": ("search_gaur_city.json", "UPRERAPRJ188811/08/2024"),
     "uprera_summary_8334.html": ("search_uprera_8334.json", "UPRERAPRJ8334"),
+    # Completed (certificate uploaded) and with one ordinary plus one COVID-19 extension.
+    "uprera_summary_2634.html": ("search_uprera_2634.json", "UPRERAPRJ2634"),
 }
 
 

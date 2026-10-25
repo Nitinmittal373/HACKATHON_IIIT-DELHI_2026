@@ -18,6 +18,8 @@ RERA_PROMOTER = re.compile(r"UPRERAPRM\d+", re.IGNORECASE)
 COMPLETION_DOCUMENT = re.compile(r"completion certificate|occupancy", re.IGNORECASE)
 # Every project uploads a blank "Proforma of Completion Certificate" at registration.
 PROFORMA = re.compile(r"proforma", re.IGNORECASE)
+COVID_NOTE = re.compile(r"covid|force majeure", re.IGNORECASE)
+LEADING_DATE = re.compile(r"\d{2}-\d{2}-\d{4}")
 
 
 class ParseError(ValueError):
@@ -41,6 +43,20 @@ class Document:
 
 
 @dataclass(frozen=True)
+class Extension:
+    """One row of the "Extension Granted" table on a Projectsummary page."""
+
+    extended_from: date | None
+    extended_to: date | None
+    note: str
+
+    @property
+    def is_covid(self) -> bool:
+        """The force-majeure extensions given to every project; they are not the builder's delay."""
+        return bool(COVID_NOTE.search(self.note))
+
+
+@dataclass(frozen=True)
 class UpreraRecord:
     rera_id: str
     name: str | None
@@ -56,10 +72,26 @@ class UpreraRecord:
     documents: tuple[Document, ...]
     project_complaints: int | None = None
     promoter_complaints: int | None = None
+    extensions: tuple[Extension, ...] = ()
+    # Day the promoter uploaded the project's completion certificate (Projectsummary only).
+    completion_uploaded_on: date | None = None
+
+    @property
+    def is_completed(self) -> bool:
+        """UP-RERA keeps type "Ongoing" after completion; the certificate block is the signal."""
+        return self.completion_uploaded_on is not None or (
+            (self.project_type or "").strip().lower() == "completed"
+        )
 
     @property
     def latest_end_date(self) -> date | None:
-        dates = [self.end_date, self.revised_end_date, *(p.end_date for p in self.permits)]
+        """The latest approved end date: original, revised, permit or extension."""
+        dates = [
+            self.end_date,
+            self.revised_end_date,
+            *(p.end_date for p in self.permits),
+            *(e.extended_to for e in self.extensions),
+        ]
         known = [d for d in dates if d is not None]
         return max(known) if known else None
 
@@ -116,6 +148,8 @@ def _parse_summary(soup: BeautifulSoup) -> UpreraRecord:
         documents=tuple(_summary_document(row) for row in _rows(soup, "grvdocumentdetails")),
         project_complaints=_leading_int(_text(soup, "lblprojectwisecomplaint")),
         promoter_complaints=_leading_int(_text(soup, "lbltotalcomplaint")),
+        extensions=tuple(_extension(row) for row in _rows(soup, "grd_extension")),
+        completion_uploaded_on=_date(_text(soup, "lblDateOfUploadingCC")),
     )
 
 
@@ -125,6 +159,16 @@ def _permit(row: dict[str, str]) -> Permit:
         permit_date=_date(row.get("Orignal Permit Date")),
         valid_upto=_date(row.get("Valid Upto")),
         end_date=_date(row.get("End Date")),
+    )
+
+
+def _extension(row: dict[str, str]) -> Extension:
+    upto = row.get("Extension Upto", "")
+    return Extension(
+        extended_from=_leading_date(row.get("Extension From", "")),
+        extended_to=_leading_date(upto),
+        # The same cell can carry a remark such as "(... force majeure caused by covid-19 ...)".
+        note=upto,
     )
 
 
@@ -211,6 +255,11 @@ def _date(text: str | None) -> date | None:
         return datetime.strptime(text.strip(), "%d-%m-%Y").date()
     except ValueError:
         return None
+
+
+def _leading_date(text: str) -> date | None:
+    found = LEADING_DATE.match(text.strip())
+    return _date(found.group(0)) if found else None
 
 
 def _leading_int(text: str | None) -> int | None:

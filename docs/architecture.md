@@ -50,7 +50,7 @@ Each source is one small module with the same shape: it reads one kind of public
 
 | Source | Site | How it reads | Extracts |
 | --- | --- | --- | --- |
-| `uprera` | up-rera.in | TinyFish **Fetch** + deterministic Python parser; the summary page is found with Search | name, number, registration date, promoter, type, district, start and end dates, permits, documents, complaint counts |
+| `uprera` | up-rera.in | TinyFish **Fetch** + deterministic Python parser; the summary page is found with Search | name, number, registration date, promoter, type, district, start and end dates, extensions granted, completion certificate date, permits, documents, complaint counts |
 | `registry` | zaubacorp.com / mca.gov.in | TinyFish agent *(Phase 2)* | company status, CIN |
 | `insolvency` | NCLT / NCLAT orders, IBBI | Search + agent *(Phase 2)* | admitted cases and which projects they cover |
 | `land` | Noida, Greater Noida, YEIDA | agent *(Phase 2)* | dues or defaulter entries |

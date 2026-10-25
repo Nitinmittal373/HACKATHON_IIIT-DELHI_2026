@@ -56,7 +56,7 @@ def test_report_for_8334_is_scored_from_the_recorded_page(client: TestClient) ->
         "value": 71,
         "band": "insufficient_evidence",
         "band_label": "Not enough evidence yet",
-        "confidence": 0.29,
+        "confidence": 0.43,
         "provisional": True,
         "hard_stop": False,
     }
