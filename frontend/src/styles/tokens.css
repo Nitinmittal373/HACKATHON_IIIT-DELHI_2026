@@ -1,0 +1,57 @@
+/* Design tokens. Orange is the single accent; the risk colours below are for risk only. */
+:root {
+  /* surfaces and ink */
+  --bg: #ffffff;
+  --soft: #fff5ec;
+  --ink: #111111;
+  --ink2: #2b2b2b;
+  --mu: #5f5f5f;
+  --fa: #737373;
+  --ln: #eeeae6;
+  --ln2: #e0dad4;
+
+  /* brand */
+  --o: #f26b1d;
+  --oD: #d9530b;
+  --oS: #ffe8d6;
+  /* Darker oranges for small text and button fills: white on --o is only 3:1. */
+  --o-text: #c2410c;
+  --o-btn: #cc4a08;
+  --o-btn-hover: #b53f06;
+  --o-wash: #ffe1cc;
+  --o-glow: rgba(242, 107, 29, 0.14);
+
+  /* risk bands: text colour on its own background */
+  --low: #16a34a;
+  --low-text: #15803d;
+  --low-bg: #e9f7ee;
+  --moderate: #a16207;
+  --moderate-bg: #fef6dd;
+  --high: #c2410c;
+  --high-bg: #fff1e2;
+  --critical: #b42318;
+  --critical-bg: #fde7e8;
+
+  /* small status dots on findings */
+  --dot-ok: #16a34a;
+  --dot-warn: #f59e0b;
+  --dot-bad: #e5484d;
+
+  /* shape */
+  --r-sm: 12px;
+  --r-md: 18px;
+  --r-lg: 24px;
+  --r-xl: 32px;
+
+  --shadow-card: 0 50px 100px -40px rgba(17, 17, 17, 0.35);
+  --shadow-soft: 0 20px 40px -22px rgba(17, 17, 17, 0.35);
+  --shadow-cta: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 8px 20px -10px rgba(242, 107, 29, 0.8);
+
+  /* motion */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* type; the font variables are set by next/font in layout.tsx */
+  --font-sans: var(--font-geist), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-deva: var(--font-devanagari), var(--font-geist), sans-serif;
+}
