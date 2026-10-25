@@ -1,24 +1,19 @@
 import Link from "next/link";
 
 import type { ExampleReport } from "@/lib/exampleReport";
+import type { Strings } from "@/lib/i18n";
 import styles from "./AgentDemo.module.css";
 
-const STEPS = [
-  "Finds your project on UP-RERA",
-  "Reads the registration date",
-  "Reads the promised completion date",
-  "Counts every extension",
-];
-
 /** The looping mini browser. It repeats a 12 second loop, one step every three seconds. */
-export function AgentDemo({ report }: { report: ExampleReport }) {
+export function AgentDemo({ report, t }: { report: ExampleReport; t: Strings }) {
   const { register } = report;
+  const labels = t.home.demo.rows;
   const rows: [string, string][] = [
-    ["Project name", report.name.toUpperCase()],
-    ["Promoter", report.promoter],
-    ["Registration date", register.registeredOn],
-    ["Proposed completion", register.completionDue],
-    ["Extensions", register.extensions],
+    [labels[0] ?? "", report.name.toUpperCase()],
+    [labels[1] ?? "", report.promoter],
+    [labels[2] ?? "", register.registeredOn],
+    [labels[3] ?? "", register.completionDue],
+    [labels[4] ?? "", register.extensions],
   ];
   const found = [
     { text: "Project matched", tone: "ok" },
@@ -31,16 +26,15 @@ export function AgentDemo({ report }: { report: ExampleReport }) {
     <section className="wrap section" id="how-it-works" aria-labelledby="demo-title">
       <div className={styles.demo}>
         <div className="rv">
-          <div className="eyebrow">Powered by TinyFish</div>
+          <div className="eyebrow">{t.home.demo.eyebrow}</div>
           <h2 id="demo-title" className={`h2 ${styles.title}`}>
-            Watch an agent read the records for you
+            {t.home.demo.title}
           </h2>
           <p className={styles.lead}>
-            A TinyFish browser agent opens each official site, finds your project and copies the
-            exact record, with the link and the minute it read it.
+            {t.home.demo.lead}
           </p>
           <ol className={styles.steps}>
-            {STEPS.map((step, index) => (
+            {t.home.demo.steps.map((step, index) => (
               <li key={step} style={{ ["--i" as string]: index }}>
                 <span className="mono">{String(index + 1).padStart(2, "0")}</span>
                 {step}
@@ -48,7 +42,7 @@ export function AgentDemo({ report }: { report: ExampleReport }) {
             ))}
           </ol>
           <Link href="/#search" className={`btn ${styles.cta}`}>
-            Try it on a project
+            {t.home.demo.cta}
             <svg className="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M5 12h14M13 6l6 6-6 6" />
             </svg>
@@ -59,7 +53,7 @@ export function AgentDemo({ report }: { report: ExampleReport }) {
           <div
             className={styles.window}
             role="img"
-            aria-label={`Illustration of an agent reading the UP-RERA page of ${report.name}`}
+            aria-label={t.home.demo.aria(report.name)}
           >
             <div className={styles.bar} aria-hidden="true">
               <span />
@@ -68,11 +62,11 @@ export function AgentDemo({ report }: { report: ExampleReport }) {
               <em className="mono">up-rera.in · {report.reraId}</em>
               <b className="mono">
                 <i className={styles.rec} />
-                EXAMPLE
+                {t.home.demo.example}
               </b>
             </div>
             <div className={styles.page} aria-hidden="true">
-              <div className={styles.head}>Project details</div>
+              <div className={styles.head}>{t.home.demo.head}</div>
               {rows.map(([label, value]) => (
                 <div key={label} className={styles.row}>
                   <span>{label}</span>
@@ -94,8 +88,7 @@ export function AgentDemo({ report }: { report: ExampleReport }) {
             </div>
           </div>
           <figcaption className={styles.caption}>
-            Illustration of a live check. The values are from the check of {report.reraId} read on{" "}
-            {report.readOn}.
+            {t.home.demo.caption(report.reraId, report.readOn)}
           </figcaption>
         </figure>
       </div>

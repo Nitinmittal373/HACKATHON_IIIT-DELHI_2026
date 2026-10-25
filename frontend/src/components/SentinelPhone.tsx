@@ -1,56 +1,51 @@
+import type { Strings } from "@/lib/i18n";
 import styles from "./SentinelPhone.module.css";
 
 interface Props {
   /** Short project name shown in the alert. */
   project: string;
   score: number;
+  t: Strings;
 }
 
 /** Neev Sentinel: a phone lock screen with two alerts, one in English and one in Hindi. */
-export function SentinelPhone({ project, score }: Props) {
+export function SentinelPhone({ project, score, t }: Props) {
   return (
     <section className="wrap section" id="sentinel" aria-labelledby="sentinel-title">
       <div className={styles.layout}>
         <div className="rv">
-          <div className="eyebrow">Neev Sentinel · coming soon</div>
+          <div className="eyebrow">{t.home.sentinel.eyebrow}</div>
           <h2 id="sentinel-title" className={`h2 ${styles.title}`}>
-            We keep watching after you book
+            {t.home.sentinel.title}
           </h2>
           <p className={styles.lead}>
-            Every week we re-read the records for your project and tell you only when something
-            changes, in English or <span className="dev">हिंदी</span>.
+            {t.home.sentinel.lead}
           </p>
           <dl className={styles.stats}>
-            <div>
-              <dt>re-checks</dt>
-              <dd className="num">Weekly</dd>
-            </div>
-            <div>
-              <dt>spam alerts</dt>
-              <dd className="num">0</dd>
-            </div>
-            <div>
-              <dt>languages</dt>
-              <dd className="num">2</dd>
-            </div>
+            {t.home.sentinel.stats.map(([label, value]) => (
+              <div key={label}>
+                <dt>{label}</dt>
+                <dd className="num">{value}</dd>
+              </div>
+            ))}
           </dl>
         </div>
 
         <figure className={`${styles.phoneWrap} rv`}>
-          <div className={styles.phone} role="img" aria-label="Illustration of two Neev Sentinel alerts on a phone lock screen, one in English and one in Hindi">
+          <div className={styles.phone} role="img" aria-label={t.home.sentinel.aria}>
             <div className={`mono ${styles.top}`}>9:41</div>
             <div className={`num ${styles.time}`}>9:41</div>
-            <div className={styles.date}>Monday, 26 October</div>
+            <div className={styles.date}>{t.home.sentinel.date}</div>
             <div className={`${styles.card} ${styles.first}`}>
               <div className={styles.cardHead}>
                 <span className={styles.appIcon} />
                 <b>NeevCheck</b>
-                <em>now</em>
+                <em>{t.home.sentinel.now}</em>
               </div>
               <div className={styles.cardBody}>
                 <b>{project}</b>
                 <br />
-                New record: a court order on this builder&apos;s projects. Score unchanged at {score}.
+                {t.home.sentinel.alert(score)}
               </div>
             </div>
             <div className={`${styles.card} ${styles.second} dev`}>
@@ -66,7 +61,7 @@ export function SentinelPhone({ project, score }: Props) {
               </div>
             </div>
           </div>
-          <figcaption className={styles.caption}>Illustration of an alert, not a real one.</figcaption>
+          <figcaption className={styles.caption}>{t.home.sentinel.caption}</figcaption>
         </figure>
       </div>
     </section>

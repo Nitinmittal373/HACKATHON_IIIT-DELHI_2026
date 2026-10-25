@@ -18,6 +18,14 @@ body {
   font-family: var(--font-sans);
   font-feature-settings: "ss01";
   -webkit-font-smoothing: antialiased;
+  /* Short pages (confirm, alerts) still push the footer to the bottom of the window. */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1 0 auto;
 }
 
 h1,
@@ -138,6 +146,9 @@ a {
 .section {
   padding-top: 100px;
   padding-bottom: 40px;
+  /* Sections below the fold are not laid out or painted until they scroll near. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 700px;
 }
 
 .u-blink {

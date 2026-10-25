@@ -1,0 +1,27 @@
+.note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  color: var(--mu);
+  font-size: 13.5px;
+}
+
+.button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--o-text);
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.problem {
+  color: var(--critical);
+}

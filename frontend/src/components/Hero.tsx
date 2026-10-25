@@ -65,10 +65,9 @@ export function Hero({ report }: { report: ExampleReport }) {
           ))}
         </div>
 
-        <ReportStage report={report} />
+        <ReportStage report={report} t={t} />
         <p className={styles.note}>
-          An example, not a live check: every value is from the check of {report.reraId} read on{" "}
-          {report.readOn}.
+          {t.home.exampleNote(report.reraId, report.readOn)}
         </p>
       </div>
     </section>

@@ -1,0 +1,95 @@
+.card {
+  padding: 24px;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.lead {
+  margin-top: 4px;
+  color: var(--mu);
+  font-size: 14px;
+}
+
+.none {
+  margin-top: 16px;
+  color: var(--mu);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px 48px;
+  gap: 14px;
+  align-items: center;
+}
+
+.name {
+  display: block;
+  font-weight: 500;
+}
+
+.sub {
+  display: block;
+  margin-top: 2px;
+  color: var(--fa);
+  font-size: 11.5px;
+}
+
+.track {
+  height: 8px;
+  border-radius: 9px;
+  background: var(--soft);
+  overflow: hidden;
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  border-radius: 9px;
+  background: var(--moderate);
+  transform-origin: left;
+  animation: grow 1.1s var(--ease-out) both;
+}
+
+.points {
+  text-align: right;
+  font-weight: 600;
+  color: var(--moderate);
+}
+
+.heavy {
+  color: var(--high);
+}
+
+.fill.heavy {
+  background: var(--high);
+}
+
+@keyframes grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@media (max-width: 960px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) 48px;
+  }
+
+  .track {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}

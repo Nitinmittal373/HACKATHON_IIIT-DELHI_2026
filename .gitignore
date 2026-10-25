@@ -37,3 +37,7 @@ Thumbs.db
 # ---------- Local references (kept on each machine) ----------
 design-ref/
 *.local.md
+
+# Playwright output
+test-results/
+playwright-report/

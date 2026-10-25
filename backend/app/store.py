@@ -5,7 +5,7 @@ Each method opens a short session, so callers never hold ORM objects.
 
 from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.db import CheckRow, FindingRow, ProjectRow, ScoreRow, SourceRunRow
@@ -59,6 +59,24 @@ class Store:
                 completed_at=row.completed_at,
                 sources=[_source_run(run) for run in runs],
             )
+
+    def count_checks_since(self, since: datetime) -> int:
+        """How many checks were started since then; each one costs live agent runs."""
+        with self._sessions() as session:
+            return session.scalar(
+                select(func.count()).select_from(CheckRow).where(CheckRow.started_at >= since)
+            ) or 0
+
+    def latest_completed_check(self, rera_id: str, since: datetime | None = None) -> Check | None:
+        """The newest finished check of a project, optionally only if it finished after `since`."""
+        with self._sessions() as session:
+            query = select(CheckRow.id).where(
+                CheckRow.rera_id == rera_id, CheckRow.status == "completed"
+            )
+            if since is not None:
+                query = query.where(CheckRow.completed_at >= since)
+            check_id = session.scalar(query.order_by(CheckRow.completed_at.desc()).limit(1))
+        return self.get_check(check_id) if check_id else None
 
     def save_source_run(self, check_id: str, run: SourceRun) -> None:
         """Insert the run, or update it if this source already has one for the check."""

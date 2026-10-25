@@ -1,0 +1,41 @@
+import type { alerts as alertsEn, sentinel as sentinelEn } from "@/lib/i18n/en/sentinel";
+
+export const sentinel: typeof sentinelEn = {
+  open: "Sentinel से निगरानी करें",
+  title: "इस प्रोजेक्ट की निगरानी करें",
+  lead: "हम इसे हर हफ़्ते दोबारा जाँचते हैं और सिर्फ़ तब बताते हैं जब कोई रिकॉर्ड सच में बदलता है। आपका ईमेल किसी और काम में नहीं आता।",
+  email: "आपका ईमेल",
+  emailPlaceholder: "aap@example.com",
+  language: "अलर्ट की भाषा",
+  english: "English",
+  hindi: "हिंदी",
+  submit: "निगरानी शुरू करें",
+  saving: "सहेजा जा रहा है…",
+  cancel: "रद्द करें",
+  doneTitle: "इस प्रोजेक्ट की निगरानी चालू है",
+  doneBody:
+    "अलर्ट हमेशा अलर्ट पेज पर दिखते हैं। जब इस सेवा में ईमेल सेट हो, तब ईमेल भी भेजा जाता है।",
+  seeAlerts: "अपने अलर्ट देखें",
+  close: "बंद करें",
+  limit: "एक ईमेल से ज़्यादा से ज़्यादा 3 प्रोजेक्ट देखे जा सकते हैं।",
+  invalidEmail: "सही ईमेल पता लिखें।",
+  failed: "यह निगरानी सहेजी नहीं जा सकी। कृपया फिर कोशिश करें।",
+  card: "हम इस प्रोजेक्ट को हर हफ़्ते दोबारा जाँचते हैं और सिर्फ़ तब बताते हैं जब कोई रिकॉर्ड बदलता है।",
+};
+
+export const alerts: typeof alertsEn = {
+  title: "आपके अलर्ट",
+  lead: "आप जिन प्रोजेक्ट की निगरानी करते हैं, उनमें Sentinel को मिले बदलाव। वही ईमेल लिखें जिससे निगरानी शुरू की थी।",
+  emailLabel: "ईमेल",
+  show: "अलर्ट दिखाएँ",
+  empty: "अभी कोई अलर्ट नहीं। Sentinel तभी बताता है जब कोई रिकॉर्ड सच में बदलता है।",
+  scoreChange: (before: number | null, after: number | null) =>
+    `NeevScore ${before ?? "–"} → ${after ?? "–"}`,
+  added: "नया",
+  removed: "अब नहीं मिला",
+  changed: "बदला",
+  openReport: "रिपोर्ट खोलें",
+  failedTitle: "आपके अलर्ट लोड नहीं हो सके",
+  invalidEmail: "सही ईमेल पता लिखें।",
+  when: "मिला",
+};

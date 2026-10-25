@@ -1,0 +1,128 @@
+import type { report as en } from "@/lib/i18n/en/report";
+
+export const report: typeof en = {
+  bands: {
+    Low: "कम जोखिम",
+    Moderate: "मध्यम जोखिम",
+    High: "ऊँचा जोखिम",
+    Critical: "गंभीर जोखिम",
+    insufficient_evidence: "अभी पर्याप्त सबूत नहीं",
+  },
+  areas: {
+    rera: "UP-RERA अनुपालन",
+    execution: "प्रोजेक्ट का निर्माण",
+    legal: "कानूनी और अदालती",
+    financial: "वित्तीय और दिवाला",
+    builder_history: "बिल्डर का इतिहास",
+    news: "खबरें",
+  },
+  checks: {
+    registration: "UP-RERA पंजीकरण",
+    completion_date: "पूर्णता की तारीख",
+    extensions: "दिए गए विस्तार",
+    company_status: "कंपनी की स्थिति",
+    insolvency: "दिवाला आदेश",
+    land_dues: "भूमि प्राधिकरण का बकाया",
+    consumer_cases: "उपभोक्ता मामले",
+  },
+  verdict: {
+    ok: "पुष्ट",
+    fail: "लाल झंडा",
+    red_flag: "लाल झंडा",
+    review: "देखें",
+    context: "संदर्भ",
+    not_found: "नहीं मिला",
+  },
+  reliability: { primary: "आधिकारिक रिकॉर्ड", secondary: "खबर या द्वितीयक स्रोत" },
+  step: (date: string) => `चरण 3 / 3 · रिपोर्ट · जाँच की तारीख ${date}`,
+  watch: "Sentinel से निगरानी करें",
+  download: "PDF डाउनलोड करें",
+  share: "साझा करें",
+  linkCopied: "लिंक कॉपी हो गया",
+  copyFailed: "एड्रेस बार से लिंक कॉपी करें",
+  checkedAgo: (hours: number) => {
+    if (hours < 1) return "एक घंटे से कम पहले जाँचा गया";
+    if (hours < 48) return `${hours} घंटे पहले जाँचा गया`;
+    return `${Math.floor(hours / 24)} दिन पहले जाँचा गया`;
+  },
+  recheck: "अभी दोबारा जाँचें",
+  outOf: "100 में से",
+  scoreLabel: (value: number, band: string) => `NeevScore 100 में से ${value}, ${band}`,
+  provisional: "अनंतिम: अभी पर्याप्त सबूत नहीं",
+  noHardStop: "कोई हार्ड स्टॉप नहीं",
+  hardStop: "हार्ड स्टॉप",
+  confidence: (percent: number) => `भरोसा ${percent}%`,
+  keyChecks: (read: number, total: number) => `${total} में से ${read} मुख्य जाँचें पढ़ी गईं`,
+  records: (records: number, sources: number) => `${records} रिकॉर्ड · ${sources} स्रोत`,
+  why: (value: number) => `${value} क्यों`,
+  whyLead: "सब 100 से शुरू करते हैं। अंक सिर्फ़ उन रिकॉर्ड के लिए कटते हैं जो हमें मिले।",
+  noDrivers: "हमारे पढ़े किसी रिकॉर्ड से कोई अंक नहीं कटा।",
+  evidence: "सबूत",
+  readOn: (date: string, time: string | null) => `पढ़ा गया ${date}${time ? `, ${time}` : ""}`,
+  points: "अंक",
+  notRead: "पढ़ा नहीं गया",
+  notReadBody: "यह पढ़ा नहीं जा सका, इसलिए इसके अंक नहीं हैं और इससे भरोसा घटता है।",
+  howToCheck: "इसे खुद कैसे जाँचें",
+  openSite: "आधिकारिक साइट खोलें",
+  planTitle: "और पैसे देने से पहले यह करें",
+  timelineTitle: "समयरेखा",
+  noTimeline: "हमारे पढ़े रिकॉर्ड में कोई तारीख वाली घटना नहीं मिली।",
+  disclaimer: (date: string) =>
+    `${date} को पढ़े गए सार्वजनिक रिकॉर्ड। यह निर्णय में मदद है, कानूनी या वित्तीय सलाह नहीं, और क्रेडिट रेटिंग भी नहीं।`,
+  sentinelTitle: "Neev Sentinel",
+  sentinelBody: "हम इस प्रोजेक्ट को हर हफ़्ते दोबारा जाँचते हैं और सिर्फ़ तब बताते हैं जब कोई रिकॉर्ड बदलता है।",
+  summary: {
+    clean: "हमारे पढ़े रिकॉर्ड में कोई लाल झंडा नहीं मिला।",
+    withIssues: (list: string) => `UP-RERA में पंजीकृत है, लेकिन ${list}।`,
+    join: (items: string[]) =>
+      items.length < 2 ? (items[0] ?? "") : `${items.slice(0, -1).join(", ")} और ${items.at(-1)}`,
+    revoked: "इसका पंजीकरण रद्द हो चुका है",
+    delay: (months: number) => `रिकॉर्ड में दर्ज पूर्णता की तारीख को ${months} महीने बीत चुके हैं`,
+    extended: (times: number) => `पूर्णता की तारीख ${times} बार बढ़ाई गई`,
+    insolvencyThis: "इस प्रोजेक्ट पर दिवाला प्रक्रिया लागू है",
+    insolvencyCompany: "प्रमोटर दिवाला प्रक्रिया में है जो इस प्रोजेक्ट को भी छू सकती है",
+    insolvencyOther: "प्रमोटर की दिवाला प्रक्रिया किसी दूसरे प्रोजेक्ट तक सीमित है",
+    insolvencyUnverified: "प्रमोटर के खिलाफ दिवाला मामला दर्ज होने की खबर है, दायरा पुष्ट नहीं",
+    complaints: (count: number) => `UP-RERA पर इस प्रोजेक्ट की ${count} शिकायतें हैं`,
+    land: "प्रमोटर भूमि प्राधिकरण की बकाया सूची में दिखता है",
+    news: (count: number) => `${count} खबरों में देरी की बात है`,
+  },
+  plan: {
+    delay: {
+      bold: "बिल्डर से संशोधित पूर्णता तिथि लिखित में माँगें",
+      rest: "और इस प्रोजेक्ट की UP-RERA विस्तार तालिका देखें।",
+    },
+    insolvency: {
+      bold: "NCLT आदेश में दायरा जाँचें",
+      rest: "कि यह प्रोजेक्ट दिवाला प्रक्रिया में आता है या नहीं।",
+    },
+    complaints: {
+      bold: "UP-RERA पर शिकायतें पढ़ें",
+      rest: "इस प्रोजेक्ट और इसके प्रमोटर की, पैसे देने से पहले।",
+    },
+    land: {
+      bold: "प्राधिकरण से नो-ड्यूज़ पत्र माँगें",
+      rest: "इस प्रोजेक्ट के लिए, पैसे देने से पहले।",
+    },
+    news: {
+      bold: "देरी की खबरें पढ़ें",
+      rest: "और हर खबर के बारे में बिल्डर से पूछें।",
+    },
+    unread: {
+      bold: "जो स्रोत हम पढ़ नहीं सके, उन्हें",
+      rest: "सबूत सूची के लिंक से खुद जाँचें।",
+    },
+    verify: {
+      bold: "पंजीकरण नंबर मिलाएँ",
+      rest: "अपने एग्रीमेंट का नंबर UP-RERA प्रोजेक्ट पेज के नंबर से मिलाएँ।",
+    },
+    agreement: {
+      bold: "दस्तख़त से पहले एग्रीमेंट पढ़ें",
+      rest: "और उसकी कब्ज़े की तारीख, जुर्माने की शर्तें और भुगतान अनुसूची को UP-RERA पेज से मिलाएँ।",
+    },
+    pay: {
+      bold: "भुगतान सिर्फ़ RERA कलेक्शन खाते में करें",
+      rest: "जो प्रोजेक्ट के UP-RERA पेज पर लिखा है। किसी दलाल या निजी खाते में कभी न दें।",
+    },
+  },
+};

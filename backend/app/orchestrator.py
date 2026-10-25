@@ -64,7 +64,7 @@ class Orchestrator:
         self._clock = clock
         self._sources = sources
         self._cache_dir = cache_dir
-        self._tasks: set[asyncio.Task[None]] = set()
+        self._tasks: dict[str, asyncio.Task[None]] = {}
 
     def start(self, project: Project) -> Check:
         """Create the check and run it in the background; returns at once."""
@@ -73,16 +73,26 @@ class Orchestrator:
         self._store.create_check(check_id, project.rera_id, self._clock())
         self._hub.open(check_id)
         task = asyncio.create_task(self._run(check_id, project))
-        self._tasks.add(task)
-        task.add_done_callback(self._tasks.discard)
+        self._tasks[check_id] = task
+        task.add_done_callback(lambda _: self._tasks.pop(check_id, None))
+        check = self._store.get_check(check_id)
+        assert check is not None
+        return check
+
+    async def finished(self, check_id: str) -> Check:
+        """Wait for a started check to end and return it as stored (used by Sentinel)."""
+        task = self._tasks.get(check_id)
+        if task is not None:
+            await asyncio.shield(task)
         check = self._store.get_check(check_id)
         assert check is not None
         return check
 
     async def shutdown(self) -> None:
-        for task in self._tasks:
+        tasks = list(self._tasks.values())
+        for task in tasks:
             task.cancel()
-        await asyncio.gather(*self._tasks, return_exceptions=True)
+        await asyncio.gather(*tasks, return_exceptions=True)
 
     async def _run(self, check_id: str, project: Project) -> None:
         self._store.set_check_status(check_id, "running")

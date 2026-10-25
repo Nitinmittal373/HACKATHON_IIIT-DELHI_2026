@@ -1,0 +1,86 @@
+import type { Metadata } from "next";
+import { notFound, redirect } from "next/navigation";
+import { cache } from "react";
+
+import { ApiProblem } from "@/components/ApiProblem";
+import { PageMessage } from "@/components/PageMessage";
+import { ActionPlan } from "@/components/report/ActionPlan";
+import { DriversCard } from "@/components/report/DriversCard";
+import { EvidenceList } from "@/components/report/EvidenceList";
+import { SentinelCard } from "@/components/report/SentinelCard";
+import { ReportHeader } from "@/components/report/ReportHeader";
+import { ScoreCard } from "@/components/report/ScoreCard";
+import { Timeline } from "@/components/report/Timeline";
+import { ApiError, getReport } from "@/lib/api";
+import { dayOf } from "@/lib/format";
+import { getStrings } from "@/lib/i18n/server";
+import { CHECK_ID_PATTERN } from "@/lib/ids";
+import { evidenceIds } from "@/lib/reportView";
+import type { Report } from "@/lib/types";
+import styles from "./report.module.css";
+
+interface Props {
+  params: Promise<{ id: string }>;
+}
+
+// The title and the page both need the report; cache() makes that one request.
+const load = cache(async (id: string): Promise<Report | ApiError> => {
+  try {
+    return await getReport(id);
+  } catch (error) {
+    if (error instanceof ApiError) return error;
+    throw error;
+  }
+});
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const report = CHECK_ID_PATTERN.test(id) ? await load(id) : null;
+  if (!report || report instanceof ApiError) return { title: "NeevCheck report" };
+  const name = report.project.name ?? report.project.rera_id;
+  return { title: `${name}: NeevScore ${report.score.value} · NeevCheck` };
+}
+
+export default async function ReportPage({ params }: Props) {
+  const { id } = await params;
+  if (!CHECK_ID_PATTERN.test(id)) notFound();
+
+  const result = await load(id);
+  if (result instanceof ApiError) return failure(result, id);
+
+  const { t, lang } = await getStrings();
+  const report = result;
+  const ids = evidenceIds(report.findings);
+  const readDate = dayOf(report.check.completed_at ?? report.check.started_at, lang);
+
+  return (
+    <>
+      <ReportHeader report={report} t={t} lang={lang} />
+      <div className={styles.grid}>
+        <div className={styles.column}>
+          <ScoreCard report={report} t={t} />
+          <DriversCard report={report} ids={ids} t={t} />
+          <EvidenceList report={report} ids={ids} t={t} lang={lang} />
+        </div>
+        <aside className={styles.column}>
+          <ActionPlan report={report} t={t} />
+          <Timeline events={report.timeline} t={t} lang={lang} />
+          <SentinelCard project={report.project} t={t} />
+          <p className={styles.disclaimer}>{t.report.disclaimer(readDate)}</p>
+        </aside>
+      </div>
+    </>
+  );
+}
+
+async function failure(error: ApiError, id: string) {
+  if (error.status === 404) notFound();
+  // 409: the check is still running (watch it) or it failed and there is no report.
+  if (error.status === 409) {
+    const { t } = await getStrings();
+    const running = /still running/i.test(error.message);
+    if (running) redirect(`/check/${id}`);
+    return <PageMessage title={t.cam.failedTitle}>{t.cam.failedBody}</PageMessage>;
+  }
+  return <ApiProblem error={error} retryHref={`/report/${id}`} />;
+}

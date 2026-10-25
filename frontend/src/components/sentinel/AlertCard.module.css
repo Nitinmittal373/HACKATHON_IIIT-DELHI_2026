@@ -1,0 +1,89 @@
+.card {
+  padding: 20px 22px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.icon {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border-radius: 6px;
+  background: var(--o);
+}
+
+.titles {
+  flex: 1;
+  min-width: 200px;
+}
+
+.project {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.when {
+  color: var(--fa);
+  font-size: 12px;
+}
+
+.score {
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #fff1e6;
+  color: var(--o-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.group {
+  margin-top: 14px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.added {
+  color: var(--low-text);
+}
+
+.changed {
+  color: var(--moderate);
+}
+
+.removed {
+  color: var(--mu);
+}
+
+.group ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+
+.group li + li {
+  margin-top: 6px;
+}
+
+.group a {
+  color: inherit;
+}
+
+.report {
+  display: inline-block;
+  margin-top: 16px;
+  color: var(--o-text);
+  font-size: 14px;
+  font-weight: 600;
+}

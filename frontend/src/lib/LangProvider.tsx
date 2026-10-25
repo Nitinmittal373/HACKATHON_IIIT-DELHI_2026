@@ -1,8 +1,9 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 
-import { STRINGS, type Lang, type Strings } from "@/lib/i18n";
+import { LANG_COOKIE, STRINGS, type Lang, type Strings } from "@/lib/i18n";
 
 interface LangState {
   lang: Lang;
@@ -10,34 +11,24 @@ interface LangState {
   t: Strings;
 }
 
-const STORAGE_KEY = "neevcheck-lang";
+const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
 const LangContext = createContext<LangState | null>(null);
 
-export function LangProvider({ children }: { children: ReactNode }) {
-  // The server always renders English; a saved choice is applied after hydration.
-  const [lang, setLangState] = useState<Lang>("en");
-
-  useEffect(() => {
-    try {
-      const saved = window.localStorage.getItem(STORAGE_KEY);
-      if (saved === "en" || saved === "hi") setLangState(saved);
-    } catch {
-      // Storage can be blocked; the page works without remembering the choice.
-    }
-  }, []);
+/** The server reads the cookie and passes it in, so the first paint is already in the right language. */
+export function LangProvider({ initial, children }: { initial: Lang; children: ReactNode }) {
+  const router = useRouter();
+  const [lang, setLangState] = useState<Lang>(initial);
 
   const value = useMemo<LangState>(() => {
     const setLang = (next: Lang) => {
       setLangState(next);
       document.documentElement.lang = next;
-      try {
-        window.localStorage.setItem(STORAGE_KEY, next);
-      } catch {
-        // Not remembered, still applied.
-      }
+      document.cookie = `${LANG_COOKIE}=${next}; path=/; max-age=${ONE_YEAR_SECONDS}; samesite=lax`;
+      // Pages rendered on the server read the cookie too, so ask them to render again.
+      router.refresh();
     };
     return { lang, setLang, t: STRINGS[lang] };
-  }, [lang]);
+  }, [lang, router]);
 
   return <LangContext.Provider value={value}>{children}</LangContext.Provider>;
 }

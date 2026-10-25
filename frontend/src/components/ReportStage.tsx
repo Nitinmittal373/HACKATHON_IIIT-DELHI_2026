@@ -1,19 +1,20 @@
 import { ScoreRing } from "@/components/ScoreRing";
 import type { ExampleReport } from "@/lib/exampleReport";
+import type { Strings } from "@/lib/i18n";
 import styles from "./ReportStage.module.css";
 
 const ORB_CLASSES = [styles.o1, styles.o2, styles.o3, styles.o4];
 
 /** The report card that rises into view with four findings floating around it. */
-export function ReportStage({ report }: { report: ExampleReport }) {
+export function ReportStage({ report, t }: { report: ExampleReport; t: Strings }) {
   return (
     <div className={styles.stage} id="sample-report">
       <div className={styles.glow} aria-hidden="true" />
       <div className={styles.rise}>
-        <article className={styles.card} aria-label={`Example report for ${report.name}`}>
+        <article className={styles.card} aria-label={t.home.report.ariaLabel(report.name)}>
           <div className={styles.top}>
             <span className={`mono ${styles.kicker}`}>
-              EXAMPLE REPORT · READ {report.readOn.toUpperCase()}
+              {t.home.report.kicker(report.readOn.toUpperCase())}
             </span>
             <span className={`${styles.band} ${styles[report.band]}`}>{report.bandLabel}</span>
           </div>

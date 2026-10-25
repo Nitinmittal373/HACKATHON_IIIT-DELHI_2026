@@ -76,3 +76,12 @@ def test_score_sets_points_on_findings(tmp_path: Path) -> None:
 
     assert store.get_score("d" * 32) == score
     assert store.list_findings("d" * 32) == [finding]
+
+
+def test_hosted_postgres_links_name_the_psycopg_driver() -> None:
+    from app.db import normalize_database_url
+
+    assert normalize_database_url("postgres://u:p@host/db") == "postgresql+psycopg://u:p@host/db"
+    assert normalize_database_url("postgresql://u:p@host/db") == "postgresql+psycopg://u:p@host/db"
+    assert normalize_database_url("postgresql+psycopg://u:p@host/db").startswith("postgresql+psycopg")
+    assert normalize_database_url("sqlite:///x.db") == "sqlite:///x.db"

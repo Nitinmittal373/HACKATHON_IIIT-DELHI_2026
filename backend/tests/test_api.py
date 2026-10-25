@@ -133,9 +133,10 @@ def test_rate_limit_returns_429_after_the_limit(tmp_path: Path) -> None:
     settings = make_settings(tmp_path, rate_limit_per_minute=2)
     app = create_app(settings, web=make_web(), clock=lambda: FIXED_NOW)
     with TestClient(app) as client:
-        assert client.post("/api/checks", json={"rera_id": "UPRERAPRJ8334"}).status_code == 202
-        assert client.post("/api/checks", json={"rera_id": "UPRERAPRJ8334"}).status_code == 202
-        blocked = client.post("/api/checks", json={"rera_id": "UPRERAPRJ8334"})
+        body = {"rera_id": "UPRERAPRJ8334", "fresh": True}
+        assert client.post("/api/checks", json=body).status_code == 202
+        assert client.post("/api/checks", json=body).status_code == 202
+        blocked = client.post("/api/checks", json=body)
 
     assert blocked.status_code == 429
     assert int(blocked.headers["Retry-After"]) >= 1

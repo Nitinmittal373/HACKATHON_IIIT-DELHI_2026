@@ -30,6 +30,11 @@ def test_cors_allows_only_the_frontend(client: TestClient) -> None:
     assert "access-control-allow-origin" not in blocked.headers
 
 
+def test_the_browser_may_read_retry_after(client: TestClient) -> None:
+    response = client.get("/api/health", headers={"Origin": "http://localhost:3000"})
+    assert response.headers["access-control-expose-headers"] == "Retry-After"
+
+
 def test_missing_api_key_fails_fast_with_a_clear_message(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

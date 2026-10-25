@@ -683,42 +683,6 @@
         {
           "type": "progress",
           "text": "Check CAPTCHA text and form state"
-        },
-        {
-          "type": "progress",
-          "text": "Focus the captcha input field"
-        },
-        {
-          "type": "progress",
-          "text": "Enter CAPTCHA text 43PkfK"
-        },
-        {
-          "type": "progress",
-          "text": "Submit the search form"
-        },
-        {
-          "type": "progress",
-          "text": "Extract total cases and result rows"
-        },
-        {
-          "type": "progress",
-          "text": "Return search results for SUPERTECH LIMITED"
-        },
-        {
-          "type": "done",
-          "status": "COMPLETED",
-          "result": {
-            "total_cases": 1,
-            "cases": [
-              {
-                "case_number": "NC/SA/317/2025",
-                "forum": "NCDRC",
-                "opposite_party": "SUPERTECH LIMITED"
-              }
-            ],
-            "captcha_seen": false
-          },
-          "error": null
         }
       ]
     }

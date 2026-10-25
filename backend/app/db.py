@@ -107,8 +107,44 @@ class ScoreRow(Base):
     detail: Mapped[dict[str, object]] = mapped_column(JSON)
 
 
+class WatchRow(Base):
+    """One person watching one project. The email is only ever used for this watch."""
+
+    __tablename__ = "watches"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True)
+    rera_id: Mapped[str] = mapped_column(ForeignKey("projects.rera_id"), index=True)
+    email: Mapped[str] = mapped_column(String(254), index=True)
+    language: Mapped[str] = mapped_column(String(2))
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime)
+    # The check later re-checks are compared against; None until the project has a finished one.
+    baseline_check_id: Mapped[str | None] = mapped_column(String(32))
+
+
+class AlertRow(Base):
+    __tablename__ = "alerts"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True)
+    watch_id: Mapped[str] = mapped_column(ForeignKey("watches.id"), index=True)
+    check_id: Mapped[str] = mapped_column(ForeignKey("checks.id"))
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime)
+    old_score: Mapped[int | None] = mapped_column(Integer)
+    new_score: Mapped[int | None] = mapped_column(Integer)
+    # {"added": [...], "removed": [...], "changed": [...]}, each entry a title and a source link.
+    diff: Mapped[dict[str, object]] = mapped_column(JSON)
+    emailed: Mapped[bool] = mapped_column(default=False)
+
+
+def normalize_database_url(database_url: str) -> str:
+    """Hosts give postgres:// or postgresql:// links; SQLAlchemy needs the driver named."""
+    for prefix in ("postgres://", "postgresql://"):
+        if database_url.startswith(prefix):
+            return "postgresql+psycopg://" + database_url.removeprefix(prefix)
+    return database_url
+
+
 def make_engine(database_url: str) -> Engine:
-    url = make_url(database_url)
+    url = make_url(normalize_database_url(database_url))
     if url.get_backend_name() == "sqlite":
         if url.database and url.database != ":memory:":
             Path(url.database).parent.mkdir(parents=True, exist_ok=True)

@@ -1,0 +1,66 @@
+.page {
+  position: relative;
+  height: 100%;
+  background: #fff;
+  font-size: 13px;
+}
+
+.head {
+  height: 40px;
+  padding: 0 20px;
+  background: #2d3e50;
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 40px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  align-items: center;
+  height: 48px;
+  padding: 0 20px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.row span {
+  color: #666;
+}
+
+.value {
+  display: block;
+  width: 55%;
+  height: 10px;
+  border-radius: 6px;
+  background: #ece8e4;
+}
+
+/* Rows are 48px tall under a 40px header; the highlight and cursor glide between them. */
+.highlight {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: calc(41px + var(--row) * 48px);
+  height: 46px;
+  border: 2px solid var(--o);
+  border-radius: 8px;
+  background: rgba(242, 107, 29, 0.07);
+  box-shadow: 0 0 0 4px var(--o-glow);
+  transition: top 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cursor {
+  position: absolute;
+  left: 46%;
+  top: calc(60px + var(--row) * 48px);
+  width: 18px;
+  height: 18px;
+  transition: top 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (max-width: 520px) {
+  .row {
+    grid-template-columns: 120px 1fr;
+  }
+}

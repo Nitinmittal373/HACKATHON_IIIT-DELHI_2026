@@ -1,0 +1,127 @@
+export const report = {
+  bands: {
+    Low: "Low risk",
+    Moderate: "Moderate risk",
+    High: "High risk",
+    Critical: "Critical risk",
+    insufficient_evidence: "Not enough evidence yet",
+  },
+  areas: {
+    rera: "UP-RERA compliance",
+    execution: "Project execution",
+    legal: "Legal and courts",
+    financial: "Financial and insolvency",
+    builder_history: "Builder history",
+    news: "News",
+  },
+  checks: {
+    registration: "UP-RERA registration",
+    completion_date: "Completion date",
+    extensions: "Extensions granted",
+    company_status: "Company status",
+    insolvency: "Insolvency orders",
+    land_dues: "Land authority dues",
+    consumer_cases: "Consumer cases",
+  },
+  verdict: {
+    ok: "Confirmed",
+    fail: "Red flag",
+    red_flag: "Red flag",
+    review: "Review",
+    context: "Context",
+    not_found: "Not found",
+  },
+  reliability: { primary: "Official record", secondary: "News or secondary source" },
+  step: (date: string) => `Step 3 of 3 · Report · Checked ${date}`,
+  watch: "Watch with Sentinel",
+  download: "Download PDF",
+  share: "Share",
+  linkCopied: "Link copied",
+  copyFailed: "Copy the link from the address bar",
+  checkedAgo: (hours: number) => {
+    if (hours < 1) return "Checked less than an hour ago";
+    if (hours < 48) return `Checked ${hours} h ago`;
+    return `Checked ${Math.floor(hours / 24)} days ago`;
+  },
+  recheck: "Re-check now",
+  outOf: "out of 100",
+  scoreLabel: (value: number, band: string) => `NeevScore ${value} out of 100, ${band}`,
+  provisional: "Provisional: not enough evidence yet",
+  noHardStop: "No hard stop",
+  hardStop: "Hard stop",
+  confidence: (percent: number) => `Confidence ${percent}%`,
+  keyChecks: (read: number, total: number) => `${read} of ${total} key checks read`,
+  records: (records: number, sources: number) =>
+    `${records} ${records === 1 ? "record" : "records"} · ${sources} ${sources === 1 ? "source" : "sources"}`,
+  why: (value: number) => `Why ${value}`,
+  whyLead: "Everyone starts at 100. Points come off only for records we found.",
+  noDrivers: "No record we read cost any points.",
+  evidence: "Evidence",
+  readOn: (date: string, time: string | null) => `read ${date}${time ? `, ${time}` : ""}`,
+  points: "Points",
+  notRead: "Not read",
+  notReadBody: "This could not be read, so it is not scored and it lowers confidence.",
+  howToCheck: "How to check this yourself",
+  openSite: "Open the official site",
+  planTitle: "Do this before paying more",
+  timelineTitle: "Timeline",
+  noTimeline: "No dated events were found in the records we read.",
+  disclaimer: (date: string) =>
+    `Public records as read on ${date}. This is decision support, not legal or financial advice, and not a credit rating.`,
+  sentinelTitle: "Neev Sentinel",
+  sentinelBody: "We re-check this project every week and tell you only when a record changes.",
+  summary: {
+    clean: "No red flags in the records we could read.",
+    withIssues: (list: string) => `Registered on UP-RERA, but ${list}.`,
+    join: (items: string[]) =>
+      items.length < 2 ? (items[0] ?? "") : `${items.slice(0, -1).join(", ")} and ${items.at(-1)}`,
+    revoked: "its registration has been revoked",
+    delay: (months: number) => `the completion date on record passed ${months} months ago`,
+    extended: (times: number) => `the completion date was extended ${times} times`,
+    insolvencyThis: "an insolvency process covers this project",
+    insolvencyCompany: "the promoter is in an insolvency process that may cover this project",
+    insolvencyOther: "the promoter's insolvency process is limited to another project",
+    insolvencyUnverified: "an insolvency case against the promoter was reported, scope not confirmed",
+    complaints: (count: number) => `${count} ${count === 1 ? "complaint" : "complaints"} about this project on UP-RERA`,
+    land: "the promoter appears on a land authority dues list",
+    news: (count: number) => `${count} news ${count === 1 ? "story reports" : "stories report"} delays`,
+  },
+  plan: {
+    delay: {
+      bold: "Ask the builder for the revised completion date in writing",
+      rest: "and check the UP-RERA extension table for this project.",
+    },
+    insolvency: {
+      bold: "Confirm the scope on the NCLT order",
+      rest: "to see whether this project is covered by the insolvency process.",
+    },
+    complaints: {
+      bold: "Read the complaints on UP-RERA",
+      rest: "about this project and its promoter before you pay.",
+    },
+    land: {
+      bold: "Ask for the authority's no-dues letter",
+      rest: "for this project before you pay.",
+    },
+    news: {
+      bold: "Read the news reports on delays",
+      rest: "and ask the builder about each one.",
+    },
+    unread: {
+      bold: "Check the sources we could not read",
+      rest: "yourself, using the links in the evidence list.",
+    },
+    verify: {
+      bold: "Match the registration number",
+      rest: "on your agreement with the one on the UP-RERA project page.",
+    },
+    agreement: {
+      bold: "Read the agreement before you sign",
+      rest: "and compare its possession date, penalty clauses and payment schedule with the UP-RERA page.",
+    },
+    pay: {
+      bold: "Pay only to the RERA collection account",
+      rest: "named on the project's UP-RERA page. Never pay a broker or a personal account.",
+    },
+  },
+};

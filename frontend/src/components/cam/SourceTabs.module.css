@@ -1,0 +1,64 @@
+.tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border: 1px solid var(--ln);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--fa);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.tab:hover {
+  border-color: var(--ln2);
+}
+
+.selected {
+  border-color: var(--o);
+  background: #fff1e6;
+  color: var(--ink);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+}
+
+.waiting {
+  background: var(--ln2);
+}
+
+.running {
+  background: var(--o);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.done {
+  background: var(--low-text);
+}
+
+.blocked {
+  background: var(--critical);
+}
+
+.unread {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--fa);
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.3;
+  }
+}

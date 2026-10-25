@@ -1,0 +1,72 @@
+.table {
+  margin-top: 26px;
+  overflow: hidden;
+}
+
+.head {
+  display: grid;
+  grid-template-columns: 28px 1.6fr 1fr 1fr 120px;
+  gap: 14px;
+  padding: 11px 18px;
+  background: var(--soft);
+  font-size: 11.5px;
+  color: var(--mu);
+}
+
+/* Stays in view while a long list scrolls, so the question is never out of reach. */
+.bar {
+  position: sticky;
+  bottom: 16px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  padding: 22px 24px;
+  border-color: var(--o);
+  background: #fffdfb;
+  box-shadow: var(--shadow-soft);
+}
+
+.found {
+  color: var(--mu);
+  font-size: 14px;
+}
+
+.found b {
+  color: var(--ink);
+}
+
+.question {
+  margin-top: 4px;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 960px) {
+  .head {
+    display: none;
+  }
+
+  .actions {
+    width: 100%;
+  }
+
+  .actions > * {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .question {
+    font-size: 18px;
+  }
+}

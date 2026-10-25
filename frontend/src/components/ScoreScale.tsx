@@ -1,37 +1,27 @@
+import type { Strings } from "@/lib/i18n";
 import styles from "./ScoreScale.module.css";
 
-/** Area weights, the same as docs/scoring.md. */
-const WEIGHTS = [
-  "UP-RERA compliance 25%",
-  "Project execution 20%",
-  "Legal & courts 15%",
-  "Financial & insolvency 15%",
-  "Builder history 15%",
-  "News 10%",
-];
-
 const BANDS = [
-  { key: "critical", name: "Critical", range: "0–39" },
-  { key: "high", name: "High", range: "40–59" },
-  { key: "moderate", name: "Moderate", range: "60–79" },
-  { key: "low", name: "Low", range: "80–100" },
+  { key: "critical", range: "0–39" },
+  { key: "high", range: "40–59" },
+  { key: "moderate", range: "60–79" },
+  { key: "low", range: "80–100" },
 ] as const;
 
 /** The 0 to 100 scale with a marker that slides to the example score as the section scrolls in. */
-export function ScoreScale({ score }: { score: number }) {
+export function ScoreScale({ score, t }: { score: number; t: Strings }) {
   return (
     <section className="wrap section" aria-labelledby="scale-title">
       <div className={`${styles.box} rv`}>
         <div className={styles.head}>
           <div>
-            <div className="eyebrow">NeevScore</div>
+            <div className="eyebrow">{t.home.scale.eyebrow}</div>
             <h2 id="scale-title" className={`h2 ${styles.title}`}>
-              One honest number, 0 to 100
+              {t.home.scale.title}
             </h2>
           </div>
           <p className={styles.lead}>
-            Everyone starts at 100. Points come off only for records we find. A source we cannot read
-            lowers confidence, never adds points.
+            {t.home.scale.lead}
           </p>
         </div>
 
@@ -39,7 +29,7 @@ export function ScoreScale({ score }: { score: number }) {
           <ol className={styles.bands}>
             {BANDS.map((band) => (
               <li key={band.key} className={styles[band.key]}>
-                {band.name}
+                {t.home.scale.bands[band.key]}
                 <em>{band.range}</em>
               </li>
             ))}
@@ -49,12 +39,11 @@ export function ScoreScale({ score }: { score: number }) {
           </div>
         </div>
         <p className={styles.caption}>
-          Marker: the score of the example check above. With fewer than half the key checks read, the
-          score is shown without a band.
+          {t.home.scale.caption}
         </p>
 
         <ul className={styles.weights}>
-          {WEIGHTS.map((weight) => (
+          {t.home.scale.weights.map((weight) => (
             <li key={weight}>{weight}</li>
           ))}
         </ul>

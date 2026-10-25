@@ -14,7 +14,7 @@ export const EXAMPLE_REPORT: ExampleReport = {
   score: 68,
   band: "Moderate",
   bandLabel: "Moderate risk",
-  confidencePercent: 86,
+  confidencePercent: 71,
   drivers: [
     { label: "Completion date passed 105 months ago", fill: 70, points: 14, tone: "bad" },
     { label: "2,803 UP-RERA complaints on the promoter", fill: 60, points: 9, tone: "warn" },

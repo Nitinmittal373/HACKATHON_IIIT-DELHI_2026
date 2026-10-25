@@ -14,9 +14,9 @@ const SOURCES = [
 ];
 
 /** A slow ticker of the public sources NeevCheck reads. The second copy only makes the loop seamless. */
-export function SourcesMarquee() {
+export function SourcesMarquee({ label }: { label: string }) {
   return (
-    <section className={styles.rail} aria-label="Sources we read">
+    <section className={styles.rail} aria-label={label}>
       <ul className={styles.track}>
         {[...SOURCES, ...SOURCES].map((source, index) => (
           <li

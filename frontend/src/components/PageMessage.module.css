@@ -1,0 +1,33 @@
+.box {
+  max-width: 720px;
+  margin: 40px 0 0;
+  padding: 32px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.body {
+  margin-top: 10px;
+  color: var(--mu);
+  line-height: 1.6;
+}
+
+.body ul {
+  margin: 10px 0 0;
+  padding-left: 20px;
+}
+
+.body li + li {
+  margin-top: 6px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
