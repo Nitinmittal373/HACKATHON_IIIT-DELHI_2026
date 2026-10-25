@@ -1,22 +1,23 @@
 import Link from "next/link";
 
 import { Glow } from "@/components/Glow";
+import type { Strings } from "@/lib/i18n";
 import styles from "./CtaBand.module.css";
 
-export function CtaBand() {
+export function CtaBand({ t }: { t: Strings }) {
   return (
     <section className="wrap" style={{ paddingTop: 80, paddingBottom: 100 }} aria-labelledby="cta-title">
       <div className={`${styles.band} rv`}>
         <Glow soft />
         <div className={styles.content}>
           <h2 id="cta-title" className={`h2 ${styles.title}`}>
-            Your home deserves
+            {t.home.cta.titleStart}
             <br />
-            <span className={styles.accent}>a background check.</span>
+            <span className={styles.accent}>{t.home.cta.titleEnd}</span>
           </h2>
-          <p className={styles.sub}>Free for your first projects. No phone number needed.</p>
+          <p className={styles.sub}>{t.home.cta.sub}</p>
           <Link href="/#search" className={`btn btnBig ${styles.button}`}>
-            Check a project now
+            {t.home.cta.button}
             <svg
               className="arrow"
               viewBox="0 0 24 24"
