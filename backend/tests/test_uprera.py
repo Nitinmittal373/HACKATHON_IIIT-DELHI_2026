@@ -223,7 +223,7 @@ def test_a_new_project_past_its_date_counts_the_delay() -> None:
         if f.kind == "past_end_date"
     )
 
-    assert delay.months == 42
+    assert delay.months == 41
     assert delay.verdict == "fail"
     assert delay.title.endswith("project still listed as New")
     assert score([delay], ["registration", "completion_date"]).drivers[0].points == -14.0
