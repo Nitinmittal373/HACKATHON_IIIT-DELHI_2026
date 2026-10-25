@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { getLang } from "@/lib/i18n/server";
 import { LangProvider } from "@/lib/LangProvider";
 import "@/styles/tokens.css";
 import "@/styles/globals.css";
@@ -32,11 +33,12 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = { themeColor: "#ffffff" };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const lang = await getLang();
   return (
-    <html lang="en" className={`${geist.variable} ${geistMono.variable} ${devanagari.variable}`}>
+    <html lang={lang} className={`${geist.variable} ${geistMono.variable} ${devanagari.variable}`}>
       <body>
-        <LangProvider>
+        <LangProvider initial={lang}>
           <Header />
           {children}
           <Footer />

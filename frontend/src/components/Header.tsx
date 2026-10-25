@@ -11,17 +11,17 @@ export function Header() {
 
   return (
     <header className={styles.header}>
-      <nav className={`wrap ${styles.nav}`} aria-label="Main">
-        <Link href="/" aria-label="NeevCheck home" className={styles.home}>
+      <nav className={`wrap ${styles.nav}`} aria-label={t.common.mainNav}>
+        <Link href="/" aria-label={t.common.homeLabel} className={styles.home}>
           <Logo />
         </Link>
         <div className={styles.links}>
-          <Link href="/#search">{t.nav.check}</Link>
           <Link href="/#sample-report">{t.nav.sample}</Link>
           <Link href="/#how-it-works">{t.nav.how}</Link>
           <Link href="/#sentinel">{t.nav.rwa}</Link>
+          <Link href="/alerts">{t.nav.alerts}</Link>
         </div>
-        <div className={styles.lang} role="group" aria-label="Language">
+        <div className={styles.lang} role="group" aria-label={t.common.language}>
           <button type="button" aria-pressed={lang === "en"} onClick={() => setLang("en")} lang="en">
             EN
           </button>
@@ -29,9 +29,9 @@ export function Header() {
             हिं
           </button>
         </div>
-        <button type="button" className={`btn ${styles.signIn}`}>
-          {t.nav.signIn}
-        </button>
+        <Link href="/#search" className={`btn ${styles.cta}`}>
+          {t.nav.check}
+        </Link>
       </nav>
     </header>
   );
