@@ -33,15 +33,19 @@ Penalties come only from parsed facts, never from rules written for one builder.
 | Finding | Area | Penalty |
 | --- | --- | --: |
 | Completion date extended *n* times (COVID-19 force-majeure extensions not counted) | Project execution | 30 + 20 × (*n* − 1) |
-| More than 12 months past the latest approved end date, project not completed | Project execution | 40 |
-| More than 24 months past the latest approved end date, project not completed | Project execution | 70 |
+| Completion date on record passed more than 12 months ago, project still listed as Ongoing | Project execution | 40 |
+| Completion date on record passed more than 24 months ago, project still listed as Ongoing | Project execution | 70 |
 | Insolvency limited to another project | Financial and insolvency | 60 |
 | Insolvency of the company or this project | Financial and insolvency | 100 and hard stop |
 | Listed for unpaid land authority dues | Financial and insolvency | 70 |
 | UP-RERA registration lapsed or revoked | UP-RERA compliance | 100 and hard stop |
 | One news story on delays (secondary) | News | 10 each |
+| Complaints on UP-RERA against the promoter, all projects: at least 20 / 100 / 500 | Builder history | 20 / 40 / 60 |
+| Complaints on UP-RERA about this project: at least 1 / 10 | Legal and courts | 15 / 40 |
 
-Everything else in a report (registration date, completion date on record, an insolvency admission whose scope is decided by a later order, court orders such as the Supreme Court's NBCC ruling, complaint counts) is shown as evidence with 0 points.
+The completion date on record is the latest date UP-RERA shows for the project. Until extension orders are read (Phase 2), the delay rule is applied to that date. Complaint counts come from the project's UP-RERA summary page, and each finding links to it.
+
+Everything else in a report (registration date, a completion date not yet passed, an insolvency admission whose scope is decided by a later order, court orders such as the Supreme Court's NBCC ruling) is shown as evidence with 0 points.
 
 ## Rules that keep the score honest
 
@@ -56,6 +60,7 @@ Everything else in a report (registration date, completion date on record, an in
 | COVID-19 force-majeure extensions are not counted as delays | They were granted to all projects |
 | Delay is measured from the latest approved end date, not the original one | Extensions already count once; the delay must not count them again |
 | A completion or occupancy certificate on record skips the delay penalty | The certificate is shown as a "review" finding: verify possession before relying on it |
+| A "Proforma of Completion Certificate" is not a certificate | It is the blank template every project uploads at registration; it never skips the delay penalty and is not shown |
 
 ## Confidence
 
@@ -83,4 +88,13 @@ Supertech Eco Village-I Phase I-C (`UPRERAPRJ8334`) with every source read, as r
 
 Confidence is 71% (5 of 7 checks) because consumer cases (e-Jagriti, CAPTCHA) and the completion date could not be read.
 
-Until the Phase 2 agents land, a live check reads UP-RERA only. For this project UP-RERA shows a completion date of 30 Dec 2017 and a completion certificate proforma uploaded on 17 Apr 2019, so the delay is not counted and the score is 100 with 29% confidence (2 of 7 checks). The low confidence is the signal that most of the record is still unread.
+Until the Phase 2 agents land, a live check reads UP-RERA only. On 25 Oct 2026 that gave:
+
+| Finding | Area | Penalty | Points |
+| --- | --- | --: | --: |
+| Completion date on record (30 Dec 2017) passed 105 months ago; project still listed as Ongoing | Project execution (20%) | 70 | −14 |
+| 2,803 complaints on UP-RERA against the promoter | Builder history (15%) | 60 | −9 |
+| 15 complaints on UP-RERA about this project | Legal and courts (15%) | 40 | −6 |
+| **NeevScore** | | | **71 · Moderate** |
+
+Confidence is 29% (registration and completion date, 2 of 7 checks): most of the record is still unread.

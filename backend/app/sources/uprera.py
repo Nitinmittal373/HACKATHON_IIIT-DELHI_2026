@@ -1,14 +1,16 @@
 """UP-RERA, the primary source: TinyFish Fetch plus a deterministic parser.
 
-The page is read with Fetch and parsed in Python. Only the sections we use
-are requested, which keeps the page small and leaves out bank accounts and
+Pages are read with Fetch and parsed in Python. Only the sections we use
+are requested, which keeps pages small and leaves out bank accounts and
 phone numbers that NeevCheck has no reason to store.
+
+Old-format projects have two pages: the details page (dates, documents) and
+a Projectsummary page (complaint counts) that only search can find.
 """
 
 import uuid
 from collections.abc import AsyncIterator
 from datetime import date, datetime
-from urllib.parse import urlsplit
 
 from app.models import Area, CheckKey, Finding, Project, Verdict
 from app.parsers.uprera_page import ParseError, UpreraRecord, parse_uprera_page
@@ -21,7 +23,8 @@ from app.sources.base import (
     SourceError,
     SourceEvent,
 )
-from app.tinyfish import WebClient
+from app.tinyfish import WebClient, WebError
+from app.uprera_links import find_summary_url, summary_url
 
 ID = "#ctl00_ContentPlaceHolder1_"
 DETAILS_SELECTORS = [
@@ -57,8 +60,7 @@ PURPOSE = "Read a UP-RERA project page to record its registration, dates and doc
 
 
 def selectors_for(url: str) -> list[str]:
-    is_summary = urlsplit(url).path.lower() == "/projectsummary"
-    return SUMMARY_SELECTORS if is_summary else DETAILS_SELECTORS
+    return SUMMARY_SELECTORS if summary_url(url) else DETAILS_SELECTORS
 
 
 async def read_record(url: str, web: WebClient) -> UpreraRecord:
@@ -94,106 +96,180 @@ class UpreraSource:
     checks: tuple[CheckKey, ...] = ("registration", "completion_date", "extensions")
 
     async def run(self, ctx: SourceContext) -> AsyncIterator[SourceEvent]:
+        project = ctx.project
         yield Progress("Opening the UP-RERA project page")
         try:
-            record = await read_record(ctx.project.details_url, ctx.web)
+            record = await read_record(project.details_url, ctx.web)
         except ParseError as error:
             raise SourceError(str(error)) from None
-        if record.rera_id != ctx.project.rera_id:
-            raise SourceError(f"The UP-RERA page shows {record.rera_id}, not {ctx.project.rera_id}")
+        if record.rera_id != project.rera_id:
+            raise SourceError(f"The UP-RERA page shows {record.rera_id}, not {project.rera_id}")
 
         yield Progress("Reading registration, completion dates and documents")
-        yield ProjectDetails(with_record(ctx.project, record))
-        for finding in findings_from_record(record, ctx.project.details_url, ctx.today, ctx.now):
+        yield ProjectDetails(with_record(project, record))
+        for finding in findings_from_record(record, project.details_url, ctx.today, ctx.now):
             yield FoundFinding(finding)
+
+        yield Progress("Reading complaint counts on the UP-RERA summary page")
+        summary, url = await self._summary(project, record, ctx.web)
+        if summary and url:
+            for finding in complaint_findings(summary, url, ctx.today, ctx.now):
+                yield FoundFinding(finding)
+        else:
+            yield Progress("The UP-RERA summary page was not found, so complaints were not read")
+
         read: list[CheckKey] = ["registration"]
         if record.latest_end_date:
             read.append("completion_date")
         yield ChecksRead(tuple(read))
 
+    async def _summary(
+        self, project: Project, record: UpreraRecord, web: WebClient
+    ) -> tuple[UpreraRecord | None, str | None]:
+        """The Projectsummary record: the page already read, or the one search finds."""
+        if summary_url(project.details_url):
+            return record, project.details_url
+        try:
+            url = await find_summary_url(project.rera_id, web)
+            summary = await read_record(url, web) if url else None
+        except (WebError, ParseError):
+            return None, None
+        if summary is None or summary.rera_id != project.rera_id:
+            return None, None
+        return summary, url
+
 
 def findings_from_record(
     record: UpreraRecord, url: str, today: date, now: datetime
 ) -> list[Finding]:
-    def finding(kind: str, area: Area, title: str, verdict: Verdict, **facts: object) -> Finding:
-        return Finding.model_validate(
-            {
-                "id": uuid.uuid4().hex,
-                "source": "uprera",
-                "kind": kind,
-                "title": title,
-                "area": area,
-                "verdict": verdict,
-                "reliability": "primary",
-                "source_url": url,
-                "read_on": today,
-                "read_at": now,
-                **facts,
-            }
-        )
-
+    """Registration, completion date or delay, and a completion certificate if one is on record."""
     registered = f" on {_day(record.registered_on)}" if record.registered_on else ""
     findings = [
-        finding(
+        _finding(
             "registration",
             "rera",
             f"Registered on UP-RERA{registered}",
             "ok",
+            url,
+            today,
+            now,
             occurred_on=record.registered_on,
         )
     ]
 
-    if record.project_complaints is not None:
-        findings.append(
-            finding(
-                "rera_complaints",
-                "rera",
-                f"{record.project_complaints} complaints on UP-RERA about this project",
-                "review" if record.project_complaints else "ok",
-                count=record.project_complaints,
-            )
-        )
-    latest = record.latest_end_date
-    if latest is None:
-        return findings
-    findings.append(
-        finding(
-            "completion_date",
-            "execution",
-            f"Completion date on record: {_day(latest)}",
-            "context",
-            occurred_on=latest,
-        )
-    )
-
-    months = months_between(latest, today)
-    # The certificate only matters once the project is late: it is why the delay is not
-    # counted. Every new project uploads the blank proforma, so before then it says nothing.
-    certificate = record.completion_certificate if months > 0 else None
-    if months > 0:
-        findings.append(
-            finding(
-                "past_end_date",
-                "execution",
-                f"{months} months past the latest approved end date ({_day(latest)})",
-                "review" if certificate or months <= 12 else "red_flag",
-                months=months,
-            )
-        )
+    certificate = record.completion_certificate
     if certificate:
-        proforma = "proforma" in certificate.name.lower()
-        what = "a completion certificate proforma" if proforma else "a completion certificate"
+        uploaded = f", uploaded {_day(certificate.uploaded_on)}" if certificate.uploaded_on else ""
         findings.append(
-            finding(
+            _finding(
                 "completion_certificate",
                 "execution",
-                f"Promoter uploaded {what}. Verify possession status",
+                f"Completion certificate on record{uploaded}. Verify possession status",
                 "review",
+                url,
+                today,
+                now,
                 occurred_on=certificate.uploaded_on,
             )
         )
 
+    latest = record.latest_end_date
+    if latest is None:
+        return findings
+    months = months_between(latest, today)
+    still_ongoing = (record.project_type or "").lower() == "ongoing"
+    if months > 0 and still_ongoing and not certificate:
+        findings.append(
+            _finding(
+                "past_end_date",
+                "execution",
+                f"Completion date on record ({_day(latest)}) passed {months} months ago; "
+                f"project still listed as {record.project_type}",
+                "fail" if months > 12 else "review",
+                url,
+                today,
+                now,
+                occurred_on=latest,
+                months=months,
+            )
+        )
+    else:
+        findings.append(
+            _finding(
+                "completion_date",
+                "execution",
+                f"Completion date on record: {_day(latest)}",
+                "context",
+                url,
+                today,
+                now,
+                occurred_on=latest,
+            )
+        )
     return findings
+
+
+def complaint_findings(
+    summary: UpreraRecord, url: str, today: date, now: datetime
+) -> list[Finding]:
+    """Complaint counts from the Projectsummary page, for the promoter and for this project."""
+    findings = []
+    if summary.promoter_complaints is not None:
+        count = summary.promoter_complaints
+        findings.append(
+            _finding(
+                "promoter_complaints",
+                "builder_history",
+                f"{count} complaints on UP-RERA against the promoter, across all its projects",
+                "review" if count else "ok",
+                url,
+                today,
+                now,
+                count=count,
+            )
+        )
+    if summary.project_complaints is not None:
+        count = summary.project_complaints
+        findings.append(
+            _finding(
+                "project_complaints",
+                "legal",
+                f"{count} complaints on UP-RERA about this project",
+                "review" if count else "ok",
+                url,
+                today,
+                now,
+                count=count,
+            )
+        )
+    return findings
+
+
+def _finding(
+    kind: str,
+    area: Area,
+    title: str,
+    verdict: Verdict,
+    url: str,
+    today: date,
+    now: datetime,
+    **facts: object,
+) -> Finding:
+    return Finding.model_validate(
+        {
+            "id": uuid.uuid4().hex,
+            "source": "uprera",
+            "kind": kind,
+            "title": title,
+            "area": area,
+            "verdict": verdict,
+            "reliability": "primary",
+            "source_url": url,
+            "read_on": today,
+            "read_at": now,
+            **facts,
+        }
+    )
 
 
 def months_between(start: date, end: date) -> int:

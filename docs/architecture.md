@@ -50,7 +50,7 @@ Each source is one small module with the same shape: it reads one kind of public
 
 | Source | Site | How it reads | Extracts |
 | --- | --- | --- | --- |
-| `uprera` | up-rera.in | TinyFish **Fetch** + deterministic Python parser | name, number, registration date, promoter, type, district, start and end dates, permits, documents, complaints |
+| `uprera` | up-rera.in | TinyFish **Fetch** + deterministic Python parser; the summary page is found with Search | name, number, registration date, promoter, type, district, start and end dates, permits, documents, complaint counts |
 | `registry` | zaubacorp.com / mca.gov.in | TinyFish agent *(Phase 2)* | company status, CIN |
 | `insolvency` | NCLT / NCLAT orders, IBBI | Search + agent *(Phase 2)* | admitted cases and which projects they cover |
 | `land` | Noida, Greater Noida, YEIDA | agent *(Phase 2)* | dues or defaulter entries |
@@ -94,7 +94,7 @@ Every event is sent as `event: <type>` with JSON `data` holding `type`, `check_i
 | `finding.added` | `finding` (with `source_url`, `read_on`, `read_at`) |
 | `source.blocked` | `reason` (for example a CAPTCHA) |
 | `source.completed` | `status` (`completed`, `blocked`, `failed`, `unavailable`), `message`, `checks_read` |
-| `check.completed` | `status` (`completed` or `failed`), `score` summary or `message`; `source` is `check` |
+| `check.completed` | `status` (`completed` or `failed`), `score` summary (`value`, `band`, `confidence`, `hard_stop`) or `message`; `source` is `check` |
 
 ## Data model
 

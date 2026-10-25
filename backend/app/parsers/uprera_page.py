@@ -16,6 +16,8 @@ ID = "ctl00_ContentPlaceHolder1_"
 RERA_IN_TEXT = re.compile(r"UPRERAPRJ\d{1,7}(?:/\d{2}/\d{4})?", re.IGNORECASE)
 RERA_PROMOTER = re.compile(r"UPRERAPRM\d+", re.IGNORECASE)
 COMPLETION_DOCUMENT = re.compile(r"completion certificate|occupancy", re.IGNORECASE)
+# Every project uploads a blank "Proforma of Completion Certificate" at registration.
+PROFORMA = re.compile(r"proforma", re.IGNORECASE)
 
 
 class ParseError(ValueError):
@@ -63,10 +65,12 @@ class UpreraRecord:
 
     @property
     def completion_certificate(self) -> Document | None:
-        return next(
-            (d for d in self.documents if d.uploaded and COMPLETION_DOCUMENT.search(d.name)),
-            None,
-        )
+        """An uploaded completion or occupancy certificate; a proforma (template) never counts."""
+        return next((d for d in self.documents if d.uploaded and is_certificate(d.name)), None)
+
+
+def is_certificate(document_name: str) -> bool:
+    return bool(COMPLETION_DOCUMENT.search(document_name)) and not PROFORMA.search(document_name)
 
 
 def parse_uprera_page(html: str) -> UpreraRecord:

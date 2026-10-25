@@ -9,30 +9,21 @@
 
 import re
 from datetime import date, datetime
-from urllib.parse import urlsplit
 
-from app.models import Project, is_new_format, is_uprera_url, normalize_rera_id
+from app.models import Project, is_uprera_url, normalize_rera_id
 from app.sources.uprera import describe_project
 from app.tinyfish import SearchHit, WebClient
+from app.uprera_links import details_url_for, https, rera_ids_in, summary_url
 
 MAX_CANDIDATES = 8
-DETAILS_URL = "https://www.up-rera.in/Frm_View_Project_Details.aspx?id={digits}"
 SEARCH_PURPOSE = "Find the UP-RERA registration page of a housing project a homebuyer named"
 
-RERA_IN_TEXT = re.compile(r"UPRERAPRJ\d{1,7}(?:/\d{2}/\d{4})?", re.IGNORECASE)
 NAME = re.compile(
     r"Project Name\s*[:.,]?\s*:?\s*(?P<name>.+?)"
     r"(?=\s+Project Id|\s+Registration Number|\.\s|,\s|\s*\.\.\.|\s*$)"
 )
 REGISTERED = re.compile(r"Registration Date\s*[:.]?\s*(?P<date>\d{2}-\d{2}-\d{4})")
 PROMOTER = re.compile(r"Promoter Name\s*[:.]?\s*(?P<name>.+?)(?=\s+Promoter Id|\.\s|\s*\.\.\.|$)")
-
-
-def details_url_for(rera_id: str) -> str | None:
-    """Old-format numbers have a stable details page; new-format ones do not."""
-    if is_new_format(rera_id):
-        return None
-    return DETAILS_URL.format(digits=rera_id.removeprefix("UPRERAPRJ"))
 
 
 async def resolve(query: str, web: WebClient) -> list[Project]:
@@ -75,14 +66,14 @@ def rank(candidates: list[Project], query: str) -> list[Project]:
 
 
 def _candidate(hit: SearchHit) -> Project | None:
-    if not is_uprera_url(_https(hit.url)):
+    if not is_uprera_url(https(hit.url)):
         return None
-    text = f"{hit.title} {hit.snippet}"
-    found = RERA_IN_TEXT.search(text)
-    if found is None:
+    ids = rera_ids_in(hit)
+    if not ids:
         return None
-    rera_id = found.group(0).upper()
-    url = details_url_for(rera_id) or _summary_url(hit.url)
+    rera_id = ids[0]
+    # New-format numbers are only reachable through the Projectsummary link search returns.
+    url = details_url_for(rera_id) or summary_url(hit.url)
     if url is None:
         return None
     return Project(
@@ -92,16 +83,6 @@ def _candidate(hit: SearchHit) -> Project | None:
         registered_on=_date(_match(REGISTERED, hit.snippet, "date")),
         details_url=url,
     )
-
-
-def _summary_url(url: str) -> str | None:
-    """New-format numbers are only reachable through the Projectsummary link search returns."""
-    url = _https(url)
-    return url if urlsplit(url).path.lower() == "/projectsummary" else None
-
-
-def _https(url: str) -> str:
-    return re.sub(r"^http://", "https://", url.strip())
 
 
 def _match(pattern: re.Pattern[str], text: str, group: str) -> str | None:

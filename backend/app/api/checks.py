@@ -15,8 +15,8 @@ from app.config import Settings
 from app.models import Check, CheckCreate, Project
 from app.orchestrator import Orchestrator
 from app.ratelimit import RateLimiter
-from app.resolve import details_url_for
 from app.store import Store
+from app.uprera_links import details_url_for
 
 router = APIRouter(tags=["checks"])
 

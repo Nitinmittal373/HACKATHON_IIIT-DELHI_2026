@@ -15,7 +15,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 SourceName = Literal["uprera", "registry", "insolvency", "land", "consumer", "news"]
 Area = Literal["rera", "execution", "legal", "financial", "builder_history", "news"]
 Reliability = Literal["primary", "secondary"]
-Verdict = Literal["ok", "red_flag", "review", "context", "not_found"]
+Verdict = Literal["ok", "fail", "red_flag", "review", "context", "not_found"]
 Band = Literal["Low", "Moderate", "High", "Critical"]
 InsolvencyScope = Literal["company", "this_project", "other_project"]
 CheckStatus = Literal["queued", "running", "completed", "failed"]

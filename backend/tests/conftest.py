@@ -14,6 +14,7 @@ from fastapi.testclient import TestClient  # noqa: E402
 
 from app.config import Settings  # noqa: E402
 from app.main import create_app  # noqa: E402
+from app.uprera_links import rera_ids_in, summary_url  # noqa: E402
 from tests.fakes import FakeWebClient, load_page, load_search  # noqa: E402
 
 URL_8334 = "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334"
@@ -39,9 +40,22 @@ def make_web() -> FakeWebClient:
             "Supertech Eco Village UP RERA project": load_search(
                 "search_supertech_eco_village.json"
             ),
+            "UPRERAPRJ8334 UP RERA project": load_search("search_uprera_8334.json"),
         },
-        pages={URL_8334: load_page("uprera_8334.html"), URL_6742: load_page("uprera_6742.html")},
+        pages={
+            URL_8334: load_page("uprera_8334.html"),
+            URL_6742: load_page("uprera_6742.html"),
+            summary_url_8334(): load_page("uprera_summary_8334.html"),
+        },
     )
+
+
+def summary_url_8334() -> str:
+    """The Projectsummary link recorded in search_uprera_8334.json."""
+    for hit in load_search("search_uprera_8334.json"):
+        if (url := summary_url(hit.url)) and "UPRERAPRJ8334" in rera_ids_in(hit):
+            return url
+    raise AssertionError("search_uprera_8334.json has no Projectsummary link for 8334")
 
 
 def read_events(client: TestClient, check_id: str) -> list[dict[str, object]]:

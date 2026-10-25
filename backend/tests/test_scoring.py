@@ -1,6 +1,8 @@
 from datetime import date
 from itertools import count
 
+import pytest
+
 from app.models import CheckKey, Finding, InsolvencyScope
 from app.scoring.engine import score
 from app.scoring.weights import KEY_CHECKS
@@ -78,6 +80,19 @@ def test_no_findings_score_100_with_no_confidence() -> None:
     assert result.band == "Low"
     assert result.confidence == 0.0
     assert result.checks_unread == list(KEY_CHECKS)
+
+
+@pytest.mark.parametrize(
+    ("count", "value"), [(19, 100), (20, 97), (100, 94), (499, 94), (500, 91), (2803, 91)]
+)
+def test_promoter_complaints_count_in_builder_history(count: int, value: int) -> None:
+    assert score([finding("promoter_complaints", count=count)], ALL_CHECKS).value == value
+
+
+@pytest.mark.parametrize(("count", "points"), [(0, []), (1, [-2.25]), (9, [-2.25]), (15, [-6.0])])
+def test_project_complaints_count_in_legal(count: int, points: list[float]) -> None:
+    result = score([finding("project_complaints", count=count)], ALL_CHECKS)
+    assert [d.points for d in result.drivers] == points
 
 
 def test_penalties_in_one_area_are_capped_at_100() -> None:

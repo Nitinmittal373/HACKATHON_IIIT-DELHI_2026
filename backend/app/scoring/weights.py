@@ -45,6 +45,8 @@ KIND_AREAS: dict[str, Area] = {
     "insolvency_scope": "financial",
     "land_dues": "financial",
     "news_story": "news",
+    "promoter_complaints": "builder_history",
+    "project_complaints": "legal",
 }
 
 EXTENSION_FIRST = 30
@@ -54,3 +56,6 @@ DELAY_STEPS: list[tuple[int, int]] = [(24, 70), (12, 40)]
 INSOLVENCY_OTHER_PROJECT = 60
 LAND_DUES = 70
 NEWS_PER_STORY = 10
+# (at least this many complaints on UP-RERA, penalty), largest first.
+PROMOTER_COMPLAINT_STEPS: list[tuple[int, int]] = [(500, 60), (100, 40), (20, 20)]
+PROJECT_COMPLAINT_STEPS: list[tuple[int, int]] = [(10, 40), (1, 15)]

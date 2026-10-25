@@ -59,8 +59,16 @@ def _penalty(finding: Finding, has_completion_certificate: bool) -> int:
             return w.LAND_DUES
         case "news_story":
             return w.NEWS_PER_STORY
+        case "promoter_complaints":
+            return _step(finding.count, w.PROMOTER_COMPLAINT_STEPS)
+        case "project_complaints":
+            return _step(finding.count, w.PROJECT_COMPLAINT_STEPS)
         case _:
             return 0
+
+
+def _step(count: int | None, steps: list[tuple[int, int]]) -> int:
+    return next((penalty for least, penalty in steps if (count or 0) >= least), 0)
 
 
 def _hard_stop_reason(finding: Finding) -> str | None:

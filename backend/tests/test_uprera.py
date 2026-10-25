@@ -4,22 +4,32 @@ from datetime import UTC, date, datetime
 import pytest
 
 from app.models import Project
-from app.parsers.uprera_page import ParseError, parse_uprera_page
+from app.parsers.uprera_page import ParseError, is_certificate, parse_uprera_page
 from app.scoring.engine import score
-from app.sources.base import ChecksRead, FoundFinding, ProjectDetails, SourceContext, SourceError
+from app.sources.base import (
+    ChecksRead,
+    FoundFinding,
+    Progress,
+    ProjectDetails,
+    SourceContext,
+    SourceError,
+)
 from app.sources.uprera import (
     DETAILS_SELECTORS,
     SUMMARY_SELECTORS,
     UpreraSource,
+    complaint_findings,
     findings_from_record,
     months_between,
     selectors_for,
 )
+from tests.conftest import make_web, summary_url_8334
 from tests.fakes import FakeWebClient, load_page
 
 URL_8334 = "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334"
 TODAY = date(2026, 10, 25)
 NOW = datetime(2026, 10, 25, 9, 30, tzinfo=UTC)
+SUMMARY_8334 = summary_url_8334()
 
 
 def test_details_page_8334() -> None:
@@ -40,11 +50,25 @@ def test_details_page_8334() -> None:
     assert record.latest_end_date == date(2017, 12, 30)
 
 
-def test_8334_has_a_completion_certificate_proforma() -> None:
-    certificate = parse_uprera_page(load_page("uprera_8334.html")).completion_certificate
-    assert certificate is not None
-    assert certificate.file_name == "PRJ14-8334Completion certificate_EV1_Ph-1C.pdf"
-    assert certificate.uploaded_on == date(2019, 4, 17)
+def test_a_completion_certificate_proforma_is_not_a_certificate() -> None:
+    record = parse_uprera_page(load_page("uprera_8334.html"))
+    proforma = next(d for d in record.documents if "Completion" in d.name)
+    assert proforma.name == "Proforma of Completion Certificate(Occupancy)"
+    assert proforma.uploaded
+    assert record.completion_certificate is None
+
+
+@pytest.mark.parametrize(
+    ("name", "counts"),
+    [
+        ("Completion Certificate", True),
+        ("Occupancy Certificate", True),
+        ("Proforma of Completion Certificate(Occupancy)", False),
+        ("Commencement Certificate", False),
+    ],
+)
+def test_is_certificate(name: str, counts: bool) -> None:
+    assert is_certificate(name) is counts
 
 
 def test_details_page_6742_takes_the_latest_end_date() -> None:
@@ -73,24 +97,36 @@ def test_unexpected_page_is_a_parse_error() -> None:
         parse_uprera_page("<html><body>Service unavailable</body></html>")
 
 
-def test_findings_and_score_for_8334_from_the_recorded_page() -> None:
+def test_findings_and_score_for_8334_from_the_recorded_pages() -> None:
     record = parse_uprera_page(load_page("uprera_8334.html"))
+    summary = parse_uprera_page(load_page("uprera_summary_8334.html"))
     findings = findings_from_record(record, URL_8334, TODAY, NOW)
+    findings += complaint_findings(summary, SUMMARY_8334, TODAY, NOW)
     by_kind = {f.kind: f for f in findings}
 
-    assert by_kind["registration"].title == "Registered on UP-RERA on 09 Aug 2017"
-    assert by_kind["past_end_date"].months == 105
-    assert by_kind["completion_certificate"].title == (
-        "Promoter uploaded a completion certificate proforma. Verify possession status"
+    assert set(by_kind) == {
+        "registration",
+        "past_end_date",
+        "promoter_complaints",
+        "project_complaints",
+    }
+    delay = by_kind["past_end_date"]
+    assert delay.title == (
+        "Completion date on record (30 Dec 2017) passed 105 months ago; "
+        "project still listed as Ongoing"
     )
-    assert by_kind["completion_certificate"].verdict == "review"
-    assert all(f.source_url == URL_8334 and f.read_on == TODAY for f in findings)
+    assert (delay.verdict, delay.reliability, delay.months) == ("fail", "primary", 105)
+    assert by_kind["promoter_complaints"].count == 2803
+    assert by_kind["project_complaints"].count == 15
+    assert by_kind["project_complaints"].source_url == SUMMARY_8334
+    assert by_kind["registration"].source_url == URL_8334
 
     result = score(findings, ["registration", "completion_date"])
-    # The certificate on record means the delay is not counted; other sources are unread.
-    assert result.value == 100
+    # -14 delay, -9 builder history (2,803 >= 500), -6 legal (15 >= 10).
+    assert [d.points for d in result.drivers] == [-14.0, -9.0, -6.0]
+    assert result.value == 71
     assert result.confidence == 0.29
-    assert "consumer_cases" in result.checks_unread
+    assert result.band == "Moderate"
 
 
 def test_findings_and_score_for_6742_count_the_delay() -> None:
@@ -99,16 +135,25 @@ def test_findings_and_score_for_6742_count_the_delay() -> None:
     delay = next(f for f in findings if f.kind == "past_end_date")
 
     assert delay.months == 42
-    assert delay.verdict == "red_flag"
+    assert delay.verdict == "fail"
     result = score(findings, ["registration", "completion_date"])
     assert result.value == 86
     assert [d.points for d in result.drivers] == [-14.0]
 
 
-def test_a_project_not_yet_due_has_no_delay_or_certificate_finding() -> None:
+def test_a_project_not_yet_due_shows_its_date_and_no_delay() -> None:
     record = parse_uprera_page(load_page("uprera_summary_188811.html"))
-    kinds = {f.kind for f in findings_from_record(record, "https://up-rera.in/x", TODAY, NOW)}
-    assert kinds == {"registration", "completion_date", "rera_complaints"}
+    findings = findings_from_record(record, "https://up-rera.in/x", TODAY, NOW)
+    assert {f.kind for f in findings} == {"registration", "completion_date"}
+
+
+def test_complaints_on_a_new_format_summary_page() -> None:
+    record = parse_uprera_page(load_page("uprera_summary_188811.html"))
+    findings = complaint_findings(record, "https://up-rera.in/x", TODAY, NOW)
+    assert [(f.kind, f.count, f.area) for f in findings] == [
+        ("promoter_complaints", 648, "builder_history"),
+        ("project_complaints", 2, "legal"),
+    ]
 
 
 @pytest.mark.parametrize(
@@ -137,13 +182,23 @@ def run_source(web: FakeWebClient, project: Project) -> list[object]:
     return asyncio.run(collect())
 
 
-def test_source_yields_project_details_findings_and_checks_read() -> None:
-    web = FakeWebClient(pages={URL_8334: load_page("uprera_8334.html")})
-    events = run_source(web, Project(rera_id="UPRERAPRJ8334", details_url=URL_8334))
+def test_source_reads_the_details_and_summary_pages() -> None:
+    events = run_source(make_web(), Project(rera_id="UPRERAPRJ8334", details_url=URL_8334))
 
     details = next(e for e in events if isinstance(e, ProjectDetails))
     assert details.project.promoter == "SUPERTECH LIMITED"
-    assert sum(isinstance(e, FoundFinding) for e in events) == 4
+    kinds = [e.finding.kind for e in events if isinstance(e, FoundFinding)]
+    assert kinds == ["registration", "past_end_date", "promoter_complaints", "project_complaints"]
+    assert events[-1] == ChecksRead(("registration", "completion_date"))
+
+
+def test_source_carries_on_when_the_summary_page_is_not_found() -> None:
+    web = FakeWebClient(pages={URL_8334: load_page("uprera_8334.html")})
+    events = run_source(web, Project(rera_id="UPRERAPRJ8334", details_url=URL_8334))
+
+    kinds = [e.finding.kind for e in events if isinstance(e, FoundFinding)]
+    assert kinds == ["registration", "past_end_date"]
+    assert any(isinstance(e, Progress) and "complaints were not read" in e.text for e in events)
     assert events[-1] == ChecksRead(("registration", "completion_date"))
 
 

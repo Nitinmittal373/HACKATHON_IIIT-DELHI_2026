@@ -51,15 +51,25 @@ def test_report_for_8334_is_scored_from_the_recorded_page(client: TestClient) ->
     assert report["project"]["name"] == "SUPERTECH ECO VILLAGE-I PHASE I-C"
     assert report["project"]["promoter"] == "SUPERTECH LIMITED"
     assert report["project"]["district"] == "Gautam Buddha Nagar"
-    assert {k: report["score"][k] for k in ("value", "band", "confidence", "hard_stop")} == {
-        "value": 100,
-        "band": "Low",
+    keys = ("value", "band", "confidence", "hard_stop")
+    assert {k: report["score"][k] for k in keys} == {
+        "value": 71,
+        "band": "Moderate",
         "confidence": 0.29,
         "hard_stop": False,
     }
-    kinds = {f["kind"] for f in report["findings"]}
-    assert kinds == {"registration", "completion_date", "past_end_date", "completion_certificate"}
-    assert all(f["source_url"].startswith("https://www.up-rera.in/") for f in report["findings"])
+    points = {f["kind"]: f for f in report["findings"]}
+    assert set(points) == {
+        "registration",
+        "past_end_date",
+        "promoter_complaints",
+        "project_complaints",
+    }
+    assert [d["points"] for d in report["score"]["drivers"]] == [-14.0, -9.0, -6.0]
+    assert all(
+        f["source_url"].startswith(("https://www.up-rera.in/", "https://up-rera.in/"))
+        for f in report["findings"]
+    )
     dates = [f["occurred_on"] for f in report["timeline"]]
     assert dates == sorted(dates)
 
