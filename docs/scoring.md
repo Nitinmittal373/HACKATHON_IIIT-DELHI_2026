@@ -33,8 +33,8 @@ Penalties come only from parsed facts, never from rules written for one builder.
 | Finding | Area | Penalty |
 | --- | --- | --: |
 | Completion date extended *n* times (COVID-19 force-majeure extensions not counted) | Project execution | 30 + 20 × (*n* − 1) |
-| Completion date on record passed more than 12 months ago, project still listed as Ongoing | Project execution | 40 |
-| Completion date on record passed more than 24 months ago, project still listed as Ongoing | Project execution | 70 |
+| Completion date on record passed more than 12 months ago, project not listed as completed | Project execution | 40 |
+| Completion date on record passed more than 24 months ago, project not listed as completed | Project execution | 70 |
 | Insolvency limited to another project | Financial and insolvency | 60 |
 | Insolvency of the company or this project | Financial and insolvency | 100 and hard stop |
 | Listed for unpaid land authority dues | Financial and insolvency | 70 |
@@ -42,6 +42,8 @@ Penalties come only from parsed facts, never from rules written for one builder.
 | One news story on delays (secondary) | News | 10 each |
 | Complaints on UP-RERA against the promoter, all projects: at least 20 / 100 / 500 | Builder history | 20 / 40 / 60 |
 | Complaints on UP-RERA about this project: at least 1 / 10 | Legal and courts | 15 / 40 |
+
+Any project whose UP-RERA type is not a completed one (Ongoing, New and so on) is late once that date has passed.
 
 The completion date on record is the latest date UP-RERA shows for the project. Until extension orders are read (Phase 2), the delay rule is applied to that date. Complaint counts come from the project's UP-RERA summary page, and each finding links to it.
 

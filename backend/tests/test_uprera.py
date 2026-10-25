@@ -1,4 +1,5 @@
 import asyncio
+from dataclasses import replace
 from datetime import UTC, date, datetime
 
 import pytest
@@ -20,6 +21,7 @@ from app.sources.uprera import (
     UpreraSource,
     complaint_findings,
     findings_from_record,
+    is_completed,
     months_between,
     selectors_for,
 )
@@ -208,3 +210,41 @@ def test_source_refuses_a_page_for_another_project() -> None:
     web = FakeWebClient(pages={url: load_page("uprera_8334.html")})
     with pytest.raises(SourceError, match="shows UPRERAPRJ8334"):
         run_source(web, Project(rera_id="UPRERAPRJ6742", details_url=url))
+
+
+def test_a_new_project_past_its_date_counts_the_delay() -> None:
+    record = parse_uprera_page(load_page("uprera_summary_188811.html"))
+    assert record.project_type == "New"
+    late = replace(record, end_date=date(2023, 4, 26))
+
+    delay = next(
+        f
+        for f in findings_from_record(late, "https://up-rera.in/x", TODAY, NOW)
+        if f.kind == "past_end_date"
+    )
+
+    assert delay.months == 42
+    assert delay.verdict == "fail"
+    assert delay.title.endswith("project still listed as New")
+    assert score([delay], ["registration", "completion_date"]).drivers[0].points == -14.0
+
+
+def test_a_completed_project_past_its_date_has_no_delay() -> None:
+    record = parse_uprera_page(load_page("uprera_summary_188811.html"))
+    done = replace(record, end_date=date(2023, 4, 26), project_type="Completed")
+    kinds = {f.kind for f in findings_from_record(done, "https://up-rera.in/x", TODAY, NOW)}
+    assert kinds == {"registration", "completion_date"}
+
+
+@pytest.mark.parametrize(
+    ("status", "completed"),
+    [
+        ("Ongoing", False),
+        ("New", False),
+        (None, False),
+        ("Completed", True),
+        ("Project Complete", True),
+    ],
+)
+def test_is_completed(status: str | None, completed: bool) -> None:
+    assert is_completed(status) is completed

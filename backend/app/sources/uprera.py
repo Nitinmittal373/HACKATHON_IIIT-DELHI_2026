@@ -177,14 +177,13 @@ def findings_from_record(
     if latest is None:
         return findings
     months = months_between(latest, today)
-    still_ongoing = (record.project_type or "").lower() == "ongoing"
-    if months > 0 and still_ongoing and not certificate:
+    if months > 0 and not is_completed(record.project_type) and not certificate:
         findings.append(
             _finding(
                 "past_end_date",
                 "execution",
                 f"Completion date on record ({_day(latest)}) passed {months} months ago; "
-                f"project still listed as {record.project_type}",
+                f"project still listed as {record.project_type or 'not completed'}",
                 "fail" if months > 12 else "review",
                 url,
                 today,
@@ -270,6 +269,14 @@ def _finding(
             **facts,
         }
     )
+
+
+COMPLETED_STATUSES = ("complete", "finished")
+
+
+def is_completed(project_type: str | None) -> bool:
+    """Only a completed project escapes the delay rule; UP-RERA also lists Ongoing, New, etc."""
+    return any(word in (project_type or "").lower() for word in COMPLETED_STATUSES)
 
 
 def months_between(start: date, end: date) -> int:
