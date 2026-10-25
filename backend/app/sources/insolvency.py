@@ -24,6 +24,8 @@ from app.tinyfish import SearchHit
 
 SEARCH_PURPOSE = "Find an order or report on a builder's insolvency case"
 OFFICIAL_HOSTS = ("nclt.gov.in", "nclat.nic.in", "ibbi.gov.in", "sci.gov.in")
+# Pages anyone can upload to or post on say nothing reliable about a court case.
+UPLOAD_HOSTS = ("scribd.com", "facebook.com", "instagram.com", "youtube.com", "linkedin.com")
 TOPIC = re.compile(r"insolvency|cirp|nclt|nclat", re.IGNORECASE)
 
 GOAL = (
@@ -83,18 +85,30 @@ class InsolvencySource(AgentSource):
 def pick_case_page(hits: list[SearchHit], promoter: str) -> SearchHit | None:
     """The best page about the promoter's case that an agent can open.
 
-    Official sites come first. PDFs are skipped: an agent browsing a PDF viewer returns little.
+    Official sites come first, then deep pages before front pages. PDFs are skipped, because an
+    agent browsing a PDF viewer returns little, and so are upload sites such as Scribd.
     """
-    usable = [
-        hit
-        for hit in hits
-        if not is_pdf(hit.url) and legal_name_in(promoter, blob(hit)) and TOPIC.search(blob(hit))
-    ]
-    return min(usable, key=lambda hit: not is_official(hit.url), default=None)
+    usable = [hit for hit in hits if is_readable_page(hit.url) and is_about_case(hit, promoter)]
+
+    def rank(hit: SearchHit) -> tuple[bool, bool]:
+        return not is_official(hit.url), is_homepage(hit.url)
+
+    return min(usable, key=rank, default=None)
 
 
-def is_pdf(url: str) -> bool:
-    return ".pdf" in url.lower() or "gen_pdf" in url.lower()
+def is_about_case(hit: SearchHit, promoter: str) -> bool:
+    return legal_name_in(promoter, blob(hit)) and bool(TOPIC.search(blob(hit)))
+
+
+def is_homepage(url: str) -> bool:
+    """A site's front page is big and general; a deep page holds the article itself."""
+    return urlsplit(url).path.strip("/") == ""
+
+
+def is_readable_page(url: str) -> bool:
+    host = urlsplit(url).hostname or ""
+    uploaded = any(host == h or host.endswith("." + h) for h in UPLOAD_HOSTS)
+    return not uploaded and "pdf" not in url.lower()
 
 
 def is_official(url: str) -> bool:

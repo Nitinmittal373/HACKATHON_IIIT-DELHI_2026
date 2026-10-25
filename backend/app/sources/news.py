@@ -11,12 +11,14 @@ the seven key checks, so it never changes confidence.
 
 import re
 from collections.abc import AsyncIterator
+from datetime import date, timedelta
 from urllib.parse import urlsplit
 
 from app.matching import (
     blob,
     brand,
     dedupe_titles,
+    distinctive_words,
     has_word,
     legal_name_in,
     mentions_project,
@@ -34,6 +36,8 @@ FETCH_PURPOSE = "Read a Supreme Court order to see which projects it names"
 MAX_STORIES = 3
 TOPIC = re.compile(r"delay|stalled|nclt|nclat|nbcc|insolven|possession|homebuyer", re.IGNORECASE)
 URL_DATE = re.compile(r"\d{2}-[A-Za-z]{3}-\d{4}")
+AGO = re.compile(r"(?P<n>\d+)\s+(?P<unit>day|week|month|year)s?\s+ago", re.IGNORECASE)
+DAYS_PER_UNIT = {"day": 1, "week": 7, "month": 30, "year": 365}
 COURT_HOST = "sci.gov.in"
 COURT_REPORT_HOSTS = ("livelaw.in", "barandbench.com", "scconline.com", "indiankanoon.org")
 
@@ -49,8 +53,7 @@ class NewsSource:
             return
 
         yield Progress("Searching news for delay coverage")
-        query = f"{project.name} {project.promoter or ''} delay OR NCLT OR NBCC".replace("  ", " ")
-        hits = await ctx.web.search(query, purpose=SEARCH_PURPOSE, domain_type="news")
+        hits = await ctx.web.search(news_query(project), purpose=SEARCH_PURPOSE, domain_type="news")
         for finding in story_findings(hits, project, ctx):
             yield FoundFinding(finding)
 
@@ -80,6 +83,24 @@ class NewsSource:
         return None
 
 
+def news_query(project: Project) -> str:
+    """Brand and project words without the phase or numeral: long exact names find nothing."""
+    words = [w for w in distinctive_words(project.name, project.promoter) if not w.isdigit()]
+    return f"{brand(project.promoter)} {' '.join(words)} delay OR NCLT OR NBCC".replace("  ", " ")
+
+
+def published_on(text: str | None, today: date) -> tuple[date | None, str]:
+    """A story's date and how to say it: news search often reports only '4 weeks ago'."""
+    exact = parse_day(text)
+    if exact:
+        return exact, ""
+    found = AGO.match((text or "").strip())
+    if not found:
+        return None, ""
+    days = int(found.group("n")) * DAYS_PER_UNIT[found.group("unit")]
+    return today - timedelta(days=days), f" (published about {text.strip()})"  # type: ignore[union-attr]
+
+
 def story_findings(hits: list[SearchHit], project: Project, ctx: SourceContext) -> list[Finding]:
     pattern = project_pattern(project.name, project.promoter)
     word = brand(project.promoter)
@@ -91,14 +112,14 @@ def story_findings(hits: list[SearchHit], project: Project, ctx: SourceContext) 
         if not (names_project or names_promoter) or not TOPIC.search(text):
             continue
         about = "this project" if names_project else "the promoter"
-        published = parse_day(hit.date)
+        published, ago = published_on(hit.date, ctx.today)
         findings.append(
             build_finding(
                 source="news",
                 reliability="secondary",
                 kind="news_story",
                 area="news",
-                title=f"News on delays, about {about}: {hit.title}",
+                title=f"News on delays, about {about}: {hit.title}{ago}",
                 verdict="review",
                 url=hit.url,
                 today=ctx.today,

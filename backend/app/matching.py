@@ -77,18 +77,24 @@ def brand(name: str | None) -> str:
     return ""
 
 
-def project_pattern(project: str | None, promoter: str | None = None) -> re.Pattern[str] | None:
-    """Regex for a project's distinguishing name, whole tokens only, over canonical() text.
+def distinctive_words(project: str | None, promoter: str | None = None) -> list[str]:
+    """The words that tell a project apart, over canonical() text.
 
-    'SUPERTECH ECO VILLAGE-I PHASE I-C' by 'SUPERTECH LIMITED' -> r'\\beco\\W+village\\W+1\\b'
+    'SUPERTECH ECO VILLAGE-I PHASE I-C' by 'SUPERTECH LIMITED' -> ['eco', 'village', '1']
     """
     name = canonical(project)
-    if not name:
-        return None
     promoter_brand = brand(promoter)
     if promoter_brand:
         name = re.sub(rf"^{re.escape(promoter_brand)}\s+", "", name)
-    tokens = PROJECT_NAME_END.split(name)[0].split()
+    return PROJECT_NAME_END.split(name)[0].split()
+
+
+def project_pattern(project: str | None, promoter: str | None = None) -> re.Pattern[str] | None:
+    """Regex for a project's distinguishing name, whole tokens only, over canonical() text.
+
+    'SUPERTECH ECO VILLAGE-I PHASE I-C' by 'SUPERTECH LIMITED' matches 'eco village 1'.
+    """
+    tokens = distinctive_words(project, promoter)
     if not tokens:
         return None
     return re.compile(r"\b" + r"\W+".join(re.escape(token) for token in tokens) + r"\b")
@@ -96,7 +102,7 @@ def project_pattern(project: str | None, promoter: str | None = None) -> re.Patt
 
 def has_word(word: str, text: str | None) -> bool:
     """Whole-word match: 'ats' is in 'ATS Greens' but not in 'stats'."""
-    return bool(word) and re.search(rf"{re.escape(word)}", normalize(text)) is not None
+    return bool(word) and re.search(rf"\b{re.escape(word)}\b", normalize(text)) is not None
 
 
 def mentions_project(pattern: re.Pattern[str] | None, text: str | None) -> bool:
