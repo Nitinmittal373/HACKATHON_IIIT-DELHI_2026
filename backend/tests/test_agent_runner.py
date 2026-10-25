@@ -33,7 +33,7 @@ class CompanyStatusSource(AgentSource):
     name = "registry"
     checks: tuple[CheckKey, ...] = ("company_status",)
 
-    def task(self, ctx: SourceContext) -> AgentTask:
+    async def task(self, ctx: SourceContext) -> AgentTask | None:
         return AgentTask(
             url=START_URL,
             goal=f"Read the company status and CIN of {ctx.project.promoter}.",
@@ -47,7 +47,9 @@ class CompanyStatusSource(AgentSource):
             },
         )
 
-    def to_findings(self, result: dict[str, Any], ctx: SourceContext) -> list[Finding]:
+    def to_findings(
+        self, result: dict[str, Any], ctx: SourceContext, task: AgentTask
+    ) -> list[Finding]:
         return [
             Finding(
                 id=uuid.uuid4().hex,

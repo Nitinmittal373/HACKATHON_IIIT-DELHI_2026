@@ -8,7 +8,6 @@ Old-format projects have two pages: the details page (dates, documents) and
 a Projectsummary page (complaint counts) that only search can find.
 """
 
-import uuid
 from collections.abc import AsyncIterator
 from datetime import date, datetime
 
@@ -23,6 +22,7 @@ from app.sources.base import (
     SourceError,
     SourceEvent,
 )
+from app.sources.findings import build_finding
 from app.tinyfish import WebClient, WebError
 from app.uprera_links import find_summary_url, summary_url
 
@@ -300,20 +300,17 @@ def _finding(
     now: datetime,
     **facts: object,
 ) -> Finding:
-    return Finding.model_validate(
-        {
-            "id": uuid.uuid4().hex,
-            "source": "uprera",
-            "kind": kind,
-            "title": title,
-            "area": area,
-            "verdict": verdict,
-            "reliability": "primary",
-            "source_url": url,
-            "read_on": today,
-            "read_at": now,
-            **facts,
-        }
+    return build_finding(
+        source="uprera",
+        reliability="primary",
+        kind=kind,
+        area=area,
+        title=title,
+        verdict=verdict,
+        url=url,
+        today=today,
+        now=now,
+        **facts,
     )
 
 

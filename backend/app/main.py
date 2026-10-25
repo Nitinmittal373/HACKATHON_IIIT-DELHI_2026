@@ -3,12 +3,13 @@
 from collections.abc import AsyncIterator, Callable
 from contextlib import asynccontextmanager
 from datetime import datetime
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import checks, events, health, projects, reports
-from app.config import Settings, load_settings
+from app.config import BACKEND_DIR, Settings, load_settings
 from app.db import make_engine, make_session_factory
 from app.events import EventHub
 from app.orchestrator import Orchestrator, utc_now
@@ -17,11 +18,14 @@ from app.security import add_security_headers
 from app.store import Store
 from app.tinyfish import LiveWebClient, WebClient
 
+DEFAULT_CACHE_DIR = BACKEND_DIR / "data" / "cache"
+
 
 def create_app(
     settings: Settings | None = None,
     web: WebClient | None = None,
     clock: Callable[[], datetime] = utc_now,
+    cache_dir: Path | None = DEFAULT_CACHE_DIR,
 ) -> FastAPI:
     """Build the app. Tests pass a fake `web` client and a fixed clock."""
     settings = settings or load_settings()
@@ -44,6 +48,7 @@ def create_app(
             concurrency=settings.agent_concurrency,
             source_timeout=settings.agent_timeout_seconds,
             clock=clock,
+            cache_dir=cache_dir,
         )
         try:
             yield

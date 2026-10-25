@@ -93,8 +93,8 @@ def test_check_shows_every_source_and_why_it_was_not_read(client: TestClient) ->
     statuses = {run["source"]: run["status"] for run in check["sources"]}
     assert statuses == {
         "uprera": "completed",
-        "registry": "unavailable",
-        "insolvency": "unavailable",
+        "registry": "completed",
+        "insolvency": "completed",
         "land": "unavailable",
         "consumer": "unavailable",
         "news": "unavailable",

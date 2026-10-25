@@ -13,6 +13,7 @@ import uuid
 from collections.abc import Callable
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta, timezone
+from pathlib import Path
 from typing import Any
 
 from app.events import EventHub
@@ -53,6 +54,7 @@ class Orchestrator:
         source_timeout: float,
         clock: Callable[[], datetime] = utc_now,
         sources: Callable[[], list[Source]] = build_sources,
+        cache_dir: Path | None = None,
     ) -> None:
         self._store = store
         self._hub = hub
@@ -61,6 +63,7 @@ class Orchestrator:
         self._source_timeout = source_timeout
         self._clock = clock
         self._sources = sources
+        self._cache_dir = cache_dir
         self._tasks: set[asyncio.Task[None]] = set()
 
     def start(self, project: Project) -> Check:
@@ -87,7 +90,12 @@ class Orchestrator:
             primary, *others = self._sources()
             now = self._clock()
             ctx = SourceContext(
-                project=project, web=self._web, today=now.astimezone(IST).date(), now=now
+                project=project,
+                web=self._web,
+                today=now.astimezone(IST).date(),
+                now=now,
+                check_id=check_id,
+                cache_dir=self._cache_dir,
             )
             ctx, primary_read = await self._run_source(check_id, primary, ctx)
             if "registration" not in primary_read:
@@ -149,7 +157,8 @@ class Orchestrator:
                 run = run.model_copy(update={"status": "failed", "message": str(error)})
             except TimeoutError:
                 message = f"No answer within {self._source_timeout:.0f} seconds"
-                run = run.model_copy(update={"status": "failed", "message": message})
+                run = run.model_copy(update={"status": "blocked", "message": message})
+                self._emit(check_id, "source.blocked", source.name, reason="timeout")
             except Exception:
                 logger.exception("source %s failed in check %s", source.name, check_id)
                 message = "Unexpected error while reading this source"

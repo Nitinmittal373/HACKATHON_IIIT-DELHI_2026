@@ -8,6 +8,7 @@ source is easy to test with a fake WebClient.
 from collections.abc import AsyncIterator
 from dataclasses import dataclass
 from datetime import date, datetime
+from pathlib import Path
 from typing import Protocol
 
 from app.models import CheckKey, Finding, Project, SourceName
@@ -28,6 +29,9 @@ class SourceContext:
     web: WebClient
     today: date
     now: datetime
+    check_id: str = ""
+    # Where raw agent answers are saved for debugging; None keeps nothing on disk.
+    cache_dir: Path | None = None
 
 
 @dataclass(frozen=True)
