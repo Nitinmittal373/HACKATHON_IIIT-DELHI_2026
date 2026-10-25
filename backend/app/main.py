@@ -45,6 +45,9 @@ def create_app(
         )
         engine = make_engine(settings.database_url)
         app.state.store = Store(make_session_factory(engine))
+        # A check's agents run inside this process; any it was running before a restart or a
+        # redeploy are gone, so those checks can never finish and are failed honestly.
+        app.state.store.fail_unfinished_checks(clock())
         app.state.hub = EventHub()
         app.state.limiter = RateLimiter(settings.rate_limit_per_minute)
         app.state.track_records = TrackRecords(app.state.web, clock)

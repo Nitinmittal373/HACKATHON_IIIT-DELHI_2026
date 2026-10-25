@@ -52,6 +52,17 @@ class Store:
             row.status = status
             row.completed_at = completed_at
 
+    def fail_unfinished_checks(self, now: datetime) -> int:
+        """Mark checks left queued or running by a stopped process as failed; returns how many."""
+        with self._sessions.begin() as session:
+            rows = session.scalars(
+                select(CheckRow).where(CheckRow.status.in_(("queued", "running")))
+            ).all()
+            for row in rows:
+                row.status = "failed"
+                row.completed_at = now
+            return len(rows)
+
     def get_check(self, check_id: str) -> Check | None:
         with self._sessions() as session:
             row = session.get(CheckRow, check_id)

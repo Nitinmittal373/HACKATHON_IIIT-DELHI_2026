@@ -208,3 +208,18 @@ def test_recent_checks_leave_out_unfinished_and_failed_ones(client: TestClient) 
     store.save_project(Project(rera_id="UPRERAPRJ1", details_url="https://www.up-rera.in/x?id=1"))
     store.create_check("d" * 32, "UPRERAPRJ1", datetime(2026, 10, 25, tzinfo=UTC))
     assert client.get("/api/checks/recent").json() == []
+
+
+def test_checks_cut_off_by_a_restart_are_failed_on_startup(tmp_path: Path) -> None:
+    settings = make_settings(tmp_path)
+    with TestClient(create_app(settings, web=make_web(), clock=lambda: FIXED_NOW)) as client:
+        store = client.app.state.store  # type: ignore[attr-defined]
+        url = "https://www.up-rera.in/x?id=1"
+        store.save_project(Project(rera_id="UPRERAPRJ1", details_url=url))
+        store.create_check("a" * 32, "UPRERAPRJ1", FIXED_NOW)
+
+    with TestClient(create_app(settings, web=make_web(), clock=lambda: FIXED_NOW)) as client:
+        check = client.get(f"/api/checks/{'a' * 32}").json()
+        events = read_events(client, "a" * 32)
+    assert check["status"] == "failed"
+    assert events[-1]["data"]["status"] == "failed"

@@ -25,3 +25,21 @@
 .problem {
   color: var(--critical);
 }
+
+.note b {
+  color: var(--ink2);
+  font-weight: 600;
+}
+
+/* A week-old report: a soft orange panel with the re-check button up front. */
+.stale {
+  padding: 10px 12px;
+  border: 1px solid var(--oS);
+  border-radius: var(--r-sm);
+  background: var(--soft);
+}
+
+.stale :global(.btn) {
+  padding: 8px 14px;
+  font-size: 14px;
+}
