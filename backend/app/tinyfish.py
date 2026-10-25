@@ -92,7 +92,12 @@ AgentEvent = AgentLiveUrl | AgentProgress | AgentDone
 
 class WebClient(Protocol):
     async def search(
-        self, query: str, *, purpose: str, domain_type: str | None = None
+        self,
+        query: str,
+        *,
+        purpose: str,
+        domain_type: str | None = None,
+        include_domains: str | None = None,
     ) -> list[SearchHit]: ...
 
     async def fetch_html(self, url: str, *, selectors: list[str], purpose: str) -> FetchedPage: ...
@@ -127,11 +132,16 @@ class LiveWebClient:
         return "LiveWebClient()"
 
     async def search(
-        self, query: str, *, purpose: str, domain_type: str | None = None
+        self,
+        query: str,
+        *,
+        purpose: str,
+        domain_type: str | None = None,
+        include_domains: str | None = None,
     ) -> list[SearchHit]:
         try:
             response = await self._sdk.search.query(
-                query, purpose=purpose, domain_type=domain_type
+                query, purpose=purpose, domain_type=domain_type, include_domains=include_domains
             )
         except APIError as error:
             raise web_error("Search failed", error) from None

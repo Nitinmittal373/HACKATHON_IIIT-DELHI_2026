@@ -45,8 +45,9 @@ UPRERA_HOSTS = {"up-rera.in", "www.up-rera.in"}
 
 
 def normalize_rera_id(text: str) -> str | None:
-    """'  upreraprj 8334 ' -> 'UPRERAPRJ8334'; anything that is not a RERA number -> None."""
-    candidate = re.sub(r"\s+", "", text).upper()
+    """' uprera prj-8334 ' -> 'UPRERAPRJ8334'; anything that is not a RERA number -> None."""
+    # People copy numbers from PDFs and brochures with spaces, hyphens or dots in them.
+    candidate = re.sub(r"[\s.\-_]+", "", text).upper()
     return candidate if RERA_ID_PATTERN.match(candidate) else None
 
 
@@ -77,7 +78,8 @@ class CheckCreate(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     rera_id: str = Field(max_length=40, examples=["UPRERAPRJ8334"])
-    # Needed only for new-format numbers, whose pages have no stable address.
+    # The page search returned. Required for new-format numbers, whose pages have no stable
+    # address; send it for every number, since many later numbers have no stable page either.
     details_url: str | None = Field(default=None, max_length=500)
     # Skip the 24-hour reuse of a recent check ("Re-check now"). The daily cap still applies.
     fresh: bool = False

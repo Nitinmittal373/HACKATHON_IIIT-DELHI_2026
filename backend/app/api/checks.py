@@ -71,8 +71,8 @@ async def create_check(
             },
             headers={"Retry-After": str(wait)},
         )
-    # Old-format numbers always use their canonical page, whatever link was sent.
-    details_url = details_url_for(body.rera_id) or body.details_url
+    # The page search confirmed for this number; a number sent alone gets its stable page.
+    details_url = body.details_url or details_url_for(body.rera_id)
     assert details_url is not None  # CheckCreate requires a link for new-format numbers
     check = orchestrator.start(Project(rera_id=body.rera_id, details_url=details_url))
     response.headers["Location"] = f"/api/checks/{check.id}"

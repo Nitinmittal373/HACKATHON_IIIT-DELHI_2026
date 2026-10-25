@@ -140,3 +140,16 @@ def test_rate_limit_returns_429_after_the_limit(tmp_path: Path) -> None:
 
     assert blocked.status_code == 429
     assert int(blocked.headers["Retry-After"]) >= 1
+
+
+def test_a_check_reads_the_page_search_confirmed(client: TestClient) -> None:
+    # Six-digit numbers have no stable details page, so the link search confirmed is kept.
+    url = "https://up-rera.in/Projectsummary?UI0aPA1ISD=nffnnE2PJOk="
+    response = client.post("/api/checks", json={"rera_id": "UPRERAPRJ396176", "details_url": url})
+    assert response.status_code == 202
+    assert response.json()["details_url"] == url
+
+
+def test_a_number_sent_alone_gets_its_stable_page(client: TestClient) -> None:
+    response = client.post("/api/checks", json={"rera_id": "UPRERAPRJ6742"})
+    assert response.json()["details_url"].endswith("Frm_View_Project_Details.aspx?id=6742")

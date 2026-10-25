@@ -46,7 +46,8 @@ def create_watch(
                 "message": f"One email can watch up to {MAX_WATCHES_PER_EMAIL} projects",
             },
         )
-    details_url = details_url_for(body.rera_id) or body.details_url
+    # The page search confirmed for this number; a number sent alone gets its stable page.
+    details_url = body.details_url or details_url_for(body.rera_id)
     assert details_url is not None  # WatchCreate requires a link for new-format numbers
     if store.get_project(body.rera_id) is None:
         store.save_project(Project(rera_id=body.rera_id, details_url=details_url))

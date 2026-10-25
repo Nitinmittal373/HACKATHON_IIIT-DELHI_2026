@@ -38,11 +38,24 @@ flowchart TB
 
 | Step | Endpoint | What happens |
 | --- | --- | --- |
-| 1. Search (from the browser) | `GET /api/projects/search?q=` | A RERA number opens its UP-RERA page; a name or promoter goes through TinyFish Search (up-rera.in results only) |
+| 1. Search (from the browser) | `GET /api/projects/search?q=` | A RERA number is confirmed on its own UP-RERA page; a name or promoter goes through TinyFish Search limited to up-rera.in (see [Finding a project](#finding-a-project)) |
 | 2. Confirm | `POST /api/checks` | Creates a check for one registration number and starts it; returns the check and its `id` (202) |
 | 3. Watch | `GET /api/checks/{id}/events` | Server-Sent Events: `source.started`, `source.live_url`, `source.progress`, `finding.added`, `source.blocked`, `source.completed`, `check.completed` |
 | 4. Report | `GET /api/checks/{id}/report` | Score, drivers, evidence and timeline (action plan in Phase 4) |
 | 5. Watch list | `POST /api/sentinel` | Adds the project to weekly re-checks; alerts are read with `GET /api/sentinel/alerts?email=` |
+
+## Finding a project
+
+`app/resolve.py` turns what the buyer typed into at most 8 candidates, each with its name, promoter, district and registration date, and the page a check will read.
+
+| Typed | How it is found |
+| --- | --- |
+| A number from 2017-18, `UPRERAPRJ8334` | Its stable details page is read directly; no Search |
+| A later number, `UPRERAPRJ188811/08/2024` or six digits such as `UPRERAPRJ396176` | These have no stable page, so Search for the exact number on up-rera.in finds its Projectsummary page |
+| A project or promoter name | TinyFish Search limited to up-rera.in. If no result carries a number, a second Search without the limit is read for UPRERAPRJ numbers |
+| `uprera prj 8334`, `UPRERA-PRJ-8334` | Spaces, hyphens, dots and case are normalised first |
+
+A number counts only when its own up-rera.in page shows it with a name and a promoter. Numbers from the second, unlimited Search must also share a word with the query, because pages about one project often print the numbers of others. Search results are completed from their own pages, four at a time within 35 seconds; a page that cannot be read in time keeps what Search said, since that came from up-rera.in itself. A query with no UP-RERA project (a project outside Uttar Pradesh, for example) returns an empty list, which the app shows as "No UP-RERA project found" with tips.
 
 ## Sources
 
@@ -98,7 +111,7 @@ Interactive docs are served at `/docs`.
 | `GET /api/sentinel/alerts?email=` | `200` alerts, newest first | `422` bad email |
 | `POST /api/sentinel/run` with header `X-Webhook-Secret` | `202` `{started}`; starts a re-check run for an external cron | `401` missing or wrong secret (always, when `WEBHOOK_SECRET` is not set) |
 
-`rera_id` accepts `UPRERAPRJ8334` and new-format numbers such as `UPRERAPRJ188811/08/2024` (case and spaces are ignored). New-format numbers also need the `details_url` that search returned; it must be an `https` link on up-rera.in.
+`rera_id` accepts `UPRERAPRJ8334` and new-format numbers such as `UPRERAPRJ188811/08/2024` (case, spaces, hyphens and dots are ignored). Send the `details_url` that search returned; it must be an `https` link on up-rera.in. It is required for new-format numbers, and a number sent without one gets its stable details page, which only numbers registered in 2017-18 have.
 
 ### Events
 

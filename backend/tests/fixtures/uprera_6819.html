@@ -1,0 +1,713 @@
+<label id="ctl00_ContentPlaceHolder1_lblProjectNameHeading" style="color: red !important; font-size: 18px;">Project Name: Hillston By URBTech- Phase 1-Tower E&amp;F</label><label id="ctl00_ContentPlaceHolder1_lblProjectNameWithID" style="color: red !important; font-size: 16px;">Project Id: (UPRERAPRJ6819)</label><label id="ctl00_ContentPlaceHolder1_lblregisdate" style="color: red !important; font-size: 16px;">Registration Date: 09-08-2017</label><label id="ctl00_ContentPlaceHolder1_lblPromoterNameHeading" style="color: red !important; font-size: 18px;">Promoter Name: GOLFGREEN BUILDCON PRIVATE LIMITED</label><label id="ctl00_ContentPlaceHolder1_lblPromoterNameWithID" style="color: red !important; font-size: 16px;">Promoter Id: (UPRERAPRM11935)</label><div id="ctl00_ContentPlaceHolder1_PanelBasicDetails">
+<div class="panel panel-danger">
+<div class="panel-body">
+<fieldset>
+<legend>
+<h4 style="background-color: #518b93; color: white; height: 40px; clear: both; color: #ddd; background-color: #518b93; padding: 10px 20px; font-family: 'Oswald',sans-serif; transition: all 0.5s;"><strong>Basic Details</strong></h4>
+</legend>
+<table style="width: 100%">
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label>
+                                                                                                    Project Type
+                                                                                                </label>
+</td>
+<td class="auto-style6 control-label" style="">:
+                                                       <span id="ctl00_ContentPlaceHolder1_lblProjectType">Ongoing</span>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">  </td>
+<td class="auto-style6 control-label" style="">  </td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="project_Catagory" id="ctl00_ContentPlaceHolder1_lblproject_Catagory">Project Category </label>
+<input class="btn-link" id="lnkEditProjectCategory" onclick="ShowProjectCategory()" style="display: none;" type="button" value="Edit"/>
+<input class="btn-link" id="lnkEditProjectCategory_Close" onclick="CloseProjectCategory()" style="display: none;" type="button" value="Close"/>
+</td>
+<td class="auto-style6 control-label" style="">:
+                                                       <span id="ctl00_ContentPlaceHolder1_lblProjectCategory">Residential</span>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="Total_area">Total area in round figure (Sq.mt.)</label>
+<input class="btn-link" id="lnkTotalAreaInRound" onclick="ShowTblTotalArea()" style="display: none;" type="button" value="Edit"/>
+<input class="btn-link" id="btnCloseTblTotalArea" onclick="CloseTblTotalArea()" style="display: none;" type="button" value="Close"/>
+</td>
+<td class="auto-style6 control-label" style="">
+<input class="form-control" disabled="disabled" id="ctl00_ContentPlaceHolder1_lblTotalArea" name="ctl00$ContentPlaceHolder1$lblTotalArea" onkeypress="return isNumber(event)" type="text" value="5382"/>
+</td>
+</tr>
+<tr>
+<td colspan="4">
+<table id="tblEditTotalArea" style="border-style: solid; background-color: lemonchiffon; display: none; padding-bottom: 15px;">
+<tr>
+<td colspan="4"> </td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="Total_area">Order Number</label>
+</td>
+<td class="auto-style6 control-label">
+<input class="form-control" id="ctl00_ContentPlaceHolder1_txtTotalArea_OrderNo" name="ctl00$ContentPlaceHolder1$txtTotalArea_OrderNo" onkeypress="return isNumbernotpoint(event)" type="text"/>
+</td>
+<td class="auto-style7" style="padding-left: 32px;"> 
+                                                                                                        </td>
+<td class="auto-style6 control-label"> 
+                                                                                                        </td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="new_project_Catagory">Order Date </label>
+</td>
+<td class="auto-style6 control-label">
+<input class="form-control" id="ctl00_ContentPlaceHolder1_txtTotalArea_OrderDate" name="ctl00$ContentPlaceHolder1$txtTotalArea_OrderDate" readonly="true" type="text"/>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="Total_area">Upload Order</label>
+</td>
+<td class="auto-style6 control-label" style="">
+<input id="ctl00_ContentPlaceHolder1_FileUpload_TotalArea" name="ctl00$ContentPlaceHolder1$FileUpload_TotalArea" type="file"/>
+</td>
+</tr>
+<tr>
+<td colspan="4" style="text-align: center;">
+<a class="btn btn-danger" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$Button2','')" id="ctl00_ContentPlaceHolder1_Button2">Update</a>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td colspan="4">
+<table id="trnewprojectcategory" style="border-style: solid; background-color: lemonchiffon; padding-bottom: 15px; display: none;">
+<tr>
+<td colspan="4"> 
+                                                                                                        </td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="new_project_Catagory">New Project Category </label>
+</td>
+<td class="auto-style6 control-label">
+<select class="form-control" id="ctl00_ContentPlaceHolder1_ddlnewProjectCatg" name="ctl00$ContentPlaceHolder1$ddlnewProjectCatg">
+</select>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="Total_area">Order Number</label>
+</td>
+<td class="auto-style6 control-label">
+<input class="form-control" id="ctl00_ContentPlaceHolder1_txtOrderNo" name="ctl00$ContentPlaceHolder1$txtOrderNo" onkeypress="return isNumbernotpoint(event)" type="text"/>
+</td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="new_project_Catagory">Order Date </label>
+</td>
+<td class="auto-style6 control-label">
+<input class="form-control" id="ctl00_ContentPlaceHolder1_txtOrderDate" name="ctl00$ContentPlaceHolder1$txtOrderDate" readonly="true" type="text"/>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="Total_area">Upload Order</label>
+</td>
+<td class="auto-style6 control-label" style="">
+<input id="ctl00_ContentPlaceHolder1_FileUploadOrder" name="ctl00$ContentPlaceHolder1$FileUploadOrder" type="file"/>
+</td>
+</tr>
+<tr>
+<td colspan="4" style="text-align: center;">
+<input class="btn btn-danger" id="ctl00_ContentPlaceHolder1_btnUpdateProjectCategory" name="ctl00$ContentPlaceHolder1$btnUpdateProjectCategory" type="submit" value="Update"/>
+</td>
+</tr>
+<tr>
+<td colspan="4"> 
+                                                                                                        </td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="project_name">Project Name</label>
+<input class="btn-link" id="lnkProjectName" onclick="ShowProjectName()" style="display: none;" type="button" value="Edit"/>
+<input class="btn-link" id="lnkProjectName_Close" onclick="CloseProjectName()" style="display: none;" type="button" value="Close"/>
+</td>
+<td class="auto-style6 control-label" style="">
+<textarea class="form-control" cols="40" disabled="disabled" id="ctl00_ContentPlaceHolder1_lblProjectName" name="ctl00$ContentPlaceHolder1$lblProjectName" rows="2">
+Hillston By URBTech- Phase 1-Tower E&amp;F</textarea>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="Registration">Registration Fee (in Rs.)  </label>
+</td>
+<td class="auto-style6 control-label" style="">:
+                                                       <span id="ctl00_ContentPlaceHolder1_lblRegistrationFee">32000</span>
+</td>
+</tr>
+<tr>
+<td colspan="4">
+<table id="tblnewprojectName" style="border-style: solid; background-color: lemonchiffon; padding-bottom: 15px; display: none;">
+<tr>
+<td colspan="4"> 
+                                                                                                        </td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="Total_area">Order Number</label>
+</td>
+<td class="auto-style6 control-label">
+<input class="form-control" id="ctl00_ContentPlaceHolder1_txtOrderNumberForProjectName" name="ctl00$ContentPlaceHolder1$txtOrderNumberForProjectName" onkeypress="return isNumbernotpoint(event)" type="text"/>
+</td>
+<td class="auto-style7" style="padding-left: 32px;"> 
+                                                                                                        </td>
+<td class="auto-style6 control-label"> 
+
+                                                                                                        </td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="new_project_Catagory">Order Date </label>
+</td>
+<td class="auto-style6 control-label">
+<input class="form-control" id="ctl00_ContentPlaceHolder1_txtOrderDateForProjectName" name="ctl00$ContentPlaceHolder1$txtOrderDateForProjectName" readonly="true" type="text"/>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="Total_area">Upload Order</label>
+</td>
+<td class="auto-style6 control-label" style="">
+<input id="ctl00_ContentPlaceHolder1_FileOrderForProjectName" name="ctl00$ContentPlaceHolder1$FileOrderForProjectName" type="file"/>
+</td>
+</tr>
+<tr>
+<td colspan="4" style="text-align: center;">
+<input class="btn btn-danger" id="ctl00_ContentPlaceHolder1_btnUpdateProjectName" name="ctl00$ContentPlaceHolder1$btnUpdateProjectName" type="submit" value="Update"/>
+</td>
+</tr>
+<tr>
+<td colspan="4"> 
+                                                                                                        </td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="project_address">
+                                                                                            Address</label>
+</td>
+<td class="auto-style6 control-label" style="">:
+                                                      <span id="ctl00_ContentPlaceHolder1_projetaddress"></span>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for=" Village_locality">
+                                                                                            Village/Locality/Sector etc.</label>
+</td>
+<td class="auto-style6 control-label" style="">: 
+                                                      <span id="ctl00_ContentPlaceHolder1_lblvill_locality"></span>
+</td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="project_state_id">State</label>
+</td>
+<td class="auto-style6 control-label" style="">:
+                                                       <span id="ctl00_ContentPlaceHolder1_lblState">Uttar Pradesh</span>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="proposed_period_month">Project Duration (In month)</label>
+</td>
+<td class="auto-style6 control-label" style="">: 
+                                                       <span id="ctl00_ContentPlaceHolder1_lblProjectDuration">78</span>
+</td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="project_district_code">District </label>
+</td>
+<td class="auto-style6 control-label" style="">
+<select class="form-control" disabled="disabled" id="ctl00_ContentPlaceHolder1_ddlDistrict" name="ctl00$ContentPlaceHolder1$ddlDistrict">
+<option value="1">Agra</option>
+<option value="2">Aligarh</option>
+<option value="3">Prayagraj</option>
+<option value="4">Ambedkar Nagar</option>
+<option value="5">Amethi</option>
+<option value="6">Amroha</option>
+<option value="7">Auraiya</option>
+<option value="8">Azamgarh</option>
+<option value="9">Bagpat</option>
+<option value="10">Bahraich</option>
+<option value="11">Balrampur</option>
+<option value="12">Ballia</option>
+<option value="13">Banda</option>
+<option value="14">Barabanki</option>
+<option value="15">Bareilly</option>
+<option value="16">Basti</option>
+<option value="17">Bijnor</option>
+<option value="18">Budaun</option>
+<option value="19">Bulandshahr</option>
+<option value="20">Chandauli</option>
+<option value="21">Chitrakoot</option>
+<option value="22">Deoria</option>
+<option value="23">Etah</option>
+<option value="24">Etawah</option>
+<option value="25">Ayodhya</option>
+<option value="26">Farrukhabad</option>
+<option value="27">Fatehpur</option>
+<option value="28">Firozabad</option>
+<option selected="selected" value="29">Gautam Buddha Nagar</option>
+<option value="30">Ghaziabad</option>
+<option value="31">Ghazipur</option>
+<option value="32">Gonda</option>
+<option value="33">Gorakhpur</option>
+<option value="34">Hamirpur</option>
+<option value="35">Hapur</option>
+<option value="36">Hardoi</option>
+<option value="37">Hathras</option>
+<option value="38">Jalaun</option>
+<option value="39">Jaunpur</option>
+<option value="40">Jhansi</option>
+<option value="41">Kannauj</option>
+<option value="42">Kanpur Dehat</option>
+<option value="43">Kanpur Nagar</option>
+<option value="44">Kasganj</option>
+<option value="45">Kaushambi</option>
+<option value="46">Kushinagar</option>
+<option value="47">Lakhimpur Kheri</option>
+<option value="48">Lalitpur</option>
+<option value="49">Lucknow</option>
+<option value="50">Maharajganj</option>
+<option value="51">Mahoba</option>
+<option value="52">Mainpuri</option>
+<option value="53">Mathura</option>
+<option value="54">Mau</option>
+<option value="55">Meerut</option>
+<option value="56">Mirzapur</option>
+<option value="57">Moradabad</option>
+<option value="58">Muzaffarnagar</option>
+<option value="59">Pilibhit</option>
+<option value="60">Pratapgarh</option>
+<option value="61">Raebareli</option>
+<option value="62">Rampur</option>
+<option value="63">Saharanpur</option>
+<option value="64">Sambhal</option>
+<option value="65">Sant Kabir Nagar</option>
+<option value="66">Sant Ravidas Nagar</option>
+<option value="67">Shahjahanpur</option>
+<option value="68">Shamli</option>
+<option value="69">Shravasti</option>
+<option value="70">Siddharthnagar</option>
+<option value="71">Sitapur</option>
+<option value="72">Sonbhadra</option>
+<option value="73">Sultanpur</option>
+<option value="74">Unnao</option>
+<option value="75">Varanasi</option>
+<option value="76">Other</option>
+<option value="0">--Select--</option>
+</select>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="original_start_date" id="ctl00_ContentPlaceHolder1_divoriginalstartdate">Original Start Date </label>
+</td>
+<td class="auto-style6 control-label" style="">
+<input class="form-control" disabled="disabled" id="ctl00_ContentPlaceHolder1_lblOriginalStartDate" name="ctl00$ContentPlaceHolder1$lblOriginalStartDate" readonly="readonly" type="text" value="04-09-2013"/>
+</td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="project_tehsil_id">
+                                                                                                    Tehsil 
+                                                <span>
+<a href='javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions("ctl00$ContentPlaceHolder1$LinkEditTehsil", "", true, "", "", false, true))' id="ctl00_ContentPlaceHolder1_LinkEditTehsil" style="display: none;">Edit</a>
+</span>
+</label>
+</td>
+<td class="auto-style6 control-label" style="">
+<select class="form-control" disabled="disabled" id="ctl00_ContentPlaceHolder1_ddlTehsil" name="ctl00$ContentPlaceHolder1$ddlTehsil">
+<option selected="selected" value="302">Gautam Buddha Nagar</option>
+<option value="311">Dadri</option>
+<option value="312">Jewar</option>
+<option value="0">Select</option>
+</select>
+<label id="ctl00_ContentPlaceHolder1_ddlTehsil_old" style="display: none;">Gautam Buddha Nagar</label>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="proposed_start_date" id="ctl00_ContentPlaceHolder1_lblProposedStartDate">Proposed Start Date </label>
+</td>
+<td class="auto-style6 control-label" style="">
+<input class="form-control" id="ctl00_ContentPlaceHolder1_lblStartDate" name="ctl00$ContentPlaceHolder1$lblStartDate" readonly="true" type="text" value="01-08-2017"/>
+</td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label>Sanctioning Competent Authority<span style="color: red;">*</span></label>
+<a href='javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions("ctl00$ContentPlaceHolder1$lnkEditCompetentAuthority", "", true, "", "", false, true))' id="ctl00_ContentPlaceHolder1_lnkEditCompetentAuthority" style="display: none;">Edit</a>
+</td>
+<td class="auto-style6 control-label">
+<select class="form-control" disabled="disabled" enableclientscript="true" id="ctl00_ContentPlaceHolder1_ddlAuthority" name="ctl00$ContentPlaceHolder1$ddlAuthority" setfocusonerror="true">
+<option value="5">Agra Development Authority</option>
+<option value="13">Aligarh Development Authority</option>
+<option value="34">Any Other Competent Authority</option>
+<option value="17">Ayodhya(Faizabad)  Development Authority</option>
+<option value="27">Azamgarh Development Authority</option>
+<option value="26">Baghpat-baraut-khekra development Authority</option>
+<option value="14">Banda Development Authority</option>
+<option value="11">Bareily Development Authority</option>
+<option value="28">Basti Development Authority</option>
+<option value="24">Bulandsahar Development Authority</option>
+<option value="31">Chitrakoot Development Authority (SPL. Area)</option>
+<option value="18">Firozabad-Shikohabad Development Authority</option>
+<option value="9">Ghaziabad Development Authority</option>
+<option value="7">Gorakhpur Development Authority</option>
+<option value="36">Greater Noida Authority</option>
+<option value="20">Hapur Pilkhuwa Development Authority</option>
+<option value="16">Jhansi Development Authority</option>
+<option value="3">Kanpur Development Authority</option>
+<option value="30">Kapilvastu Development Authority (SPL. Area)</option>
+<option value="25">Khurja Development Authority</option>
+<option value="33">Kushinagar Development Authority (SPL. Area)</option>
+<option value="4">Lucknow  Development Authority</option>
+<option value="39">Lucknow Industrial Development Authority</option>
+<option value="10">Mathura-Vrindavan Development Authority</option>
+<option value="6">Meerut Development Authority</option>
+<option value="29">Mirzapur-Vindhyanchal Development Authority (SPL. Area)</option>
+<option value="12">Moradabad Development Authority</option>
+<option value="21">Muzaffarnagar Development Authority</option>
+<option value="35">Noida Authority</option>
+<option value="23">Orai Development Authority</option>
+<option value="2">Prayagraj(Allahabad) Development Authority</option>
+<option value="8">Raebareily Development Authority</option>
+<option value="22">Rampur Development Authority</option>
+<option value="19">Saharanpur Development Authority</option>
+<option value="32">Shaktinagar Development Authority (SPL. Area)</option>
+<option value="38">U.P. Awas Evam Vikas Parishad</option>
+<option value="15">Unnao Shuklaganj Development Authority</option>
+<option value="1">Varanasi Development Authority</option>
+<option value="37">Yamuna Expressway Authority</option>
+<option selected="selected" value="0">Noida Authority</option>
+</select>
+<span id="ctl00_ContentPlaceHolder1_RequiredFieldValidator7" style="color:Red;color:red;visibility:hidden;">Select Competant Authority</span>
+</td>
+<td class="auto-style7" colspan="2" style="padding-left: 32px;">
+<span style="font-size: 15px !important;"></span>
+</td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="registration_fee">Project Cost (in Lacs) </label>
+<input class="btn-link" id="lnkEditProjCost" onclick="ShowProjectCost()" style="display: none;" type="button" value="Edit"/>
+<input class="btn-link" id="lnkEditProjCost_Close" onclick="CloseProjectCost()" style="display: none;" type="button" value="Close"/>
+</td>
+<td class="auto-style6 control-label" style="">
+<input class="form-control" disabled="disabled" id="ctl00_ContentPlaceHolder1_lblProjectCost" name="ctl00$ContentPlaceHolder1$lblProjectCost" onkeypress="return isNumbernotpoint(event)" type="text" value="8880"/>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="proposed_end_date">Proposed Completion Date</label>
+</td>
+<td class="auto-style6 control-label" style="">
+<input class="form-control" id="ctl00_ContentPlaceHolder1_lblEndDate" name="ctl00$ContentPlaceHolder1$lblEndDate" onchange="javascript:setTimeout('__doPostBack(\'ctl00$ContentPlaceHolder1$lblEndDate\',\'\')', 0)" onkeypress="if (WebForm_TextBoxKeyHandler(event) == false) return false;" readonly="readonly" type="text" value="30-01-2024"/>
+</td>
+</tr>
+<tr>
+<td colspan="4">
+<table id="tblEditProjectCost" style="border-style: solid; background-color: lemonchiffon; padding-bottom: 15px; display: none;">
+<tr>
+<td colspan="4"> 
+                                                                                                        </td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="Total_area">Order Number</label>
+</td>
+<td class="auto-style6 control-label">
+<input class="form-control" id="ctl00_ContentPlaceHolder1_txtProjectCost_OrderNo" name="ctl00$ContentPlaceHolder1$txtProjectCost_OrderNo" onkeypress="return isNumbernotpoint(event)" type="text"/>
+</td>
+<td class="auto-style7" style="padding-left: 32px;"> 
+                                                                                                        </td>
+<td class="auto-style6 control-label"> 
+                                                                                                        </td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="new_project_Catagory">Order Date </label>
+</td>
+<td class="auto-style6 control-label">
+<input class="form-control" id="ctl00_ContentPlaceHolder1_txtProjectCost_OrderDate" name="ctl00$ContentPlaceHolder1$txtProjectCost_OrderDate" readonly="true" type="text"/>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="Total_area">Upload Order</label>
+</td>
+<td class="auto-style6 control-label" style="">
+<input id="ctl00_ContentPlaceHolder1_FileUpload_ProjectCost" name="ctl00$ContentPlaceHolder1$FileUpload_ProjectCost" type="file"/>
+</td>
+</tr>
+<tr>
+<td colspan="4" style="text-align: center;">
+<input class="btn btn-danger" id="ctl00_ContentPlaceHolder1_btnProjectCost_Update" name="ctl00$ContentPlaceHolder1$btnProjectCost_Update" type="submit" value="Update"/>
+</td>
+</tr>
+<tr>
+<td colspan="4"> 
+                                                                                                        </td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td colspan="4">
+<table style="width: 100%;">
+<tr>
+<td class="auto-style7" colspan="4" style="padding-left: 0px;">
+<h4 style="background-color: #518b93; color: white; height: 40px; clear: both; color: #ddd; background-color: #518b93; padding: 10px 20px; font-family: 'Oswald',sans-serif; transition: all 0.5s;">Geographic Location 
+                                               <span style="font-size: 15px !important;">
+</span>
+</h4>
+<br/>
+<label>(end points of scheme/ project)</label>
+</td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="Latitude1">
+                                                                                                                Latitude
+                                                                                                            </label>
+</td>
+<td class="auto-style6 control-label" style="">
+<input class="form-control" disabled="disabled" id="ctl00_ContentPlaceHolder1_lblLat1" name="ctl00$ContentPlaceHolder1$lblLat1" onkeypress="return isNumber(event)" type="text" value="28.5557265"/>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="Latitude2">
+                                                                                                                Latitude
+                                                                                                            </label>
+</td>
+<td class="auto-style6 control-label" style="">
+<input class="form-control" disabled="disabled" id="ctl00_ContentPlaceHolder1_lblLat2" name="ctl00$ContentPlaceHolder1$lblLat2" onkeypress="return isNumber(event)" type="text" value="28.5557600"/>
+</td>
+</tr>
+<tr>
+<td class="auto-style7" style="padding-left: 0px;">
+<label for="Long1">
+                                                                                                                Longtitude
+                                                                                                            </label>
+</td>
+<td class="auto-style6 control-label" style="">
+<input class="form-control" disabled="disabled" id="ctl00_ContentPlaceHolder1_lblLong1" name="ctl00$ContentPlaceHolder1$lblLong1" onkeypress="return isNumber(event)" type="text" value="77.3896671"/>
+</td>
+<td class="auto-style7" style="padding-left: 32px;">
+<label for="Long1">
+                                                                                                                Longtitude
+                                                                                                            </label>
+</td>
+<td class="auto-style6 control-label" style="">
+<input class="form-control" disabled="disabled" id="ctl00_ContentPlaceHolder1_lblLong2" name="ctl00$ContentPlaceHolder1$lblLong2" onkeypress="return isNumber(event)" type="text" value="77.3896821"/>
+</td>
+</tr>
+<tr>
+<td colspan="4">
+<table style="width:100%;">
+<tr>
+<td class="auto-style6 control-label" colspan="4" style="padding-left: 32px;">
+<label for="Agent_Selection">
+                                                                                                                Agents 
+                                                                                                            </label>
+</td>
+</tr>
+<tr>
+<td class="auto-style6 control-label" colspan="4" style="">
+<br/>
+<div>
+<table border="0" cellpadding="4" cellspacing="0" class="table table-bordered table-striped" id="ctl00_ContentPlaceHolder1_grvagents" style="color:#333333;border-collapse:collapse;">
+<tr style="color:White;background-color:Orange;font-weight:bold;">
+<th scope="col">
+                                                                                                                            SNo.
+                                                                                                                        </th><th scope="col">Agent Name</th>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvagents_ctl02_lblSRNO">1</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvagents_ctl02_Label1"><p>WEALTH CLINIC PRIVATE LIMITED - UPRERAAGT10521</p></span>
+</td>
+</tr>
+</table>
+</div>
+<span style="font-size: 15px !important;">
+</span>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</fieldset>
+</div>
+</div>
+</div><input class="form-control" id="ctl00_ContentPlaceHolder1_txtrevised_end_date" name="ctl00$ContentPlaceHolder1$txtrevised_end_date" onchange="checkprojectenddate()" readonly="readonly" type="text"/><table border="0" cellpadding="4" cellspacing="0" class="table table-bordered table-striped" id="ctl00_ContentPlaceHolder1_grdPermitDetails" style="color:#333333;width:170%;border-collapse:collapse;">
+<tr style="color:White;background-color:Orange;font-weight:bold;">
+<th scope="col">
+                                                                                                                SNo.
+                                                                                                            </th><th scope="col">Orignal Permit No</th><th scope="col">Orignal Permit Date</th><th scope="col">Valid Upto</th><th scope="col">Revalidated Permit No</th><th scope="col">Revalidated Permit Date</th><th scope="col" style="width:200px;">Revalidated Permit Valid Upto</th><th scope="col" style="width:200px;">Permit Extendable Upto</th><th scope="col">End Date</th><th scope="col">Uploaded Approve Layout</th><th scope="col">Uploaded Sanctioned Letter</th><th scope="col">Uploaded Approved Map</th><th scope="col">Uploaded Floor Plan Of All Types</th><th scope="col">Uploaded  Project Specifications</th><th scope="col">Uploaded Sajra Detail</th>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lblSRNO">1</span>
+</td><td style="width:150px;">
+<span id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lblPermitNumber">IV-1409/692</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lblPermitDate">04-09-2013</span>
+</td><td style="width:100px;">
+<span id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lblValidUpto">03-09-2023</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lblrPermitNumber"></span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lblrPermitDate"></span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lblrValidUpto"></span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lblrextUpto"></span>
+</td><td style="width:100px;">
+<span id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lblRevisedEndDateShow">31-07-2023</span>
+</td><td>
+<a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grdPermitDetails$ctl02$lnkUploadedApprovedLayout','')" id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lnkUploadedApprovedLayout" style="color: black"><i aria-hidden="true" class="fa fa-eye" style="font-size:20px;color:crimson"></i>Download</a> 
+                                                                                                            </td><td>
+<a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grdPermitDetails$ctl02$lnkUploadedSanctionedLetter','')" id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lnkUploadedSanctionedLetter" style="color: black"><i aria-hidden="true" class="fa fa-eye" style="font-size:20px;color:crimson"></i>Download</a> 
+                                                                                                            </td><td>
+<a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grdPermitDetails$ctl02$lnkUploadedApprovedMap','')" id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lnkUploadedApprovedMap" style="color: black"><i aria-hidden="true" class="fa fa-eye" style="font-size:20px;color:crimson"></i>Download</a> 
+                                                                                                            </td><td>
+<a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grdPermitDetails$ctl02$lnkUploadedFloorPlanOfAllTypes','')" id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lnkUploadedFloorPlanOfAllTypes" style="color: black"><i aria-hidden="true" class="fa fa-eye" style="font-size:20px;color:crimson"></i>Download</a> 
+                                                                                                            </td><td>
+<a href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grdPermitDetails$ctl02$lnkUploadedProjectSpecifications','')" id="ctl00_ContentPlaceHolder1_grdPermitDetails_ctl02_lnkUploadedProjectSpecifications" style="color: black"><i aria-hidden="true" class="fa fa-eye" style="font-size:20px;color:crimson"></i>Download</a> 
+                                                                                                            </td><td>
+                                                                                                                
+                                                                                                                         
+                                                                                                                   
+                                                                                                                </td>
+</tr>
+</table><table border="0" cellpadding="4" cellspacing="0" class="table table-bordered table-striped" id="ctl00_ContentPlaceHolder1_grvdocumentdetails" style="color:#333333;border-collapse:collapse;">
+<tr style="color:White;background-color:Orange;font-weight:bold;">
+<th scope="col">
+                                                                                                                            SNo.
+                                                                                                                        </th><th scope="col">Document Name</th><th scope="col">Uploaded File Name</th><th scope="col">Uploaded Date</th><th scope="col">Upload Doc Type</th><th scope="col">Download</th>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl02_lblSRNO">1</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl02_Label2">Proforma of Conveyance Deed</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl02_Label7">Promoter select NA for this document</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl02_Labeldate"></span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl02_Labdoc"></span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl02_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl02$mainid" type="hidden"/>
+                                                                                                                             
+                                                                                                 <span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl02_lblna">NA</span>
+</td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl03_lblSRNO">2</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl03_Label2">Details of Encumbrances</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl03_Label7">PRJ35-6819bank Sanction letter.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl03_Labeldate">25-06-2018</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl03_Labdoc">New</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl03_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl03$mainid" type="hidden" value="44360"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl03$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl03_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl04_lblSRNO">3</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl04_Label2">Commencement Certificate</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl04_Label7">PRJ24-68196 AUTHENTICATED COPY OF APPROVALS &amp; COMMENCEMENT CERTIFICATE.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl04_Labeldate">20-06-2018</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl04_Labdoc">New</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl04_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl04$mainid" type="hidden" value="44227"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl04$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl04_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl05_lblSRNO">4</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl05_Label2">Proforma of Application Form</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl05_Label7">PRJ73-6819application form performa.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl05_Labeldate">20-06-2018</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl05_Labdoc">New</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl05_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl05$mainid" type="hidden" value="44228"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl05$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl05_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl06_lblSRNO">5</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl06_Label2">Proforma of Allotment Letter</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl06_Label7">PRJ19-6819allotment letter performa.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl06_Labeldate">20-06-2018</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl06_Labdoc">New</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl06_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl06$mainid" type="hidden" value="44229"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl06$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl06_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#284775;background-color:White;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl07_lblSRNO">6</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl07_Label2">Electricity Supply Plan</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl07_Label7">PRJ33-6819Tower -A to E  Electrical Plans All FloorFRGG.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl07_Labeldate">25-06-2018</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl07_Labdoc">New</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl07_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl07$mainid" type="hidden" value="44361"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl07$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl07_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr><tr style="color:#333333;background-color:#F7F6F3;">
+<td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl08_lblSRNO">7</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl08_Label2">Affidavit (Form-B)</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl08_Label7">PRJ92-6819Revised declaration form.pdf</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl08_Labeldate">20-06-2018</span>
+</td><td>
+<span id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl08_Labdoc">New</span>
+</td><td>
+<input id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl08_mainid" name="ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl08$mainid" type="hidden" value="44226"/>
+<a class="btn btn-lightBlue" href="javascript:__doPostBack('ctl00$ContentPlaceHolder1$grvdocumentdetails$ctl08$Lnkdownload','')" id="ctl00_ContentPlaceHolder1_grvdocumentdetails_ctl08_Lnkdownload" style="color: black">Download</a> 
+                                                                                                 
+                                                                                                                            
+                                                                                                                            
+                                                                                                                        </td>
+</tr>
+</table>

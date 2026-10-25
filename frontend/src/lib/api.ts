@@ -135,10 +135,10 @@ export function createCheck(
   project: Pick<Project, "rera_id" | "details_url">,
   options: { fresh?: boolean } = {},
 ): Promise<Check> {
-  // Old-format numbers have a fixed page; only new-format ones need the link from search.
+  // The page search confirmed: many numbers registered after 2018 have no stable address.
   const body = {
     rera_id: project.rera_id,
-    ...(project.rera_id.includes("/") ? { details_url: project.details_url } : {}),
+    details_url: project.details_url,
     ...(options.fresh ? { fresh: true } : {}),
   };
   return request("/api/checks", { method: "POST", body });
@@ -151,7 +151,7 @@ export function createWatch(
 ): Promise<Watch> {
   const body = {
     rera_id: project.rera_id,
-    ...(project.rera_id.includes("/") ? { details_url: project.details_url } : {}),
+    details_url: project.details_url,
     email,
     language,
   };
