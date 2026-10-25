@@ -6,6 +6,7 @@ import { Hero } from "@/components/Hero";
 import { ScoreScale } from "@/components/ScoreScale";
 import { SentinelPhone } from "@/components/SentinelPhone";
 import { SourcesMarquee } from "@/components/SourcesMarquee";
+import { WakeServer } from "@/components/WakeServer";
 import { EXAMPLE_REPORT } from "@/lib/example8334";
 import { getStrings } from "@/lib/i18n/server";
 
@@ -14,6 +15,7 @@ export default async function HomePage() {
   const { t } = await getStrings();
   return (
     <main>
+      <WakeServer />
       <Hero report={EXAMPLE_REPORT} />
       <SourcesMarquee label={t.home.marqueeLabel} />
       <BrochureVsRecords report={EXAMPLE_REPORT} t={t} />

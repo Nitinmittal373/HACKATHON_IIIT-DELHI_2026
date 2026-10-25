@@ -1,8 +1,8 @@
 /**
  * A stand-in for the NeevCheck backend that replays recorded answers (e2e/fixtures/, written by
- * backend/scripts/export_e2e_fixtures.py). Pages that run on the server (search, report) fetch
- * the API from the Next server, where a browser tool cannot intercept requests, so the browser
- * tests start this small server instead of the real backend. Nothing here reaches the network.
+ * backend/scripts/export_e2e_fixtures.py). Some pages (report, live check) fetch the API from
+ * the Next server, where a browser tool cannot intercept requests, so the browser tests start
+ * this small server instead of the real backend. Nothing here reaches the network.
  *
  *   node e2e/mock-api.ts          (port MOCK_API_PORT, default 8010)
  */

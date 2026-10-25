@@ -50,8 +50,11 @@ class FakeWebClient:
         pages: dict[str, str] | None = None,
         agent_runs: dict[str, list[AgentEvent]] | None = None,
         texts: dict[str, str] | None = None,
+        search_error: WebError | None = None,
     ) -> None:
         self.searches = searches or {}
+        # Raised by every search, to replay a TinyFish failure.
+        self.search_error = search_error
         self.pages = pages or {}
         self.texts = texts or {}
         self.agent_runs = agent_runs or {}
@@ -62,6 +65,8 @@ class FakeWebClient:
         self, query: str, *, purpose: str, domain_type: str | None = None
     ) -> list[SearchHit]:
         self.calls.append(("search", query))
+        if self.search_error:
+            raise self.search_error
         return self.searches.get(query, [])
 
     async def fetch_html(self, url: str, *, selectors: list[str], purpose: str) -> FetchedPage:

@@ -6,7 +6,7 @@ responses through a fake client and never touch the network.
 
 from collections.abc import AsyncIterator
 from dataclasses import dataclass
-from typing import Any, Protocol
+from typing import Any, Literal, Protocol
 
 import httpx
 from pydantic import BaseModel, SecretStr
@@ -29,8 +29,22 @@ from tinyfish import (
 FETCH_URL = "https://api.fetch.tinyfish.ai/"
 
 
+# Why a call failed, so the API can tell a visitor what happened instead of "it failed".
+WebErrorCode = Literal[
+    "timeout", "tinyfish_key", "wallet_empty", "rate_limited", "unreachable", "upstream"
+]
+
+
 class WebError(RuntimeError):
     """A TinyFish call failed. The message is safe to show and never holds the key."""
+
+    def __init__(
+        self, message: str, code: WebErrorCode = "upstream", retry_after: int | None = None
+    ) -> None:
+        super().__init__(message)
+        self.code: WebErrorCode = code
+        # Seconds TinyFish asked us to wait, when it sent a rate-limit answer.
+        self.retry_after = retry_after
 
 
 class SearchHit(BaseModel):
@@ -120,7 +134,7 @@ class LiveWebClient:
                 query, purpose=purpose, domain_type=domain_type
             )
         except APIError as error:
-            raise WebError(f"Search failed: {describe(error)}") from None
+            raise web_error("Search failed", error) from None
         return [SearchHit.model_validate(hit.model_dump()) for hit in response.results]
 
     async def fetch_html(self, url: str, *, selectors: list[str], purpose: str) -> FetchedPage:
@@ -149,11 +163,11 @@ class LiveWebClient:
         try:
             response = await self._http.post(FETCH_URL, json=body, headers=headers)
         except httpx.TimeoutException:
-            raise WebError("Fetch failed: TinyFish did not answer in time") from None
+            raise WebError("Fetch failed: TinyFish did not answer in time", "timeout") from None
         except httpx.HTTPError:
-            raise WebError("Fetch failed: could not reach TinyFish") from None
+            raise WebError("Fetch failed: could not reach TinyFish", "unreachable") from None
         if response.status_code != 200:
-            raise WebError(f"Fetch failed: TinyFish answered HTTP {response.status_code}")
+            raise fetch_status_error(response)
         payload = response.json()
         results = payload.get("results") or []
         if payload.get("errors") or not results or not results[0].get("text"):
@@ -180,11 +194,55 @@ class LiveWebClient:
                         error = event.error.message if event.error else None
                         yield AgentDone(str(event.status), event.result_json, error)
         except APIError as error:
-            raise WebError(f"Agent run failed: {describe(error)}") from None
+            raise web_error("Agent run failed", error) from None
 
     async def aclose(self) -> None:
         await self._http.aclose()
         await self._sdk.close()
+
+
+def web_error(action: str, error: APIError) -> WebError:
+    return WebError(f"{action}: {describe(error)}", code_of(error), retry_after_of(error))
+
+
+def fetch_status_error(response: httpx.Response) -> WebError:
+    status = response.status_code
+    if status in (401, 403):
+        return WebError("Fetch failed: TinyFish rejected the API key", "tinyfish_key")
+    if status == 402:
+        return WebError("Fetch failed: the TinyFish account has no credit left", "wallet_empty")
+    if status == 429:
+        wait = _seconds(response.headers.get("Retry-After"))
+        return WebError("Fetch failed: TinyFish rate limit reached", "rate_limited", wait)
+    return WebError(f"Fetch failed: TinyFish answered HTTP {status}")
+
+
+def code_of(error: APIError) -> WebErrorCode:
+    if isinstance(error, AuthenticationError):
+        return "tinyfish_key"
+    if isinstance(error, PaymentRequiredError):
+        return "wallet_empty"
+    if isinstance(error, RateLimitError):
+        return "rate_limited"
+    if isinstance(error, APITimeoutError):
+        return "timeout"
+    if isinstance(error, APIConnectionError):
+        return "unreachable"
+    return "upstream"
+
+
+def retry_after_of(error: APIError) -> int | None:
+    response = getattr(error, "response", None)
+    if not isinstance(error, RateLimitError) or response is None:
+        return None
+    return _seconds(response.headers.get("Retry-After"))
+
+
+def _seconds(value: str | None) -> int | None:
+    try:
+        return max(1, int(float(value))) if value else None
+    except ValueError:
+        return None
 
 
 def describe(error: APIError) -> str:
