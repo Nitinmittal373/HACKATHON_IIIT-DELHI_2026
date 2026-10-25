@@ -12,7 +12,6 @@ so the same case is never counted twice.
 """
 
 import re
-from datetime import date, datetime
 from typing import Any
 from urllib.parse import urlsplit
 
@@ -20,13 +19,12 @@ from app.matching import blob, legal_name_in, mentions_project, project_pattern
 from app.models import CheckKey, Finding, InsolvencyScope, Project, Reliability, Verdict
 from app.sources.agent import AgentSource, AgentTask
 from app.sources.base import SourceContext
-from app.sources.findings import build_finding
+from app.sources.findings import build_finding, parse_day
 from app.tinyfish import SearchHit
 
 SEARCH_PURPOSE = "Find an order or report on a builder's insolvency case"
 OFFICIAL_HOSTS = ("nclt.gov.in", "nclat.nic.in", "ibbi.gov.in", "sci.gov.in")
 TOPIC = re.compile(r"insolvency|cirp|nclt|nclat", re.IGNORECASE)
-DAY_FORMATS = ("%Y-%m-%d", "%d-%m-%Y", "%d/%m/%Y", "%d %B %Y", "%d %b %Y", "%B %d, %Y", "%b %d, %Y")
 
 GOAL = (
     "This page reports on the insolvency case of {promoter} before the NCLT or NCLAT. Read it "
@@ -162,12 +160,3 @@ def to_findings(
         title = "Insolvency covers the whole company"
         findings.append(make("insolvency_scope", title, "red_flag", scope=scope))
     return findings
-
-
-def parse_day(text: str | None) -> date | None:
-    for fmt in DAY_FORMATS:
-        try:
-            return datetime.strptime((text or "").strip(), fmt).date()
-        except ValueError:
-            continue
-    return None

@@ -1,6 +1,8 @@
 from app.sources.base import Source
+from app.sources.consumer import ConsumerSource
 from app.sources.insolvency import InsolvencySource
-from app.sources.pending import NotConnected
+from app.sources.land import LandSource
+from app.sources.news import NewsSource
 from app.sources.registry import RegistrySource
 from app.sources.uprera import UpreraSource
 
@@ -11,7 +13,7 @@ def build_sources() -> list[Source]:
         UpreraSource(),
         RegistrySource(),
         InsolvencySource(),
-        NotConnected("land", ("land_dues",)),
-        NotConnected("consumer", ("consumer_cases",)),
-        NotConnected("news", ()),
+        LandSource(),
+        ConsumerSource(),
+        NewsSource(),
     ]

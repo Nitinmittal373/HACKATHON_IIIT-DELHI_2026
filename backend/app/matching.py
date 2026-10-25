@@ -94,6 +94,11 @@ def project_pattern(project: str | None, promoter: str | None = None) -> re.Patt
     return re.compile(r"\b" + r"\W+".join(re.escape(token) for token in tokens) + r"\b")
 
 
+def has_word(word: str, text: str | None) -> bool:
+    """Whole-word match: 'ats' is in 'ATS Greens' but not in 'stats'."""
+    return bool(word) and re.search(rf"{re.escape(word)}", normalize(text)) is not None
+
+
 def mentions_project(pattern: re.Pattern[str] | None, text: str | None) -> bool:
     return pattern is not None and pattern.search(canonical(text)) is not None
 

@@ -95,9 +95,9 @@ def test_check_shows_every_source_and_why_it_was_not_read(client: TestClient) ->
         "uprera": "completed",
         "registry": "completed",
         "insolvency": "completed",
-        "land": "unavailable",
-        "consumer": "unavailable",
-        "news": "unavailable",
+        "land": "completed",
+        "consumer": "failed",  # the fake web client gives the agent nothing to answer with
+        "news": "completed",
     }
 
 

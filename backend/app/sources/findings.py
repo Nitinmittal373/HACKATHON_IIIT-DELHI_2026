@@ -35,3 +35,25 @@ def build_finding(
             **facts,
         }
     )
+
+
+DAY_FORMATS = (
+    "%Y-%m-%d",
+    "%d-%m-%Y",
+    "%d/%m/%Y",
+    "%d %B %Y",
+    "%d %b %Y",
+    "%d-%b-%Y",
+    "%B %d, %Y",
+    "%b %d, %Y",
+)
+
+
+def parse_day(text: str | None) -> date | None:
+    """A date as agents and search engines write it; None when it is not a clear date."""
+    for fmt in DAY_FORMATS:
+        try:
+            return datetime.strptime((text or "").strip(), fmt).date()
+        except ValueError:
+            continue
+    return None
