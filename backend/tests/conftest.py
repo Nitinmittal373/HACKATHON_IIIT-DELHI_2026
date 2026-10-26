@@ -83,3 +83,11 @@ def web() -> FakeWebClient:
 def client(settings: Settings, web: FakeWebClient) -> Iterator[TestClient]:
     with TestClient(create_app(settings, web=web, clock=lambda: FIXED_NOW)) as test_client:
         yield test_client
+
+
+@pytest.fixture(autouse=True)
+def forget_open_web_searches() -> None:
+    """The open-web search remembers answers for a day; no test may see another's."""
+    from app.states.openweb import CACHE
+
+    CACHE.clear()

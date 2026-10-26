@@ -95,15 +95,19 @@ async def search_open_web(query: str, web: WebClient, cache: SearchCache = CACHE
 
 async def open_web_hits(query: str, web: WebClient, cache: SearchCache = CACHE) -> list[SearchHit]:
     texts = [template.format(q=query) for template in SEARCH_TEMPLATES]
-    groups = await asyncio.gather(*(_cached_search(text, web, cache) for text in texts))
+    groups = await asyncio.gather(*(cached_search(text, web, cache) for text in texts))
     return [hit for group in groups for hit in group]
 
 
-async def _cached_search(text: str, web: WebClient, cache: SearchCache) -> list[SearchHit]:
-    if (kept := cache.get(text)) is not None:
+async def cached_search(
+    text: str, web: WebClient, cache: SearchCache = CACHE, domains: str | None = None
+) -> list[SearchHit]:
+    """One Search, remembered for a day under its text and the domains it was limited to."""
+    key = f"{text} @{domains}" if domains else text
+    if (kept := cache.get(key)) is not None:
         return kept
-    hits = await web.search(text, purpose=SEARCH_PURPOSE)
-    cache.put(text, hits)
+    hits = await web.search(text, purpose=SEARCH_PURPOSE, include_domains=domains)
+    cache.put(key, hits)
     return hits
 
 

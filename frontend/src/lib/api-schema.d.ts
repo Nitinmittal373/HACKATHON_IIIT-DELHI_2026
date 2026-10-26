@@ -208,6 +208,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/promoters/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Search Promoters
+         * @description The registered projects and company pages Search finds for a builder's name.
+         */
+        get: operations["search_promoters_api_promoters_search_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/sentinel": {
         parameters: {
             query?: never;
@@ -568,6 +588,18 @@ export interface components {
              * @enum {string}
              */
             status: "queued" | "running" | "completed" | "failed";
+        };
+        /**
+         * CompanyHit
+         * @description A company-registry page that names a company like the builder's.
+         */
+        CompanyHit: {
+            /** Cin */
+            cin: string | null;
+            /** Name */
+            name: string;
+            /** Source Url */
+            source_url: string;
         };
         /** ComparedProject */
         ComparedProject: {
@@ -988,6 +1020,19 @@ export interface components {
             state_name: string;
             /** Status */
             status: ("confirmed" | "listings_only" | "from_document" | "from_order") | null;
+        };
+        /** PromoterSearchResponse */
+        PromoterSearchResponse: {
+            /** Companies */
+            companies: components["schemas"]["CompanyHit"][];
+            /** Projects */
+            projects: components["schemas"]["Project"][];
+            /** Query */
+            query: string;
+            /** Searched States */
+            searched_states: string[];
+            /** State */
+            state: string | null;
         };
         /** ReasonCode */
         ReasonCode: {
@@ -1870,6 +1915,8 @@ export interface operations {
                 q: string;
                 /** @description State code such as MH; omit to search every state */
                 state?: string | null;
+                /** @description City or locality such as 'Sector 43 Noida' */
+                locality?: string | null;
             };
             header?: never;
             path?: never;
@@ -1941,6 +1988,49 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TrackRecord"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description TinyFish failed; `detail.code` says why */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    search_promoters_api_promoters_search_get: {
+        parameters: {
+            query: {
+                /** @description Builder or company name */
+                q: string;
+                /** @description State code to limit to */
+                state?: string | null;
+                /** @description City or locality */
+                city?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PromoterSearchResponse"];
                 };
             };
             /** @description Validation Error */

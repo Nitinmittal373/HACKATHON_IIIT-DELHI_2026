@@ -1,12 +1,14 @@
+import asyncio
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
-from app.api.deps import get_store
-from app.api.projects import search_error
+from app.api.deps import get_store, get_web
+from app.api.projects import SEARCH_BUDGET_SECONDS, search_error
+from app.states.promoter_search import PromoterSearchResponse, search_promoter
 from app.states.registry import adapter_for, known_state
 from app.store import Store
-from app.tinyfish import WebError
+from app.tinyfish import WebClient, WebError
 from app.track_record import TrackedProject, TrackRecord, TrackRecords
 
 router = APIRouter(tags=["projects"])
@@ -45,3 +47,27 @@ def with_score(project: TrackedProject, store: Store) -> TrackedProject:
     if check is None:
         return project
     return project.model_copy(update={"check_id": check.id, "display_score": check.display_score})
+
+
+@router.get(
+    "/api/promoters/search",
+    responses={502: {"description": "TinyFish failed; `detail.code` says why"}},
+)
+async def search_promoters(
+    q: Annotated[str, Query(min_length=3, max_length=120, description="Builder or company name")],
+    web: Annotated[WebClient, Depends(get_web)],
+    state: Annotated[str | None, Query(max_length=2, description="State code to limit to")] = None,
+    city: Annotated[str | None, Query(max_length=80, description="City or locality")] = None,
+) -> PromoterSearchResponse:
+    """The registered projects and company pages Search finds for a builder's name."""
+    if state is not None and not known_state(state.upper()):
+        raise HTTPException(status_code=422, detail=f"{state} is not a supported state code")
+    try:
+        return await asyncio.wait_for(
+            search_promoter(q.strip(), web, state.upper() if state else None, city),
+            SEARCH_BUDGET_SECONDS,
+        )
+    except TimeoutError:
+        raise search_error(WebError("The RERA portals did not answer in time", "timeout")) from None
+    except WebError as error:
+        raise search_error(error) from None
