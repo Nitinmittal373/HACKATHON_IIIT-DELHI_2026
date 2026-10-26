@@ -58,3 +58,14 @@ Investigated with free Search and Fetch on 26 Oct 2026 for SUPERTECH LIMITED.
 | Group projects on UP-RERA | Search on up-rera.in by exact legal name, then each project page (at most 20 per check) | Search + Fetch + parser | Read; delayed means more than 12 months past the latest date on the details page, so extensions only on the summary page can make it an undercount |
 
 The group source never runs a browser agent. A profile that does not name exactly the promoter's legal company is not used, so "Supertech Limited" never collects "Supertech Realtors Private Limited".
+
+## Insolvency, land authorities and lender notices (v2)
+
+| Signal | Access reality | Method | Status |
+| --- | --- | --- | --- |
+| Promoter in CIRP (NCLT / IBBI) | Public orders and announcements on nclt.gov.in, ibbi.gov.in, nclat.nic.in; strict legal-name and scope matching already in `insolvency.py` | Search + agent only if a page cannot be read | Read (unchanged). Only an official page is a hard stop |
+| Sister company in CIRP or liquidation | Registry status of each related company (see the group source) | Search + Fetch | Read when a page is found |
+| Noida / GNIDA / YEIDA defaulter lists | Published as PDFs; exact legal name matched with an amount on the same line (already in `land.py`) | Search + Fetch text | Read (unchanged) |
+| OC / CC past due, failed 25% package deposit | No readable list found | none | **Not read** |
+| SARFAESI auction notices | Lender and IBAPI notice pages are indexed by Search; none named SUPERTECH LIMITED on 26 Oct 2026 | Search only (`V2_SOURCES=true`) | Read. A lender or government page is scored; any other page is shown for review with no points |
+| Pending consumer or civil cases | e-Jagriti shows a CAPTCHA; we never bypass one | none | Unread: the report links to the official site and lists it under R12 |

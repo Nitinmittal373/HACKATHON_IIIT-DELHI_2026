@@ -126,7 +126,7 @@ Credit ratings weigh business, financial, project and management risk separately
 | P3 Legal and insolvency | 25% | Promoter in CIRP 100 (**hard stop**, official NCLT/IBBI/MCA page only); sister company or other project in insolvency 50; RERA complaints about the project 10 each (max 100); pending cases 5 each (max 40) |
 | P4 Financial and corporate health | 15% | Company or director struck off or disqualified 40; recent charge 20; late MCA filings 20; SARFAESI auction notice 60 |
 | P5 Land authority and approvals | 5% | On a land authority defaulter list 70; failed package deposit 50; no OC/CC past due 30 |
-| P6 Sentiment and news | 5% | Credible delay or protest article in the last 12 months: 10 each (max 60). Secondary, shown for review |
+| P6 Sentiment and news | 5% | Delay or protest article known to be from the last 12 months: 10 each (max 60). An undated article is shown but not scored. Secondary, shown for review |
 
 ## Bands
 

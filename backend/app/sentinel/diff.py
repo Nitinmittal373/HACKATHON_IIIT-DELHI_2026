@@ -19,11 +19,14 @@ Key = tuple[str, str, str]
 Facts = tuple[int | None, str | None, date | None, str]
 
 # The news source has no key checks, so a completed run is a read even with none listed.
-NO_KEY_CHECKS: set[SourceName] = {"news"}
+NO_KEY_CHECKS: set[SourceName] = {"news", "sarfaesi"}
+
+# Each page is its own finding, so a new notice or story shows up as a change.
+PER_PAGE_KINDS = {"news_story", "sarfaesi_notice", "sarfaesi_report"}
 
 
 def key_of(finding: Finding) -> Key:
-    link = finding.source_url if finding.kind == "news_story" else ""
+    link = finding.source_url if finding.kind in PER_PAGE_KINDS else ""
     return (finding.source, finding.kind, link)
 
 
