@@ -129,3 +129,17 @@ def test_the_states_endpoint_carries_those_links(tmp_path: Path) -> None:
     with TestClient(create_app(make_settings(tmp_path), web=FakeWebClient())) as client:
         states = client.get("/api/states").json()
     assert all(state["unregistered_url"].startswith("https://") for state in states)
+
+
+def test_a_company_name_repeated_by_its_title_is_listed_once() -> None:
+    from app.states.promoter_search import companies_in
+    from app.tinyfish import SearchHit
+
+    hit = SearchHit(
+        title="LODHA DEVELOPERS LIMITED",
+        url="https://www.zaubacorp.com/x",
+        snippet="LODHA DEVELOPERS LIMITED's CIN is L45200MH1995PLC093041",
+    )
+    [company] = companies_in([hit], {"lodha"})
+    assert company.name == "LODHA DEVELOPERS LIMITED"
+    assert company.cin == "L45200MH1995PLC093041"
