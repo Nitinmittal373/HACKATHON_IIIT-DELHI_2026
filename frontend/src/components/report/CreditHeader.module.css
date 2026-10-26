@@ -116,3 +116,10 @@
     padding: 20px;
   }
 }
+
+.narrative {
+  margin: 14px 0 0;
+  color: var(--ink2);
+  font-size: 14px;
+  line-height: 1.55;
+}

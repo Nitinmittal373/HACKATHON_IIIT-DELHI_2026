@@ -55,6 +55,10 @@ export const credit: typeof English = {
   r12Note: "पढ़ा नहीं जा सका, इसलिए अंक नहीं कटे। इससे सिर्फ़ भरोसा घटता है।",
   classicTitle: "क्लासिक स्कोर (0–100)",
   classicNote: "मूल नींवस्कोर, ताकि कुछ खोए नहीं।",
+  narrative: (value, band, reasons, unreadCount) =>
+    `स्कोर 900 में से ${value} (${band})।` +
+    (reasons.length > 0 ? ` सबसे बड़े कारण: ${reasons.join("; ")}।` : " हमारे पढ़े किसी रिकॉर्ड से अंक नहीं कटे।") +
+    (unreadCount > 0 ? ` 6 में से ${unreadCount} तरह के रिकॉर्ड नहीं पढ़े जा सके; इससे भरोसा घटता है, स्कोर नहीं।` : ""),
   ratingNotice: "सार्वजनिक रिकॉर्ड पर आधारित जोखिम संकेतक — क्रेडिट रेटिंग नहीं।",
   ledger: {
     open: "प्रमाण बही खोलें",

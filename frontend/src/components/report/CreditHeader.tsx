@@ -20,6 +20,14 @@ export function CreditHeader({ report, ids, t }: Props) {
   if (!score) return null;
   const band = t.credit.bands[score.band];
   const read = PILLAR_COUNT - score.pillars_unread.length;
+  // Built from the reason codes by a template; no model writes it and none can change the score.
+  const costing = topReasons(score).filter((reason) => reason.code !== "R12" && reason.points < 0);
+  const narrative = t.credit.narrative(
+    score.value,
+    band,
+    costing.map((reason) => t.credit.codes[reason.code] ?? reason.label),
+    score.pillars_unread.length,
+  );
 
   return (
     <section className={`card ${styles.card}`} aria-label={t.credit.title}>
@@ -57,6 +65,7 @@ export function CreditHeader({ report, ids, t }: Props) {
           <ReasonChips reasons={topReasons(score)} rows={ledgerRows(report, ids)} />
         </div>
       </div>
+      <p className={styles.narrative}>{narrative}</p>
       <PillarBars score={score} t={t} />
       <p className={styles.notice}>{t.credit.ratingNotice}</p>
     </section>

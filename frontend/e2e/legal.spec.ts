@@ -52,3 +52,8 @@ test("the correction form has no accessibility violations, in Hindi too", async 
   const result = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
   expect(result.violations.map((v) => v.id)).toEqual([]);
 });
+
+test("a plain-language summary is built from the reason codes", async ({ page }) => {
+  await page.goto(REPORT);
+  await expect(page.getByText(/^Scored \d+ out of 900 \(.+\)\. The biggest reasons: /)).toBeVisible();
+});
