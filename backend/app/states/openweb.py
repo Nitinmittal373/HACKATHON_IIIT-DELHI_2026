@@ -90,8 +90,7 @@ class Votes:
 
 
 async def search_open_web(query: str, web: WebClient, cache: SearchCache = CACHE) -> list[Project]:
-    hits = await open_web_hits(query, web, cache)
-    return candidates_from(hits, query)
+    return candidates_from(await open_web_hits(query, web, cache), query)
 
 
 async def open_web_hits(query: str, web: WebClient, cache: SearchCache = CACHE) -> list[SearchHit]:

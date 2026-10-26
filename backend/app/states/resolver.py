@@ -9,12 +9,22 @@
 """
 
 import asyncio
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from urllib.parse import urlsplit
 
-from app.models import Project
+from app.models import PreReraNote, Project
+from app.states.builder import identify_builder
+from app.states.confirm import confirm_on_portals
 from app.states.names import DEFAULT_STATE
-from app.states.openweb import domain_of, search_open_web
+from app.states.openweb import (
+    NAME_SHARE,
+    candidates_from,
+    domain_of,
+    name_words,
+    open_web_hits,
+    share_of,
+)
+from app.states.prerera import pre_rera_notes
 from app.states.registry import ADAPTERS, BY_CODE, detect_state
 from app.states.search_adapter import SearchStateAdapter
 from app.states.text import rank, squash
@@ -32,31 +42,76 @@ class Resolved:
     # The state the number's format pointed at, when the text was a registration number.
     detected_state: str | None
     searched_states: list[str]
+    pre_rera: list[PreReraNote] = field(default_factory=list)
 
 
 async def resolve_any(query: str, web: WebClient, state: str | None = None) -> Resolved:
     """Portal candidates and open-web candidates together, each number once."""
-    portals, found = await asyncio.gather(
-        resolve_on_portals(query, web, state), search_open_web(query, web), return_exceptions=True
+    portals, hits = await asyncio.gather(
+        resolve_on_portals(query, web, state), open_web_hits(query, web), return_exceptions=True
     )
     if isinstance(portals, BaseException):
         raise portals
-    if isinstance(found, WebError) and not portals.candidates:
-        raise found
-    if isinstance(found, BaseException):
-        if not isinstance(found, WebError):
-            raise found
-        found = []  # The portals answered; a failed open-web search only means fewer candidates.
-    typed = detect_state(query)
-    typed_number = squash(typed[0].canonical_id(query) or "") if typed else ""
-    wanted = [
-        p
-        for p in found
-        if (state not in BY_CODE or p.state == state)
-        and (not typed_number or squash(p.rera_id) == typed_number)
-    ]
+    if isinstance(hits, WebError) and not portals.candidates:
+        raise hits
+    if isinstance(hits, BaseException):
+        if not isinstance(hits, WebError):
+            raise hits
+        hits = []  # The portals answered; a failed open-web search only means fewer candidates.
+    found = candidates_from(hits, query) + portal_pages_in(hits, query)
+    wanted = [p for p in found if wanted_state(p, state) and wanted_number(p, query)]
     merged = merge(portals.candidates, wanted, query)
-    return Resolved(merged, portals.detected_state, portals.searched_states)
+    merged = await confirm_on_portals(merged, web)
+    merged = await name_the_builder_of_a_typed_number(merged, query, web)
+    return Resolved(
+        merged, portals.detected_state, portals.searched_states, pre_rera_notes(hits, query)
+    )
+
+
+def wanted_state(project: Project, state: str | None) -> bool:
+    return state not in BY_CODE or project.state == state
+
+
+def wanted_number(project: Project, query: str) -> bool:
+    """A typed number keeps only itself; a name keeps every number found."""
+    typed = detect_state(query)
+    number = typed[0].canonical_id(query) if typed else None
+    return number is None or squash(project.rera_id) == squash(number)
+
+
+def portal_pages_in(hits: list[SearchHit], query: str) -> list[Project]:
+    """Numbers on a portal's own pages that Search surfaced, read from their snippets."""
+    words = name_words(query)
+    found = []
+    for code, state_hits in hits_by_state(hits).items():
+        adapter = BY_CODE[code]
+        if not isinstance(adapter, SearchStateAdapter):
+            continue
+        for project in adapter.candidates_from_hits(state_hits):
+            held = f"{project.name or ''} {project.promoter or ''}".lower()
+            if words and share_of(words, held) >= NAME_SHARE:
+                found.append(
+                    project.model_copy(
+                        update={"status": "confirmed", "sources": [domain_of(project.details_url)]}
+                    )
+                )
+    return found
+
+
+async def name_the_builder_of_a_typed_number(
+    candidates: list[Project], query: str, web: WebClient
+) -> list[Project]:
+    """A number typed alone gets its builder from public listings when no portal page named one."""
+    typed = detect_state(query)
+    if typed is None or len(candidates) != 1 or candidates[0].promoter:
+        return candidates
+    try:
+        identity = await identify_builder(candidates[0].rera_id, web)
+    except WebError:
+        return candidates
+    if identity is None:
+        return candidates
+    return [candidates[0].model_copy(update={"promoter": identity.name})]
 
 
 def merge(portal: list[Project], open_web: list[Project], query: str) -> list[Project]:
