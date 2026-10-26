@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pytest
 
-from app.models import Finding, Project
-from app.sources.base import FoundFinding, SourceContext, SourceError
+from app.models import FamilyTree, Finding, Project
+from app.sources.base import FoundFinding, GroupTree, SourceContext, SourceError
 from app.sources.group import GroupSource, is_delayed, status_findings
 from app.sources.mca import is_this_company, parse_profile
 from app.sources.registry import parse_company_table
@@ -140,3 +140,65 @@ def test_with_v2_sources_the_group_pillar_is_scored(tmp_path: Path) -> None:
     assert "P2" not in v2["pillars_unread"]
     assert "R13" in [c["code"] for c in v2["reason_codes"]]
     assert report["score"]["value"] == 68  # the classic score does not read group findings
+
+
+def collect_tree() -> FamilyTree:
+    web = FakeWebClient().replay(RECORDING)
+    ctx = SourceContext(project=PROJECT, web=web, today=CAPTURED.date(), now=CAPTURED)
+
+    async def find() -> FamilyTree:
+        trees = [e.tree async for e in GroupSource().run(ctx) if isinstance(e, GroupTree)]
+        (tree,) = trees
+        return tree
+
+    return asyncio.run(find())
+
+
+def test_the_family_tree_has_directors_companies_and_projects() -> None:
+    tree = collect_tree()
+
+    assert tree.promoter == "SUPERTECH LIMITED"
+    assert tree.source_url.startswith("https://www.tofler.in/")
+    assert len(tree.directors) == 6
+    assert all(set(d.model_dump()) == {"name", "din"} for d in tree.directors)
+    assert len(tree.companies) == 8
+    listed = [p for c in tree.companies for p in c.projects] + tree.promoter_projects
+    assert 1 <= len(listed) <= 20
+    assert len({p.rera_id for p in listed}) == len(listed)  # a project is under one company only
+    assert all(p.details_url.startswith("https://") for p in listed)
+
+
+def test_the_tree_marks_projects_by_what_was_read() -> None:
+    tree = collect_tree()
+
+    states = {p.state for p in tree.promoter_projects}
+    assert states <= {"ok", "delayed", "lapsed", "unread"}
+    assert "delayed" in states
+
+
+def test_the_report_carries_the_family_tree(tmp_path: Path) -> None:
+    from fastapi.testclient import TestClient
+
+    from app.main import create_app
+    from tests.conftest import make_settings, make_web, read_events
+    from tests.test_recorded_check import CAPTURED_AT
+    from tests.test_recorded_check import RECORDING as CHECK
+
+    web = make_web().replay(CHECK).replay(RECORDING)
+    app = create_app(
+        make_settings(tmp_path, v2_sources=True), web=web, clock=lambda: CAPTURED_AT, cache_dir=None
+    )
+    with TestClient(app) as client:
+        check_id = client.post("/api/checks", json={"rera_id": "UPRERAPRJ8334"}).json()["id"]
+        read_events(client, check_id)
+        report = client.get(f"/api/checks/{check_id}/report").json()
+
+    assert report["family"]["promoter"] == "SUPERTECH LIMITED"
+    assert len(report["family"]["directors"]) == 6
+    assert report["score"]["value"] == 68
+
+
+def test_a_report_without_the_group_source_has_no_family_tree(tmp_path: Path) -> None:
+    from tests.test_recorded_check import check
+
+    assert check(tmp_path)["report"]["family"] is None

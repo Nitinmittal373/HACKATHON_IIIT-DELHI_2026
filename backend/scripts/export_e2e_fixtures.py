@@ -102,11 +102,32 @@ def export_v2_report() -> None:
             with client.stream("GET", f"/api/checks/{check_id}/events") as response:
                 response.read()
             report = client.get(f"/api/checks/{check_id}/report").json()
-    save("report.json", json.dumps(report, indent=2, ensure_ascii=False).replace(check_id, e2e_id) + "\n")
+    text = json.dumps(report, indent=2, ensure_ascii=False).replace(check_id, e2e_id)
+    save("report.json", text + "\n")
+
+
+FLAGGED_ID = "f" * 32
+
+
+def export_flagged_report() -> None:
+    """report-flagged.json: the real report with two tree nodes marked, for a rendering test.
+
+    The real recording has no insolvent or struck-off company, so the red outline and its text
+    label could not be tested. This copy is only ever served by the browser-test mock, under its
+    own id; no visitor can reach it.
+    """
+    report = json.loads((OUT / "report.json").read_text(encoding="utf-8"))
+    report["check"]["id"] = FLAGGED_ID
+    family = report["family"]
+    family["companies"][0] |= {"status": "Under CIRP", "flag": "cirp"}
+    family["promoter_projects"][0]["state"] = "lapsed"
+    save_json("report-flagged.json", report)
 
 
 if __name__ == "__main__":
-    if sys.argv[1:] == ["v2"]:
+    if sys.argv[1:] == ["flagged"]:
+        export_flagged_report()
+    elif sys.argv[1:] == ["v2"]:
         export_v2_report()
     elif sys.argv[1:] == ["extras"]:
         export_compare()

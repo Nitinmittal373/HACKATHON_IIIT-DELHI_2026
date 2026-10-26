@@ -14,6 +14,7 @@ from app.models import (
     CheckStatus,
     CheckSummary,
     Driver,
+    FamilyTree,
     Finding,
     Project,
     RecentCheck,
@@ -21,6 +22,9 @@ from app.models import (
     ScoreV2,
     SourceRun,
 )
+
+# Keys the v1 score detail also holds for the v2 score and the family tree.
+EXTRA_DETAIL = ("v2", "family")
 
 # Finding fields stored in finding_extras instead of the findings table.
 EXTRA_FIELDS = ("snippet", "total")
@@ -209,6 +213,17 @@ class Store:
             row = session.get_one(ScoreRow, check_id)
             row.detail = {**row.detail, "v2": score.model_dump(mode="json")}
 
+    def save_family(self, check_id: str, tree: FamilyTree) -> None:
+        with self._sessions.begin() as session:
+            row = session.get_one(ScoreRow, check_id)
+            row.detail = {**row.detail, "family": tree.model_dump(mode="json")}
+
+    def get_family(self, check_id: str) -> FamilyTree | None:
+        with self._sessions() as session:
+            row = session.get(ScoreRow, check_id)
+            stored = row.detail.get("family") if row else None
+            return FamilyTree.model_validate(stored) if stored else None
+
     def get_score_v2(self, check_id: str) -> ScoreV2 | None:
         with self._sessions() as session:
             row = session.get(ScoreRow, check_id)
@@ -225,7 +240,7 @@ class Store:
                 band=row.band,  # type: ignore[arg-type]  # written only from Band
                 confidence=row.confidence,
                 hard_stop=row.hard_stop,
-                **{k: v for k, v in row.detail.items() if k != "v2"},  # type: ignore[arg-type]
+                **{k: v for k, v in row.detail.items() if k not in EXTRA_DETAIL},  # type: ignore[arg-type]
             )
 
 

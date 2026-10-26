@@ -23,6 +23,7 @@ from app.models import (
     CheckKey,
     Event,
     EventType,
+    FamilyTree,
     Finding,
     Project,
     SourceName,
@@ -35,6 +36,7 @@ from app.sources.base import (
     Blocked,
     ChecksRead,
     FoundFinding,
+    GroupTree,
     LiveUrl,
     Progress,
     ProjectDetails,
@@ -79,6 +81,8 @@ class Orchestrator:
         self._cache_dir = cache_dir
         self._source_cache = source_cache
         self._tasks: dict[str, asyncio.Task[None]] = {}
+        # The family tree a check's group source drew, kept until its score is saved.
+        self._families: dict[str, FamilyTree] = {}
 
     def start(self, project: Project, fresh: bool = False) -> Check:
         """Create the check and run it in the background; returns at once."""
@@ -133,6 +137,9 @@ class Orchestrator:
             result = score(findings, read)
             self._store.save_score(check_id, result)
             self._save_score_v2(check_id, findings, read)
+            family = self._families.pop(check_id, None)
+            if family is not None:
+                self._store.save_family(check_id, family)
             self._finish(
                 check_id, "completed", score=result.model_dump(mode="json", include=SUMMARY)
             )
@@ -154,6 +161,7 @@ class Orchestrator:
             entity = entity_for(source.name, ctx.project) if self._source_cache else None
             cached = None if fresh else self._cached(source, entity, ctx)
             collected: list[Finding] = []
+            family: FamilyTree | None = None
             try:
                 async with asyncio.timeout(self._source_timeout):
                     events = replay(cached) if cached else source.run(ctx)
@@ -177,13 +185,16 @@ class Orchestrator:
                                 self._emit(check_id, "source.blocked", source.name, reason=reason)
                             case ChecksRead(checks=checks):
                                 read = tuple(c for c in checks if c in source.checks)
+                            case GroupTree(tree=tree):
+                                family = tree
+                                self._families[check_id] = tree
                             case ProjectDetails(project=project):
                                 self._store.save_project(project)
                                 ctx = replace(ctx, project=project)
                 status = "blocked" if run.status == "blocked" else "completed"
                 run = run.model_copy(update={"status": status})
                 if status == "completed" and cached is None and entity and (read or collected):
-                    self._remember(source, entity, ctx, collected, read)
+                    self._remember(source, entity, ctx, collected, read, family)
             except SourceUnavailable as error:
                 run = run.model_copy(update={"status": "unavailable", "message": str(error)})
             except (SourceError, WebError) as error:
@@ -225,9 +236,10 @@ class Orchestrator:
         ctx: SourceContext,
         findings: list[Finding],
         read: tuple[CheckKey, ...],
+        family: FamilyTree | None,
     ) -> None:
         assert self._source_cache is not None
-        self._source_cache.put(source.name, entity, ctx.today, ctx.now, findings, read)
+        self._source_cache.put(source.name, entity, ctx.today, ctx.now, findings, read, family)
 
     def _save_score_v2(self, check_id: str, findings: list[Finding], read: set[CheckKey]) -> None:
         """v2 sits next to v1; if it ever fails the v1 report must still be delivered."""
@@ -268,6 +280,8 @@ async def replay(cached: CachedRead) -> AsyncIterator[SourceEvent]:
     yield Progress(f"Reusing the read made on {stamp}; nothing was fetched again")
     for finding in cached.fresh_copies():
         yield FoundFinding(finding)
+    if cached.family is not None:
+        yield GroupTree(cached.family)
     yield ChecksRead(cached.checks_read)
 
 

@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from app.db import SourceCacheRow
 from app.matching import normalize
-from app.models import CheckKey, Finding, Project, SourceName
+from app.models import CheckKey, FamilyTree, Finding, Project, SourceName
 
 # How many days a result is reused. Company-level group facts change slowly.
 TTL_DAYS: dict[SourceName, int] = {
@@ -33,6 +33,7 @@ class CachedRead:
     read_at: datetime
     findings: list[Finding]
     checks_read: tuple[CheckKey, ...]
+    family: FamilyTree | None = None
 
     def fresh_copies(self) -> list[Finding]:
         """The findings under new ids, so each check owns its own rows; read times are kept."""
@@ -70,8 +71,10 @@ class SourceCache:
             ).first()
             if row is None:
                 return None
+            family = (row.extras or {}).get("family")
             return CachedRead(
                 read_at=row.read_at,
+                family=FamilyTree.model_validate(family) if family else None,
                 findings=[Finding.model_validate(f) for f in row.findings],
                 checks_read=tuple(row.checks_read),  # type: ignore[arg-type]  # saved from CheckKey
             )
@@ -84,7 +87,9 @@ class SourceCache:
         read_at: datetime,
         findings: list[Finding],
         checks_read: tuple[CheckKey, ...],
+        family: FamilyTree | None = None,
     ) -> None:
+        extras = {"family": family.model_dump(mode="json")} if family else {}
         with self._sessions.begin() as session:
             session.merge(
                 SourceCacheRow(
@@ -94,5 +99,6 @@ class SourceCache:
                     read_at=read_at,
                     checks_read=list(checks_read),
                     findings=[f.model_dump(mode="json") for f in findings],
+                    extras=extras,
                 )
             )
