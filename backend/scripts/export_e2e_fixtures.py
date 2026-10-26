@@ -8,8 +8,9 @@ the report. Run from backend/:  python -m scripts.export_e2e_fixtures
 id the other fixtures use: the comparison of that check with the recorded UP-RERA page of
 UPRERAPRJ6742, the promoter's other projects from the recorded up-rera.in searches and the
 Sentinel alert a changed record raises. `python -m scripts.export_e2e_fixtures states` writes
-the state list and the Maharashtra flow from the recorded check_mh.json. `python -m scripts.export_e2e_fixtures v2` rewrites the
-report with the v2 sources on, which is the 300-900 score the report screens show.
+the state list and the Maharashtra flow from the recorded check_mh.json.
+`python -m scripts.export_e2e_fixtures v2` rewrites the report with the v2 sources on, which is
+the 300-900 score the report screens show.
 
 backend/tests/test_e2e_fixtures.py checks every file against the API's own models.
 """

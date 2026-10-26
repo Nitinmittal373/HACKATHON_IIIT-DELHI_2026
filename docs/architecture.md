@@ -44,9 +44,26 @@ flowchart TB
 | 4. Report | `GET /api/checks/{id}/report` | Score, drivers, evidence and timeline (action plan in Phase 4) |
 | 5. Watch list | `POST /api/sentinel` | Adds the project to weekly re-checks; alerts are read with `GET /api/sentinel/alerts?email=` |
 
+## State adapters
+
+`backend/app/states/` holds one small file per state. Each builds a `StateAdapter` from the facts in [states.md](states.md): code, name, authority, domains, number patterns, coverage level, examples and complaint page.
+
+```
+buyer's text ─► detect_state ─► registry ─► StateAdapter ─┬─ resolve(query)  Search on the state's domains
+   (any state)   (number format)                          ├─ read(project)   ProjectRecord (state-agnostic)
+                                                          └─ details_url / complaint_url / coverage
+UP:   UpAdapter wraps the original UP-RERA code (Fetch + parser), unchanged
+rest: SearchStateAdapter reads the portal's own pages through Search snippets (and the page or
+      list row when Fetch can open it: Goa, Bihar, Jharkhand)
+```
+
+`ProjectRecord` (state, number, name, promoter, district, registration date, promised and revised completion, extensions, status, complaints, `source_url`, `read_at`, the snippet text) is all the scoring needs. `StateReraSource` turns it into the same findings UP-RERA gives, so NeevScore v2 is unchanged for every state; a fact the portal did not show stays unread (R12) and never costs points. The findings of a search-only read carry `via: "search_snippet"`. The state is not stored: every number format belongs to exactly one state, so `state_of(rera_id)` gives it back, and records made before all-India support are UP.
+
+`GET /api/states` lists the adapters; `GET /api/projects/search?q=&state=` accepts an optional state. With no state, a number is routed by its format and a name is searched with one combined Search across every portal, then one focused Search for the three states that answered best, plus UP. `POST /api/checks` takes an optional `state`; the details link is accepted only on that state's own domains. The source cache is keyed by state for every state but UP.
+
 ## Finding a project
 
-`app/resolve.py` turns what the buyer typed into at most 8 candidates, each with its name, promoter, district and registration date, and the page a check will read.
+For UP, `app/resolve.py` (behind `UpAdapter`) turns what the buyer typed into at most 8 candidates, each with its name, promoter, district and registration date, and the page a check will read.
 
 | Typed | How it is found |
 | --- | --- |

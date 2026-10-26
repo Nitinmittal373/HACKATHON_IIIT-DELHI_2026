@@ -28,6 +28,7 @@ A risk check for under-construction homes in Uttar Pradesh. NeevCheck sends **Ti
 
 - [The problem](#the-problem)
 - [What NeevCheck does](#what-neevcheck-does)
+- [All-India coverage](#all-india-coverage)
 - [See it in action](#see-it-in-action)
 - [A real check: Supertech Eco Village-I Phase I-C](#a-real-check-supertech-eco-village-i-phase-i-c)
 - [How it works](#how-it-works)
@@ -60,7 +61,7 @@ A broker's brochure says *"possession on time"*. The records may say the complet
 
 | | Feature | What the buyer gets |
 | :-: | --- | --- |
-| 🔎 | **Search first, no forms** | Type a project name, a promoter or any UP-RERA number (2017 or new format). We show the matching phases from the register and ask *"Is this the property you're looking for?"* before any agent runs. |
+| 🔎 | **Search first, no forms** | Type a project name, a promoter or a RERA number of any state (UP numbers of 2017 or the new format, a MahaRERA `P…` number and so on). We show the matching phases from the register and ask *"Is this the property you're looking for?"* before any agent runs. |
 | 🤖 | **Agent Cam** | Watch TinyFish browser agents open each official site, find the project and copy the exact record, live. |
 | 📊 | **NeevScore (300–900)** | One explained number, like a credit score: six weighted pillars, a confidence meter and the top reason codes (R01–R14). Every point lost links to the record behind it. The first 0–100 score is kept as one line in the method section, for transparency. |
 | 🗂️ | **Evidence Locker** | Every finding carries its source link and the minute it was read. *No source, no claim.* |
@@ -72,13 +73,51 @@ A broker's brochure says *"possession on time"*. The records may say the complet
 | ⚖️ | **Compare** | Two or three projects side by side, row by row; it names the best only when the evidence allows. |
 | 💬 | **Share on WhatsApp** | A short message with the score and a link, for the family group. |
 | 🔔 | **Neev Sentinel** | Weekly re-checks; an alert only when a record actually changes. |
-| 🏟️ | **War Room** | Six lanes (UP-RERA, company registry, group companies, insolvency, land authority, news) run in parallel, each with its own live ticker and findings count. Click a lane to enlarge its live browser view. |
+| 🏟️ | **War Room** | Six lanes (the state's RERA, company registry, group companies, insolvency, land authority, news) run in parallel, each with its own live ticker and findings count. Click a lane to enlarge its live browser view. |
 | 🌳 | **Builder family tree** | Promoter, directors (name and DIN only), related companies and their UP-RERA projects. Flagged nodes carry a text label, never colour alone; a list view serves phones and screen readers. |
 | 📜 | **Evidence ledger** | Every claim with its page, read time, the words on the page, reliability, points and reason code. |
 | ✉️ | **UP-RERA complaint draft** | One click builds an editable complaint from facts only, with numbered source annexures, in English or Hindi. *Draft for you to review and file. Not legal advice.* |
 | 🛰️ | **Monitor watch** | Watching a project also creates TinyFish Monitors on its UP-RERA page and on builder news; a changed page re-scores the project and alerts with the diff. |
 | 🙋 | **Right of reply** | "Report a mistake" on every report; the messages go to an operator log. |
 | 🌐 | **English and हिंदी** | Plain-language reports for every family member. |
+
+## All-India coverage
+
+Any RERA-registered project in India can be searched. Deepest coverage is in Uttar Pradesh. How much of a record can be read depends on the state's portal, and the app says so on every result and report:
+
+- **Full**: Fetch opens the project page and a parser reads every field. Only UP-RERA.
+- **Partial**: a page or list is opened, but it shows only some fields (Goa, Bihar, Jharkhand).
+- **Search only**: the portal cannot be opened by a program (it blocks it, asks for a CAPTCHA or a login, or loads data with scripts). NeevCheck shows only what the portal's own pages print in search results, marked "search snippet" in the evidence ledger, and links to the full record. Fields not shown stay unread: they lower confidence and never add penalty points. A CAPTCHA or login is never bypassed.
+
+The company registry, insolvency, group companies, lender notices and news are read for every state. Land dues lists exist for Uttar Pradesh only.
+
+| State | Authority | Level | Example number |
+| --- | --- | --- | --- |
+| Uttar Pradesh (UP) | UP-RERA | Full | `UPRERAPRJ8334` |
+| Maharashtra (MH) | MahaRERA | Search only | `P51800000937` |
+| Haryana (HR) | HRERA (Gurugram and Panchkula) | Search only | `HRERA-PKL-JJR-867-2026` |
+| Karnataka (KA) | K-RERA | Search only | `PRM/KA/RERA/1251/309/PR/190517/002554` |
+| Delhi (DL) | Delhi RERA | Search only | `DLRERA2023P0008` |
+| Telangana (TG) | TG-RERA | Search only | format not yet verified |
+| Gujarat (GJ) | GujRERA | Search only | `PR/GJ/SURAT/SURAT CITY/SUDA/RAA00299/290917` |
+| Tamil Nadu (TN) | TNRERA | Search only | `TN/01/Layout/0001/2017` |
+| Rajasthan (RJ) | RAJ-RERA | Search only | `RAJ/P/2020/1380` |
+| Madhya Pradesh (MP) | MPRERA | Search only | format not yet verified |
+| West Bengal (WB) | WBRERA | Search only | `WBRERA/P/KOL/2024/002005` |
+| Punjab (PB) | RERA Punjab | Search only | `PBRERA-SAS79-PR0083` |
+| Kerala (KL) | K-RERA | Search only | `K-RERA/PRJ/039/2020` |
+| Andhra Pradesh (AP) | AP RERA | Search only | `410 OF 2017` |
+| Uttarakhand (UK) | UKRERA | Search only | `UKREP06240000564` |
+| Bihar (BR) | RERA Bihar | Partial | `BRERAP187328070625271029E00` |
+| Odisha (OD) | ORERA | Search only | `RP/09/2019/00287` |
+| Goa (GA) | Goa RERA | Partial | `PRGO08242238` |
+| Chhattisgarh (CG) | CG RERA | Search only | `PCGRERA220618000295` |
+| Himachal Pradesh (HP) | HP RERA | Search only | `RERAHPSOP09170006` |
+| Jharkhand (JH) | JHARERA | Partial | `JHARERA/PROJECT/215/2024` |
+| Assam (AS) | RERA Assam | Search only | `RERAA KM 68 OF 2022-2023` |
+| Jammu and Kashmir (JK) | JK RERA | Search only | `RERA-JK-JMU-6-2026` |
+
+Telangana and Madhya Pradesh are marked "format not yet verified" because no real number has been read from their portals. The research behind this table, with every domain, number format and gate, is in [docs/states.md](docs/states.md); the live table is the [/coverage](frontend/src/app/(app)/coverage/page.tsx) page.
 
 ## See it in action
 
@@ -273,6 +312,7 @@ Search and Fetch are free and are tried first; an agent run is the last step. A 
 │   │   ├── api/             routes: search, checks, events (SSE), reports, meta, sentinel
 │   │   ├── sources/         one module per public source, plus the shared agent runner
 │   │   ├── parsers/         deterministic page parsers (UP-RERA)
+│   │   ├── states/          one adapter per state RERA portal, the registry and the resolver
 │   │   ├── scoring/         NeevScore engine (v2/) and the classic 0–100 score
 │   │   ├── sentinel/        watches, change detection, alerts, email
 │   │   ├── orchestrator.py  runs a check and streams its events
@@ -284,7 +324,7 @@ Search and Fetch are free and are tried first; an agent run is the last step. A 
 ├── frontend/                Next.js app
 │   ├── e2e/                 Playwright tests against a recorded API
 │   └── src/
-│       ├── app/             routes: home, check, check/[id], report/[id], reports, compare, alerts
+│       ├── app/             routes: home, check, check/[id], report/[id], reports, compare, alerts, coverage
 │       ├── components/      Skyline, AgentCam, NeevScore, EvidenceList …
 │       ├── lib/             API client and types generated from the contract, English and Hindi copy
 │       └── styles/          tokens, globals, app screens and print
@@ -345,6 +385,7 @@ The full API is described in [`docs/architecture.md`](docs/architecture.md#api).
 - [x] **Phase 5 · Sentinel and sharing** — weekly re-checks, alerts, PDF, Hindi
 - [x] **v2 · Credit-style score** — NeevScore 300–900 with reason codes, War Room, family tree, evidence ledger, complaint draft, Monitor watch
 - [x] **One contract, one score** — the API contract is exported from the backend and generates the frontend types; NeevScore 300–900 is the only score shown
+- [x] **All-India RERA coverage** — a state adapter per portal (UP full; Goa, Bihar and Jharkhand partial; the rest search only), a state picker, badges, a coverage page and state-aware reports and complaint drafts
 - [ ] **Phase 6 · Launch** — accessibility, end-to-end tests, deployment, v1.0
 
 ## Responsible use of public data

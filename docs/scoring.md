@@ -67,6 +67,10 @@ The report shows the four codes that cost the most points, like a credit report.
 
 Findings that map to no v2 rule (a registration date, a court order, an unverified insolvency report) still appear in the evidence list with 0 v2 points. The v2 reason codes use only facts the code can read; a signal that cannot be read honestly stays unread and appears under R12.
 
+## Other states
+
+The rules read only findings, never a state. A state adapter turns its portal into the same findings UP-RERA gives (registration, completion date, delay against the promised date, status, complaints), so the same rules apply. For a state whose portal can only be read through Search snippets, most of those facts are not shown: they stay unread, appear under R12 and lower confidence, and never cost points. The land-dues check exists for Uttar Pradesh only; for any other state it is unread. Such a read is usually *provisional* (too few pillars read), which the report says in plain words. The live proofs in the pull request show this: a Maharashtra, a Haryana and a Karnataka project each score 900 with 33% confidence and no penalty, because little beyond the registration could be read.
+
 ## Worked example
 
 Supertech Eco Village-I Phase I-C (`UPRERAPRJ8334`), checked live with every source on. The same numbers are in the recorded fixture the browser tests replay.
