@@ -1,5 +1,13 @@
 import { ALL_SOURCES, EXTRA_SOURCES, SOURCE_ORDER } from "@/lib/sources";
-import type { Check, CheckEvent, Finding, ScoreSummary, SourceName, SourceRun } from "@/lib/types";
+import type {
+  Check,
+  CheckEvent,
+  Finding,
+  RunStatus,
+  ScoreSummary,
+  SourceName,
+  SourceRun,
+} from "@/lib/types";
 
 /** What the Agent Cam shows for one source. "unread" means the source could not be read. */
 export type SourceStatus = "waiting" | "running" | "done" | "blocked" | "unread";
@@ -41,10 +49,6 @@ export function initialState(): CamState {
   return { sources, findings: [], outcome: null };
 }
 
-function text(value: unknown): string | null {
-  return typeof value === "string" && value ? value : null;
-}
-
 /** Only https pages are ever put in the live-view frame. */
 function isHttps(url: string): boolean {
   try {
@@ -58,22 +62,10 @@ function patch(state: CamState, name: SourceName, change: Partial<SourceView>): 
   return { ...state, sources: { ...state.sources, [name]: { ...state.sources[name], ...change } } };
 }
 
-function finishedStatus(status: string | null): SourceStatus {
+function finishedStatus(status: RunStatus): SourceStatus {
   if (status === "completed") return "done";
   if (status === "blocked") return "blocked";
   return "unread";
-}
-
-function readFinding(value: unknown): Finding | null {
-  const finding = value as Finding | null;
-  return finding && typeof finding.id === "string" && typeof finding.title === "string"
-    ? finding
-    : null;
-}
-
-function readScore(value: unknown): ScoreSummary | null {
-  const score = value as ScoreSummary | null;
-  return score && typeof score.value === "number" ? score : null;
 }
 
 /**
@@ -81,41 +73,37 @@ function readScore(value: unknown): ScoreSummary | null {
  * browser that reconnects receives the run again from the start.
  */
 export function applyEvent(state: CamState, event: CheckEvent): CamState {
-  if (event.source === "check") {
-    if (event.type !== "check.completed") return state;
-    if (event.data.status === "completed") {
-      return { ...state, outcome: { status: "completed", score: readScore(event.data.score) } };
-    }
-    const message = text(event.data.message) ?? "The check could not be completed";
-    return { ...state, outcome: { status: "failed", message } };
-  }
-
-  const name = event.source;
   switch (event.type) {
     case "source.started":
-      return patch(state, name, { status: "running" });
+      return patch(state, event.source, { status: "running" });
     case "source.live_url": {
-      const url = text(event.data.url);
-      return url && isHttps(url) ? patch(state, name, { liveUrl: url }) : state;
+      const { url } = event.data;
+      return url && isHttps(url) ? patch(state, event.source, { liveUrl: url }) : state;
     }
     case "source.progress": {
-      const note = text(event.data.text);
-      return note ? patch(state, name, { note, notes: state.sources[name].notes + 1 }) : state;
+      const note = event.data.text;
+      if (!note) return state;
+      return patch(state, event.source, { note, notes: state.sources[event.source].notes + 1 });
     }
     case "finding.added": {
-      const finding = readFinding(event.data.finding);
-      if (!finding || state.findings.some((known) => known.id === finding.id)) return state;
+      const { finding } = event.data;
+      if (state.findings.some((known) => known.id === finding.id)) return state;
       return { ...state, findings: [finding, ...state.findings] };
     }
     case "source.blocked":
-      return patch(state, name, { status: "blocked", reason: text(event.data.reason) });
+      return patch(state, event.source, { status: "blocked", reason: event.data.reason || null });
     case "source.completed": {
-      const status = finishedStatus(text(event.data.status));
-      const reason = text(event.data.message) ?? state.sources[name].reason;
-      return patch(state, name, { status, reason });
+      const status = finishedStatus(event.data.status);
+      const reason = event.data.message ?? state.sources[event.source].reason;
+      return patch(state, event.source, { status, reason });
     }
-    default:
-      return state;
+    case "check.completed": {
+      if (event.data.status === "completed") {
+        return { ...state, outcome: { status: "completed", score: event.data.score } };
+      }
+      const message = event.data.message ?? "The check could not be completed";
+      return { ...state, outcome: { status: "failed", message } };
+    }
   }
 }
 

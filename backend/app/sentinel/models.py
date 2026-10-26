@@ -6,6 +6,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from app.api_model import ApiModel
 from app.models import DisplayScore, is_new_format, is_uprera_url, normalize_rera_id
 
 Language = Literal["en", "hi"]
@@ -52,7 +53,7 @@ class WatchCreate(BaseModel):
         return self
 
 
-class Watch(BaseModel):
+class Watch(ApiModel):
     id: str
     rera_id: str
     email: str
@@ -61,12 +62,12 @@ class Watch(BaseModel):
     baseline_check_id: str | None = None
 
 
-class FindingChange(BaseModel):
+class FindingChange(ApiModel):
     title: str
     source_url: str | None = None
 
 
-class Diff(BaseModel):
+class Diff(ApiModel):
     added: list[FindingChange] = []
     removed: list[FindingChange] = []
     changed: list[FindingChange] = []
@@ -76,7 +77,7 @@ class Diff(BaseModel):
         return not (self.added or self.removed or self.changed)
 
 
-class Alert(BaseModel):
+class Alert(ApiModel):
     id: str
     watch_id: str
     rera_id: str

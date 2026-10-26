@@ -6,8 +6,7 @@ an unread source can never look like a clean record.
 
 from typing import Literal
 
-from pydantic import BaseModel
-
+from app.api_model import ApiModel
 from app.models import (
     Area,
     Band,
@@ -30,7 +29,7 @@ TOP_FINDINGS = 3
 NOTABLE = ("red_flag", "fail", "review")
 
 
-class AreaPoints(BaseModel):
+class AreaPoints(ApiModel):
     area: Area
     label: str
     lost: float
@@ -38,7 +37,7 @@ class AreaPoints(BaseModel):
     max: float
 
 
-class PillarPoints(BaseModel):
+class PillarPoints(ApiModel):
     id: PillarId
     name: str
     # Points this pillar took off the 300-900 score, and the most it could take.
@@ -46,13 +45,13 @@ class PillarPoints(BaseModel):
     max: float
 
 
-class FindingLine(BaseModel):
+class FindingLine(ApiModel):
     title: str
     source_url: str
     points: float
 
 
-class ComparedProject(BaseModel):
+class ComparedProject(ApiModel):
     check_id: str
     project: Project
     # The score to show and rank by; `score`, `band` and `areas` are the classic 0-100 view.
@@ -72,7 +71,7 @@ class ComparedProject(BaseModel):
     top_findings: list[FindingLine]
 
 
-class Comparison(BaseModel):
+class Comparison(ApiModel):
     projects: list[ComparedProject]
     # The check with the best score among those read well enough to rank, if there is one.
     best: str | None

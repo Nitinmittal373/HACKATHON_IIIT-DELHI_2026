@@ -5,8 +5,7 @@ The numbers come from the scoring constants, so the frontend never keeps its own
 
 from typing import Literal
 
-from pydantic import BaseModel
-
+from app.api_model import ApiModel
 from app.models import PillarId
 from app.scoring.v2 import weights as w
 from app.scoring.v2.reasons import DATA_UNAVAILABLE, LABELS
@@ -15,27 +14,27 @@ ScoreVersion = Literal["v2"]
 RangeBandKey = Literal["Low", "Watch", "Elevated", "High"]
 
 
-class Scale(BaseModel):
+class Scale(ApiModel):
     min: int
     max: int
 
 
-class BandRange(BaseModel):
+class BandRange(ApiModel):
     key: RangeBandKey
     min: int
     max: int
 
 
-class PillarWeight(BaseModel):
+class PillarWeight(ApiModel):
     id: PillarId
     weight: float
 
 
-class ReasonCodeId(BaseModel):
+class ReasonCodeId(ApiModel):
     code: str
 
 
-class Meta(BaseModel):
+class Meta(ApiModel):
     scale: Scale
     # Highest band first. A score outside every band is "not enough evidence", which has no range.
     bands: list[BandRange]

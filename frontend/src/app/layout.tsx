@@ -6,6 +6,8 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { getLang } from "@/lib/i18n/server";
 import { LangProvider } from "@/lib/LangProvider";
+import { loadMeta } from "@/lib/meta";
+import { MetaProvider } from "@/lib/MetaProvider";
 import "@/styles/tokens.css";
 import "@/styles/globals.css";
 import "@/styles/app.css";
@@ -38,14 +40,16 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { themeColor: "#ffffff" };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  const lang = await getLang();
+  const [lang, meta] = await Promise.all([getLang(), loadMeta()]);
   return (
     <html lang={lang} className={`${geist.variable} ${geistMono.variable} ${devanagari.variable}`}>
       <body>
         <LangProvider initial={lang}>
-          <Header />
-          {children}
-          <Footer />
+          <MetaProvider meta={meta}>
+            <Header />
+            {children}
+            <Footer />
+          </MetaProvider>
         </LangProvider>
       </body>
     </html>
