@@ -95,6 +95,19 @@ class FindingRow(Base):
     points: Mapped[float | None] = mapped_column(Float)
 
 
+class SourceCacheRow(Base):
+    """One source's result for one entity on one day, kept with the time it was really read."""
+
+    __tablename__ = "source_cache"
+
+    source: Mapped[str] = mapped_column(String(20), primary_key=True)
+    entity: Mapped[str] = mapped_column(String(400), primary_key=True)
+    day: Mapped[date] = mapped_column(Date, primary_key=True)
+    read_at: Mapped[datetime] = mapped_column(UTCDateTime)
+    checks_read: Mapped[list[str]] = mapped_column(JSON, default=list)
+    findings: Mapped[list[dict[str, object]]] = mapped_column(JSON, default=list)
+
+
 class FindingExtraRow(Base):
     """Optional facts of a finding (snippet, totals), kept apart so older databases need no
     column added to the findings table."""

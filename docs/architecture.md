@@ -226,3 +226,7 @@ NeevCheck has no sign-in. The app keeps the ids of the checks a visitor starts i
 ## Resuming a check
 
 `/check/{id}` loads the check in the browser. A finished check goes straight to its report; a running one opens the Agent Cam, whose event stream replays every event so far and then follows the run, so a refresh or a reopened tab loses nothing. Agents run inside the API process, so a restart or redeploy ends them: on startup the API marks any check still queued or running as failed, instead of leaving it "running" forever. Each report shows "Records read on <date>"; after seven days it says the records are more than a week old and puts **Re-check now** first.
+
+## Source cache (v2)
+
+With `V2_SOURCES=true` each source result is kept per (source, entity, day) in the `source_cache` table. Registry, insolvency, land, news and lender notices are reused for the same UTC day, the group source for 7 days. A reused read keeps the time it was really read, and "Re-check now" bypasses the cache. Blocked or failed reads are never kept. `python -m scripts.prewarm UPRERAPRJ8334 ...` runs real checks ahead of a demo.

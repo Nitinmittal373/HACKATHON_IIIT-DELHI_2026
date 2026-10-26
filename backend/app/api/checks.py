@@ -80,7 +80,9 @@ async def create_check(
     # The page search confirmed for this number; a number sent alone gets its stable page.
     details_url = body.details_url or details_url_for(body.rera_id)
     assert details_url is not None  # CheckCreate requires a link for new-format numbers
-    check = orchestrator.start(Project(rera_id=body.rera_id, details_url=details_url))
+    check = orchestrator.start(
+        Project(rera_id=body.rera_id, details_url=details_url), fresh=body.fresh
+    )
     response.headers["Location"] = f"/api/checks/{check.id}"
     return check
 
