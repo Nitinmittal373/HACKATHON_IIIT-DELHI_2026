@@ -12,7 +12,7 @@ data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","s
 
 id: 4
 event: finding.added
-data: {"type":"finding.added","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"uprera","ts":"2026-10-25T04:00:00Z","data":{"finding":{"id":"360bbe7b9ea5435ab2317415043b5d30","source":"uprera","kind":"registration","title":"Registration number appears on MahaRERA","area":"rera","verdict":"ok","reliability":"primary","source_url":"https://maharera.maharashtra.gov.in/projects-search-result?certificate_no=P99000055716","read_on":"2026-10-25","read_at":"2026-10-25T04:00:00Z","occurred_on":null,"count":null,"months":null,"scope":null,"total":null,"snippet":"P99000055716. SRI BALAJI RESIDENCY. Bhupesh Vasudev Bari. Dahanu. State. MAHARASHTRA. Pincode. 401602. Certificate. District. Palghar. Last Modified.","via":"search_snippet"}}}
+data: {"type":"finding.added","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"uprera","ts":"2026-10-25T04:00:00Z","data":{"finding":{"id":"fab645af672a4e20ad73ae092869db25","source":"uprera","kind":"registration","title":"Registration number appears on MahaRERA","area":"rera","verdict":"ok","reliability":"primary","source_url":"https://maharera.maharashtra.gov.in/projects-search-result?certificate_no=P99000055716","read_on":"2026-10-25","read_at":"2026-10-25T04:00:00Z","occurred_on":null,"count":null,"months":null,"scope":null,"total":null,"snippet":"P99000055716. SRI BALAJI RESIDENCY. Bhupesh Vasudev Bari. Dahanu. State. MAHARASHTRA. Pincode. 401602. Certificate. District. Palghar. Last Modified.","via":"search_snippet"}}}
 
 id: 5
 event: source.completed
@@ -180,5 +180,5 @@ data: {"type":"source.completed","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","
 
 id: 46
 event: check.completed
-data: {"type":"check.completed","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"check","ts":"2026-10-25T04:00:00Z","data":{"status":"completed","score":{"value":100,"band":"insufficient_evidence","band_label":"Not enough evidence yet","confidence":0.14,"provisional":true,"hard_stop":false},"display_score":{"value":900,"band":"insufficient_evidence","hard_stop":false,"confidence":0.33,"provisional":true}}}
+data: {"type":"check.completed","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"check","ts":"2026-10-25T04:00:00Z","data":{"status":"completed","score":{"value":100,"band":"insufficient_evidence","band_label":"Not enough evidence yet","confidence":0.14,"provisional":true,"hard_stop":false},"display_score":{"value":null,"provisional_value":900,"band":"insufficient_evidence","hard_stop":false,"confidence":0.33,"provisional":true,"records_read":2,"records_total":6}}}
 

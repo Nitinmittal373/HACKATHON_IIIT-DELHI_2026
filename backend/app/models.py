@@ -233,23 +233,52 @@ class ScoreV2(ApiModel):
 
 
 class DisplayScore(ApiModel):
-    """The score every screen shows: NeevScore v2 on the 300-900 scale, without the detail."""
+    """The score every screen shows: NeevScore v2 on the 300-900 scale, without the detail.
 
-    value: int
+    When too little was read to rate the project (band insufficient_evidence) there is no number
+    to show: `value` is null, and the computed one is kept as `provisional_value` for the
+    method section only. A number nobody can stand behind is worse than none.
+    """
+
+    value: int | None
+    # The computed number of an unrated project; shown nowhere but the method section.
+    provisional_value: int | None = None
     band: BandV2
     hard_stop: bool
     confidence: float
-    # True when too little was read to rate the project; the value is shown but not banded.
+    # True when too little was read to rate the project.
     provisional: bool
+    # How many of the six record types (pillars) were read.
+    records_read: int = 0
+    records_total: int = 6
+
+    @model_validator(mode="before")
+    @classmethod
+    def hide_an_unrated_number(cls, data: Any) -> Any:
+        """Also applies to scores stored before this rule, so no old answer shows a number."""
+        if not isinstance(data, dict):
+            return data
+        data = dict(data)
+        total = data.setdefault("records_total", 6)
+        data.setdefault("records_read", round(float(data.get("confidence", 0)) * total))
+        if data.get("band") == "insufficient_evidence":
+            data["provisional_value"] = data.get("provisional_value", data.get("value"))
+            data["value"] = None
+            data["provisional"] = True
+        return data
 
     @classmethod
     def of(cls, score: ScoreV2) -> "DisplayScore":
-        return cls(
-            value=score.value,
-            band=score.band,
-            hard_stop=score.hard_stop,
-            confidence=score.confidence,
-            provisional=score.provisional,
+        return cls.model_validate(
+            {
+                "value": score.value,
+                "band": score.band,
+                "hard_stop": score.hard_stop,
+                "confidence": score.confidence,
+                "provisional": score.provisional,
+                "records_read": len(score.pillars) - len(score.pillars_unread),
+                "records_total": len(score.pillars),
+            }
         )
 
 

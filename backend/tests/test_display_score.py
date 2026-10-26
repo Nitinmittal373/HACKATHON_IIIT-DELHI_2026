@@ -41,7 +41,16 @@ def finished_check(client: TestClient, rera_id: str = "UPRERAPRJ8334", **body: o
 def assert_display(display: dict[str, object]) -> None:
     assert display["value"] in SCALE
     assert display["band"] in {"Low", "Watch", "Elevated", "High", "insufficient_evidence"}
-    assert set(display) == {"value", "band", "hard_stop", "confidence", "provisional"}
+    assert set(display) == {
+        "value",
+        "provisional_value",
+        "band",
+        "hard_stop",
+        "confidence",
+        "provisional",
+        "records_read",
+        "records_total",
+    }
 
 
 def drop_v2(client: TestClient, check_id: str) -> None:

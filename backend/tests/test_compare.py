@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 
 from app.compare import best_on_records, compared
 from app.main import create_app
-from app.models import Project, Report
+from app.models import DisplayScore, Project, Report
 from tests.conftest import make_settings, make_web, read_events
 from tests.fakes import load_recording
 
@@ -83,11 +83,24 @@ def test_equal_scores_are_a_tie(client: TestClient) -> None:
 def test_the_best_score_wins_among_checks_read_well_enough(client: TestClient) -> None:
     eco = finished_check(client, "UPRERAPRJ8334")
     report = Report.model_validate(client.get(f"/api/checks/{eco}/report").json())
-    base = compared(report)
-    better_score = base.display_score.model_copy(update={"value": base.display_score.value + 60})
+    # The recording is thin, so build rated and unrated scores by hand.
+    rated = {"band": "Watch", "hard_stop": False, "confidence": 0.83, "provisional": False}
+    base = compared(report).model_copy(
+        update={"display_score": DisplayScore.model_validate({"value": 620, **rated})}
+    )
+    better_score = DisplayScore.model_validate({"value": 680, **rated})
     better = base.model_copy(update={"check_id": "b" * 32, "display_score": better_score})
-    thin_score = base.display_score.model_copy(update={"value": 890, "confidence": 0.17})
+    thin_score = DisplayScore.model_validate(
+        {
+            "value": 890,
+            "band": "insufficient_evidence",
+            "hard_stop": False,
+            "confidence": 0.17,
+            "provisional": True,
+        }
+    )
     higher_but_thin = base.model_copy(update={"check_id": "c" * 32, "display_score": thin_score})
+    assert thin_score.value is None
 
     assert best_on_records([base, better, higher_but_thin]) == ("b" * 32, "best_score")
 

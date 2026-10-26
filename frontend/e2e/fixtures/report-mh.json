@@ -74,11 +74,14 @@
     ],
     "reused": false,
     "display_score": {
-      "value": 900,
+      "value": null,
+      "provisional_value": 900,
       "band": "insufficient_evidence",
       "hard_stop": false,
       "confidence": 0.33,
-      "provisional": true
+      "provisional": true,
+      "records_read": 2,
+      "records_total": 6
     }
   },
   "project": {
@@ -150,7 +153,7 @@
   },
   "findings": [
     {
-      "id": "360bbe7b9ea5435ab2317415043b5d30",
+      "id": "fab645af672a4e20ad73ae092869db25",
       "source": "uprera",
       "kind": "registration",
       "title": "Registration number appears on MahaRERA",
@@ -171,11 +174,14 @@
   ],
   "timeline": [],
   "display_score": {
-    "value": 900,
+    "value": null,
+    "provisional_value": 900,
     "band": "insufficient_evidence",
     "hard_stop": false,
     "confidence": 0.33,
-    "provisional": true
+    "provisional": true,
+    "records_read": 2,
+    "records_total": 6
   },
   "score_v2": {
     "value": 900,

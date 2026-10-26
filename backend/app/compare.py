@@ -86,10 +86,10 @@ def compare(reports: list[Report]) -> Comparison:
 
 def best_on_records(projects: list[ComparedProject]) -> tuple[str | None, BestReason]:
     """Rank only checks that read at least half the pillars; a thin check proves little."""
-    ranked = [p for p in projects if p.display_score.confidence >= v2.MIN_CONFIDENCE_FOR_BAND]
+    ranked = [p for p in projects if p.display_score.value is not None]
     if len(ranked) < 2:
         return None, "not_enough_evidence"
-    top = max(p.display_score.value for p in ranked)
+    top = max(p.display_score.value or 0 for p in ranked)
     leaders = [p for p in ranked if p.display_score.value == top]
     if len(leaders) > 1:
         return None, "tie"
