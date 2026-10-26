@@ -14,6 +14,7 @@ from urllib.parse import quote, urlsplit
 
 from app.models import Project
 from app.states.base import ProjectRecord, StateSpec
+from app.states.lists import ROW_PARSERS
 from app.states.text import (
     DISTRICT_LABELS,
     IST,
@@ -143,7 +144,9 @@ class SearchStateAdapter:
     async def _fetched_page(
         self, project: Project, evidence: list[tuple[str, str]], web: WebClient
     ) -> list[tuple[str, str]]:
-        """The project's own page, for states whose pages Fetch can read."""
+        """The project's own page, or its row in a list page, for states Fetch can read."""
+        if self.spec.row_parser:
+            return await self._list_row(project, web)
         if self.coverage == "search_only" or not evidence:
             return []
         url = evidence[0][0]
@@ -153,6 +156,15 @@ class SearchStateAdapter:
             return []
         text = clean(page.text)
         return [(url, text)] if squash(project.rera_id) in squash(text) else []
+
+    async def _list_row(self, project: Project, web: WebClient) -> list[tuple[str, str]]:
+        url = self.spec.search_url
+        try:
+            page = await web.fetch_text(url, purpose="Read a state RERA list of projects")
+        except WebError:
+            return []
+        row = ROW_PARSERS[self.spec.row_parser or ""](page.text, project.rera_id)
+        return [(url, row)] if row else []
 
     def _on_portal(self, url: str) -> bool:
         host = urlsplit(url).hostname or ""
