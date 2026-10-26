@@ -69,3 +69,22 @@ The group source never runs a browser agent. A profile that does not name exactl
 | OC / CC past due, failed 25% package deposit | No readable list found | none | **Not read** |
 | SARFAESI auction notices | Lender and IBAPI notice pages are indexed by Search; none named SUPERTECH LIMITED on 26 Oct 2026 | Search only (`V2_SOURCES=true`) | Read. A lender or government page is scored; any other page is shown for review with no points |
 | Pending consumer or civil cases | e-Jagriti shows a CAPTCHA; we never bypass one | none | Unread: the report links to the official site and lists it under R12 |
+
+## Feasibility at a glance
+
+| Signal | Access reality | TinyFish method | Status |
+| --- | --- | --- | --- |
+| Registration lapsed or revoked | Project status text on up-rera.in | Fetch | Read |
+| Delay against the promised date, extensions | Details and summary pages | Fetch | Read |
+| Quarterly progress reports missed | No per-project table in what Fetch returns | Fetch, agent tried | Not read (R12) |
+| Penalty orders | PDFs and press releases, not a per-project list | none | Not read (R12) |
+| Directors, charges, related companies | Tofler public profile; other mirrors refuse Fetch | Search + Fetch | Read; name and DIN only |
+| Struck-off director, late filings, other directorships | No readable public page | none | Not read |
+| Group companies' UP-RERA projects | up-rera.in search by exact legal name | Search + Fetch | Read, capped at 10 companies and 20 projects |
+| Promoter in CIRP | NCLT / IBBI pages, strict name and scope matching | Search + agent when needed | Read |
+| Land authority defaulter lists | Authority PDFs | Search + Fetch text | Read |
+| OC / CC past due, failed 25% deposit | No readable list | none | Not read |
+| SARFAESI auction notices | Lender and IBAPI pages | Search | Read; review only unless the page is a lender's or the government's |
+| Pending consumer cases | e-Jagriti shows a CAPTCHA | none | Not read; the report links to the official site |
+| Page changes after a watch starts | Public UP-RERA page and news search | Monitors (page and topic) | Triggers a re-check only; never a claim |
+| Builder background dossier (BETA idea) | TinyFish Research would be needed | not built | Skipped: it must never feed the score |

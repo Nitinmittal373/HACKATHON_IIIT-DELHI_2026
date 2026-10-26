@@ -36,6 +36,14 @@ services:
         value: "2"
       - key: SENTINEL_INTERVAL_HOURS
         value: "168"
+      # NeevScore v2 sources (group companies, lender notices, per-day cache). Free Search and
+      # Fetch only.
+      - key: V2_SOURCES
+        value: "true"
+      # Optional. The API's own public address; with WEBHOOK_SECRET it lets watches create
+      # TinyFish Monitors that call the webhook. Without it Sentinel keeps its weekly schedule.
+      - key: PUBLIC_BASE_URL
+        sync: false
       # Optional email for alerts.
       - key: SMTP_HOST
         sync: false

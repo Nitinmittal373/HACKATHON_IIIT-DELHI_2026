@@ -114,6 +114,10 @@ Interactive docs are served at `/docs`.
 | `POST /api/sentinel` `{rera_id, details_url?, email, language}` | `201` watch (`200` if the same email already watches it) | `422` bad input, `409` more than 3 watches for one email, `429` rate limit |
 | `GET /api/sentinel/alerts?email=` | `200` alerts, newest first | `422` bad email |
 | `POST /api/sentinel/run` with header `X-Webhook-Secret` | `202` `{started}`; starts a re-check run for an external cron | `401` missing or wrong secret (always, when `WEBHOOK_SECRET` is not set) |
+| `POST /api/sentinel/webhook` with header `X-Webhook-Secret` or `?secret=` | `202` `{status}`: `accepted` (the project is re-checked in the background), `duplicate` (a delivery already handled) or `ignored` (a monitor we do not know). Called by TinyFish monitors | `401` missing or wrong secret, `413` payload over 200 kB |
+| `DELETE /api/sentinel/{watch_id}` | `204`; removes the watch and cancels its TinyFish monitors | `404` unknown watch |
+| `POST /api/corrections` `{report_id, finding_id?, message, contact?}` | `201` `{id}`; stored for the operator | `404` unknown report, `422` bad input, `429` rate limit |
+| `GET /api/corrections` with header `X-Webhook-Secret` | `200` the latest corrections, newest first (admin log) | `401` missing or wrong secret |
 
 `rera_id` accepts `UPRERAPRJ8334` and new-format numbers such as `UPRERAPRJ188811/08/2024` (case, spaces, hyphens and dots are ignored). Send the `details_url` that search returned; it must be an `https` link on up-rera.in. It is required for new-format numbers, and a number sent without one gets its stable details page, which only numbers registered in 2017-18 have.
 
@@ -200,6 +204,46 @@ An alert stores the old and new score and the diff, and is shown at `/alerts?ema
 ### Cost guards
 
 `MAX_CHECKS_PER_DAY` (default 30) caps the checks started per UTC day, Sentinel's included; past it new checks get `429` with the wait until midnight and Sentinel stops its run. A check of the same project that finished in the last 24 hours is returned instead of starting another (`reused: true`); the report then says "Checked X h ago" with a **Re-check now** button that sends `fresh: true`.
+
+### Watching with TinyFish Monitors
+
+When `PUBLIC_BASE_URL` and `WEBHOOK_SECRET` are both set, a new watch also creates two TinyFish monitors (a daily schedule, since every completed check is billed):
+
+- a **page monitor** on the UP-RERA details URL: "alert if the completion date changes, a new extension or penalty order appears, or the registration status changes";
+- a **topic monitor** for `"<builder>" homebuyers protest OR NCLT`.
+
+```mermaid
+sequenceDiagram
+    participant U as Buyer
+    participant API as NeevCheck API
+    participant M as TinyFish Monitor
+    U->>API: POST /api/sentinel (email, project)
+    API->>M: create page + topic monitors (webhook_url)
+    M-->>M: daily re-read of the page / topic
+    M->>API: POST /api/sentinel/webhook (secret, monitor id, run id)
+    API->>API: constant-time secret check, drop repeated delivery
+    API->>API: re-check that project, diff against the watch baseline
+    API-->>U: alert with the diff (app, and email when SMTP is set)
+    U->>API: DELETE /api/sentinel/{watch_id}
+    API->>M: cancel monitors
+```
+
+The webhook only decides *which project to re-check*; the alert is always built from a normal check and its diff, so a monitor cannot put a claim in a report. The daily check cap still applies. TinyFish is given the secret inside the webhook URL because a monitor can only be given a URL; the endpoint also accepts it as the `X-Webhook-Secret` header. A failed monitor call is logged and never fails the watch. Without `PUBLIC_BASE_URL` nothing changes: the built-in Sentinel schedule is the only trigger. Monitors are billed on the TinyFish wallet ($0.005 per completed check), so one watch costs about $0.01 a day.
+
+## The escalation ladder
+
+Every source tries the cheapest way to read a page first and only escalates when it has to.
+
+```mermaid
+flowchart LR
+    S[Search<br/>free] --> F[Fetch<br/>free]
+    F -->|page unreadable or needs clicks| A[Agent run<br/>paid]
+    A -->|CAPTCHA, login or paywall| U[Unable to verify<br/>R12: confidence only]
+    F -->|page read| P[Parser + finding<br/>with source, time, snippet]
+    A -->|page read| P
+```
+
+A report costs at most three agent runs: the insolvency source and e-Jagriti each use one, and the registry source only when Fetch cannot read its page. UP-RERA, the builder's group, lender notices, land-authority lists and news are read with Search and Fetch alone. Results are cached per (source, entity, day) with `V2_SOURCES=true`.
 
 ## Free-plan cold starts
 
