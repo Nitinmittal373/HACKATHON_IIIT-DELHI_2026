@@ -20,15 +20,15 @@ export const compare: typeof en = {
   notEnough:
     "इन प्रोजेक्ट को रैंक करने लायक सबूत नहीं हैं: कम से कम दो के आधे रिकॉर्ड प्रकार पढ़े जाने चाहिए।",
   rows: {
-    rera: "UP-RERA नं.",
+    rera: "RERA नं.",
     promoter: "प्रमोटर",
     district: "ज़िला",
     registered: "पंजीकरण की तारीख",
     score: "NeevScore",
     areas: "स्तंभवार कटे अंक",
     delay: "पूरा होने की तारीख के बाद महीने",
-    projectComplaints: "इस प्रोजेक्ट पर UP-RERA शिकायतें",
-    promoterComplaints: "प्रमोटर पर UP-RERA शिकायतें",
+    projectComplaints: "इस प्रोजेक्ट पर RERA शिकायतें",
+    promoterComplaints: "प्रमोटर पर RERA शिकायतें",
     insolvency: "दिवाला",
     company: "कंपनी की स्थिति",
     unread: "जो मुख्य जाँचें नहीं पढ़ी गईं",

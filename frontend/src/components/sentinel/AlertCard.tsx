@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { NeevScore } from "@/components/NeevScore";
+import { StateBadge } from "@/components/StateBadge";
 import { dayOf } from "@/lib/format";
 import type { Lang, Strings } from "@/lib/i18n";
 import type { Alert, AlertChange } from "@/lib/types";
@@ -27,7 +28,9 @@ export function AlertCard({ alert, t, lang }: Props) {
       <header className={styles.head}>
         <span className={styles.icon} aria-hidden="true" />
         <div className={styles.titles}>
-          <h2 className={styles.project}>{alert.project_name ?? alert.rera_id}</h2>
+          <h2 className={styles.project}>
+            {alert.project_name ?? alert.rera_id} <StateBadge code={alert.state} name={alert.state_name} rera={alert.rera_name} t={t} lang={lang} />
+          </h2>
           <span className={`mono ${styles.when}`}>
             {t.alerts.when} {dayOf(alert.created_at, lang)}
           </span>

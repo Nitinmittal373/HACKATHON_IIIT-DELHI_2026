@@ -1,0 +1,184 @@
+id: 1
+event: source.started
+data: {"type":"source.started","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"uprera","ts":"2026-10-25T04:00:00Z","data":{}}
+
+id: 2
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"uprera","ts":"2026-10-25T04:00:00Z","data":{"text":"Looking for P99000055716 on MahaRERA"}}
+
+id: 3
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"uprera","ts":"2026-10-25T04:00:00Z","data":{"text":"Reading what MahaRERA shows about the project"}}
+
+id: 4
+event: finding.added
+data: {"type":"finding.added","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"uprera","ts":"2026-10-25T04:00:00Z","data":{"finding":{"id":"360bbe7b9ea5435ab2317415043b5d30","source":"uprera","kind":"registration","title":"Registration number appears on MahaRERA","area":"rera","verdict":"ok","reliability":"primary","source_url":"https://maharera.maharashtra.gov.in/projects-search-result?certificate_no=P99000055716","read_on":"2026-10-25","read_at":"2026-10-25T04:00:00Z","occurred_on":null,"count":null,"months":null,"scope":null,"total":null,"snippet":"P99000055716. SRI BALAJI RESIDENCY. Bhupesh Vasudev Bari. Dahanu. State. MAHARASHTRA. Pincode. 401602. Certificate. District. Palghar. Last Modified.","via":"search_snippet"}}}
+
+id: 5
+event: source.completed
+data: {"type":"source.completed","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"uprera","ts":"2026-10-25T04:00:00Z","data":{"status":"completed","message":null,"checks_read":["registration"]}}
+
+id: 6
+event: source.started
+data: {"type":"source.started","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"registry","ts":"2026-10-25T04:00:00Z","data":{}}
+
+id: 7
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"registry","ts":"2026-10-25T04:00:00Z","data":{"text":"No company page with the promoter's exact legal name was found"}}
+
+id: 8
+event: source.completed
+data: {"type":"source.completed","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"registry","ts":"2026-10-25T04:00:00Z","data":{"status":"completed","message":null,"checks_read":[]}}
+
+id: 9
+event: source.started
+data: {"type":"source.started","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"group","ts":"2026-10-25T04:00:00Z","data":{}}
+
+id: 10
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"group","ts":"2026-10-25T04:00:00Z","data":{"text":"Finding the public company profile of Bhupesh Vasudev Bari"}}
+
+id: 11
+event: source.completed
+data: {"type":"source.completed","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"group","ts":"2026-10-25T04:00:00Z","data":{"status":"failed","message":"No public company profile with the promoter's exact name was read","checks_read":[]}}
+
+id: 12
+event: source.started
+data: {"type":"source.started","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"sarfaesi","ts":"2026-10-25T04:00:00Z","data":{}}
+
+id: 13
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"sarfaesi","ts":"2026-10-25T04:00:00Z","data":{"text":"Searching for SARFAESI auction notices naming Bhupesh Vasudev Bari"}}
+
+id: 14
+event: source.completed
+data: {"type":"source.completed","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"sarfaesi","ts":"2026-10-25T04:00:00Z","data":{"status":"completed","message":null,"checks_read":[]}}
+
+id: 15
+event: source.started
+data: {"type":"source.started","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"insolvency","ts":"2026-10-25T04:00:00Z","data":{}}
+
+id: 16
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"insolvency","ts":"2026-10-25T04:00:00Z","data":{"text":"No page about this promoter's insolvency case was found"}}
+
+id: 17
+event: source.completed
+data: {"type":"source.completed","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"insolvency","ts":"2026-10-25T04:00:00Z","data":{"status":"completed","message":null,"checks_read":[]}}
+
+id: 18
+event: source.started
+data: {"type":"source.started","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"land","ts":"2026-10-25T04:00:00Z","data":{}}
+
+id: 19
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"land","ts":"2026-10-25T04:00:00Z","data":{"text":"Land dues lists exist for Uttar Pradesh only; not read here"}}
+
+id: 20
+event: source.completed
+data: {"type":"source.completed","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"land","ts":"2026-10-25T04:00:00Z","data":{"status":"completed","message":null,"checks_read":[]}}
+
+id: 21
+event: source.started
+data: {"type":"source.started","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{}}
+
+id: 22
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Opening e-jagriti.gov.in"}}
+
+id: 23
+event: source.live_url
+data: {"type":"source.live_url","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"url":"https://live.tinyfish.example/session"}}
+
+id: 24
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Navigate to e-Jagriti case search page"}}
+
+id: 25
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Understand search options available on the page"}}
+
+id: 26
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Understand the search form layout and options"}}
+
+id: 27
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Select More Advance Search option to find opposite party search"}}
+
+id: 28
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Understand Search By dropdown options"}}
+
+id: 29
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Open Search By dropdown to find opposite party option"}}
+
+id: 30
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Select Respondent/Opposite Party search option"}}
+
+id: 31
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Type the party name Bhupesh Vasudev Bari"}}
+
+id: 32
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Find the submit button to proceed with search"}}
+
+id: 33
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Find submit button"}}
+
+id: 34
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Find all buttons on the page"}}
+
+id: 35
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Find submit button ID"}}
+
+id: 36
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Find submit button element ID"}}
+
+id: 37
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"List all elements with IDs to find submit button"}}
+
+id: 38
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Find submit button visually"}}
+
+id: 39
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Stop due to CAPTCHA on search form"}}
+
+id: 40
+event: source.blocked
+data: {"type":"source.blocked","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"reason":"This page asks for a CAPTCHA. We never bypass one"}}
+
+id: 41
+event: source.completed
+data: {"type":"source.completed","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"status":"blocked","message":"This page asks for a CAPTCHA. We never bypass one","checks_read":[]}}
+
+id: 42
+event: source.started
+data: {"type":"source.started","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"news","ts":"2026-10-25T04:00:00Z","data":{}}
+
+id: 43
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"news","ts":"2026-10-25T04:00:00Z","data":{"text":"Searching news for delay coverage"}}
+
+id: 44
+event: source.progress
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"news","ts":"2026-10-25T04:00:00Z","data":{"text":"Checking whether the Supreme Court's NBCC order names this project"}}
+
+id: 45
+event: source.completed
+data: {"type":"source.completed","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"news","ts":"2026-10-25T04:00:00Z","data":{"status":"completed","message":null,"checks_read":[]}}
+
+id: 46
+event: check.completed
+data: {"type":"check.completed","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"check","ts":"2026-10-25T04:00:00Z","data":{"status":"completed","score":{"value":100,"band":"insufficient_evidence","band_label":"Not enough evidence yet","confidence":0.14,"provisional":true,"hard_stop":false},"display_score":{"value":900,"band":"insufficient_evidence","hard_stop":false,"confidence":0.33,"provisional":true}}}
+

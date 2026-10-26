@@ -1,0 +1,387 @@
+[
+  {
+    "code": "UP",
+    "name": "Uttar Pradesh",
+    "rera_name": "UP-RERA",
+    "coverage": "full",
+    "examples": [
+      "UPRERAPRJ8334",
+      "UPRERAPRJ2634"
+    ],
+    "note": "Fetch reads the project page and its summary page: promoter, dates, extensions, status and complaint counts.",
+    "portal_url": "https://www.up-rera.in/",
+    "complaint_url": "https://www.up-rera.in/ComplaintHome",
+    "id_patterns": [
+      "UPRERAPRJ\\d{1,7}(?:/\\d{2}/\\d{4})?"
+    ],
+    "format_verified": true
+  },
+  {
+    "code": "MH",
+    "name": "Maharashtra",
+    "rera_name": "MahaRERA",
+    "coverage": "search_only",
+    "examples": [
+      "P51800000937",
+      "P52100031791"
+    ],
+    "note": "Search shows the number, name, promoter and district. The full project view is behind a login, so it is never opened.",
+    "portal_url": "https://www.maharera.maharashtra.gov.in/projects-search-result",
+    "complaint_url": "https://www.maharera.maharashtra.gov.in/complaint-filing-under-registered-project",
+    "id_patterns": [
+      "P[1-9]\\d{10}"
+    ],
+    "format_verified": true
+  },
+  {
+    "code": "HR",
+    "name": "Haryana",
+    "rera_name": "HRERA (Gurugram and Panchkula)",
+    "coverage": "search_only",
+    "examples": [
+      "HRERA-PKL-JJR-867-2026",
+      "RC/REP/HARERA/GGM/1061/793/2026/33"
+    ],
+    "note": "Fetch and an India-proxy agent both fail on this portal; Search returns approval date, status and promoter.",
+    "portal_url": "https://haryanarera.gov.in/assistancecontrol/project_search_public/2",
+    "complaint_url": "https://haryanarera.gov.in/",
+    "id_patterns": [
+      "HE?RERA-[A-Z]{3}-[A-Z]{2,4}-\\d+-\\d{4}",
+      "RC/REP/HARERA/GGM/\\d+(?:/\\d+)*"
+    ],
+    "format_verified": true
+  },
+  {
+    "code": "KA",
+    "name": "Karnataka",
+    "rera_name": "K-RERA",
+    "coverage": "search_only",
+    "examples": [
+      "PRM/KA/RERA/1251/309/PR/190517/002554",
+      "PRM/KA/RERA/1251/446/PR/170915/000176"
+    ],
+    "note": "Fetch cannot reach the portal; Search returns the registration certificate page and project lists.",
+    "portal_url": "https://rera.karnataka.gov.in/viewAllProjects",
+    "complaint_url": "https://rera.karnataka.gov.in/",
+    "id_patterns": [
+      "PRM/KA/RERA/\\d+/\\d+/PR/\\d{6}/\\d{6}"
+    ],
+    "format_verified": true
+  },
+  {
+    "code": "DL",
+    "name": "Delhi",
+    "rera_name": "Delhi RERA",
+    "coverage": "search_only",
+    "examples": [
+      "DLRERA2023P0008",
+      "DLRERA2022P0036"
+    ],
+    "note": "Delhi RERA's e-portal; Fetch cannot reach it.",
+    "portal_url": "https://erera.co.in/reradelhiindex/PublicView/ProjectInfo",
+    "complaint_url": "https://erera.co.in/reradelhiindex/GenComplaint/RegComplaint",
+    "id_patterns": [
+      "DLRERA\\d{4}P\\d{4}"
+    ],
+    "format_verified": true
+  },
+  {
+    "code": "TG",
+    "name": "Telangana",
+    "rera_name": "TG-RERA",
+    "coverage": "search_only",
+    "examples": [],
+    "note": "The project search sits behind a CAPTCHA, which is never bypassed. The number format is not yet confirmed from a real record.",
+    "portal_url": "https://rerait.telangana.gov.in/SearchList/Search",
+    "complaint_url": "https://rera.telangana.gov.in/complaint/",
+    "id_patterns": [
+      "P0\\d{10}"
+    ],
+    "format_verified": false
+  },
+  {
+    "code": "GJ",
+    "name": "Gujarat",
+    "rera_name": "GujRERA",
+    "coverage": "search_only",
+    "examples": [
+      "PR/GJ/SURAT/SURAT CITY/SUDA/RAA00299/290917",
+      "PR/GJ/AHMEDABAD/AHMEDABAD CITY/AUDA/RAA04710/210119"
+    ],
+    "note": "Search returns registration certificates; Fetch cannot reach the portal.",
+    "portal_url": "https://gujrera.gujarat.gov.in/",
+    "complaint_url": "https://gujrera.gujarat.gov.in/",
+    "id_patterns": [
+      "PR/GJ/[A-Z ]+/[A-Z ]+/[A-Za-z ]+/[A-Z]{3}\\d{4,6}/\\d{6}"
+    ],
+    "format_verified": true
+  },
+  {
+    "code": "TN",
+    "name": "Tamil Nadu",
+    "rera_name": "TNRERA",
+    "coverage": "search_only",
+    "examples": [
+      "TN/01/Layout/0001/2017",
+      "TNRERA/7/LO/3733/2026"
+    ],
+    "note": "Search returns project pages with status and completion date; Fetch cannot reach the portal.",
+    "portal_url": "https://rera.tn.gov.in/registered-building/tn",
+    "complaint_url": "https://rera.tn.gov.in/complaint/login",
+    "id_patterns": [
+      "TN/\\d+/[A-Za-z]+/\\d+/\\d{4}",
+      "TNRERA/\\d+/[A-Za-z]+/\\d+/\\d{4}"
+    ],
+    "format_verified": true
+  },
+  {
+    "code": "RJ",
+    "name": "Rajasthan",
+    "rera_name": "RAJ-RERA",
+    "coverage": "search_only",
+    "examples": [
+      "RAJ/P/2020/1380",
+      "RAJ/P/2024/3129"
+    ],
+    "note": "The portal needs JavaScript, so Fetch returns nothing; Search returns promoter project lists.",
+    "portal_url": "https://rera.rajasthan.gov.in/ProjectList",
+    "complaint_url": "https://rera.rajasthan.gov.in/",
+    "id_patterns": [
+      "RAJ/P/\\d{4}/\\d+"
+    ],
+    "format_verified": true
+  },
+  {
+    "code": "MP",
+    "name": "Madhya Pradesh",
+    "rera_name": "MPRERA",
+    "coverage": "search_only",
+    "examples": [],
+    "note": "No portal page could be read; the number format is not yet confirmed from a real record.",
+    "portal_url": "https://rera.mp.gov.in/",
+    "complaint_url": "https://rera.mp.gov.in/",
+    "id_patterns": [
+      "P-[A-Z]{3}-\\d{2}-\\d{4}"
+    ],
+    "format_verified": false
+  },
+  {
+    "code": "WB",
+    "name": "West Bengal",
+    "rera_name": "WBRERA",
+    "coverage": "search_only",
+    "examples": [
+      "WBRERA/P/KOL/2024/002005",
+      "WBRERA/P/NOR/2024/002226"
+    ],
+    "note": "Search returns project pages with completion and extension dates; Fetch cannot reach the portal.",
+    "portal_url": "https://rera.wb.gov.in/",
+    "complaint_url": "https://rera.wb.gov.in/",
+    "id_patterns": [
+      "WBRERA/P/[A-Z]{3}/\\d{4}/\\d+"
+    ],
+    "format_verified": true
+  },
+  {
+    "code": "PB",
+    "name": "Punjab",
+    "rera_name": "RERA Punjab",
+    "coverage": "search_only",
+    "examples": [
+      "PBRERA-SAS79-PR0083"
+    ],
+    "note": "Fetch fails (HTTP 522); Search returns quarterly update pages.",
+    "portal_url": "https://rera.punjab.gov.in/reraindex/publicview/projectinfo",
+    "complaint_url": "https://rera.punjab.gov.in/",
+    "id_patterns": [
+      "PBRERA-[A-Z0-9]+-PR\\d+"
+    ],
+    "format_verified": true
+  },
+  {
+    "code": "KL",
+    "name": "Kerala",
+    "rera_name": "K-RERA",
+    "coverage": "search_only",
+    "examples": [
+      "K-RERA/PRJ/039/2020",
+      "K-RERA/PRJ/KKD/096/2025"
+    ],
+    "note": "Search returns registration and extension certificates.",
+    "portal_url": "https://rera.kerala.gov.in/explore-projects",
+    "complaint_url": "https://rera.kerala.gov.in/",
+    "id_patterns": [
+      "K-RERA/PRJ/(?:[A-Z]{3}/)?\\d+/\\d{4}"
+    ],
+    "format_verified": true
+  },
+  {
+    "code": "AP",
+    "name": "Andhra Pradesh",
+    "rera_name": "AP RERA",
+    "coverage": "search_only",
+    "examples": [
+      "410 OF 2017",
+      "246 OF 2018"
+    ],
+    "note": "Numbers look like '410 OF 2017'; Fetch cannot reach the portal.",
+    "portal_url": "https://rera.ap.gov.in/RERA/Views/Home.aspx",
+    "complaint_url": "https://rera.ap.gov.in/",
+    "id_patterns": [
+      "\\d{1,5} OF \\d{4}"
+    ],
+    "format_verified": true
+  },
+  {
+    "code": "UK",
+    "name": "Uttarakhand",
+    "rera_name": "UKRERA",
+    "coverage": "search_only",
+    "examples": [
+      "UKREP06240000564"
+    ],
+    "note": "No portal page could be read; the number comes from a registration certificate.",
+    "portal_url": "https://rera.uk.gov.in/",
+    "complaint_url": "https://rera.uk.gov.in/",
+    "id_patterns": [
+      "UKREP\\d{10,14}"
+    ],
+    "format_verified": true
+  },
+  {
+    "code": "BR",
+    "name": "Bihar",
+    "rera_name": "RERA Bihar",
+    "coverage": "partial",
+    "examples": [
+      "BRERAP187328070625271029E00",
+      "BRERAP00923-1/607/R-783/2019"
+    ],
+    "note": "Fetch reads the first page of the registered-projects list; a project further down is found through Search only.",
+    "portal_url": "https://rera.bihar.gov.in/RegisteredPP.aspx",
+    "complaint_url": "https://rera.bihar.gov.in/",
+    "id_patterns": [
+      "BRERAP\\d{10,}[A-Z0-9]*",
+      "BRERAP\\d{4,6}-\\d+/\\d+/R-\\d+/\\d{4}"
+    ],
+    "format_verified": true
+  },
+  {
+    "code": "OD",
+    "name": "Odisha",
+    "rera_name": "ORERA",
+    "coverage": "search_only",
+    "examples": [
+      "RP/09/2019/00287",
+      "RP/07/2024/01240"
+    ],
+    "note": "Project data loads with JavaScript, so Fetch sees an empty shell.",
+    "portal_url": "https://rera.odisha.gov.in/projects/project-list",
+    "complaint_url": "https://rera.odisha.gov.in/complaint-status/",
+    "id_patterns": [
+      "RP/\\d{2}/\\d{4}/\\d{5}"
+    ],
+    "format_verified": true
+  },
+  {
+    "code": "GA",
+    "name": "Goa",
+    "rera_name": "Goa RERA",
+    "coverage": "partial",
+    "examples": [
+      "PRGO08242238",
+      "PRGO05242234"
+    ],
+    "note": "Fetch reads the project page, which needs a link that Search finds first.",
+    "portal_url": "https://rera.goa.gov.in/",
+    "complaint_url": "https://rera.goa.gov.in/",
+    "id_patterns": [
+      "PRGO\\d{8}"
+    ],
+    "format_verified": true
+  },
+  {
+    "code": "CG",
+    "name": "Chhattisgarh",
+    "rera_name": "CG RERA",
+    "coverage": "search_only",
+    "examples": [
+      "PCGRERA220618000295",
+      "PCGRERA030424001753"
+    ],
+    "note": "Search returns the approved, delayed and extended project lists.",
+    "portal_url": "https://rera.cgstate.gov.in/Approved_project_List.aspx",
+    "complaint_url": "https://rera.cgstate.gov.in/",
+    "id_patterns": [
+      "PCGRERA\\d{12}"
+    ],
+    "format_verified": true
+  },
+  {
+    "code": "HP",
+    "name": "Himachal Pradesh",
+    "rera_name": "HP RERA",
+    "coverage": "search_only",
+    "examples": [
+      "RERAHPSOP09170006"
+    ],
+    "note": "The public dashboard needs a form; Search returns the quarterly project list.",
+    "portal_url": "https://hprera.nic.in/PublicDashboard",
+    "complaint_url": "https://hprera.nic.in/",
+    "id_patterns": [
+      "RERAHP[A-Z]{2,4}\\d{8,}"
+    ],
+    "format_verified": true
+  },
+  {
+    "code": "JH",
+    "name": "Jharkhand",
+    "rera_name": "JHARERA",
+    "coverage": "partial",
+    "examples": [
+      "JHARERA/PROJECT/215/2024",
+      "JHARERA/PROJECT/132/2021"
+    ],
+    "note": "Fetch reads the first page of the registered-projects list; a project further down is found through Search only.",
+    "portal_url": "https://jharera.jharkhand.gov.in/Home/RegisteredProjectsList",
+    "complaint_url": "https://jharera.jharkhand.gov.in/",
+    "id_patterns": [
+      "JHARERA/ ?PROJECT/\\d+/\\d{4}"
+    ],
+    "format_verified": true
+  },
+  {
+    "code": "AS",
+    "name": "Assam",
+    "rera_name": "RERA Assam",
+    "coverage": "search_only",
+    "examples": [
+      "RERAA KM 68 OF 2022-2023",
+      "RERAA KM 105 OF 2022-2023"
+    ],
+    "note": "Search returns project pages with approval remarks; Fetch cannot reach the portal.",
+    "portal_url": "https://rera.assam.gov.in/admincontrol/registered_projects/1",
+    "complaint_url": "https://rera.assam.gov.in/",
+    "id_patterns": [
+      "RERAA KM \\d+ OF \\d{4}-\\d{4}"
+    ],
+    "format_verified": true
+  },
+  {
+    "code": "JK",
+    "name": "Jammu and Kashmir",
+    "rera_name": "JK RERA",
+    "coverage": "search_only",
+    "examples": [
+      "RERA-JK-JMU-6-2026",
+      "RERA-JK-JMU-5-2026"
+    ],
+    "note": "Search returns the registered project list and project pages.",
+    "portal_url": "https://rera.jk.gov.in/admincontrol/registered_projects/1",
+    "complaint_url": "https://rera.jk.gov.in/",
+    "id_patterns": [
+      "RERA-JK-[A-Z]{3}-\\d+-\\d{4}"
+    ],
+    "format_verified": true
+  }
+]

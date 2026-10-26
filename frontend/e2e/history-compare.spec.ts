@@ -85,7 +85,7 @@ test.describe("Compare", () => {
     await expect(page.getByRole("status").filter({ hasText: "not enough evidence to rank" })).toBeVisible();
     const table = page.getByRole("table", { name: "Comparison of the selected projects" });
     await expect(table.getByRole("row", { name: /^Months past the completion date/ })).toContainText("105 months");
-    await expect(table.getByRole("row", { name: /^UP-RERA complaints on the promoter/ })).toContainText("2,803");
+    await expect(table.getByRole("row", { name: /^RERA complaints on the promoter/ })).toContainText("2,803");
     // Never read for 6742, so it says so instead of looking clean.
     await expect(table.getByRole("row", { name: /^Company status/ })).toContainText("Not read");
   });

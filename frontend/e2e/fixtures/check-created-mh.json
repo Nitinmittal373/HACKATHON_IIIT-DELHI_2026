@@ -1,0 +1,14 @@
+{
+  "state": "MH",
+  "state_name": "Maharashtra",
+  "rera_name": "MahaRERA",
+  "id": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+  "rera_id": "P99000055716",
+  "details_url": "https://maharera.maharashtra.gov.in/projects-search-result?certificate_no=P99000055716",
+  "status": "queued",
+  "started_at": "2026-10-25T04:00:00Z",
+  "completed_at": null,
+  "sources": [],
+  "reused": false,
+  "display_score": null
+}

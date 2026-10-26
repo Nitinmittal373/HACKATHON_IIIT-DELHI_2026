@@ -33,6 +33,9 @@ const json = (name: string): Record<string, unknown> => JSON.parse(read(name));
 const FLAGGED_ID = "f".repeat(32);
 
 let finished = false;
+// The Maharashtra check (search_only) has its own recorded answers and id.
+const MH_NUMBER = "P99000055716";
+const mhId = (): string => json("check-created-mh.json").id as string;
 
 function send(res: ServerResponse, status: number, body: unknown, headers: Record<string, string> = {}) {
   res.writeHead(status, {
@@ -44,13 +47,13 @@ function send(res: ServerResponse, status: number, body: unknown, headers: Recor
   res.end(JSON.stringify(body));
 }
 
-async function streamEvents(res: ServerResponse) {
+async function streamEvents(res: ServerResponse, file = "events.sse") {
   res.writeHead(200, {
     "Content-Type": "text/event-stream",
     "Cache-Control": "no-cache",
     "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
   });
-  for (const block of read("events.sse").trim().split("\n\n")) {
+  for (const block of read(file).trim().split("\n\n")) {
     res.write(`${block}\n\n`);
     await new Promise((done) => setTimeout(done, EVENT_DELAY_MS));
   }
@@ -74,6 +77,9 @@ function recordedSummary(): Schemas["CheckSummary"] {
   return {
     id: check.id,
     rera_id: check.rera_id,
+    state: check.state,
+    state_name: check.state_name,
+    rera_name: check.rera_name,
     details_url: check.details_url,
     project: project.name,
     promoter: project.promoter,
@@ -103,13 +109,27 @@ createServer(async (req, res) => {
   const url = new URL(req.url ?? "/", `http://localhost:${PORT}`);
   const path = url.pathname;
 
+  if (req.method === "OPTIONS") {
+    // The browser asks before any JSON POST made from another origin.
+    res.writeHead(204, {
+      "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    });
+    return res.end();
+  }
+
   if (path === "/api/health") return send(res, 200, { status: "ok" });
 
   if (path === "/api/projects/search") {
     const query = url.searchParams.get("q") ?? "";
     if (/nothing/i.test(query)) return send(res, 200, { query, candidates: [] });
+    if (query === MH_NUMBER) return send(res, 200, json("search-mh.json"));
+    if (/prestige/i.test(query)) return send(res, 200, json("search-grouped.json"));
     return send(res, 200, { ...json("search.json"), query });
   }
+
+  if (path === "/api/states") return send(res, 200, JSON.parse(read("states.json")));
 
   if (path === "/api/meta") return send(res, 200, json("meta.json"));
 
@@ -125,6 +145,7 @@ createServer(async (req, res) => {
       return send(res, 429, { detail }, { "Retry-After": "30" });
     }
     finished = false;
+    if (body.rera_id === MH_NUMBER) return send(res, 202, json("check-created-mh.json"));
     return send(res, 202, json("check-created.json"));
   }
 
@@ -150,6 +171,10 @@ createServer(async (req, res) => {
   const check = path.match(/^\/api\/checks\/([0-9a-f]{32})(\/events|\/report)?$/);
   if (check) {
     const [, id, tail] = check;
+    if (id === mhId()) {
+      if (tail === "/events") return streamEvents(res, "events-mh.sse");
+      return send(res, 200, json(tail === "/report" ? "report-mh.json" : "check-done-mh.json"));
+    }
     const known = json("check-created.json").id;
     if (id === FLAGGED_ID && tail === "/report") return send(res, 200, json("report-flagged.json"));
     if (id !== known) return send(res, 404, { detail: "No check with this id" });

@@ -11,6 +11,8 @@ interface Props {
   view: SourceView;
   /** The page the agent is on, shown in the address bar. */
   address: string;
+  /** Where a buyer can check this source themselves, when it is not the default one. */
+  officialUrl?: string;
   percent: number;
   t: Strings;
 }
@@ -24,7 +26,7 @@ const BADGE: Record<SourceView["status"], "live" | "stopped" | "finished" | "que
 };
 
 /** The agent's browser: address bar, the live view (or an illustration) and a progress bar. */
-export function BrowserWindow({ name, view, address, percent, t }: Props) {
+export function BrowserWindow({ name, view, address, officialUrl, percent, t }: Props) {
   const label = t.cam.sourceLabels[name];
   const badge = BADGE[view.status];
   const stepText = view.status === "running" ? (view.note ?? t.cam.stepReading(label)) : t.cam.status[view.status];
@@ -47,7 +49,7 @@ export function BrowserWindow({ name, view, address, percent, t }: Props) {
       </div>
 
       <div className={styles.screen}>
-        <Screen name={name} view={view} t={t} label={label} />
+        <Screen name={name} view={view} t={t} label={label} officialUrl={officialUrl} />
       </div>
 
       <div className={styles.progress}>
@@ -71,7 +73,19 @@ export function BrowserWindow({ name, view, address, percent, t }: Props) {
   );
 }
 
-function Screen({ name, view, t, label }: { name: SourceName; view: SourceView; t: Strings; label: string }) {
+function Screen({
+  name,
+  view,
+  t,
+  label,
+  officialUrl,
+}: {
+  name: SourceName;
+  view: SourceView;
+  t: Strings;
+  label: string;
+  officialUrl?: string;
+}) {
   if (view.status === "running" && view.liveUrl) {
     return (
       <iframe
@@ -86,20 +100,32 @@ function Screen({ name, view, t, label }: { name: SourceName; view: SourceView; 
   }
   if (view.status === "running") return <UpreraReplica notes={view.notes} t={t} />;
   if (view.status === "blocked") {
-    return <Notice tone="stopped" text={stopReason(view.reason, t)} name={name} t={t} />;
+    return <Notice tone="stopped" text={stopReason(view.reason, t)} name={name} href={officialUrl} t={t} />;
   }
   if (view.status === "unread") {
-    return <Notice tone="stopped" text={t.cam.unreadReason} name={name} t={t} />;
+    return <Notice tone="stopped" text={t.cam.unreadReason} name={name} href={officialUrl} t={t} />;
   }
-  return <Notice tone="quiet" text={t.cam.status[view.status]} name={name} t={t} />;
+  return <Notice tone="quiet" text={t.cam.status[view.status]} name={name} href={officialUrl} t={t} />;
 }
 
-function Notice({ tone, text, name, t }: { tone: "stopped" | "quiet"; text: string; name: SourceName; t: Strings }) {
+function Notice({
+  tone,
+  text,
+  name,
+  href,
+  t,
+}: {
+  tone: "stopped" | "quiet";
+  text: string;
+  name: SourceName;
+  href?: string;
+  t: Strings;
+}) {
   return (
     <div className={`${styles.notice} ${styles[tone === "stopped" ? "noticeStopped" : "noticeQuiet"]}`}>
       <p>{text}</p>
       {tone === "stopped" && (
-        <a href={SOURCE_INFO[name].officialUrl} target="_blank" rel="noopener noreferrer">
+        <a href={href ?? SOURCE_INFO[name].officialUrl} target="_blank" rel="noopener noreferrer">
           {t.cam.checkYourself}
           <span className="sr"> ({t.common.opensInNewTab})</span>
         </a>

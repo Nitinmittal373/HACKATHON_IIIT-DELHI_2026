@@ -15,7 +15,7 @@ test("a slow, sleeping server: waking notice first, then the search, then result
 
   await page.goto("/check?q=Supertech%20Eco%20Village");
   await expect(page.getByRole("status").filter({ hasText: "Waking up the server" })).toBeVisible();
-  await expect(page.getByRole("status").filter({ hasText: "Searching UP-RERA" })).toBeVisible();
+  await expect(page.getByRole("status").filter({ hasText: "Searching RERA portals" })).toBeVisible();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(RESULTS);
 });
 
@@ -46,7 +46,7 @@ test("a real API error names its reason and is not retried", async ({ page }) =>
 
   await page.goto("/check?q=Supertech%20Eco%20Village");
   const alert = page.locator("section[role=alert]");
-  await expect(alert).toContainText("We could not search UP-RERA just now");
+  await expect(alert).toContainText("We could not search the RERA portals just now");
   await expect(alert).toContainText("out of credit");
   expect(calls).toBe(1);
 });

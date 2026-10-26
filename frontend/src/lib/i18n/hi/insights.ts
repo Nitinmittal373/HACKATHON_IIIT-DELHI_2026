@@ -3,10 +3,10 @@ import type { insights as en } from "@/lib/i18n/en/insights";
 export const insights: typeof en = {
   track: {
     title: (promoter: string) => `${promoter} के दूसरे UP-RERA प्रोजेक्ट`,
-    note: "up-rera.in पर प्रमोटर के पूरे कानूनी नाम से खोजकर मिले। खोज कुछ प्रोजेक्ट दिखाती है, हमेशा सब नहीं।",
-    loading: "up-rera.in पर खोज हो रही है…",
+    note: "UP-RERA पर प्रमोटर के पूरे कानूनी नाम से खोजकर मिले। खोज कुछ प्रोजेक्ट दिखाती है, हमेशा सब नहीं।",
+    loading: "UP-RERA पर खोज हो रही है…",
     none: "खोज में इस प्रमोटर के नाम वाला कोई दूसरा UP-RERA प्रोजेक्ट नहीं मिला।",
-    failed: "अभी up-rera.in पर खोज नहीं हो सकी।",
+    failed: "अभी UP-RERA पर खोज नहीं हो सकी।",
     unnamed: "खोज में नाम नहीं दिखा",
     registered: (date: string) => `पंजीकरण ${date}`,
     check: "जाँचें",

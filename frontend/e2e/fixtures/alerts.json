@@ -1,7 +1,10 @@
 [
   {
-    "id": "6cf957e35262422a8494f865b1511fe5",
-    "watch_id": "2b08d93cb3c84043b4087f442a88110a",
+    "state": "UP",
+    "state_name": "Uttar Pradesh",
+    "rera_name": "UP-RERA",
+    "id": "2a319738b0504792be98ced766eef880",
+    "watch_id": "bdf5fbe10a4b4f64bd5c1d8a9d6eb392",
     "rera_id": "UPRERAPRJ8334",
     "project_name": "SUPERTECH ECO VILLAGE-I PHASE I-C",
     "check_id": "4ad9752355f9455aa9d242c93950ea04",

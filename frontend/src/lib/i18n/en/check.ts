@@ -3,10 +3,10 @@ export const check = {
     step: "Step 1 of 3 · Confirm",
     title: (count: number, query: string) =>
       `We found ${count} ${count === 1 ? "project" : "projects"} for “${query}”`,
-    lead: "From the UP-RERA register. Each phase has its own registration, so pick the one on your agreement.",
+    lead: "From the state RERA portals. Each phase has its own registration, so pick the one on your agreement.",
     tableLabel: "Matching projects",
     colProject: "Project",
-    colNumber: "UP-RERA no.",
+    colNumber: "RERA no.",
     colRegistered: "Registered",
     bestMatch: "Best match",
     unnamed: "Project name not shown on search",
@@ -16,25 +16,25 @@ export const check = {
     no: "Not this one",
     starting: "Starting the check…",
     pickOne: "Pick the project on your agreement to continue.",
-    emptyTitle: "No UP-RERA project found",
+    emptyTitle: "No RERA project found",
     emptyBody: (query: string) =>
-      `We could not find a registered project for “${query}” on UP-RERA. Nothing was checked and nothing was charged.`,
+      `We could not find a registered project for “${query}” on the RERA portals searched. Nothing was checked and nothing was charged.`,
     tipsTitle: "Things to try",
     tips: [
-      "Search by the UP-RERA number, for example UPRERAPRJ8334. It is on your agreement and on the builder's brochure.",
+      "Search by the RERA number, for example UPRERAPRJ8334 or P51800000937. It is on your agreement and on the builder's brochure.",
       "Check the spelling, or search by the builder's name.",
       "Use the project name as written on your agreement, with the phase.",
-      "NeevCheck reads the UP-RERA register only, so projects outside Uttar Pradesh are not listed.",
+      "Pick the state next to the search box to narrow the search. The Coverage page lists which portals can be read in full.",
     ],
     searchAgain: "Search again",
     waking: "Waking up the server, this takes up to a minute on the free plan…",
-    searching: "Searching UP-RERA…",
-    searchingNote: "Reading the UP-RERA register live. A name search can take up to a minute.",
-    searchFailedTitle: "We could not search UP-RERA just now",
+    searching: "Searching RERA portals…",
+    searchingNote: "Reading RERA portals live. A name search can take up to a minute.",
+    searchFailedTitle: "We could not search the RERA portals just now",
     searchFailedBody:
       "The search did not finish. Nothing was charged and nothing was saved. Please try again in a minute.",
     searchTimeout:
-      "UP-RERA or the search service did not answer in time. Nothing was charged. Please try again.",
+      "A RERA portal or the search service did not answer in time. Nothing was charged. Please try again.",
     searchKey:
       "The search service did not accept NeevCheck's key, so nothing could be read. This is on our side; please try again later.",
     searchBusy: (seconds: number) =>

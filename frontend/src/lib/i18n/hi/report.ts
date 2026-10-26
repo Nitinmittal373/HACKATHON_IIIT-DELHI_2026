@@ -27,6 +27,7 @@ export const report: typeof en = {
     not_found: "नहीं मिला",
   },
   reliability: { primary: "आधिकारिक रिकॉर्ड", secondary: "खबर या द्वितीयक स्रोत" },
+  viaSnippet: "खोज अंश",
   step: (date: string) => `चरण 3 / 3 · रिपोर्ट · जाँच की तारीख ${date}`,
   watch: "Sentinel से निगरानी करें",
   download: "PDF डाउनलोड करें",

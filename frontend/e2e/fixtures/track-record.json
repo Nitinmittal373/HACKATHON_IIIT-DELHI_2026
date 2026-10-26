@@ -2,6 +2,9 @@
   "promoter": "SUPERTECH LIMITED",
   "projects": [
     {
+      "state": "UP",
+      "state_name": "Uttar Pradesh",
+      "rera_name": "UP-RERA",
       "rera_id": "UPRERAPRJ8267",
       "name": "Supertech Upcountry (Plotted)",
       "promoter": "SUPERTECH LIMITED",
@@ -12,6 +15,9 @@
       "display_score": null
     },
     {
+      "state": "UP",
+      "state_name": "Uttar Pradesh",
+      "rera_name": "UP-RERA",
       "rera_id": "UPRERAPRJ5017",
       "name": "SUPERTECH CAPETOWN (PHASE-I)",
       "promoter": "SUPERTECH LIMITED",
@@ -22,6 +28,9 @@
       "display_score": null
     },
     {
+      "state": "UP",
+      "state_name": "Uttar Pradesh",
+      "rera_name": "UP-RERA",
       "rera_id": "UPRERAPRJ408",
       "name": "SPORTS VILLAGE (PHASE-I)",
       "promoter": "SUPERTECH LIMITED",
@@ -32,6 +41,9 @@
       "display_score": null
     },
     {
+      "state": "UP",
+      "state_name": "Uttar Pradesh",
+      "rera_name": "UP-RERA",
       "rera_id": "UPRERAPRJ5582",
       "name": "SUPERTECH UPCOUNTRY GH-01 (PHASE-I)",
       "promoter": "SUPERTECH LIMITED",

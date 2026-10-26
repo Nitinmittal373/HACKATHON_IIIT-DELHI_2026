@@ -9,6 +9,8 @@ type Schemas = components["schemas"];
 
 export type Project = Schemas["Project"];
 export type SearchResponse = Schemas["SearchResponse"];
+/** One state's RERA portal and how much of it NeevCheck reads (GET /api/states). */
+export type StateInfo = Schemas["StateInfo"];
 export type SourceRun = Schemas["SourceRun"];
 export type Check = Schemas["Check"];
 export type Finding = Schemas["Finding"];

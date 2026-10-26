@@ -1,10 +1,10 @@
 export const insights = {
   track: {
     title: (promoter: string) => `Other UP-RERA projects by ${promoter}`,
-    note: "Found by searching up-rera.in for the promoter's full legal name. Search shows some projects, not always all of them.",
-    loading: "Searching up-rera.in…",
+    note: "Found by searching UP-RERA for the promoter's full legal name. Search shows some projects, not always all of them.",
+    loading: "Searching UP-RERA…",
     none: "Search found no other UP-RERA project that names this promoter.",
-    failed: "We could not search up-rera.in just now.",
+    failed: "We could not search UP-RERA just now.",
     unnamed: "Name not shown on search",
     registered: (date: string) => `Registered ${date}`,
     check: "Check",

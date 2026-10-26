@@ -7,7 +7,8 @@ the report. Run from backend/:  python -m scripts.export_e2e_fixtures
 `python -m scripts.export_e2e_fixtures extras` writes only the newer answers, keeping the check
 id the other fixtures use: the comparison of that check with the recorded UP-RERA page of
 UPRERAPRJ6742, the promoter's other projects from the recorded up-rera.in searches and the
-Sentinel alert a changed record raises. `python -m scripts.export_e2e_fixtures v2` rewrites the
+Sentinel alert a changed record raises. `python -m scripts.export_e2e_fixtures states` writes
+the state list and the Maharashtra flow from the recorded check_mh.json. `python -m scripts.export_e2e_fixtures v2` rewrites the
 report with the v2 sources on, which is the 300-900 score the report screens show.
 
 backend/tests/test_e2e_fixtures.py checks every file against the API's own models.
@@ -144,6 +145,33 @@ def export_alerts() -> None:
 
 
 FLAGGED_ID = "f" * 32
+MH_CHECK_ID = "a1" * 16
+MH_NUMBER = "P99000055716"
+GROUPED_QUERY = "Prestige Lakeside Habitat"
+
+
+def export_states() -> None:
+    """states.json (GET /api/states) and the Maharashtra flow: search, check, events, report."""
+    with tempfile.TemporaryDirectory() as folder:
+        grouped = FakeWebClient().replay(load_recording("states_name_prestige.json"))
+        with TestClient(create_app(make_settings(Path(folder)), web=grouped)) as client:
+            found = client.get("/api/projects/search", params={"q": GROUPED_QUERY})
+            save_json("search-grouped.json", found.json())
+    with tempfile.TemporaryDirectory() as folder:
+        web = FakeWebClient().replay(load_recording("check_mh.json"))
+        settings = make_settings(Path(folder), v2_sources=True)
+        app = create_app(settings, web=web, clock=lambda: FIXED_NOW, cache_dir=None)
+        with TestClient(app) as client:
+            save_json("states.json", client.get("/api/states").json())
+            search = client.get("/api/projects/search", params={"q": MH_NUMBER})
+            save_json("search-mh.json", search.json())
+            created = client.post("/api/checks", json={"rera_id": MH_NUMBER}).json()
+            RENAMED[created["id"]] = MH_CHECK_ID
+            save_json("check-created-mh.json", created)
+            with client.stream("GET", f"/api/checks/{created['id']}/events") as response:
+                save("events-mh.sse", "\n".join(response.iter_lines()) + "\n")
+            save_json("check-done-mh.json", client.get(f"/api/checks/{created['id']}").json())
+            save_json("report-mh.json", client.get(f"/api/checks/{created['id']}/report").json())
 
 
 def export_flagged_report() -> None:
@@ -166,6 +194,8 @@ if __name__ == "__main__":
         export_flagged_report()
     elif sys.argv[1:] == ["v2"]:
         export_v2_report()
+    elif sys.argv[1:] == ["states"]:
+        export_states()
     elif sys.argv[1:] == ["extras"]:
         export_compare()
         export_track_record()

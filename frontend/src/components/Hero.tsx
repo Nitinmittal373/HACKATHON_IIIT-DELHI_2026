@@ -10,9 +10,12 @@ import { heroCard } from "@/lib/heroCard";
 import { useLang } from "@/lib/LangProvider";
 import { useMeta } from "@/lib/MetaProvider";
 import { useRecentChecks } from "@/lib/useRecentChecks";
+import { useStates } from "@/lib/useStates";
 import styles from "./Hero.module.css";
 
-const TRY_THESE = ["UPRERAPRJ8334", "Gaur City", "Supertech"];
+// Real numbers read from each portal, one per state, taken from GET /api/states.
+const CHIP_STATES = ["UP", "MH", "HR", "KA"];
+const FALLBACK_CHIPS = ["UPRERAPRJ8334", "Gaur City", "Supertech"];
 const WORD_STEP_SECONDS = 0.06;
 
 /** Search-first hero: headline, search, quick examples and the latest real report. */
@@ -21,6 +24,11 @@ export function Hero() {
   const meta = useMeta();
   const words = t.hero.headline;
   const recent = useRecentChecks();
+  const load = useStates();
+  const chips =
+    load.status === "ready"
+      ? CHIP_STATES.flatMap((code) => load.states.find((s) => s.code === code)?.examples.slice(0, 1) ?? [])
+      : FALLBACK_CHIPS;
   const latest = recent.status === "ready" ? recent.checks[0] : undefined;
   const card = latest ? heroCard(latest, t, lang, meta) : null;
 
@@ -59,12 +67,12 @@ export function Hero() {
 
         <div className={`${styles.try} ${styles.fadeUp}`} style={{ animationDelay: "0.6s" }}>
           <span>{t.hero.try}</span>
-          {TRY_THESE.map((query) => (
+          {chips.map((query) => (
             <Link
               key={query}
               href={`/check?q=${encodeURIComponent(query)}`}
               prefetch={false}
-              className={`${styles.chip} ${query.startsWith("UPRERA") ? "mono" : ""}`}
+              className={`${styles.chip} ${/\d/.test(query) ? "mono" : ""}`}
             >
               {query}
             </Link>

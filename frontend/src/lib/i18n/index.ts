@@ -9,6 +9,7 @@ import { family as familyEn } from "@/lib/i18n/en/family";
 import { compare as compareEn } from "@/lib/i18n/en/compare";
 import { report as reportEn } from "@/lib/i18n/en/report";
 import { reports as reportsEn } from "@/lib/i18n/en/reports";
+import { states as statesEn } from "@/lib/i18n/en/states";
 import { score as scoreEn } from "@/lib/i18n/en/score";
 import { alerts as alertsEn, sentinel as sentinelEn } from "@/lib/i18n/en/sentinel";
 import { app as appHi } from "@/lib/i18n/hi/app";
@@ -22,6 +23,7 @@ import { family as familyHi } from "@/lib/i18n/hi/family";
 import { compare as compareHi } from "@/lib/i18n/hi/compare";
 import { report as reportHi } from "@/lib/i18n/hi/report";
 import { reports as reportsHi } from "@/lib/i18n/hi/reports";
+import { states as statesHi } from "@/lib/i18n/hi/states";
 import { score as scoreHi } from "@/lib/i18n/hi/score";
 import { alerts as alertsHi, sentinel as sentinelHi } from "@/lib/i18n/hi/sentinel";
 
@@ -38,6 +40,7 @@ const en = {
   report: reportEn,
   reports: reportsEn,
   score: scoreEn,
+  states: statesEn,
   compare: compareEn,
   insights: insightsEn,
   sentinel: sentinelEn,
@@ -58,6 +61,7 @@ const hi: Strings = {
   report: reportHi,
   reports: reportsHi,
   score: scoreHi,
+  states: statesHi,
   compare: compareHi,
   insights: insightsHi,
   sentinel: sentinelHi,
