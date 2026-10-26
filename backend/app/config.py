@@ -37,6 +37,9 @@ class Settings(BaseSettings):
     # external cron can still call POST /api/sentinel/run).
     sentinel_interval_hours: float = Field(default=168, ge=0)
     webhook_secret: SecretStr | None = None
+    # This API's public address. With it and WEBHOOK_SECRET, watching a project also creates
+    # TinyFish monitors that call back here; without it Sentinel keeps its own schedule.
+    public_base_url: str | None = None
     # Optional email delivery of alerts; without smtp_host alerts are only stored.
     smtp_host: str | None = None
     smtp_port: int = 587
@@ -45,7 +48,13 @@ class Settings(BaseSettings):
     smtp_from: str | None = None
 
     @field_validator(
-        "webhook_secret", "smtp_host", "smtp_user", "smtp_password", "smtp_from", mode="before"
+        "webhook_secret",
+        "public_base_url",
+        "smtp_host",
+        "smtp_user",
+        "smtp_password",
+        "smtp_from",
+        mode="before",
     )
     @classmethod
     def blank_means_unset(cls, value: object) -> object:

@@ -146,6 +146,25 @@ class WatchRow(Base):
     baseline_check_id: Mapped[str | None] = mapped_column(String(32))
 
 
+class MonitorRow(Base):
+    """A TinyFish monitor created for a watch; cancelled when the watch is removed."""
+
+    __tablename__ = "monitors"
+
+    monitor_id: Mapped[str] = mapped_column(String(100), primary_key=True)
+    watch_id: Mapped[str] = mapped_column(ForeignKey("watches.id"), index=True)
+    kind: Mapped[str] = mapped_column(String(10))
+
+
+class WebhookReceiptRow(Base):
+    """A webhook delivery already handled, so a repeated delivery changes nothing."""
+
+    __tablename__ = "webhook_receipts"
+
+    key: Mapped[str] = mapped_column(String(100), primary_key=True)
+    received_at: Mapped[datetime] = mapped_column(UTCDateTime)
+
+
 class AlertRow(Base):
     __tablename__ = "alerts"
 

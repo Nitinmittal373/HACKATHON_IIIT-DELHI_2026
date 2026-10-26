@@ -1,14 +1,34 @@
 """Neev Sentinel routes: watch a project, read alerts, and trigger a re-check run."""
 
+import hashlib
 import hmac
+import json
+import logging
 from collections.abc import Callable
 from datetime import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Query, Response
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    Header,
+    HTTPException,
+    Path,
+    Query,
+    Request,
+    Response,
+)
 
 from app.api.checks import rate_limit
-from app.api.deps import get_clock, get_sentinel, get_sentinel_store, get_settings, get_store
+from app.api.deps import (
+    get_clock,
+    get_monitors,
+    get_sentinel,
+    get_sentinel_store,
+    get_settings,
+    get_store,
+)
 from app.config import Settings
 from app.models import Project
 from app.sentinel.models import (
@@ -18,21 +38,26 @@ from app.sentinel.models import (
     Watch,
     WatchCreate,
 )
+from app.sentinel.monitors import MonitorError, MonitorGateway
 from app.sentinel.service import Sentinel
 from app.sentinel.store import SentinelStore
 from app.store import Store
 from app.uprera_links import details_url_for
 
+MAX_WEBHOOK_BYTES = 200_000
+logger = logging.getLogger(__name__)
 router = APIRouter(tags=["sentinel"])
 
 
 @router.post("/api/sentinel", status_code=201, dependencies=[Depends(rate_limit)])
-def create_watch(
+async def create_watch(
     body: WatchCreate,
     response: Response,
     store: Annotated[Store, Depends(get_store)],
     watches: Annotated[SentinelStore, Depends(get_sentinel_store)],
     clock: Annotated[Callable[[], datetime], Depends(get_clock)],
+    settings: Annotated[Settings, Depends(get_settings)],
+    gateway: Annotated[MonitorGateway | None, Depends(get_monitors)],
 ) -> Watch:
     existing = watches.find_watch(body.email, body.rera_id)
     if existing:
@@ -52,13 +77,59 @@ def create_watch(
     if store.get_project(body.rera_id) is None:
         store.save_project(Project(rera_id=body.rera_id, details_url=details_url))
     latest = store.latest_completed_check(body.rera_id)
-    return watches.add_watch(
+    watch = watches.add_watch(
         email=body.email,
         rera_id=body.rera_id,
         language=body.language,
         created_at=clock(),
         baseline_check_id=latest.id if latest else None,
     )
+    if gateway:
+        project = store.get_project(body.rera_id)
+        await add_monitors(
+            gateway, watches, watch, details_url, project and project.promoter, settings
+        )
+    return watch
+
+
+async def add_monitors(
+    gateway: MonitorGateway,
+    watches: SentinelStore,
+    watch: Watch,
+    details_url: str,
+    promoter: str | None,
+    settings: Settings,
+) -> None:
+    """Best effort: if a monitor cannot be made, Sentinel's own schedule still covers the watch."""
+    assert settings.public_base_url and settings.webhook_secret  # a gateway exists only then
+    secret = settings.webhook_secret.get_secret_value()
+    hook = f"{settings.public_base_url.rstrip('/')}/api/sentinel/webhook?secret={secret}"
+    try:
+        created = [await gateway.create_page_monitor(details_url, hook)]
+        watches.add_monitor(watch.id, created[0].monitor_id, created[0].kind)
+        if promoter:
+            topic = await gateway.create_topic_monitor(promoter, hook)
+            watches.add_monitor(watch.id, topic.monitor_id, topic.kind)
+    except MonitorError as error:
+        logger.warning("Monitors for a watch were not fully created: %s", error)
+
+
+@router.delete("/api/sentinel/{watch_id}", status_code=204)
+async def remove_watch(
+    watch_id: Annotated[str, Path(pattern=r"^[0-9a-f]{32}$", description="Watch id")],
+    watches: Annotated[SentinelStore, Depends(get_sentinel_store)],
+    gateway: Annotated[MonitorGateway | None, Depends(get_monitors)],
+) -> Response:
+    """Stop watching. The watch id is unguessable and is the only proof needed."""
+    if watches.get_watch(watch_id) is None:
+        raise HTTPException(status_code=404, detail="No watch with this id")
+    for monitor_id in watches.remove_watch(watch_id):
+        if gateway:
+            try:
+                await gateway.cancel(monitor_id)
+            except MonitorError as error:
+                logger.warning("A monitor was not cancelled: %s", error)
+    return Response(status_code=204)
 
 
 @router.get("/api/sentinel/alerts")
@@ -79,9 +150,54 @@ async def run_sentinel(
     x_webhook_secret: Annotated[str | None, Header()] = None,
 ) -> dict[str, bool]:
     """For an external cron. Needs the WEBHOOK_SECRET; with none configured nobody gets in."""
-    expected = settings.webhook_secret.get_secret_value() if settings.webhook_secret else None
-    if expected is None or x_webhook_secret is None:
-        raise HTTPException(status_code=401, detail="Missing or wrong secret")
-    if not hmac.compare_digest(x_webhook_secret.encode(), expected.encode()):
-        raise HTTPException(status_code=401, detail="Missing or wrong secret")
+    require_secret(settings, x_webhook_secret)
     return {"started": sentinel.start_run()}
+
+
+def require_secret(settings: Settings, given: str | None) -> None:
+    expected = settings.webhook_secret.get_secret_value() if settings.webhook_secret else None
+    if expected is None or given is None:
+        raise HTTPException(status_code=401, detail="Missing or wrong secret")
+    if not hmac.compare_digest(given.encode(), expected.encode()):
+        raise HTTPException(status_code=401, detail="Missing or wrong secret")
+
+
+@router.post("/api/sentinel/webhook", status_code=202)
+async def monitor_webhook(
+    request: Request,
+    background: BackgroundTasks,
+    settings: Annotated[Settings, Depends(get_settings)],
+    watches: Annotated[SentinelStore, Depends(get_sentinel_store)],
+    sentinel: Annotated[Sentinel, Depends(get_sentinel)],
+    clock: Annotated[Callable[[], datetime], Depends(get_clock)],
+    x_webhook_secret: Annotated[str | None, Header()] = None,
+    secret: Annotated[str | None, Query(max_length=200)] = None,
+) -> dict[str, str]:
+    """Called by a TinyFish monitor, which can only be given a URL, so the secret may come in
+    the query string. A repeated delivery is acknowledged and ignored."""
+    require_secret(settings, x_webhook_secret or secret)
+    raw = await request.body()
+    if len(raw) > MAX_WEBHOOK_BYTES:
+        raise HTTPException(status_code=413, detail="Payload too large")
+    monitor_id, run_id = monitor_and_run(raw)
+    rera_id = watches.project_for_monitor(monitor_id) if monitor_id else None
+    if rera_id is None:
+        return {"status": "ignored"}
+    key = f"{monitor_id}:{run_id or hashlib.sha256(raw).hexdigest()}"[:100]
+    if not watches.claim_delivery(key, clock()):
+        return {"status": "duplicate"}
+    background.add_task(sentinel.recheck_project, rera_id)
+    return {"status": "accepted"}
+
+
+def monitor_and_run(raw: bytes) -> tuple[str | None, str | None]:
+    """The monitor id and run id in a delivery, whichever of the two shapes it uses."""
+    try:
+        payload = json.loads(raw)
+    except ValueError:
+        return None, None
+    if not isinstance(payload, dict):
+        return None, None
+    monitor = payload.get("monitor_id") or (payload.get("monitor") or {}).get("id")
+    run = payload.get("run_id") or (payload.get("run") or {}).get("id")
+    return (monitor if isinstance(monitor, str) else None, run if isinstance(run, str) else None)

@@ -11,6 +11,7 @@ from app.events import EventHub
 from app.models import Check
 from app.orchestrator import Orchestrator
 from app.ratelimit import RateLimiter
+from app.sentinel.monitors import MonitorGateway
 from app.sentinel.service import Sentinel
 from app.sentinel.store import SentinelStore
 from app.store import Store
@@ -45,6 +46,10 @@ def get_sentinel(request: Request) -> Sentinel:
 
 def get_sentinel_store(request: Request) -> SentinelStore:
     return request.app.state.sentinel_store
+
+
+def get_monitors(request: Request) -> MonitorGateway | None:
+    return request.app.state.monitors
 
 
 def get_clock(request: Request) -> Callable[[], datetime]:

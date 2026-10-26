@@ -17,6 +17,7 @@ from app.events import EventHub
 from app.orchestrator import Orchestrator, utc_now
 from app.ratelimit import RateLimiter
 from app.security import add_security_headers
+from app.sentinel.monitors import MonitorGateway, TinyFishMonitors
 from app.sentinel.service import Sentinel
 from app.sentinel.store import SentinelStore
 from app.sources import build_sources
@@ -33,6 +34,7 @@ def create_app(
     web: WebClient | None = None,
     clock: Callable[[], datetime] = utc_now,
     cache_dir: Path | None = DEFAULT_CACHE_DIR,
+    monitors: MonitorGateway | None = None,
 ) -> FastAPI:
     """Build the app. Tests pass a fake `web` client and a fixed clock."""
     settings = settings or load_settings()
@@ -75,6 +77,13 @@ def create_app(
             settings,
             clock,
         )
+        # Monitors need an address TinyFish can call and a secret to prove the call is its own.
+        wants_monitors = settings.public_base_url and settings.webhook_secret
+        app.state.monitors = monitors or (
+            TinyFishMonitors(settings.tinyfish_api_key, timeout=settings.fetch_timeout_seconds)
+            if wants_monitors
+            else None
+        )
         schedule = None
         if settings.sentinel_interval_hours > 0:
             schedule = asyncio.create_task(app.state.sentinel.loop())
@@ -85,6 +94,8 @@ def create_app(
                 schedule.cancel()
             await app.state.orchestrator.shutdown()
             await app.state.web.aclose()
+            if app.state.monitors:
+                await app.state.monitors.aclose()
             engine.dispose()
 
     app = FastAPI(title="NeevCheck API", version="0.1.0", lifespan=lifespan)
@@ -95,7 +106,7 @@ def create_app(
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
-        allow_methods=["GET", "POST"],
+        allow_methods=["GET", "POST", "DELETE"],
         allow_headers=["Content-Type"],
         # Without this the browser hides Retry-After and cannot tell a visitor how long to wait.
         expose_headers=["Retry-After"],
