@@ -18,6 +18,7 @@ from app.ratelimit import RateLimiter
 from app.security import add_security_headers
 from app.sentinel.service import Sentinel
 from app.sentinel.store import SentinelStore
+from app.sources import build_sources
 from app.store import Store
 from app.tinyfish import LiveWebClient, WebClient
 from app.track_record import TrackRecords
@@ -59,6 +60,7 @@ def create_app(
             # The agent stops itself at agent_timeout_seconds; this is only the backstop.
             source_timeout=settings.agent_timeout_seconds + SOURCE_TIMEOUT_GRACE_SECONDS,
             clock=clock,
+            sources=lambda: build_sources(settings.v2_sources),
             cache_dir=cache_dir,
         )
         app.state.sentinel_store = SentinelStore(make_session_factory(engine))

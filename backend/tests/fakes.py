@@ -119,6 +119,7 @@ class FakeWebClient:
             key = search_key(search["query"], search.get("include_domains"))
             self.searches.setdefault(key, hits)
         self.texts |= recording["texts"]
+        self.pages |= recording.get("pages", {})
         for run in recording["agents"]:
             self.agent_runs[run["url"]] = [agent_event(raw) for raw in run["events"]]
         return self

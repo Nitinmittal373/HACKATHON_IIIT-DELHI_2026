@@ -41,3 +41,20 @@ Investigated with free Search and Fetch on 25 Oct 2026, project UPRERAPRJ8334.
 | Penalty orders against a project | Orders are published as PDFs and press releases, not as a per-project list we could confirm | none | **Not read.** Stays unread and appears under R12 |
 
 Nothing is guessed: a signal that cannot be read adds no points and lowers confidence.
+
+## Company registry mirrors and the builder's group (v2, `V2_SOURCES=true`)
+
+Investigated with free Search and Fetch on 26 Oct 2026 for SUPERTECH LIMITED.
+
+| Signal | Access reality | Method | Status |
+| --- | --- | --- | --- |
+| Directors (name and DIN) | Tofler's public profile lists them; Zaubacorp and TheCompanyCheck return "could not be read" to Fetch | Search + Fetch, parsed in Python | Read. Only name and DIN are kept: no addresses, PAN or phones (DPDP minimisation) |
+| Charges (recent creation) | Tofler lists lenders, amounts and charge dates | Search + Fetch | Read; a `charge_created` finding only when a charge is dated in the last 12 months |
+| Related companies | Tofler's "related companies" table (name only, no CIN) | Search + Fetch | Read, at most 10 per check |
+| Status of a related company | Economic Times company page (Zaubacorp address mapped to it), exact legal-name match | Search + Fetch | Read when a page is found; otherwise unread, never assumed clean |
+| Other directorships of each director | Not in the text Tofler's profile returns | none | **Not read.** R07 comes from related companies only |
+| Struck-off or disqualified director | No readable page found | none | **Not read** |
+| Late MCA filings | The registry pages show the last AGM and balance sheet dates only | none | **Not read** |
+| Group projects on UP-RERA | Search on up-rera.in by exact legal name, then each project page (at most 20 per check) | Search + Fetch + parser | Read; delayed means more than 12 months past the latest date on the details page, so extensions only on the summary page can make it an undercount |
+
+The group source never runs a browser agent. A profile that does not name exactly the promoter's legal company is not used, so "Supertech Limited" never collects "Supertech Realtors Private Limited".
