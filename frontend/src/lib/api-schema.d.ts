@@ -355,6 +355,11 @@ export interface components {
             /** Rera Id */
             rera_id: string;
             /**
+             * Rera Name
+             * @default UP-RERA
+             */
+            rera_name: string;
+            /**
              * State
              * @default UP
              */
@@ -423,6 +428,11 @@ export interface components {
             id: string;
             /** Rera Id */
             rera_id: string;
+            /**
+             * Rera Name
+             * @default UP-RERA
+             */
+            rera_name: string;
             /**
              * Reused
              * @default false
@@ -536,6 +546,11 @@ export interface components {
             promoter: string | null;
             /** Rera Id */
             rera_id: string;
+            /**
+             * Rera Name
+             * @default UP-RERA
+             */
+            rera_name: string;
             /** Score */
             score: number | null;
             /**
@@ -924,6 +939,11 @@ export interface components {
             /** Rera Id */
             rera_id: string;
             /**
+             * Rera Name
+             * @default UP-RERA
+             */
+            rera_name: string;
+            /**
              * State
              * @default UP
              */
@@ -989,6 +1009,11 @@ export interface components {
             registered_on: string | null;
             /** Rera Id */
             rera_id: string;
+            /**
+             * Rera Name
+             * @default UP-RERA
+             */
+            rera_name: string;
             /** Score */
             score: number | null;
             /**
@@ -1015,11 +1040,32 @@ export interface components {
         /** Report */
         Report: {
             check: components["schemas"]["Check"];
+            /**
+             * Complaint Url
+             * @default https://www.up-rera.in/ComplaintHome
+             */
+            complaint_url: string;
+            /**
+             * Coverage
+             * @default full
+             * @enum {string}
+             */
+            coverage: "full" | "partial" | "search_only";
             display_score: components["schemas"]["DisplayScore"];
             family: components["schemas"]["FamilyTree"] | null;
             /** Findings */
             findings: components["schemas"]["Finding"][];
+            /**
+             * Portal Url
+             * @default https://www.up-rera.in/
+             */
+            portal_url: string;
             project: components["schemas"]["Project"];
+            /**
+             * Rera Name
+             * @default UP-RERA
+             */
+            rera_name: string;
             score: components["schemas"]["Score"];
             score_v2: components["schemas"]["ScoreV2"];
             /**
@@ -1289,6 +1335,10 @@ export interface components {
             coverage: "full" | "partial" | "search_only";
             /** Examples */
             examples: string[];
+            /** Format Verified */
+            format_verified: boolean;
+            /** Id Patterns */
+            id_patterns: string[];
             /** Name */
             name: string;
             /** Note */
@@ -1330,6 +1380,11 @@ export interface components {
             registered_on: string | null;
             /** Rera Id */
             rera_id: string;
+            /**
+             * Rera Name
+             * @default UP-RERA
+             */
+            rera_name: string;
             /**
              * State
              * @default UP
@@ -1374,6 +1429,11 @@ export interface components {
             language: "en" | "hi";
             /** Rera Id */
             rera_id: string;
+            /**
+             * Rera Name
+             * @default UP-RERA
+             */
+            rera_name: string;
             /**
              * State
              * @default UP

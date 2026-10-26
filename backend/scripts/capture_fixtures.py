@@ -41,7 +41,7 @@ LIVE_CHECKS = {
     CHECK_FIXTURE: "UPRERAPRJ8334",
     "check_mh.json": "P99000055716",
     "check_hr.json": "RC/REP/HARERA/GGM/1059/791/2026/31",
-    "check_ka.json": "PRM/KA/RERA/1251/446/PR/170915/000176",
+    "check_ka.json": "PRM/KA/RERA/1251/446/PR/190723/006078",
 }
 
 SEARCHES = {

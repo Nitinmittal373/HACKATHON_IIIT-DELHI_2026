@@ -68,6 +68,7 @@ class SearchStateAdapter:
         self.complaint_url = spec.complaint_url
         self.search_url = spec.search_url
         self.note = spec.note
+        self.unverified_format = spec.unverified_format
         self._patterns = spec.patterns
 
     def detect(self, query: str) -> float:
@@ -192,19 +193,19 @@ class SearchStateAdapter:
         )
 
     def _positional(self, text: str, url: str) -> Facts:
-        # Orders and lists print the same values in other orders, so only the portal's own
-        # project pages are read by position.
-        on_project_page = self.spec.positional_in in url
-        found = re.search(self.spec.positional, text) if self.spec.positional else None
-        found = found if on_project_page else None
-        if found is None:
-            return Facts()
-        groups = found.groupdict()
-        return Facts(
-            name=groups.get("name"),
-            promoter=groups.get("promoter"),
-            district=groups.get("district"),
-        )
+        # Orders and lists print the same values in other orders, so a pattern is applied only
+        # to the pages of the kind it was written for.
+        pairs = [(self.spec.positional_in, self.spec.positional or ""), *self.spec.extra_positional]
+        for part, pattern in pairs:
+            found = re.search(pattern, text) if pattern and part in url else None
+            if found:
+                groups = found.groupdict()
+                return Facts(
+                    name=groups.get("name"),
+                    promoter=groups.get("promoter"),
+                    district=groups.get("district"),
+                )
+        return Facts()
 
     def candidates_from_hits(self, hits: list[SearchHit]) -> list[Project]:
         by_id: dict[str, Project] = {}

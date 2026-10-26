@@ -20,6 +20,13 @@ ADAPTER = SearchStateAdapter(
             "page and project lists."
         ),
         positional_in="reraCertificate",
+        extra_positional=(
+            (
+                "/view",
+                r"PR/\d{6}/\d{6},\s+(?P<promoter>[^,;]{3,80}),\s+(?P<name>[^,;]{3,80}),"
+                r"\s+[^,;]{3,30},\s+(?P<district>[^,;]{3,40})",
+            ),
+        ),
         positional=r"PR/\d{6}/\d{6}[.\s]+(?P<name>[A-Z0-9][A-Z0-9 &'.\-]{2,80}?),\s",
         details_template="https://rera.karnataka.gov.in/reraCertificate?CER_NO={id}",
     )

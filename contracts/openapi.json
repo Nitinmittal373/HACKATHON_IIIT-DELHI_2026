@@ -94,6 +94,11 @@
             "title": "Rera Id",
             "type": "string"
           },
+          "rera_name": {
+            "default": "UP-RERA",
+            "title": "Rera Name",
+            "type": "string"
+          },
           "state": {
             "default": "UP",
             "title": "State",
@@ -112,6 +117,7 @@
         "required": [
           "state",
           "state_name",
+          "rera_name",
           "id",
           "watch_id",
           "rera_id",
@@ -279,6 +285,11 @@
             "title": "Rera Id",
             "type": "string"
           },
+          "rera_name": {
+            "default": "UP-RERA",
+            "title": "Rera Name",
+            "type": "string"
+          },
           "reused": {
             "default": false,
             "title": "Reused",
@@ -321,6 +332,7 @@
         "required": [
           "state",
           "state_name",
+          "rera_name",
           "id",
           "rera_id",
           "details_url",
@@ -565,6 +577,11 @@
             "title": "Rera Id",
             "type": "string"
           },
+          "rera_name": {
+            "default": "UP-RERA",
+            "title": "Rera Name",
+            "type": "string"
+          },
           "score": {
             "anyOf": [
               {
@@ -600,6 +617,7 @@
         "required": [
           "state",
           "state_name",
+          "rera_name",
           "id",
           "rera_id",
           "details_url",
@@ -1750,6 +1768,11 @@
             "title": "Rera Id",
             "type": "string"
           },
+          "rera_name": {
+            "default": "UP-RERA",
+            "title": "Rera Name",
+            "type": "string"
+          },
           "state": {
             "default": "UP",
             "title": "State",
@@ -1764,6 +1787,7 @@
         "required": [
           "state",
           "state_name",
+          "rera_name",
           "rera_id",
           "name",
           "promoter",
@@ -1939,6 +1963,11 @@
             "title": "Rera Id",
             "type": "string"
           },
+          "rera_name": {
+            "default": "UP-RERA",
+            "title": "Rera Name",
+            "type": "string"
+          },
           "score": {
             "anyOf": [
               {
@@ -1979,6 +2008,7 @@
         "required": [
           "state",
           "state_name",
+          "rera_name",
           "id",
           "rera_id",
           "details_url",
@@ -2004,6 +2034,21 @@
           "check": {
             "$ref": "#/components/schemas/Check"
           },
+          "complaint_url": {
+            "default": "https://www.up-rera.in/ComplaintHome",
+            "title": "Complaint Url",
+            "type": "string"
+          },
+          "coverage": {
+            "default": "full",
+            "enum": [
+              "full",
+              "partial",
+              "search_only"
+            ],
+            "title": "Coverage",
+            "type": "string"
+          },
           "display_score": {
             "$ref": "#/components/schemas/DisplayScore"
           },
@@ -2024,8 +2069,18 @@
             "title": "Findings",
             "type": "array"
           },
+          "portal_url": {
+            "default": "https://www.up-rera.in/",
+            "title": "Portal Url",
+            "type": "string"
+          },
           "project": {
             "$ref": "#/components/schemas/Project"
+          },
+          "rera_name": {
+            "default": "UP-RERA",
+            "title": "Rera Name",
+            "type": "string"
           },
           "score": {
             "$ref": "#/components/schemas/Score"
@@ -2054,6 +2109,7 @@
         "required": [
           "state",
           "state_name",
+          "rera_name",
           "check",
           "project",
           "score",
@@ -2061,7 +2117,10 @@
           "timeline",
           "display_score",
           "score_v2",
-          "family"
+          "family",
+          "coverage",
+          "portal_url",
+          "complaint_url"
         ],
         "title": "Report",
         "type": "object"
@@ -2733,6 +2792,17 @@
             "title": "Examples",
             "type": "array"
           },
+          "format_verified": {
+            "title": "Format Verified",
+            "type": "boolean"
+          },
+          "id_patterns": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Id Patterns",
+            "type": "array"
+          },
           "name": {
             "title": "Name",
             "type": "string"
@@ -2758,7 +2828,9 @@
           "examples",
           "note",
           "portal_url",
-          "complaint_url"
+          "complaint_url",
+          "id_patterns",
+          "format_verified"
         ],
         "title": "StateInfo",
         "type": "object"
@@ -2867,6 +2939,11 @@
             "title": "Rera Id",
             "type": "string"
           },
+          "rera_name": {
+            "default": "UP-RERA",
+            "title": "Rera Name",
+            "type": "string"
+          },
           "state": {
             "default": "UP",
             "title": "State",
@@ -2881,6 +2958,7 @@
         "required": [
           "state",
           "state_name",
+          "rera_name",
           "rera_id",
           "name",
           "promoter",
@@ -2971,6 +3049,11 @@
             "title": "Rera Id",
             "type": "string"
           },
+          "rera_name": {
+            "default": "UP-RERA",
+            "title": "Rera Name",
+            "type": "string"
+          },
           "state": {
             "default": "UP",
             "title": "State",
@@ -2985,6 +3068,7 @@
         "required": [
           "state",
           "state_name",
+          "rera_name",
           "id",
           "rera_id",
           "email",
