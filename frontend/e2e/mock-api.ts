@@ -21,6 +21,9 @@ const RATE_LIMITED_RERA_ID = "UPRERAPRJ4878";
 const read = (name: string): string => readFileSync(resolve(FIXTURES, name), "utf-8");
 const json = (name: string): Record<string, unknown> => JSON.parse(read(name));
 
+// A copy of the report with two tree nodes marked, so the flagged styling can be tested.
+const FLAGGED_ID = "f".repeat(32);
+
 let finished = false;
 
 function send(res: ServerResponse, status: number, body: unknown, headers: Record<string, string> = {}) {
@@ -135,6 +138,7 @@ createServer(async (req, res) => {
   if (check) {
     const [, id, tail] = check;
     const known = json("check-created.json").id;
+    if (id === FLAGGED_ID && tail === "/report") return send(res, 200, json("report-flagged.json"));
     if (id !== known) return send(res, 404, { detail: "No check with this id" });
     if (tail === "/events") return streamEvents(res);
     if (tail === "/report") return send(res, 200, json("report.json"));

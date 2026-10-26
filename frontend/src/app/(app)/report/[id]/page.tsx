@@ -9,6 +9,7 @@ import { BuilderQuestions } from "@/components/report/BuilderQuestions";
 import { CreditHeader } from "@/components/report/CreditHeader";
 import { DriversCard } from "@/components/report/DriversCard";
 import { EvidenceList } from "@/components/report/EvidenceList";
+import { FamilyTree } from "@/components/report/FamilyTree";
 import { SentinelCard } from "@/components/report/SentinelCard";
 import { ReportHeader } from "@/components/report/ReportHeader";
 import { ScoreCard } from "@/components/report/ScoreCard";
@@ -65,6 +66,7 @@ export default async function ReportPage({ params }: Props) {
           <ScoreCard report={report} t={t} compact={report.score_v2 != null} />
           <DriversCard report={report} ids={ids} t={t} />
           <EvidenceList report={report} ids={ids} t={t} lang={lang} />
+          {report.family && <FamilyTree tree={report.family} />}
         </div>
         <aside className={styles.column}>
           <ActionPlan report={report} t={t} />
