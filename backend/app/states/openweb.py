@@ -204,7 +204,10 @@ def names_project(
 
 
 def share_of(words: set[str], text: str) -> float:
-    return len({w for w in words if w in text}) / len(words)
+    """The share of the words the text holds, whether it spells them apart ("My Wood") or not."""
+    flat = re.sub(r"[^a-z0-9]", "", text)
+    present = {w for w in words if w in text or (len(w) > 4 and w.rstrip("s") in flat)}
+    return len(present) / len(words)
 
 
 def brand_tokens(query: str) -> set[str]:
@@ -252,3 +255,14 @@ def name_from(titles: list[str], query: str) -> str | None:
     scored = [(-len(words & distinctive_words(part)), len(part), part) for part in parts]
     scored = [item for item in scored if item[0] < 0]
     return min(scored)[2] if scored else None
+
+
+def hits_by_state(hits: list[SearchHit]) -> dict[str, list[SearchHit]]:
+    grouped: dict[str, list[SearchHit]] = {}
+    for hit in hits:
+        host = domain_of(hit.url)
+        for adapter in ADAPTERS:
+            if any(host == d or host.endswith("." + d) for d in adapter.domains):
+                grouped.setdefault(adapter.code, []).append(hit)
+                break
+    return grouped
