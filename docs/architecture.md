@@ -74,6 +74,20 @@ For UP, `app/resolve.py` (behind `UpAdapter`) turns what the buyer typed into at
 
 A number counts only when its own up-rera.in page shows it with a name and a promoter. Numbers from the second, unlimited Search must also share a word with the query, because pages about one project often print the numbers of others. Search results are completed from their own pages, four at a time within 35 seconds; a page that cannot be read in time keeps what Search said, since that came from up-rera.in itself. A query with no UP-RERA project (a project outside Uttar Pradesh, for example) returns an empty list, which the app shows as "No UP-RERA project found" with tips.
 
+### Finding a project on the open web
+
+A state portal Search cannot read still has its projects' numbers printed by the builder and by listing sites, so `app/states/openweb.py` also runs two Searches with no domain limit (`<q> RERA registration number`, `<q> RERA`, cached for 24 hours) beside the portal search. It looks for the number formats of every state (`id_patterns`) in the titles and snippets and votes:
+
+| Who prints the number | Points |
+| --- | --- |
+| A page on that state's RERA domain | +3 |
+| The builder's own site (its domain holds the brand word of the query) | +2 |
+| Any other distinct domain | +1 each |
+
+A number is kept at 3 points, or when two domains print it, and only if one of them prints it next to the project's name (at least 75% of its distinctive words, city names ignored). A list of projects gives each number only the words up to its neighbours, so a number beside another project's name is not this project's. Plain formats such as `112 of 2021` need "RERA" beside them. Several numbers (phases, towers) are separate candidates.
+
+Each kept number is then searched exactly on its state's domain (`app/states/confirm.py`, at most four per query). A page that prints it makes the candidate `confirmed`; otherwise it stays `listings_only` and the app says so. Listing sites are used only to find the number; a finding still needs the portal. A listing sentence such as "does not apply to RERA and has already been delivered" (`app/states/prerera.py`) becomes a `pre_rera` note: the app quotes the sentence, links the page and offers a builder-only check, with no project score. A number typed alone that no portal page names gets its builder from `identify_builder`.
+
 ## Sources
 
 Each source is one small module with the same shape: it reads one kind of public record and yields events (progress, live view URL, findings, which key checks it read). It never writes to the database; the orchestrator does.

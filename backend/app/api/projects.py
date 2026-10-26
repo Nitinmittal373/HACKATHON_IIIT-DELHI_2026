@@ -47,6 +47,7 @@ async def search_projects(
         candidates=found.candidates,
         detected_state=found.detected_state,
         searched_states=found.searched_states,
+        pre_rera=found.pre_rera,
     )
 
 
