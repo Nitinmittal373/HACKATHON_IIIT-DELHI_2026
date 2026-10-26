@@ -90,6 +90,7 @@ function FindingRow({ finding, id, points, t, lang }: RowProps) {
         <span className={styles.name}>{finding.title}</span>
         <span className={styles.sub}>
           {t.cam.sourceLabels[finding.source]} · {readOn} · {t.report.reliability[finding.reliability]}
+          {finding.via && ` (${t.report.viaSnippet})`}
         </span>
       </span>
       <span className={styles.side}>

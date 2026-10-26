@@ -22,6 +22,7 @@ import { TrackRecord } from "@/components/report/TrackRecord";
 import { ApiError, getReport } from "@/lib/api";
 import { dayOf } from "@/lib/format";
 import { getStrings } from "@/lib/i18n/server";
+import { relabel } from "@/lib/i18n/relabel";
 import { loadMeta } from "@/lib/meta";
 import { CHECK_ID_PATTERN } from "@/lib/ids";
 import { evidenceIds } from "@/lib/reportView";
@@ -57,8 +58,10 @@ export default async function ReportPage({ params }: Props) {
   const result = await load(id);
   if (result instanceof ApiError) return failure(result, id);
 
-  const [{ t, lang }, meta] = await Promise.all([getStrings(), loadMeta()]);
+  const [{ t: base, lang }, meta] = await Promise.all([getStrings(), loadMeta()]);
   const report = result;
+  // The copy was written for UP-RERA; this report names its own state's authority.
+  const t = relabel(base, report.rera_name);
   const ids = evidenceIds(report.findings);
   const readDate = dayOf(report.check.completed_at ?? report.check.started_at, lang);
 
@@ -78,7 +81,12 @@ export default async function ReportPage({ params }: Props) {
           <BuilderQuestions report={report} t={t} />
           <ComplaintDraft report={report} />
           {report.project.promoter && (
-            <TrackRecord promoter={report.project.promoter} reraId={report.project.rera_id} />
+            <TrackRecord
+              promoter={report.project.promoter}
+              reraId={report.project.rera_id}
+              state={report.state}
+              rera={report.rera_name}
+            />
           )}
           <Timeline events={report.timeline} t={t} lang={lang} />
           <MethodNote report={report} meta={meta} t={t} />

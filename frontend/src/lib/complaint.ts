@@ -1,9 +1,7 @@
 import { formatDay } from "@/lib/format";
 import type { Lang, Strings } from "@/lib/i18n";
+import { stateLabel } from "@/lib/states";
 import type { Finding, Report } from "@/lib/types";
-
-/** Where a buyer files the complaint. The draft does not file anything. */
-export const UPRERA_COMPLAINT_URL = "https://www.up-rera.in/";
 
 const COMPLAINT_KINDS = [
   "past_end_date",
@@ -37,7 +35,7 @@ export function buildComplaintDraft(report: Report, t: Strings, lang: Lang): str
   const readOn = formatDay(report.check.completed_at?.slice(0, 10) ?? report.check.started_at.slice(0, 10), lang);
 
   const lines = [
-    c.to,
+    c.to(stateLabel(report.state, report.state_name, lang), report.rera_name),
     "",
     c.subject(project.name ?? project.rera_id, project.rera_id),
     "",

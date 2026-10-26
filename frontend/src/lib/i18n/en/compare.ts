@@ -18,15 +18,15 @@ export const compare = {
   notEnough:
     "There is not enough evidence to rank these projects: at least two of them need half of the record types read.",
   rows: {
-    rera: "UP-RERA no.",
+    rera: "RERA no.",
     promoter: "Promoter",
     district: "District",
     registered: "Registered on",
     score: "NeevScore",
     areas: "Points lost by pillar",
     delay: "Months past the completion date",
-    projectComplaints: "UP-RERA complaints on this project",
-    promoterComplaints: "UP-RERA complaints on the promoter",
+    projectComplaints: "RERA complaints on this project",
+    promoterComplaints: "RERA complaints on the promoter",
     insolvency: "Insolvency",
     company: "Company status",
     unread: "Key checks not read",

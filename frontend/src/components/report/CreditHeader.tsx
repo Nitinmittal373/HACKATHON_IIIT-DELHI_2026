@@ -64,7 +64,11 @@ export function CreditHeader({ report, ids, meta, t }: Props) {
           </div>
         </div>
         <div className={styles.reasons}>
-          <ReasonChips reasons={topReasons(score)} rows={ledgerRows(report, ids)} />
+          <ReasonChips
+            reasons={topReasons(score)}
+            rows={ledgerRows(report, ids)}
+            rera={report.rera_name}
+          />
         </div>
       </div>
       <p className={styles.narrative}>{narrative}</p>

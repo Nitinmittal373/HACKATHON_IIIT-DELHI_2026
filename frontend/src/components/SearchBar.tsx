@@ -1,8 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useId, useRef, type FormEvent } from "react";
+import { useId, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 
+import { useLang } from "@/lib/LangProvider";
+import { detectState, stateLabel } from "@/lib/states";
+import { useStates } from "@/lib/useStates";
 import styles from "./SearchBar.module.css";
 
 interface Props {
@@ -12,12 +15,33 @@ interface Props {
 }
 
 const MAX_QUERY_LENGTH = 100;
+const ALL_INDIA = "";
 
-/** The big search box. It takes a UP-RERA number, a project name or a promoter name. */
+/**
+ * The big search box. It takes a RERA number of any state, a project name or a promoter name.
+ * The state picker starts on All India and follows the number as it is typed.
+ */
 export function SearchBar({ label, placeholder, submitLabel }: Props) {
   const router = useRouter();
+  const { lang, t } = useLang();
+  const load = useStates();
   const inputId = useId();
+  const stateId = useId();
   const input = useRef<HTMLInputElement>(null);
+  const [state, setState] = useState(ALL_INDIA);
+  // A state the visitor picked by hand is never changed by what they type.
+  const [chosenByHand, setChosenByHand] = useState(false);
+  const states = load.status === "ready" ? load.states : [];
+
+  function typed(event: ChangeEvent<HTMLInputElement>) {
+    if (chosenByHand) return;
+    setState(detectState(event.target.value, states)?.code ?? ALL_INDIA);
+  }
+
+  function pick(event: ChangeEvent<HTMLSelectElement>) {
+    setState(event.target.value);
+    setChosenByHand(event.target.value !== ALL_INDIA);
+  }
 
   function search(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -26,7 +50,8 @@ export function SearchBar({ label, placeholder, submitLabel }: Props) {
       input.current?.focus();
       return;
     }
-    router.push(`/check?q=${encodeURIComponent(query)}`);
+    const scope = state === ALL_INDIA ? "" : `&state=${encodeURIComponent(state)}`;
+    router.push(`/check?q=${encodeURIComponent(query)}${scope}`);
   }
 
   return (
@@ -60,7 +85,19 @@ export function SearchBar({ label, placeholder, submitLabel }: Props) {
         minLength={2}
         autoComplete="off"
         required
+        onChange={typed}
       />
+      <label htmlFor={stateId} className="sr">
+        {t.states.pickerLabel}
+      </label>
+      <select id={stateId} name="state" className={styles.state} value={state} onChange={pick}>
+        <option value={ALL_INDIA}>{t.states.allIndia}</option>
+        {states.map((item) => (
+          <option key={item.code} value={item.code}>
+            {stateLabel(item.code, item.name, lang)}
+          </option>
+        ))}
+      </select>
       <button type="submit" className="btn btnBig">
         {submitLabel}
         <svg

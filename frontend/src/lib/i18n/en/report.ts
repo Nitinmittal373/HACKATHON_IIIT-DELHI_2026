@@ -25,6 +25,8 @@ export const report = {
     not_found: "Not found",
   },
   reliability: { primary: "Official record", secondary: "News or secondary source" },
+  /** Appended to the reliability when a fact was read from a Search result, not an opened page. */
+  viaSnippet: "search snippet",
   step: (date: string) => `Step 3 of 3 · Report · Checked ${date}`,
   watch: "Watch with Sentinel",
   download: "Download PDF",

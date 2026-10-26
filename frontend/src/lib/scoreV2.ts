@@ -20,6 +20,8 @@ export interface LedgerRow {
   readAt: string | null;
   snippet: string | null;
   reliability: Finding["reliability"];
+  /** "search_snippet" when the fact came from Search result text, not an opened page. */
+  via: Finding["via"];
   verdict: Verdict;
   /** Points lost in NeevScore v2 (negative), or null when the record cost nothing. */
   points: number | null;
@@ -39,6 +41,7 @@ export function ledgerRows(report: Report, ids: Map<string, string>): LedgerRow[
       readAt: finding.read_at,
       snippet: finding.snippet ?? null,
       reliability: finding.reliability,
+      via: finding.via,
       verdict: finding.verdict,
       points: driver ? driver.points : null,
       code: driver ? driver.code : null,

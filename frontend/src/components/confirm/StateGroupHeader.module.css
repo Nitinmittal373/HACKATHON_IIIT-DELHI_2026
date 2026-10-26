@@ -1,0 +1,26 @@
+.head {
+  margin-top: 26px;
+  display: grid;
+  gap: 6px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.title h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.level {
+  padding: 1px 9px;
+  border: 1px solid var(--ln2);
+  border-radius: 999px;
+  color: var(--mu);
+  font-size: 12px;
+}

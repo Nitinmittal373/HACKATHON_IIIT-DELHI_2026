@@ -9,6 +9,7 @@ import type {
   RecentCheck,
   Report,
   SearchResponse,
+  StateInfo,
   TrackRecord,
   Watch,
   WatchCreate,
@@ -131,9 +132,10 @@ export function isTransient(error: unknown): boolean {
 }
 
 /** Runs in the browser, straight to the API, and tries once more after a transient failure. */
-export async function searchProjects(query: string): Promise<SearchResponse> {
+export async function searchProjects(query: string, state?: string): Promise<SearchResponse> {
+  const scope = state ? `&state=${encodeURIComponent(state)}` : "";
   const search = () =>
-    request<SearchResponse>(`/api/projects/search?q=${encodeURIComponent(query)}`, {
+    request<SearchResponse>(`/api/projects/search?q=${encodeURIComponent(query)}${scope}`, {
       timeoutMs: SEARCH_TIMEOUT_MS,
     });
   try {
@@ -146,12 +148,13 @@ export async function searchProjects(query: string): Promise<SearchResponse> {
 
 /** `fresh` skips the reuse of a check from the last 24 hours ("Re-check now"). */
 export function createCheck(
-  project: Pick<Project, "rera_id" | "details_url">,
+  project: Pick<Project, "rera_id" | "details_url" | "state">,
   options: { fresh?: boolean } = {},
 ): Promise<Check> {
   // The page search confirmed: many numbers registered after 2018 have no stable address.
   const body: CheckCreate = {
     rera_id: project.rera_id,
+    state: project.state,
     details_url: project.details_url,
     ...(options.fresh ? { fresh: true } : {}),
   };
@@ -159,12 +162,13 @@ export function createCheck(
 }
 
 export function createWatch(
-  project: Pick<Project, "rera_id" | "details_url">,
+  project: Pick<Project, "rera_id" | "details_url" | "state">,
   email: string,
   language: WatchCreate["language"],
 ): Promise<Watch> {
   const body: WatchCreate = {
     rera_id: project.rera_id,
+    state: project.state,
     details_url: project.details_url,
     email,
     language,
@@ -192,10 +196,25 @@ export function compareChecks(ids: string[]): Promise<Comparison> {
   });
 }
 
-/** A promoter's other UP-RERA projects, found with Search on up-rera.in. */
-export function promoterProjects(promoter: string, exclude: string): Promise<TrackRecord> {
-  const query = `name=${encodeURIComponent(promoter)}&exclude=${encodeURIComponent(exclude)}`;
+/** A promoter's other projects in one state, found with Search on that state's portal. */
+export function promoterProjects(
+  promoter: string,
+  exclude: string,
+  state: string,
+): Promise<TrackRecord> {
+  const query =
+    `name=${encodeURIComponent(promoter)}&exclude=${encodeURIComponent(exclude)}` +
+    `&state=${encodeURIComponent(state)}`;
   return request<TrackRecord>(`/api/promoters/projects?${query}`, { timeoutMs: WAKE_TIMEOUT_MS });
+}
+
+let statesList: Promise<StateInfo[]> | null = null;
+
+/** Every state NeevCheck can search, with its coverage level and examples (one request per page load). */
+export function getStates(): Promise<StateInfo[]> {
+  statesList ??= request<StateInfo[]>("/api/states", { timeoutMs: WAKE_TIMEOUT_MS });
+  statesList.catch(() => (statesList = null));
+  return statesList;
 }
 
 const RECENT_FRESH_FOR_MS = 60_000;

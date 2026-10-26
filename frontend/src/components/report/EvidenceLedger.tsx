@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 
 import { ExternalLinkIcon } from "@/components/report/ExternalLinkIcon";
 import { formatDay, formatTime } from "@/lib/format";
+import { relabel } from "@/lib/i18n/relabel";
 import { useLang } from "@/lib/LangProvider";
 import type { LedgerRow } from "@/lib/scoreV2";
 import styles from "./EvidenceLedger.module.css";
@@ -14,13 +15,16 @@ interface Props {
   /** The reason code the ledger is narrowed to, or null for every record. */
   code: string | null;
   codes: string[];
+  /** The state's authority, so the source reads MahaRERA, not UP-RERA. */
+  rera: string;
   onFilter: (code: string | null) => void;
   onClose: () => void;
 }
 
 /** A side drawer listing every claim with its page, read time, excerpt, points and reason code. */
-export function EvidenceLedger({ rows, open, code, codes, onFilter, onClose }: Props) {
-  const { t, lang } = useLang();
+export function EvidenceLedger({ rows, open, code, codes, rera, onFilter, onClose }: Props) {
+  const { t: base, lang } = useLang();
+  const t = relabel(base, rera);
   const dialog = useRef<HTMLDialogElement>(null);
   const shown = code ? rows.filter((row) => row.code === code) : rows;
 
@@ -84,6 +88,7 @@ export function EvidenceLedger({ rows, open, code, codes, onFilter, onClose }: P
                     <dt>{t.credit.ledger.source}</dt>
                     <dd>
                       {t.cam.sourceLabels[row.source]} · {t.report.reliability[row.reliability]}
+                      {row.via && ` (${t.report.viaSnippet})`}
                     </dd>
                   </div>
                   <div>

@@ -61,8 +61,8 @@ test("the confirm list and its buttons work from the keyboard", async ({ page })
 
 test("an unknown project gets a friendly answer with tips", async ({ page }) => {
   await page.goto("/check?q=nothing%20here");
-  await expect(page.getByRole("heading", { name: "No UP-RERA project found" })).toBeVisible();
-  await expect(page.getByText(/Search by the UP-RERA number/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "No RERA project found" })).toBeVisible();
+  await expect(page.getByText(/Search by the RERA number/)).toBeVisible();
 });
 
 test("a rate-limited visitor sees how long to wait", async ({ page }) => {

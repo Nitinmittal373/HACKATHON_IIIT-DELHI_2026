@@ -22,10 +22,10 @@ type Phase =
 const WAKE_NOTICE_AFTER_MS = 1500;
 
 /**
- * Searches UP-RERA from the browser, straight to the API, so a slow search or a sleeping
+ * Searches the RERA portals from the browser, straight to the API, so a slow search or a sleeping
  * free-plan server never runs into a hosting platform's function time limit.
  */
-export function ProjectSearch({ query }: { query: string }) {
+export function ProjectSearch({ query, state }: { query: string; state?: string }) {
   const { t } = useLang();
   const [phase, setPhase] = useState<Phase>({ kind: "connecting" });
   const [attempt, setAttempt] = useState(0);
@@ -42,7 +42,7 @@ export function ProjectSearch({ query }: { query: string }) {
       clearTimeout(notice);
       update({ kind: "searching" });
       try {
-        update({ kind: "done", result: await searchProjects(query) });
+        update({ kind: "done", result: await searchProjects(query, state) });
       } catch (error) {
         update({ kind: "failed", error });
       }
@@ -53,7 +53,7 @@ export function ProjectSearch({ query }: { query: string }) {
       cancelled = true;
       clearTimeout(notice);
     };
-  }, [query, attempt]);
+  }, [query, state, attempt]);
 
   if (phase.kind === "failed") {
     const { text, reason } = describeSearchError(phase.error, t);
@@ -75,12 +75,13 @@ export function ProjectSearch({ query }: { query: string }) {
 
   if (phase.kind !== "done") return <SearchProgress waking={phase.kind === "waking"} t={t} />;
 
-  const { candidates } = phase.result;
+  const { candidates, searched_states: searched } = phase.result;
   if (candidates.length === 0) return <EmptyResults query={query} t={t} />;
   return (
     <>
       <h1 className="h2 pageTitle">{t.confirm.title(candidates.length, query)}</h1>
       <p className="pageLead">{t.confirm.lead}</p>
+      {searched.length > 0 && <p className="pageLead">{t.states.searchedIn(searched.join(", "))}</p>}
       <ConfirmPicker projects={candidates} />
     </>
   );

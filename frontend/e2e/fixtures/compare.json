@@ -3,6 +3,9 @@
     {
       "check_id": "4ad9752355f9455aa9d242c93950ea04",
       "project": {
+        "state": "UP",
+        "state_name": "Uttar Pradesh",
+        "rera_name": "UP-RERA",
         "rera_id": "UPRERAPRJ8334",
         "name": "SUPERTECH ECO VILLAGE-I PHASE I-C",
         "promoter": "SUPERTECH LIMITED",
@@ -125,8 +128,11 @@
       ]
     },
     {
-      "check_id": "402acab56e2840e9b5804afe65d8c3bb",
+      "check_id": "add238f5962343d59c119e8571b6602d",
       "project": {
+        "state": "UP",
+        "state_name": "Uttar Pradesh",
+        "rera_name": "UP-RERA",
         "rera_id": "UPRERAPRJ6742",
         "name": "14th Avenue (Group Housing) - Gaur City",
         "promoter": "Gaursons Promoters Private Limited",

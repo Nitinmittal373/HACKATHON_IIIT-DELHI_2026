@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 
 import { NeevScore } from "@/components/NeevScore";
+import { StateBadge } from "@/components/StateBadge";
 import { describeApiError } from "@/lib/apiMessages";
 import { dayOf } from "@/lib/format";
 import { startCheck } from "@/lib/history";
@@ -58,7 +59,9 @@ export function ReportCard({ check, picked, canPick, onTogglePicked, onRemove }:
         <h2 id={titleId} className={styles.name}>
           {name}
         </h2>
-        <p className={`mono ${styles.id}`}>{check.rera_id}</p>
+        <p className={`mono ${styles.id}`}>
+          {check.rera_id} <StateBadge code={check.state} name={check.state_name} rera={check.rera_name} t={t} lang={lang} />
+        </p>
         <p className={styles.tags}>
           {display && <NeevScore value={display.value} band={display.band} variant="chip" showValue={false} />}
           <span className={styles.status} data-status={status}>

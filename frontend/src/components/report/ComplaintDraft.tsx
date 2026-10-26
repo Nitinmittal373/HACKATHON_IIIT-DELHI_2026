@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 
-import { buildComplaintDraft, UPRERA_COMPLAINT_URL } from "@/lib/complaint";
+import { buildComplaintDraft } from "@/lib/complaint";
+import { relabel } from "@/lib/i18n/relabel";
 import { useLang } from "@/lib/LangProvider";
 import type { Report } from "@/lib/types";
 import styles from "./ComplaintDraft.module.css";
@@ -11,7 +12,9 @@ type Feedback = "copied" | "failed" | null;
 
 /** One click builds an editable complaint from the findings; the buyer reviews and files it. */
 export function ComplaintDraft({ report }: { report: Report }) {
-  const { t, lang } = useLang();
+  const { t: base, lang } = useLang();
+  // The draft names this state's authority, not UP-RERA.
+  const t = relabel(base, report.rera_name);
   const [draft, setDraft] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<Feedback>(null);
 
@@ -68,7 +71,7 @@ export function ComplaintDraft({ report }: { report: Report }) {
             <button type="button" className="btn2" onClick={print}>
               {t.complaint.print}
             </button>
-            <a className="btn2" href={UPRERA_COMPLAINT_URL} target="_blank" rel="noopener noreferrer">
+            <a className="btn2" href={report.complaint_url} target="_blank" rel="noopener noreferrer">
               {t.complaint.file}
             </a>
             <span role="status">

@@ -1,0 +1,79 @@
+{
+  "state": "MH",
+  "state_name": "Maharashtra",
+  "rera_name": "MahaRERA",
+  "id": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+  "rera_id": "P99000055716",
+  "details_url": "https://maharera.maharashtra.gov.in/projects-search-result?certificate_no=P99000055716",
+  "status": "completed",
+  "started_at": "2026-10-25T04:00:00Z",
+  "completed_at": "2026-10-25T04:00:00Z",
+  "sources": [
+    {
+      "source": "uprera",
+      "status": "completed",
+      "live_url": null,
+      "message": null,
+      "checks_read": [
+        "registration"
+      ]
+    },
+    {
+      "source": "registry",
+      "status": "completed",
+      "live_url": null,
+      "message": null,
+      "checks_read": []
+    },
+    {
+      "source": "group",
+      "status": "failed",
+      "live_url": null,
+      "message": "No public company profile with the promoter's exact name was read",
+      "checks_read": []
+    },
+    {
+      "source": "sarfaesi",
+      "status": "completed",
+      "live_url": null,
+      "message": null,
+      "checks_read": []
+    },
+    {
+      "source": "insolvency",
+      "status": "completed",
+      "live_url": null,
+      "message": null,
+      "checks_read": []
+    },
+    {
+      "source": "land",
+      "status": "completed",
+      "live_url": null,
+      "message": null,
+      "checks_read": []
+    },
+    {
+      "source": "consumer",
+      "status": "blocked",
+      "live_url": "https://live.tinyfish.example/session",
+      "message": "This page asks for a CAPTCHA. We never bypass one",
+      "checks_read": []
+    },
+    {
+      "source": "news",
+      "status": "completed",
+      "live_url": null,
+      "message": null,
+      "checks_read": []
+    }
+  ],
+  "reused": false,
+  "display_score": {
+    "value": 900,
+    "band": "insufficient_evidence",
+    "hard_stop": false,
+    "confidence": 0.33,
+    "provisional": true
+  }
+}

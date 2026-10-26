@@ -13,7 +13,7 @@ interface Props {
   hours: number;
   /** The day the records were read, already formatted. */
   readOn: string;
-  project: Pick<Project, "rera_id" | "details_url">;
+  project: Pick<Project, "rera_id" | "details_url" | "state">;
 }
 
 // Records change: a delay order or an insolvency admission can land in any week.

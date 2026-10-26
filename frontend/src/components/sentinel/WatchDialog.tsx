@@ -9,7 +9,7 @@ import type { Project } from "@/lib/types";
 import styles from "./WatchDialog.module.css";
 
 interface Props {
-  project: Pick<Project, "rera_id" | "details_url">;
+  project: Pick<Project, "rera_id" | "details_url" | "state">;
   open: boolean;
   onClose: () => void;
 }

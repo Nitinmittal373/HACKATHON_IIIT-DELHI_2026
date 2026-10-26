@@ -1,3 +1,5 @@
+import { CoverageNote } from "@/components/CoverageNote";
+import { StateBadge } from "@/components/StateBadge";
 import { RecheckNote } from "@/components/report/RecheckNote";
 import { ReportActions } from "@/components/report/ReportActions";
 import { dayOf, hoursSince } from "@/lib/format";
@@ -26,8 +28,22 @@ export function ReportHeader({ report, t, lang }: Props) {
           </h1>
           <p className={styles.meta}>
             {meta && `${meta} · `}
-            <span className="mono">{project.rera_id}</span>
+            <span className="mono">{project.rera_id}</span>{" "}
+            <StateBadge
+              code={report.state}
+              name={report.state_name}
+              rera={report.rera_name}
+              t={t}
+              lang={lang}
+              withName
+            />
           </p>
+          <CoverageNote
+            coverage={report.coverage}
+            rera={report.rera_name}
+            href={report.portal_url}
+            t={t}
+          />
           <RecheckNote
             hours={hoursSince(check.completed_at ?? check.started_at)}
             readOn={checkedOn}
