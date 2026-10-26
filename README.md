@@ -18,7 +18,7 @@ A risk check for under-construction homes in Uttar Pradesh. NeevCheck sends **Ti
 
 <br>
 
-<img src="docs/assets/hero.gif" width="860" alt="NeevCheck home page: search bar, a report card scoring Supertech Eco Village-I Phase I-C at 68 out of 100, and an animated construction skyline">
+<img src="docs/assets/hero.gif" width="860" alt="NeevCheck home page: search bar, a report card scoring Supertech Eco Village-I Phase I-C at NeevScore 621 (Watch), and an animated construction skyline">
 
 </div>
 
@@ -33,7 +33,6 @@ A risk check for under-construction homes in Uttar Pradesh. NeevCheck sends **Ti
 - [How it works](#how-it-works)
 - [Architecture](#architecture)
 - [NeevScore](#neevscore)
-- [NeevScore v2: the credit-style score](#neevscore-v2-the-credit-style-score)
 - [Where NeevCheck fits](#where-neevcheck-fits)
 - [What a check costs](#what-a-check-costs)
 - [Tech stack](#tech-stack)
@@ -63,7 +62,7 @@ A broker's brochure says *"possession on time"*. The records may say the complet
 | :-: | --- | --- |
 | 🔎 | **Search first, no forms** | Type a project name, a promoter or any UP-RERA number (2017 or new format). We show the matching phases from the register and ask *"Is this the property you're looking for?"* before any agent runs. |
 | 🤖 | **Agent Cam** | Watch TinyFish browser agents open each official site, find the project and copy the exact record, live. |
-| 📊 | **NeevScore (0–100)** | One explained number. Every point lost links to the record behind it. |
+| 📊 | **NeevScore (300–900)** | One explained number, like a credit score: six weighted pillars, a confidence meter and the top reason codes (R01–R14). Every point lost links to the record behind it. The first 0–100 score is kept as one line in the method section, for transparency. |
 | 🗂️ | **Evidence Locker** | Every finding carries its source link and the minute it was read. *No source, no claim.* |
 | 🧬 | **Builder DNA** | Sister projects, insolvency scope and linked companies for the same promoter. |
 | ✅ | **Buyer Action Plan** | Four concrete things to check before paying more. |
@@ -74,7 +73,6 @@ A broker's brochure says *"possession on time"*. The records may say the complet
 | 💬 | **Share on WhatsApp** | A short message with the score and a link, for the family group. |
 | 🔔 | **Neev Sentinel** | Weekly re-checks; an alert only when a record actually changes. |
 | 🏟️ | **War Room** | Six lanes (UP-RERA, company registry, group companies, insolvency, land authority, news) run in parallel, each with its own live ticker and findings count. Click a lane to enlarge its live browser view. |
-| 🔢 | **NeevScore 300–900 + reason codes** | A credit-report style score with six weighted pillars, a confidence meter and the top four reason codes (R01–R14), each linked to its evidence. The classic 0–100 score stays below it. |
 | 🌳 | **Builder family tree** | Promoter, directors (name and DIN only), related companies and their UP-RERA projects. Flagged nodes carry a text label, never colour alone; a list view serves phones and screen readers. |
 | 📜 | **Evidence ledger** | Every claim with its page, read time, the words on the page, reliability, points and reason code. |
 | ✉️ | **UP-RERA complaint draft** | One click builds an editable complaint from facts only, with numbered source annexures, in English or Hindi. *Draft for you to review and file. Not legal advice.* |
@@ -94,13 +92,13 @@ A broker's brochure says *"possession on time"*. The records may say the complet
 <table>
 <tr>
 <td width="50%"><img src="docs/assets/screens/confirm.png" alt="Confirm step listing four Supertech Eco Village phases from the UP-RERA register"><br><sub><b>Confirm</b> — real phases from the UP-RERA register. Nothing runs until the buyer confirms.</sub></td>
-<td width="50%"><img src="docs/assets/screens/report.png" alt="Report page with NeevScore 76, reasons, evidence and a buyer action plan"><br><sub><b>Report</b> — score, reasons, evidence, timeline and next steps.</sub></td>
+<td width="50%"><img src="docs/assets/screens/report.png" alt="Report page with a NeevScore dial, reasons, evidence and a buyer action plan"><br><sub><b>Report</b> — score, reasons, evidence, timeline and next steps.</sub></td>
 </tr>
 </table>
 
 <table>
 <tr>
-<td width="50%"><img src="docs/assets/screens/my-reports.png" alt="My reports listing two checks with their scores, bands and Open, Compare, Re-check and Remove buttons"><br><sub><b>My reports</b>: your checks, kept in this browser. No accounts.</sub></td>
+<td width="50%"><img src="docs/assets/screens/my-reports.png" alt="My reports listing two checks with their NeevScores, bands and Open, Compare, Re-check and Remove buttons"><br><sub><b>My reports</b>: your checks, kept in this browser. No accounts.</sub></td>
 <td width="50%"><img src="docs/assets/screens/compare.png" alt="Compare page with two projects side by side and a note that there is not enough evidence to rank them"><br><sub><b>Compare</b>: row by row from the records. A thin check is never ranked.</sub></td>
 </tr>
 </table>
@@ -125,30 +123,32 @@ A broker's brochure says *"possession on time"*. The records may say the complet
 
 ## A real check: Supertech Eco Village-I Phase I-C
 
-A live check of `UPRERAPRJ8334`, read on 25 Oct 2026. Every value comes from a public record; each row links to where it was read. The check is recorded in [`backend/tests/fixtures/check_8334.json`](backend/tests/fixtures/check_8334.json) and replayed by the tests.
+A live check of `UPRERAPRJ8334`, read on 25 Oct 2026 with every source on. Every value comes from a public record; each row links to where it was read. The check is recorded in [`backend/tests/fixtures/check_8334.json`](backend/tests/fixtures/check_8334.json) and replayed by the tests.
 
 | Record | Value | Source |
 | --- | --- | --- |
 | UP-RERA registration | `UPRERAPRJ8334`, registered 09 Aug 2017 | [UP-RERA](https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334) |
-| Completion date on record | 30 Dec 2017, 105 months ago; project still listed as Ongoing; no extension orders on the register | UP-RERA project page |
+| Completion date on record | 30 Dec 2017, 105 months ago; project still listed as Ongoing; no extension orders on the register. Shown as evidence; NeevScore scores a delay from the revised date and the extension orders | UP-RERA project page |
 | Promoter | SUPERTECH LIMITED · 2,803 complaints on UP-RERA across its projects, 15 about this project | UP-RERA project summary |
 | Company status | Active, CIN U74899DL1995PLC074422 | [Economic Times company page](https://economictimes.indiatimes.com/company/supertech-limited/U74899DL1995PLC074422) |
 | Insolvency | NCLT admitted an application on 25 Mar 2022. A news report says the order covers the whole company; no court order was read, so this is **not scored** and needs checking against the NCLT and NCLAT orders | [Fortune India](https://www.fortuneindia.com/enterprise/nclt-declares-supertech-insolvent-whats-the-future-of-25000-homebuyers/107553) |
 | Completion order | Supreme Court order of 5 Feb 2026 names Eco Village-1 among the 16 stalled Supertech projects the NBCC is to complete | [Supreme Court](https://api.sci.gov.in/supremecourt/2025/5007/5007_2025_1_18_68404_Order_05-Feb-2026.pdf) |
 | Consumer cases | Not read: e-Jagriti asks for a CAPTCHA, so the agent stopped. Search it yourself by the promoter's name | [e-Jagriti](https://e-jagriti.gov.in/advance-case-search) |
 | Land authority dues | Not read: the authorities' dues lists could not be fetched | |
+| Group projects | 5 of 5 other UP-RERA projects of the group are more than 12 months past their completion date | UP-RERA project pages |
 
-**NeevScore 68 / 100 · Moderate risk**
+**NeevScore 621 · Watch**
 
 ```text
-100  starting score
--14  completion date passed 105 months ago; still Ongoing   (UP-RERA)
- -9  2,803 complaints on UP-RERA against the promoter       (UP-RERA)
- -6  15 complaints on UP-RERA about this project            (UP-RERA)
- -3  three news stories on delays                           (secondary)
- ──
- 68  Moderate · confidence 71% (5 of 7 key checks) · no hard stop
+900  starting score
+-150 15 complaints on UP-RERA about this project            (R05, UP-RERA)
+-120 5 of 5 group projects past their completion date       (R13, UP-RERA)
+  -9 three recent news stories on delays                    (R11, secondary)
+ ───
+ 621  Watch · confidence 83% (5 of 6 record types) · no hard stop
 ```
+
+The classic 0–100 score of the same records was 68. It is kept only for transparency.
 
 **What the buyer should do next:** read the NCLT and NCLAT orders on the insolvency, ask the builder for the current possession date in writing, check whether this phase is on NBCC's list of 16 projects, and ask the Greater Noida authority for the project's dues position.
 
@@ -198,7 +198,7 @@ sequenceDiagram
     A->>T: run agent per source
     T-->>A: live view URL, progress, extracted record
     A-->>B: event: source.progress / finding.added
-    A-->>B: event: check.completed {score: 76}
+    A-->>B: event: check.completed {display_score: 621}
     B->>A: GET /api/checks/{id}/report
 ```
 
@@ -206,32 +206,28 @@ More detail in [`docs/architecture.md`](docs/architecture.md).
 
 ## NeevScore
 
-Every project starts at **100**. Points come off only for records we find, weighted by area. Absence of a record never adds points; a source we cannot read lowers **confidence**, not the score.
+NeevScore is a number from **300 to 900**, like a credit score: higher is safer. It is the score on every screen, and the backend owns its scale (`GET /api/meta` serves the scale, the band edges and the weights; the frontend never keeps a copy). It follows the shape of a credit report: `900 − 6 × Σ(weight × pillar penalty)`, clipped to 300–900. Points come off only for records we find. Absence of a record never adds points; a source we cannot read appears as reason code **R12 Data unavailable**, costs nothing and lowers **confidence**.
 
-| Area | Weight | Examples |
+| Pillar | Weight | Examples |
 | --- | --: | --- |
-| UP-RERA compliance | 25% | registration status, missed quarterly updates |
-| Project execution | 20% | completion date extensions, delay length |
-| Legal and courts | 15% | orders against the promoter |
-| Financial and insolvency | 15% | insolvency of the company or this project |
-| Builder history | 15% | stalled sister projects |
-| News | 10% | delay or fraud coverage (secondary) |
+| Regulatory compliance (RERA) | 30% | registration status, extensions, missed quarterly updates |
+| Delivery track record | 20% | other projects of the same group delayed or lapsed |
+| Legal and insolvency | 25% | insolvency of the promoter or this project, complaints, cases |
+| Financial and corporate health | 15% | struck-off or disqualified directors, charges, auction notices |
+| Land authority and approvals | 5% | dues lists, missing completion or occupancy certificates |
+| Sentiment and news | 5% | delay or protest coverage (secondary) |
 
 | Band | Range |
 | --- | --- |
-| 🟢 Low | 80–100 |
-| 🟡 Moderate | 60–79 |
-| 🟠 High | 40–59 |
-| 🔴 Critical | 0–39 · any hard stop (for example, this project in insolvency) caps the score here |
-| ⚪ Not enough evidence yet | shown instead of a band while fewer than half the key checks are read; the score is provisional |
+| 🟢 Low risk | 750–900 |
+| 🟡 Watch | 600–749 |
+| 🟠 Elevated risk | 450–599 |
+| 🔴 High risk | 300–449 · any hard stop (for example, this project in insolvency per an official page) caps the score here |
+| ⚪ Not enough evidence yet | shown instead of a band while fewer than half the six record types are read; the score is provisional |
 
-Full method and test cases: [`docs/scoring.md`](docs/scoring.md).
+A live check of UPRERAPRJ8334 on 25 Oct 2026 gave **621 (Watch)** with 5 of 6 record types read. The weights are transparent expert priors, to be calibrated on labelled stalled-project lists. Checks stored before NeevScore existed are re-scored from their stored findings when read, so no report falls back to the old number. The first version of the score (0–100, classic score 68 for the same check) is kept for transparency as one line in each report's method section.
 
-## NeevScore v2: the credit-style score
-
-NeevScore v2 is added next to the classic score; both are returned. It follows the shape of a credit report: `900 − 6 × Σ(weight × pillar penalty)`, clipped to 300–900, across six pillars (RERA compliance 30%, delivery track record 20%, legal and insolvency 25%, financial and corporate health 15%, land authority 5%, news 5%). Bands: 750–900 Low risk, 600–749 Watch, 450–599 Elevated, 300–449 High; any hard stop forces High and says so. A signal that cannot be read is never guessed: it appears as reason code **R12 Data unavailable**, adds no penalty and lowers confidence.
-
-A live check of UPRERAPRJ8334 on 26 Oct 2026 gave **621 (Watch)** with 5 of 6 record types read (classic score 68, Moderate). The weights are transparent expert priors, to be calibrated on labelled stalled-project lists. Method: [`docs/scoring.md`](docs/scoring.md#neevscore-v2-300900).
+Full method and worked examples: [`docs/scoring.md`](docs/scoring.md#neevscore-method).
 
 ## Where NeevCheck fits
 
@@ -274,24 +270,25 @@ Search and Fetch are free and are tried first; an agent run is the last step. A 
 .
 ├── backend/                 FastAPI service
 │   ├── app/
-│   │   ├── api/             routes: search, checks, events (SSE), reports, sentinel
+│   │   ├── api/             routes: search, checks, events (SSE), reports, meta, sentinel
 │   │   ├── sources/         one module per public source, plus the shared agent runner
 │   │   ├── parsers/         deterministic page parsers (UP-RERA)
-│   │   ├── scoring/         NeevScore engine and weights
+│   │   ├── scoring/         NeevScore engine (v2/) and the classic 0–100 score
 │   │   ├── sentinel/        watches, change detection, alerts, email
 │   │   ├── orchestrator.py  runs a check and streams its events
 │   │   ├── tinyfish.py      the only module that calls TinyFish
 │   │   ├── models.py        Pydantic models shared by the API
 │   │   └── main.py
-│   ├── scripts/             capture_fixtures.py records real responses for tests
+│   ├── scripts/             export_openapi.py writes the API contract; capture_fixtures.py records real responses
 │   └── tests/               pytest, with recorded TinyFish responses in fixtures/
 ├── frontend/                Next.js app
 │   ├── e2e/                 Playwright tests against a recorded API
 │   └── src/
 │       ├── app/             routes: home, check, check/[id], report/[id], reports, compare, alerts
-│       ├── components/      Skyline, AgentCam, ScoreRing, EvidenceList …
-│       ├── lib/             API client, event hook, English and Hindi copy
+│       ├── components/      Skyline, AgentCam, NeevScore, EvidenceList …
+│       ├── lib/             API client and types generated from the contract, English and Hindi copy
 │       └── styles/          tokens, globals, app screens and print
+├── contracts/               openapi.json, exported from the backend (the API contract)
 ├── docs/                    architecture, scoring, data sources, deployment, assets
 ├── render.yaml              Render Blueprint for the API
 └── .github/                 CI, issue forms, pull request template
@@ -317,8 +314,11 @@ ruff check . && pytest -q        # tests replay recorded responses, no key neede
 cd frontend
 npm install
 npm run dev                      # http://localhost:3000
-npm run lint && npm run typecheck && npm run build
+npm run lint && npm run typecheck && npm run test:unit && npm run build
 npm run e2e                      # browser tests; need `npx playwright install chromium` once
+
+# after changing a backend model (from the repo root)
+make contract                    # exports contracts/openapi.json and regenerates the frontend types
 ```
 
 The key never leaves your machine: `.env` is git-ignored and the app never logs it. A `TINYFISH_API_KEY` set in your shell takes precedence over `.env`.
@@ -330,6 +330,7 @@ curl "localhost:8000/api/projects/search?q=UPRERAPRJ8334"
 curl -X POST localhost:8000/api/checks -H "Content-Type: application/json"      -d '{"rera_id": "UPRERAPRJ8334"}'                       # returns {"id": ...}
 curl -N localhost:8000/api/checks/<id>/events               # live event stream
 curl localhost:8000/api/checks/<id>/report
+curl localhost:8000/api/meta                                # the score scale, band edges and weights
 ```
 
 The full API is described in [`docs/architecture.md`](docs/architecture.md#api).
@@ -343,6 +344,7 @@ The full API is described in [`docs/architecture.md`](docs/architecture.md#api).
 - [x] **Phase 4 · Check flow** — search, confirm, Agent Cam, report
 - [x] **Phase 5 · Sentinel and sharing** — weekly re-checks, alerts, PDF, Hindi
 - [x] **v2 · Credit-style score** — NeevScore 300–900 with reason codes, War Room, family tree, evidence ledger, complaint draft, Monitor watch
+- [x] **One contract, one score** — the API contract is exported from the backend and generates the frontend types; NeevScore 300–900 is the only score shown
 - [ ] **Phase 6 · Launch** — accessibility, end-to-end tests, deployment, v1.0
 
 ## Responsible use of public data
