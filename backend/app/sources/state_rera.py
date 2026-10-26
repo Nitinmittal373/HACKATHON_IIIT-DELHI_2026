@@ -21,6 +21,8 @@ from app.sources.base import (
 from app.sources.findings import build_finding
 from app.sources.uprera import REGISTRATION_ENDED, months_between
 from app.states.base import ProjectRecord, StateAdapter
+from app.states.builder import BuilderIdentity, identify_builder
+from app.tinyfish import WebError
 
 COMPLETED_STATUS = ("complet", "possession", "occupancy")
 
@@ -43,9 +45,20 @@ class StateReraSource:
             )
 
         yield Progress(f"Reading what {adapter.rera_name} shows about the project")
-        yield ProjectDetails(with_record(project, record))
+        identity = None
+        if not record.promoter_name:
+            yield Progress(
+                "The portal's page names no promoter; looking for the builder in listings"
+            )
+            identity = await find_builder(record.rera_id, ctx)
+        named = record.model_copy(
+            update={"promoter_name": record.promoter_name or (identity.name if identity else None)}
+        )
+        yield ProjectDetails(with_record(project, named))
         for finding in findings_from_record(record, adapter, ctx.today, ctx.now):
             yield FoundFinding(finding)
+        if identity:
+            yield FoundFinding(identity_finding(identity, adapter, ctx))
 
         read: list[CheckKey] = ["registration"]
         if record.latest_completion:
@@ -53,6 +66,36 @@ class StateReraSource:
         if record.revised_completion or record.extensions:
             read.append("extensions")
         yield ChecksRead(tuple(read))
+
+
+async def find_builder(rera_id: str, ctx: SourceContext) -> BuilderIdentity | None:
+    """A failed lookup only leaves the builder unnamed, as before."""
+    try:
+        return await identify_builder(rera_id, ctx.web)
+    except WebError:
+        return None
+
+
+def identity_finding(
+    identity: BuilderIdentity, adapter: StateAdapter, ctx: SourceContext
+) -> Finding:
+    """Who the builder is, for the reader to verify. It maps to no scoring rule: 0 points."""
+    url, near = identity.sources[0]
+    return build_finding(
+        source="uprera",
+        reliability="secondary",
+        kind="builder_identity",
+        area="builder_history",
+        title=(
+            f"Builder identified from public listings: {identity.name}. "
+            f"Verify on {adapter.rera_name}"
+        ),
+        verdict="context",
+        url=url,
+        today=ctx.today,
+        now=ctx.now,
+        snippet=near,
+    )
 
 
 def with_record(project: Project, record: ProjectRecord) -> Project:
