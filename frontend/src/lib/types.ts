@@ -151,6 +151,33 @@ export interface ScoreV2 {
   pillars_unread: PillarId[];
 }
 
+export type FamilyFlag = "cirp" | "struck_off";
+export type FamilyProjectState = "ok" | "delayed" | "lapsed" | "unread";
+
+export interface FamilyProject {
+  rera_id: string;
+  name: string | null;
+  details_url: string;
+  state: FamilyProjectState;
+}
+
+export interface FamilyCompany {
+  name: string;
+  status: string | null;
+  status_url: string | null;
+  flag: FamilyFlag | null;
+  projects: FamilyProject[];
+}
+
+/** The builder's group: directors by name and DIN only, related companies and their projects. */
+export interface FamilyTree {
+  promoter: string;
+  source_url: string;
+  directors: { name: string; din: string }[];
+  promoter_projects: FamilyProject[];
+  companies: FamilyCompany[];
+}
+
 export interface Report {
   check: Check;
   project: Project;
@@ -158,6 +185,7 @@ export interface Report {
   findings: Finding[];
   timeline: Finding[];
   score_v2?: ScoreV2 | null;
+  family?: FamilyTree | null;
 }
 
 export type EventType =

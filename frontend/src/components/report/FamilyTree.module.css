@@ -1,0 +1,274 @@
+.card {
+  padding: 24px;
+}
+
+.title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.lead {
+  margin: 6px 0 0;
+  color: var(--mu);
+  font-size: 14px;
+}
+
+.legend {
+  margin: 8px 0 0;
+  color: var(--fa);
+  font-size: 12.5px;
+}
+
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 18px;
+  align-items: start;
+  margin-top: 16px;
+}
+
+.graph {
+  overflow-x: auto;
+  padding: 4px;
+  border: 1px solid var(--ln);
+  border-radius: var(--r-md);
+  background: #fdfaf8;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  min-width: 720px;
+  height: auto;
+}
+
+.edge {
+  fill: none;
+  stroke: var(--ln2);
+  stroke-width: 1.5;
+}
+
+/* The registry says "related", not "owned by", so those lines are dashed. */
+.related {
+  stroke-dasharray: 5 4;
+}
+
+.node {
+  cursor: pointer;
+  outline: none;
+}
+
+.box {
+  fill: #fff;
+  stroke: var(--ln2);
+  stroke-width: 1.5;
+}
+
+.node:hover .box {
+  stroke: var(--fa);
+}
+
+.node:focus-visible .box,
+.selected .box {
+  stroke: var(--o);
+  stroke-width: 3;
+}
+
+.node[data-flag="cirp"] .box,
+.node[data-flag="struck_off"] .box,
+.node[data-flag="lapsed"] .box {
+  stroke: var(--critical);
+  stroke-width: 2.5;
+}
+
+.node[data-flag="delayed"] .box,
+.node[data-flag="unread"] .box {
+  stroke: var(--high);
+  stroke-dasharray: 6 4;
+  stroke-width: 2;
+}
+
+.node[data-flag="cirp"]:focus-visible .box,
+.node[data-flag="struck_off"]:focus-visible .box,
+.node[data-flag="lapsed"]:focus-visible .box,
+.node[data-flag="delayed"]:focus-visible .box,
+.node[data-flag="unread"]:focus-visible .box,
+.node.selected .box {
+  stroke: var(--o);
+  stroke-width: 3.5;
+}
+
+.name {
+  fill: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sub {
+  fill: var(--mu);
+  font-size: 12px;
+}
+
+.flagText {
+  fill: var(--critical);
+  font-weight: 600;
+}
+
+.details {
+  padding: 14px;
+  border: 1px solid var(--ln);
+  border-radius: var(--r-md);
+  font-size: 14px;
+}
+
+.detailsTitle {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.details p {
+  margin: 6px 0 0;
+}
+
+.hint {
+  color: var(--mu);
+  font-size: 13px;
+}
+
+.kind {
+  color: var(--fa);
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.detailName {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.flagLine {
+  color: var(--critical);
+  font-weight: 600;
+}
+
+.source {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 10px;
+  color: var(--o-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.list {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ln);
+}
+
+.listTitle {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.tierTitle {
+  margin: 14px 0 6px;
+  color: var(--mu);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.items {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--ln);
+  border-radius: var(--r-sm);
+  background: #fff;
+  text-align: left;
+  font: inherit;
+}
+
+.item[aria-pressed="true"] {
+  border-color: var(--o);
+}
+
+.item[data-flag="cirp"],
+.item[data-flag="struck_off"],
+.item[data-flag="lapsed"] {
+  border: 2px solid var(--critical);
+}
+
+.item[data-flag="delayed"],
+.item[data-flag="unread"] {
+  border: 2px dashed var(--high);
+}
+
+.itemName {
+  font-size: 13.5px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.itemSub {
+  color: var(--mu);
+  font-size: 12.5px;
+}
+
+.item[data-flag="cirp"] .itemSub,
+.item[data-flag="struck_off"] .itemSub,
+.item[data-flag="lapsed"] .itemSub {
+  color: var(--critical);
+  font-weight: 600;
+}
+
+.none {
+  margin: 0;
+  color: var(--mu);
+  font-size: 13px;
+}
+
+@media (max-width: 960px) {
+  .body {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* On a phone the diagram would need sideways scrolling; the list says the same thing. */
+@media (max-width: 720px) {
+  .graph {
+    display: none;
+  }
+
+  .items {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    padding: 18px;
+  }
+}
+
+@media print {
+  .details {
+    display: none;
+  }
+}

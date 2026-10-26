@@ -3,6 +3,7 @@ import { home as homeEn } from "@/lib/i18n/en/home";
 import { insights as insightsEn } from "@/lib/i18n/en/insights";
 import { check as checkEn } from "@/lib/i18n/en/check";
 import { credit as creditEn } from "@/lib/i18n/en/credit";
+import { family as familyEn } from "@/lib/i18n/en/family";
 import { compare as compareEn } from "@/lib/i18n/en/compare";
 import { report as reportEn } from "@/lib/i18n/en/report";
 import { reports as reportsEn } from "@/lib/i18n/en/reports";
@@ -12,6 +13,7 @@ import { home as homeHi } from "@/lib/i18n/hi/home";
 import { insights as insightsHi } from "@/lib/i18n/hi/insights";
 import { check as checkHi } from "@/lib/i18n/hi/check";
 import { credit as creditHi } from "@/lib/i18n/hi/credit";
+import { family as familyHi } from "@/lib/i18n/hi/family";
 import { compare as compareHi } from "@/lib/i18n/hi/compare";
 import { report as reportHi } from "@/lib/i18n/hi/report";
 import { reports as reportsHi } from "@/lib/i18n/hi/reports";
@@ -24,6 +26,7 @@ const en = {
   ...checkEn,
   home: homeEn,
   credit: creditEn,
+  family: familyEn,
   report: reportEn,
   reports: reportsEn,
   compare: compareEn,
@@ -40,6 +43,7 @@ const hi: Strings = {
   ...checkHi,
   home: homeHi,
   credit: creditHi,
+  family: familyHi,
   report: reportHi,
   reports: reportsHi,
   compare: compareHi,
