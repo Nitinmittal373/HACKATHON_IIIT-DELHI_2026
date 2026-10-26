@@ -1,0 +1,83 @@
+.title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.none {
+  margin: 8px 0 0;
+  color: var(--mu);
+  font-size: 14px;
+}
+
+.chips {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--ln);
+  border-radius: var(--r-sm);
+  background: #fff;
+  color: var(--ink);
+  text-align: left;
+  font: inherit;
+  transition: border-color 0.2s var(--ease-out);
+}
+
+.chip:hover {
+  border-color: var(--o);
+}
+
+/* A dashed outline marks "not read", so it is not told apart by colour alone. */
+.chip[data-unread="true"] {
+  border-style: dashed;
+  background: #fdfaf8;
+}
+
+.code {
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: var(--oS);
+  color: var(--ink2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.label {
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.points {
+  color: var(--high);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.chip[data-unread="true"] .points {
+  color: var(--mu);
+  font-weight: 500;
+}
+
+.note {
+  margin: 8px 0 0;
+  color: var(--mu);
+  font-size: 12.5px;
+}
+
+.open {
+  margin-top: 14px;
+}

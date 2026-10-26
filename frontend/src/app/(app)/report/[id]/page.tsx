@@ -6,6 +6,7 @@ import { ApiProblem } from "@/components/ApiProblem";
 import { PageMessage } from "@/components/PageMessage";
 import { ActionPlan } from "@/components/report/ActionPlan";
 import { BuilderQuestions } from "@/components/report/BuilderQuestions";
+import { CreditHeader } from "@/components/report/CreditHeader";
 import { DriversCard } from "@/components/report/DriversCard";
 import { EvidenceList } from "@/components/report/EvidenceList";
 import { SentinelCard } from "@/components/report/SentinelCard";
@@ -60,7 +61,8 @@ export default async function ReportPage({ params }: Props) {
       <ReportHeader report={report} t={t} lang={lang} />
       <div className={styles.grid}>
         <div className={styles.column}>
-          <ScoreCard report={report} t={t} />
+          <CreditHeader report={report} ids={ids} t={t} />
+          <ScoreCard report={report} t={t} compact={report.score_v2 != null} />
           <DriversCard report={report} ids={ids} t={t} />
           <EvidenceList report={report} ids={ids} t={t} lang={lang} />
         </div>

@@ -5,14 +5,29 @@ import { summarize } from "@/lib/summary";
 import type { Report } from "@/lib/types";
 import styles from "./ScoreCard.module.css";
 
-export function ScoreCard({ report, t }: { report: Report; t: Strings }) {
+interface Props {
+  report: Report;
+  t: Strings;
+  /** Shown small under the 300-900 header, which leads the report. */
+  compact?: boolean;
+}
+
+export function ScoreCard({ report, t, compact = false }: Props) {
   const { score } = report;
   const band = t.report.bands[score.band];
 
   return (
-    <section className={`card ${styles.card}`} aria-label={t.report.scoreLabel(score.value, band)}>
-      <ScoreRing value={score.value} band={score.band} size={180} delay={0.3} />
+    <section
+      className={`card ${styles.card} ${compact ? styles.compact : ""}`}
+      aria-label={t.report.scoreLabel(score.value, band)}
+    >
+      <ScoreRing value={score.value} band={score.band} size={compact ? 110 : 180} delay={0.3} />
       <div>
+        {compact && (
+          <p className={styles.classic}>
+            <b>{t.credit.classicTitle}</b> · {t.credit.classicNote}
+          </p>
+        )}
         <span className={styles.band} data-band={score.band}>
           {band}
         </span>

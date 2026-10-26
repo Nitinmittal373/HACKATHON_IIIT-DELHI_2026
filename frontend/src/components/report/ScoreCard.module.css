@@ -6,6 +6,23 @@
   padding: 26px;
 }
 
+.compact {
+  grid-template-columns: 120px minmax(0, 1fr);
+  gap: 20px;
+  padding: 16px 20px;
+}
+
+.compact .summary {
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.classic {
+  margin: 0 0 8px;
+  color: var(--mu);
+  font-size: 13px;
+}
+
 .band {
   display: inline-block;
   padding: 6px 12px;
