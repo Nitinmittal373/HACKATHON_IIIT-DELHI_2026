@@ -9,6 +9,7 @@
 
 ### Added
 
+- **All-India RERA coverage.** A state adapter per portal (`backend/app/states/`): UP full; Goa, Bihar and Jharkhand partial; 18 other states search only, read from the portal's own search results and marked as such. Additive API: `GET /api/states`, an optional `state` on search, checks, watches and promoter projects, and `state`, `state_name` and `rera_name` on every project, check, report, summary and alert, plus `Finding.via`. A state picker, state badges, a coverage page, and state-aware reports and complaint drafts in English and Hindi. Research for every portal is in `docs/states.md`.
 - `display_score` (value, band, hard stop, confidence, provisional) on every answer that shows a score: the report, the check and its events, My reports, recent checks, Compare, Sentinel alerts and promoter projects. Checks stored before NeevScore existed are re-scored from their findings when read.
 - `GET /api/meta`: the score scale, band edges, pillar weights and reason codes, so no client hard-codes them.
 - Compare now ranks by NeevScore and lists points lost per pillar instead of per area.

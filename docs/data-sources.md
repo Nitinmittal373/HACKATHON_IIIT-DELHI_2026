@@ -4,6 +4,7 @@ NeevCheck reads only public records. Each source has a reliability level that de
 
 | Source | Site | What we read | Reliability |
 | --- | --- | --- | --- |
+| State RERA portals | see [states.md](states.md) | Registration number, name, promoter, dates and status, as far as the portal can be read | Primary; read from a page, a list row or, for search-only states, a Search snippet (marked as such) |
 | UP-RERA | [up-rera.in](https://www.up-rera.in) | Registration, promoter, completion date, extensions granted, completion certificate, documents, complaint counts | Primary |
 | Company registry | [mca.gov.in](https://www.mca.gov.in), [Economic Times](https://economictimes.indiatimes.com), [zaubacorp.com](https://www.zaubacorp.com) | Company name, CIN, status | Primary on MCA; the mirrors are secondary |
 | Insolvency | NCLT / NCLAT orders, [ibbi.gov.in](https://ibbi.gov.in), news reports of the case | Whether a case was admitted, when, and which projects it covers | Primary on official sites; news reports are secondary |
@@ -21,6 +22,10 @@ NeevCheck reads only public records. Each source has a reliability level that de
 - If a site shows a **CAPTCHA**, the agent stops and is never retried. The source is marked *Unable to verify* and the report tells the buyer how to check it themselves. e-Jagriti and zaubacorp both do this today.
 - A list that is not published or cannot be read (the land authorities' dues lists, on the day of the recorded check) leaves its check **unread**: absence of a record never adds points.
 - We respect each site's rate limits and run at most `AGENT_CONCURRENCY` agents at once.
+
+## All-India: how a state is read
+
+Every state's domains, number formats, gates and readable fields were checked on real pages and are listed in [states.md](states.md). Fetch can open UP-RERA, Goa and the first page of the Bihar and Jharkhand lists; other portals answer `proxy_error`, `login_required` or a CAPTCHA, and an India-proxy agent could not reach them either. For those, NeevCheck uses TinyFish Search limited to the portal's domains and parses the labelled facts in the snippet. The snippet text is kept as the evidence, the finding's source is the portal page Search returned, and a field the snippet does not show is unread. The Unified RERA Portal (rera.mohua.gov.in) is only a directory of state authorities, so it adds no coverage.
 
 ## What we never do
 
