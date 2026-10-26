@@ -33,6 +33,9 @@ A risk check for under-construction homes in Uttar Pradesh. NeevCheck sends **Ti
 - [How it works](#how-it-works)
 - [Architecture](#architecture)
 - [NeevScore](#neevscore)
+- [NeevScore v2: the credit-style score](#neevscore-v2-the-credit-style-score)
+- [Where NeevCheck fits](#where-neevcheck-fits)
+- [What a check costs](#what-a-check-costs)
 - [Tech stack](#tech-stack)
 - [Project structure](#project-structure)
 - [Getting started](#getting-started)
@@ -70,6 +73,13 @@ A broker's brochure says *"possession on time"*. The records may say the complet
 | ⚖️ | **Compare** | Two or three projects side by side, row by row; it names the best only when the evidence allows. |
 | 💬 | **Share on WhatsApp** | A short message with the score and a link, for the family group. |
 | 🔔 | **Neev Sentinel** | Weekly re-checks; an alert only when a record actually changes. |
+| 🏟️ | **War Room** | Six lanes (UP-RERA, company registry, group companies, insolvency, land authority, news) run in parallel, each with its own live ticker and findings count. Click a lane to enlarge its live browser view. |
+| 🔢 | **NeevScore 300–900 + reason codes** | A credit-report style score with six weighted pillars, a confidence meter and the top four reason codes (R01–R14), each linked to its evidence. The classic 0–100 score stays below it. |
+| 🌳 | **Builder family tree** | Promoter, directors (name and DIN only), related companies and their UP-RERA projects. Flagged nodes carry a text label, never colour alone; a list view serves phones and screen readers. |
+| 📜 | **Evidence ledger** | Every claim with its page, read time, the words on the page, reliability, points and reason code. |
+| ✉️ | **UP-RERA complaint draft** | One click builds an editable complaint from facts only, with numbered source annexures, in English or Hindi. *Draft for you to review and file. Not legal advice.* |
+| 🛰️ | **Monitor watch** | Watching a project also creates TinyFish Monitors on its UP-RERA page and on builder news; a changed page re-scores the project and alerts with the diff. |
+| 🙋 | **Right of reply** | "Report a mistake" on every report; the messages go to an operator log. |
 | 🌐 | **English and हिंदी** | Plain-language reports for every family member. |
 
 ## See it in action
@@ -100,6 +110,16 @@ A broker's brochure says *"possession on time"*. The records may say the complet
 <br>
 <img src="docs/assets/screens/home-full.png" alt="Full NeevCheck home page">
 </details>
+
+<table>
+<tr>
+<td width="50%"><img src="docs/assets/screens/report-v2.png" alt="Credit-style header: NeevScore 621 out of 900, Watch band, evidence read 5 of 6, top reason codes R05, R13 and R11, and six pillar bars"><br><sub><b>NeevScore 300–900</b>: band, confidence, reason codes and where the points went. A live check of UPRERAPRJ8334.</sub></td>
+<td width="50%"><img src="docs/assets/screens/family-tree.png" alt="Builder family tree of Supertech Limited with directors, related companies and delayed UP-RERA projects, and the same content as a list"><br><sub><b>Family tree</b>: directors by name and DIN, related companies and their projects, with a list view.</sub></td>
+</tr>
+</table>
+
+<img src="docs/assets/screens/complaint-draft.png" width="560" alt="UP-RERA complaint draft with the banner Draft for you to review and file, an editable text box and an annexure list">
+<br><sub><b>Complaint draft</b>: built from the findings only, with numbered annexures.</sub>
 
 > Screens are from the approved final design (v1.0). They are refreshed from the running app at each release.
 
@@ -207,6 +227,33 @@ Every project starts at **100**. Points come off only for records we find, weigh
 
 Full method and test cases: [`docs/scoring.md`](docs/scoring.md).
 
+## NeevScore v2: the credit-style score
+
+NeevScore v2 is added next to the classic score; both are returned. It follows the shape of a credit report: `900 − 6 × Σ(weight × pillar penalty)`, clipped to 300–900, across six pillars (RERA compliance 30%, delivery track record 20%, legal and insolvency 25%, financial and corporate health 15%, land authority 5%, news 5%). Bands: 750–900 Low risk, 600–749 Watch, 450–599 Elevated, 300–449 High; any hard stop forces High and says so. A signal that cannot be read is never guessed: it appears as reason code **R12 Data unavailable**, adds no penalty and lowers confidence.
+
+A live check of UPRERAPRJ8334 on 26 Oct 2026 gave **621 (Watch)** with 5 of 6 record types read (classic score 68, Moderate). The weights are transparent expert priors, to be calibrated on labelled stalled-project lists. Method: [`docs/scoring.md`](docs/scoring.md#neevscore-v2-300900).
+
+## Where NeevCheck fits
+
+| Tool | What it is known for | The gap NeevCheck owns |
+| --- | --- | --- |
+| Landeed + Terra | Land records and title checks | Looks at the land, not the builder's RERA delivery record, group companies or insolvency |
+| Probe42 | Company risk data sold through APIs, mostly to lenders | Not made for a family buying one flat; no project-level RERA signals or plain-language reasons |
+| Tofler, Zauba | Company registry mirrors and director data | Raw data with no project score; we read them as one source among several |
+| Legal verification by a lawyer | A one-off title and approvals opinion, paid | Slow and rarely repeated; NeevCheck is free first-pass screening and a list of questions to take to the lawyer |
+| QorpIQ | Company information platform | Same as above: company-level data, nothing about the project's delivery |
+| PropEquity, PropAlert | Market and project tracking and delay analytics | Aggregate market views, not a sourced, per-project proof for one buyer |
+| Property portals | Listings and builder marketing | No incentive to show risk |
+| MahaRERA grading | A regulator's project grading in Maharashtra | Not available for Uttar Pradesh |
+| CRISIL and other rating agencies | Ratings of builders for lenders and investors | Paid and not aimed at buyers; NeevCheck is explicitly *not* a credit rating |
+| FPCE | A federation that supports homebuyers | Advocacy and collective action; NeevCheck gives each buyer the records and a complaint draft |
+
+NeevCheck's gap: **a free, sourced, per-project risk check for a UP buyer, with proof for every point and a complaint draft when the records show a problem.** Descriptions of other tools are brief summaries of what they are known for, not reviews.
+
+## What a check costs
+
+Search and Fetch are free and are tried first; an agent run is the last step. A report uses at most three agent runs (insolvency, e-Jagriti, and the registry only as a fallback); the group, lender notices, land lists, news and UP-RERA are read with Search and Fetch alone, and results are cached per source, entity and day. Watching a project adds two TinyFish Monitors at about $0.005 per completed daily check. `python -m scripts.prewarm` runs real checks ahead of a demo so nobody waits. See the [escalation ladder](docs/architecture.md#the-escalation-ladder).
+
 ## Tech stack
 
 | Layer | Choice | Why |
@@ -295,6 +342,7 @@ The full API is described in [`docs/architecture.md`](docs/architecture.md#api).
 - [x] **Phase 3 · Frontend foundation** — design tokens, layout, animated skyline, home page
 - [x] **Phase 4 · Check flow** — search, confirm, Agent Cam, report
 - [x] **Phase 5 · Sentinel and sharing** — weekly re-checks, alerts, PDF, Hindi
+- [x] **v2 · Credit-style score** — NeevScore 300–900 with reason codes, War Room, family tree, evidence ledger, complaint draft, Monitor watch
 - [ ] **Phase 6 · Launch** — accessibility, end-to-end tests, deployment, v1.0
 
 ## Responsible use of public data

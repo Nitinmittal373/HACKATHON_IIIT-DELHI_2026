@@ -55,7 +55,7 @@ export const credit = {
   classicNote: "The original NeevScore, kept so nothing is lost.",
   narrative: (value: number, band: string, reasons: string[], unreadCount: number) =>
     `Scored ${value} out of 900 (${band}).` +
-    (reasons.length > 0 ? ` The biggest reasons: ${reasons.join("; ").toLowerCase()}.` : " No record we read cost any points.") +
+    (reasons.length > 0 ? ` The biggest reasons: ${reasons.join("; ")}.` : " No record we read cost any points.") +
     (unreadCount > 0 ? ` ${unreadCount} of 6 record types could not be read, which lowers confidence but not the score.` : ""),
   ratingNotice: "Risk indicator based on public records — not a credit rating.",
   ledger: {
