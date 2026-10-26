@@ -17,6 +17,7 @@ from pathlib import Path
 
 from app.config import load_settings
 from app.models import Project
+from app.states.builder import identify_builder
 from app.states.registry import adapter_for, detect_state
 from app.states.resolver import resolve_any
 from app.tinyfish import LiveWebClient
@@ -28,6 +29,7 @@ READS = {
     "states_mh.json": "P99000055716",
     "states_ka.json": "PRM/KA/RERA/1251/446/PR/170915/000176",
     "states_hr.json": "RC/REP/HARERA/GGM/1059/791/2026/31",
+    "states_hr_pkl.json": "HRERA-PKL-JJR-867-2026",
     "states_wb.json": "WBRERA/P/KOL/2024/002005",
     "states_ga.json": "PRGO08242238",
     "states_br.json": "BRERAP00923-1/607/R-783/2019",
@@ -36,6 +38,9 @@ READS = {
 # Landline numbers of promoters that list pages print; the recorder's scrub only knows mobiles.
 LANDLINE = re.compile(r"(?<!\d)0\d{2,4}-?\d{6,8}(?!\d)")
 NAME_SEARCH = ("states_name_prestige.json", "Prestige Lakeside Habitat")
+# Numbers whose builder is looked up in public listings: one that two results agree on, and
+# one (a Godrej tower) whose listings print the project name but not the builder's.
+BUILDER_IDS = ("HRERA-PKL-JJR-867-2026", "RC/REP/HARERA/GGM/1059/791/2026/31")
 
 
 async def main() -> None:
@@ -64,6 +69,16 @@ async def main() -> None:
     finally:
         await web.aclose()
     save(name, web.recording(), key)
+
+    web = RecordingWebClient(
+        LiveWebClient(settings.tinyfish_api_key, fetch_timeout=45, agent_timeout=60)
+    )
+    try:
+        for rera_id in BUILDER_IDS:
+            await identify_builder(rera_id, web)
+    finally:
+        await web.aclose()
+    save("states_builder.json", web.recording(), key)
 
 
 def now() -> datetime:

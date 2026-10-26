@@ -58,7 +58,7 @@ PROMOTER_LABELS = (
     "Promoter Name",
     "Name of the Promoter",
     "Developer Name",
-    "Promoter(?! Details| Type| Info| Id| shall| agree)",
+    r"Promoter(?=\s*[:\-])",
 )
 DISTRICT_LABELS = ("District",)
 STATUS_LABELS = ("Project Status", "Current Status")
