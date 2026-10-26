@@ -134,6 +134,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/extract": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Extract Numbers
+         * @description RERA numbers in a PDF brochure or agreement, or in the text a QR code held.
+         *
+         *     The file is read in memory and never stored. A photo is not accepted: the browser decodes
+         *     its QR code and sends only the text.
+         */
+        post: operations["extract_numbers_api_extract_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/health": {
         parameters: {
             query?: never;
@@ -747,6 +770,26 @@ export interface components {
             pillar: "P1" | "P2" | "P3" | "P4" | "P5" | "P6";
             /** Points */
             points: number;
+        };
+        /** ExtractResponse */
+        ExtractResponse: {
+            /** Candidates */
+            candidates: components["schemas"]["Project"][];
+            /** Message */
+            message: string | null;
+            /** Numbers */
+            numbers: components["schemas"]["ExtractedNumber"][];
+            /** Source */
+            source: string;
+        };
+        /** ExtractedNumber */
+        ExtractedNumber: {
+            /** Line */
+            line: string;
+            /** Rera Id */
+            rera_id: string;
+            /** State */
+            state: string;
         };
         /** FamilyCompany */
         FamilyCompany: {
@@ -1863,6 +1906,54 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
+            };
+        };
+    };
+    extract_numbers_api_extract_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    text: string;
+                };
+                "application/pdf": string;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExtractResponse"];
+                };
+            };
+            /** @description The file is larger than 5 MB */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Only a PDF, or the text of a QR code, is accepted */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The file could not be read */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

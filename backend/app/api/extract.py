@@ -58,7 +58,13 @@ def rate_limit(
             "required": True,
             "content": {
                 "application/pdf": {"schema": {"type": "string", "format": "binary"}},
-                "application/json": {"schema": {"$ref": "#/components/schemas/ExtractText"}},
+                "application/json": {
+                    "schema": {
+                        "type": "object",
+                        "properties": {"text": {"type": "string", "maxLength": MAX_TEXT}},
+                        "required": ["text"],
+                    }
+                },
             },
         }
     },

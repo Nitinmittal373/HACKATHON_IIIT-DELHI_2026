@@ -3837,7 +3837,16 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ExtractText"
+                "properties": {
+                  "text": {
+                    "maxLength": 4000,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "text"
+                ],
+                "type": "object"
               }
             },
             "application/pdf": {
