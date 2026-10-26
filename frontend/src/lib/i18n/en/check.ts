@@ -16,17 +16,6 @@ export const check = {
     no: "Not this one",
     starting: "Starting the check…",
     pickOne: "Pick the project on your agreement to continue.",
-    emptyTitle: "No RERA project found",
-    emptyBody: (query: string) =>
-      `We could not find a registered project for “${query}” on the RERA portals searched. Nothing was checked and nothing was charged.`,
-    tipsTitle: "Things to try",
-    tips: [
-      "Search by the RERA number, for example UPRERAPRJ8334 or P51800000937. It is on your agreement and on the builder's brochure.",
-      "Check the spelling, or search by the builder's name.",
-      "Use the project name as written on your agreement, with the phase.",
-      "Pick the state next to the search box to narrow the search. The Coverage page lists which portals can be read in full.",
-    ],
-    searchAgain: "Search again",
     waking: "Waking up the server, this takes up to a minute on the free plan…",
     searching: "Searching RERA portals…",
     searchingNote: "Reading RERA portals live. A name search can take up to a minute.",

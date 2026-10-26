@@ -1,0 +1,16 @@
+.badge {
+  display: inline-block;
+  width: fit-content;
+  padding: 3px 9px;
+  border: 1px solid var(--ln2);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--mu);
+  font: 600 11.5px var(--font-sans);
+}
+
+.confirmed {
+  border-color: var(--o);
+  background: var(--oS);
+  color: var(--ink);
+}

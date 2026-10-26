@@ -27,6 +27,20 @@ NeevCheck reads only public records. Each source has a reliability level that de
 
 Every state's domains, number formats, gates and readable fields were checked on real pages and are listed in [states.md](states.md). Fetch can open UP-RERA, Goa and the first page of the Bihar and Jharkhand lists; other portals answer `proxy_error`, `login_required` or a CAPTCHA, and an India-proxy agent could not reach them either. For those, NeevCheck uses TinyFish Search limited to the portal's domains and parses the labelled facts in the snippet. The snippet text is kept as the evidence, the finding's source is the portal page Search returned, and a field the snippet does not show is unread. When a portal's snippet names no promoter, one more free Search runs for the exact registration number with no domain limit. A name is taken only if it stands next to that exact number in at least two different results and no other name has the same support. It is stored as a `builder_identity` finding with reliability "secondary", scored by no rule, and the report says "Builder identified from public listings; verify on <RERA name>". The company registry, insolvency, group, SARFAESI and news sources then run with it as they do for UP. The Unified RERA Portal (rera.mohua.gov.in) is only a directory of state authorities, so it adds no coverage.
 
+## Used only to find a project, never scored
+
+Finding the project is separate from checking it. To reach a project's number NeevCheck may read builder sites, listing sites, a brochure or QR code the buyer gives, and public orders, and every one of them is a way to a number, not a source of findings:
+
+| Used to find | Where | What it gives | What it never does |
+| --- | --- | --- | --- |
+| The number | Builder and listing sites, through unrestricted Search | A registration number, voted on by who prints it | Add a finding or a point; a number is `confirmed` only when a state portal page prints it |
+| The number | The buyer's own PDF or the text of a QR code | A number and the words around it, with personal details removed | Keep the file; it is read in memory and dropped |
+| The builder and sometimes the number | RERA orders, indiankanoon.org and NCLT orders that name the project | A builder's name and the order's link | Count as evidence; the order is shown to the buyer and linked, nothing more |
+| "Delivered before RERA" | A listing's sentence about the project | A note that quotes the sentence and its page | Give the project a RERA score; the card offers the builder's registered projects instead |
+| Companies of a builder | Company-registry mirrors of MCA data | A name and a CIN | Merge companies of one group; each is its own legal entity |
+
+When nothing is found by any of these, NeevCheck says only that it could not find a RERA registration in public records. It never calls a project illegal or unregistered, because a public search can miss a project.
+
 ## What we never do
 
 - Bypass a CAPTCHA, login or paywall

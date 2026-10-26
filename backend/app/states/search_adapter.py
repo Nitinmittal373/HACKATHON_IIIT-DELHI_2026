@@ -66,6 +66,7 @@ class SearchStateAdapter:
         self.coverage = spec.coverage
         self.examples = spec.examples
         self.complaint_url = spec.complaint_url
+        self.unregistered_url = spec.unregistered_url or spec.complaint_url
         self.search_url = spec.search_url
         self.note = spec.note
         self.unverified_format = spec.unverified_format

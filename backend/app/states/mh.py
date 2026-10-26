@@ -13,6 +13,7 @@ ADAPTER = SearchStateAdapter(
         coverage="search_only",
         examples=("P51800000937", "P52100031791"),
         complaint_url="https://www.maharera.maharashtra.gov.in/complaint-filing-under-registered-project",
+        unregistered_url="https://www.maharera.maharashtra.gov.in/complaint-against-unregistered-project",
         search_url="https://www.maharera.maharashtra.gov.in/projects-search-result",
         query_name="MahaRERA",
         note=(

@@ -24,6 +24,7 @@ class UpAdapter:
     coverage = "full"
     examples = ("UPRERAPRJ8334", "UPRERAPRJ2634")
     complaint_url = "https://www.up-rera.in/ComplaintHome"
+    unregistered_url = "https://www.up-rera.in/NonRegistration"
     search_url = "https://www.up-rera.in/"
     unverified_format = False
     note = (

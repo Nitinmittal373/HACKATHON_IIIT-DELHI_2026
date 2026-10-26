@@ -1494,6 +1494,8 @@ export interface components {
             portal_url: string;
             /** Rera Name */
             rera_name: string;
+            /** Unregistered Url */
+            unregistered_url: string;
         };
         /** TrackRecord */
         TrackRecord: {

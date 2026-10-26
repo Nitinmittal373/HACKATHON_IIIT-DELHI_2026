@@ -9,6 +9,14 @@ type Schemas = components["schemas"];
 
 export type Project = Schemas["Project"];
 export type SearchResponse = Schemas["SearchResponse"];
+export type PreReraNote = Schemas["PreReraNote"];
+export type OrderLead = Schemas["OrderLead"];
+/** A builder's projects and company pages (GET /api/promoters/search). */
+export type PromoterSearchResponse = Schemas["PromoterSearchResponse"];
+export type CompanyHit = Schemas["CompanyHit"];
+/** The numbers found in a PDF or in the text of a QR code (POST /api/extract). */
+export type ExtractResponse = Schemas["ExtractResponse"];
+export type CandidateStatus = NonNullable<Schemas["Project"]["status"]>;
 /** One state's RERA portal and how much of it NeevCheck reads (GET /api/states). */
 export type StateInfo = Schemas["StateInfo"];
 export type SourceRun = Schemas["SourceRun"];

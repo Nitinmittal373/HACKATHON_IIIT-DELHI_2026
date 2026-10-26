@@ -19,6 +19,7 @@ def list_states() -> list[StateInfo]:
             note=adapter.note,
             portal_url=adapter.search_url,
             complaint_url=adapter.complaint_url,
+            unregistered_url=adapter.unregistered_url,
             id_patterns=list(adapter.id_patterns),
             format_verified=not adapter.unverified_format,
         )

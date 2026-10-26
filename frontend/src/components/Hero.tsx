@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { Glow } from "@/components/Glow";
+import { MoreWays } from "@/components/find/MoreWays";
 import { ReportStage } from "@/components/ReportStage";
 import { SearchBar } from "@/components/SearchBar";
 import { Skyline } from "@/components/Skyline";
@@ -63,6 +64,10 @@ export function Hero() {
             placeholder={t.hero.placeholder}
             submitLabel={t.hero.submit}
           />
+        </div>
+
+        <div className={styles.fadeUp} style={{ animationDelay: "0.55s" }}>
+          <MoreWays />
         </div>
 
         <div className={`${styles.try} ${styles.fadeUp}`} style={{ animationDelay: "0.6s" }}>

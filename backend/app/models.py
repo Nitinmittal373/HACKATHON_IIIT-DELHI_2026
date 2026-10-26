@@ -154,6 +154,8 @@ class StateInfo(ApiModel):
     note: str
     portal_url: str
     complaint_url: str
+    # Where to report a project that should be registered and is not.
+    unregistered_url: str
     # Patterns the registration numbers of this state match, so a page can pick the state while
     # a visitor types. Written for Python, and valid in JavaScript with the "i" flag.
     id_patterns: list[str]
