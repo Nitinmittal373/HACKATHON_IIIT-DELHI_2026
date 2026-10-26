@@ -22,9 +22,11 @@ const { GIFEncoder, applyPalette, quantize } = gifenc;
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:3000";
 const ASSETS = resolve(dirname(fileURLToPath(import.meta.url)), "../../docs/assets");
 const SETTLE_MS = 7000; // the hero's longest entrance animation ends at about 5 s
-const GIF_SIZE = { width: 1000, height: 640 };
+const GIF_SIZE = { width: 860, height: 550 };
 const GIF_SECONDS = 7;
-const GIF_COLORS = 128;
+const GIF_COLORS = 48;
+// A pause between pictures keeps the animation under about a megabyte.
+const FRAME_GAP_MS = 140;
 // Scroll-driven reveals only play while scrolling; for a still picture show their final state.
 const REVEAL_OFF = ".rv, [class*=ScoreScale_marker] { animation: none !important; }";
 
@@ -67,6 +69,7 @@ async function heroGif(page: Page): Promise<void> {
   while (Date.now() - start < GIF_SECONDS * 1000) {
     const png = PNG.sync.read(await page.screenshot());
     frames.push({ rgba: new Uint8Array(png.data), at: Date.now() - start });
+    await page.waitForTimeout(FRAME_GAP_MS);
   }
 
   frames.forEach((frame, index) => {

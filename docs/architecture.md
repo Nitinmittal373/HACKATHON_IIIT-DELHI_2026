@@ -93,7 +93,7 @@ Each kept number is then searched exactly on its state's domain (`app/states/con
 For buyers whose project has no website to search:
 
 - `GET /api/promoters/search?q=&state=&city=` (`app/states/promoter_search.py`) takes a builder's name and runs three Searches: the state RERA domains (the named state, the state of the named city, or all of them), company-registry mirrors of MCA data (name and CIN only), and the open web, whose numbers are voted on like a project name's. It returns the registered projects found, each with its number, state, status and the sites that printed it, and the company pages found. Generic words such as "Limited" and "Developers" never decide a match, and different Lodha companies are listed apart, never merged.
-- `GET /api/projects/search?q=&locality=` adds a city or locality ("Sector 150 Noida"). `app/states/places.py` maps about 200 cities and areas to a state, so the portals searched narrow to it; the locality is added to the open-web search and never counts as part of the project's name.
+- `GET /api/projects/search?q=&locality=` adds a city or locality ("Sector 150 Noida"). `app/states/places.py` maps about 150 cities and areas to a state, so the portals searched narrow to it; the locality is added to the open-web search and never counts as part of the project's name.
 
 ### Brochure, agreement and QR
 
