@@ -91,6 +91,11 @@ class StateTagged(ApiModel):
         return {**filled, **data}
 
 
+# "confirmed": a state portal page prints the number. "listings_only": builder and listing sites
+# print it but no portal page was read. The last two come from an uploaded file or a public order.
+CandidateStatus = Literal["confirmed", "listings_only", "from_document", "from_order"]
+
+
 class Project(StateTagged):
     rera_id: str
     name: str | None = None
@@ -98,6 +103,19 @@ class Project(StateTagged):
     registered_on: date | None = None
     district: str | None = None
     details_url: str
+    # None for candidates a state adapter produced from its own portal pages.
+    status: CandidateStatus | None = None
+    # Where the number was seen: site names, or "your document".
+    sources: list[str] = []
+
+
+class PreReraNote(ApiModel):
+    """A project that public pages say was finished before RERA, so it has no number to find."""
+
+    name: str
+    # The words of the page that say so, and the page.
+    statement: str
+    source_url: str
 
 
 class SearchResponse(ApiModel):
@@ -107,6 +125,8 @@ class SearchResponse(ApiModel):
     detected_state: str | None = None
     # The states whose portals were searched, so the page can say where it looked.
     searched_states: list[str] = []
+    # Projects public pages say are older than RERA; they get a builder-only check.
+    pre_rera: list[PreReraNote] = []
 
 
 class StateInfo(ApiModel):

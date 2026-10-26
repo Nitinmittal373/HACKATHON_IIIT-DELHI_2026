@@ -1731,6 +1731,30 @@
         "title": "PillarWeight",
         "type": "object"
       },
+      "PreReraNote": {
+        "description": "A project that public pages say was finished before RERA, so it has no number to find.",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "source_url": {
+            "title": "Source Url",
+            "type": "string"
+          },
+          "statement": {
+            "title": "Statement",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "statement",
+          "source_url"
+        ],
+        "title": "PreReraNote",
+        "type": "object"
+      },
       "ProgressData": {
         "properties": {
           "text": {
@@ -1804,6 +1828,14 @@
             "title": "Rera Name",
             "type": "string"
           },
+          "sources": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Sources",
+            "type": "array"
+          },
           "state": {
             "default": "UP",
             "title": "State",
@@ -1813,6 +1845,23 @@
             "default": "Uttar Pradesh",
             "title": "State Name",
             "type": "string"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "confirmed",
+                  "listings_only",
+                  "from_document",
+                  "from_order"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
           }
         },
         "required": [
@@ -1824,7 +1873,9 @@
           "promoter",
           "registered_on",
           "district",
-          "details_url"
+          "details_url",
+          "status",
+          "sources"
         ],
         "title": "Project",
         "type": "object"
@@ -2427,6 +2478,14 @@
             ],
             "title": "Detected State"
           },
+          "pre_rera": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/PreReraNote"
+            },
+            "title": "Pre Rera",
+            "type": "array"
+          },
           "query": {
             "title": "Query",
             "type": "string"
@@ -2444,7 +2503,8 @@
           "query",
           "candidates",
           "detected_state",
-          "searched_states"
+          "searched_states",
+          "pre_rera"
         ],
         "title": "SearchResponse",
         "type": "object"
@@ -2975,6 +3035,14 @@
             "title": "Rera Name",
             "type": "string"
           },
+          "sources": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Sources",
+            "type": "array"
+          },
           "state": {
             "default": "UP",
             "title": "State",
@@ -2984,6 +3052,23 @@
             "default": "Uttar Pradesh",
             "title": "State Name",
             "type": "string"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "confirmed",
+                  "listings_only",
+                  "from_document",
+                  "from_order"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
           }
         },
         "required": [
@@ -2996,6 +3081,8 @@
           "registered_on",
           "district",
           "details_url",
+          "status",
+          "sources",
           "check_id",
           "display_score"
         ],
