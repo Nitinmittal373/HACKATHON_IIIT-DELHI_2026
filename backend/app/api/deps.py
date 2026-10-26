@@ -7,6 +7,7 @@ from typing import Annotated
 from fastapi import HTTPException, Path, Request
 
 from app.config import Settings
+from app.corrections import CorrectionStore
 from app.events import EventHub
 from app.models import Check
 from app.orchestrator import Orchestrator
@@ -46,6 +47,10 @@ def get_sentinel(request: Request) -> Sentinel:
 
 def get_sentinel_store(request: Request) -> SentinelStore:
     return request.app.state.sentinel_store
+
+
+def get_correction_store(request: Request) -> CorrectionStore:
+    return request.app.state.corrections
 
 
 def get_monitors(request: Request) -> MonitorGateway | None:

@@ -169,6 +169,15 @@ export function createWatch(
   return request("/api/sentinel", { method: "POST", body });
 }
 
+export function sendCorrection(body: {
+  report_id: string;
+  finding_id?: string;
+  message: string;
+  contact?: string;
+}): Promise<{ id: string }> {
+  return request("/api/corrections", { method: "POST", body });
+}
+
 export function getAlerts(email: string): Promise<Alert[]> {
   return request(`/api/sentinel/alerts?email=${encodeURIComponent(email)}`);
 }

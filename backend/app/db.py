@@ -165,6 +165,19 @@ class WebhookReceiptRow(Base):
     received_at: Mapped[datetime] = mapped_column(UTCDateTime)
 
 
+class CorrectionRow(Base):
+    """A reader's request to correct a report, kept for the operator to review."""
+
+    __tablename__ = "corrections"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime)
+    report_id: Mapped[str] = mapped_column(String(32), index=True)
+    finding_id: Mapped[str | None] = mapped_column(String(100))
+    message: Mapped[str] = mapped_column(String(2000))
+    contact: Mapped[str | None] = mapped_column(String(254))
+
+
 class AlertRow(Base):
     __tablename__ = "alerts"
 
