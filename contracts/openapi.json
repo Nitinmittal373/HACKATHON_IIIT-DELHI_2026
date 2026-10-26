@@ -103,10 +103,13 @@
           "id",
           "watch_id",
           "rera_id",
+          "project_name",
           "check_id",
           "created_at",
           "old_score",
           "new_score",
+          "old_display_score",
+          "new_display_score",
           "added",
           "removed",
           "changed"
@@ -298,7 +301,11 @@
           "rera_id",
           "details_url",
           "status",
-          "started_at"
+          "started_at",
+          "completed_at",
+          "sources",
+          "reused",
+          "display_score"
         ],
         "title": "Check",
         "type": "object"
@@ -346,7 +353,10 @@
           }
         },
         "required": [
-          "status"
+          "status",
+          "message",
+          "score",
+          "display_score"
         ],
         "title": "CheckCompletedData",
         "type": "object"
@@ -543,7 +553,12 @@
           "project",
           "promoter",
           "status",
-          "created_at"
+          "score",
+          "band",
+          "confidence",
+          "display_score",
+          "created_at",
+          "completed_at"
         ],
         "title": "CheckSummary",
         "type": "object"
@@ -1023,7 +1038,11 @@
           }
         },
         "required": [
-          "name"
+          "name",
+          "status",
+          "status_url",
+          "flag",
+          "projects"
         ],
         "title": "FamilyCompany",
         "type": "object"
@@ -1081,6 +1100,7 @@
         },
         "required": [
           "rera_id",
+          "name",
           "details_url",
           "state"
         ],
@@ -1125,7 +1145,9 @@
         "required": [
           "promoter",
           "source_url",
-          "directors"
+          "directors",
+          "promoter_projects",
+          "companies"
         ],
         "title": "FamilyTree",
         "type": "object"
@@ -1298,10 +1320,18 @@
           "source",
           "kind",
           "title",
+          "area",
           "verdict",
           "reliability",
           "source_url",
-          "read_on"
+          "read_on",
+          "read_at",
+          "occurred_on",
+          "count",
+          "months",
+          "scope",
+          "total",
+          "snippet"
         ],
         "title": "Finding",
         "type": "object"
@@ -1369,7 +1399,8 @@
           }
         },
         "required": [
-          "title"
+          "title",
+          "source_url"
         ],
         "title": "FindingChange",
         "type": "object"
@@ -1656,6 +1687,10 @@
         },
         "required": [
           "rera_id",
+          "name",
+          "promoter",
+          "registered_on",
+          "district",
           "details_url"
         ],
         "title": "Project",
@@ -1860,7 +1895,16 @@
           "project",
           "promoter",
           "status",
-          "created_at"
+          "score",
+          "band",
+          "confidence",
+          "display_score",
+          "created_at",
+          "completed_at",
+          "registered_on",
+          "sources_read",
+          "drivers",
+          "reasons"
         ],
         "title": "RecentCheck",
         "type": "object"
@@ -1914,7 +1958,8 @@
           "findings",
           "timeline",
           "display_score",
-          "score_v2"
+          "score_v2",
+          "family"
         ],
         "title": "Report",
         "type": "object"
@@ -2019,6 +2064,7 @@
           "confidence",
           "provisional",
           "hard_stop",
+          "hard_stop_reason",
           "drivers",
           "areas",
           "checks_unread"
@@ -2159,6 +2205,7 @@
           "band_label",
           "provisional",
           "hard_stop",
+          "hard_stop_reason",
           "confidence",
           "pillars",
           "reason_codes",
@@ -2276,7 +2323,9 @@
           }
         },
         "required": [
-          "status"
+          "status",
+          "message",
+          "checks_read"
         ],
         "title": "SourceCompletedData",
         "type": "object"
@@ -2482,7 +2531,10 @@
         },
         "required": [
           "source",
-          "status"
+          "status",
+          "live_url",
+          "message",
+          "checks_read"
         ],
         "title": "SourceRun",
         "type": "object"
@@ -2638,7 +2690,13 @@
         },
         "required": [
           "rera_id",
-          "details_url"
+          "name",
+          "promoter",
+          "registered_on",
+          "district",
+          "details_url",
+          "check_id",
+          "display_score"
         ],
         "title": "TrackedProject",
         "type": "object"
@@ -2727,7 +2785,8 @@
           "rera_id",
           "email",
           "language",
-          "created_at"
+          "created_at",
+          "baseline_check_id"
         ],
         "title": "Watch",
         "type": "object"

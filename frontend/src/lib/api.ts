@@ -1,14 +1,17 @@
 import type {
   Alert,
   Check,
+  CheckCreate,
   CheckSummary,
   Comparison,
+  CorrectionCreate,
   Project,
   RecentCheck,
   Report,
   SearchResponse,
   TrackRecord,
   Watch,
+  WatchCreate,
 } from "@/lib/types";
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
@@ -147,55 +150,52 @@ export function createCheck(
   options: { fresh?: boolean } = {},
 ): Promise<Check> {
   // The page search confirmed: many numbers registered after 2018 have no stable address.
-  const body = {
+  const body: CheckCreate = {
     rera_id: project.rera_id,
     details_url: project.details_url,
     ...(options.fresh ? { fresh: true } : {}),
   };
-  return request("/api/checks", { method: "POST", body });
+  return request<Check>("/api/checks", { method: "POST", body });
 }
 
 export function createWatch(
   project: Pick<Project, "rera_id" | "details_url">,
   email: string,
-  language: "en" | "hi",
+  language: WatchCreate["language"],
 ): Promise<Watch> {
-  const body = {
+  const body: WatchCreate = {
     rera_id: project.rera_id,
     details_url: project.details_url,
     email,
     language,
   };
-  return request("/api/sentinel", { method: "POST", body });
+  return request<Watch>("/api/sentinel", { method: "POST", body });
 }
 
-export function sendCorrection(body: {
-  report_id: string;
-  finding_id?: string;
-  message: string;
-  contact?: string;
-}): Promise<{ id: string }> {
-  return request("/api/corrections", { method: "POST", body });
+export function sendCorrection(body: CorrectionCreate): Promise<{ id: string }> {
+  return request<{ id: string }>("/api/corrections", { method: "POST", body });
 }
 
 export function getAlerts(email: string): Promise<Alert[]> {
-  return request(`/api/sentinel/alerts?email=${encodeURIComponent(email)}`);
+  return request<Alert[]>(`/api/sentinel/alerts?email=${encodeURIComponent(email)}`);
 }
 
 /** The checks a visitor started, for "My reports". Ids the server no longer has are left out. */
 export function listChecks(ids: string[]): Promise<CheckSummary[]> {
-  return request(`/api/checks?ids=${ids.join(",")}`, { timeoutMs: WAKE_TIMEOUT_MS });
+  return request<CheckSummary[]>(`/api/checks?ids=${ids.join(",")}`, { timeoutMs: WAKE_TIMEOUT_MS });
 }
 
 /** Two or three finished checks side by side. */
 export function compareChecks(ids: string[]): Promise<Comparison> {
-  return request(`/api/checks/compare?ids=${ids.join(",")}`, { timeoutMs: WAKE_TIMEOUT_MS });
+  return request<Comparison>(`/api/checks/compare?ids=${ids.join(",")}`, {
+    timeoutMs: WAKE_TIMEOUT_MS,
+  });
 }
 
 /** A promoter's other UP-RERA projects, found with Search on up-rera.in. */
 export function promoterProjects(promoter: string, exclude: string): Promise<TrackRecord> {
   const query = `name=${encodeURIComponent(promoter)}&exclude=${encodeURIComponent(exclude)}`;
-  return request(`/api/promoters/projects?${query}`, { timeoutMs: WAKE_TIMEOUT_MS });
+  return request<TrackRecord>(`/api/promoters/projects?${query}`, { timeoutMs: WAKE_TIMEOUT_MS });
 }
 
 const RECENT_FRESH_FOR_MS = 60_000;
@@ -212,11 +212,11 @@ export function recentChecks(): Promise<RecentCheck[]> {
 }
 
 export function getCheck(id: string): Promise<Check> {
-  return request(`/api/checks/${id}`);
+  return request<Check>(`/api/checks/${id}`);
 }
 
 export function getReport(id: string): Promise<Report> {
-  return request(`/api/checks/${id}/report`);
+  return request<Report>(`/api/checks/${id}/report`);
 }
 
 export function eventsUrl(id: string): string {

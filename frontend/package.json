@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit",
     "e2e": "playwright test",
     "capture": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/capture.ts",
-    "gen:api": "openapi-typescript ../contracts/openapi.json -o src/lib/api-schema.d.ts"
+    "gen:api": "openapi-typescript ../contracts/openapi.json -o src/lib/api-schema.d.ts --default-non-nullable false"
   },
   "dependencies": {
     "next": "15.5.28",

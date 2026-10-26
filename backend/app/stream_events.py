@@ -7,43 +7,44 @@ what each event holds, so the OpenAPI contract gives the browser real types for 
 from datetime import datetime
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
+from app.api_model import ApiModel
 from app.models import Band, CheckKey, DisplayScore, Finding, RunStatus, SourceName
 
 
-class _Event(BaseModel):
+class _Event(ApiModel):
     check_id: str
     ts: datetime
 
 
-class NoData(BaseModel):
+class NoData(ApiModel):
     pass
 
 
-class LiveUrlData(BaseModel):
+class LiveUrlData(ApiModel):
     url: str
 
 
-class ProgressData(BaseModel):
+class ProgressData(ApiModel):
     text: str
 
 
-class FindingData(BaseModel):
+class FindingData(ApiModel):
     finding: Finding
 
 
-class BlockedData(BaseModel):
+class BlockedData(ApiModel):
     reason: str
 
 
-class SourceCompletedData(BaseModel):
+class SourceCompletedData(ApiModel):
     status: RunStatus
     message: str | None = None
     checks_read: list[CheckKey] = []
 
 
-class ScoreSummary(BaseModel):
+class ScoreSummary(ApiModel):
     """The classic 0-100 summary sent with check.completed, kept for older clients."""
 
     value: int
@@ -54,7 +55,7 @@ class ScoreSummary(BaseModel):
     hard_stop: bool
 
 
-class CheckCompletedData(BaseModel):
+class CheckCompletedData(ApiModel):
     status: Literal["completed", "failed"]
     # Why a check failed, in words a visitor can read.
     message: str | None = None

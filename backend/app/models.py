@@ -12,6 +12,8 @@ from urllib.parse import urlsplit
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
+from app.api_model import ApiModel
+
 SourceName = Literal[
     "uprera", "registry", "insolvency", "land", "consumer", "news", "group", "sarfaesi"
 ]
@@ -62,7 +64,7 @@ def is_uprera_url(url: str) -> bool:
     return parts.scheme == "https" and parts.hostname in UPRERA_HOSTS
 
 
-class Project(BaseModel):
+class Project(ApiModel):
     rera_id: str
     name: str | None = None
     promoter: str | None = None
@@ -71,7 +73,7 @@ class Project(BaseModel):
     details_url: str
 
 
-class SearchResponse(BaseModel):
+class SearchResponse(ApiModel):
     query: str
     candidates: list[Project]
 
@@ -108,7 +110,7 @@ class CheckCreate(BaseModel):
         return self
 
 
-class SourceRun(BaseModel):
+class SourceRun(ApiModel):
     source: SourceName
     status: RunStatus
     live_url: str | None = None
@@ -120,7 +122,7 @@ PillarId = Literal["P1", "P2", "P3", "P4", "P5", "P6"]
 BandV2 = Literal["Low", "Watch", "Elevated", "High", "insufficient_evidence"]
 
 
-class Pillar(BaseModel):
+class Pillar(ApiModel):
     id: PillarId
     name: str
     weight: float
@@ -130,7 +132,7 @@ class Pillar(BaseModel):
     points: float
 
 
-class DriverV2(BaseModel):
+class DriverV2(ApiModel):
     """One finding's share of the score, so the evidence ledger can show it."""
 
     finding_id: str
@@ -140,14 +142,14 @@ class DriverV2(BaseModel):
     points: float
 
 
-class ReasonCode(BaseModel):
+class ReasonCode(ApiModel):
     code: str
     label: str
     finding_ids: list[str]
     points: float
 
 
-class ScoreV2(BaseModel):
+class ScoreV2(ApiModel):
     value: int
     band: BandV2
     band_label: str
@@ -163,7 +165,7 @@ class ScoreV2(BaseModel):
     pillars_unread: list[PillarId]
 
 
-class DisplayScore(BaseModel):
+class DisplayScore(ApiModel):
     """The score every screen shows: NeevScore v2 on the 300-900 scale, without the detail."""
 
     value: int
@@ -184,7 +186,7 @@ class DisplayScore(BaseModel):
         )
 
 
-class Check(BaseModel):
+class Check(ApiModel):
     id: str
     rera_id: str
     details_url: str
@@ -198,7 +200,7 @@ class Check(BaseModel):
     display_score: DisplayScore | None = None
 
 
-class Finding(BaseModel):
+class Finding(ApiModel):
     id: str
     source: SourceName
     kind: str
@@ -221,7 +223,7 @@ class Finding(BaseModel):
     snippet: str | None = Field(default=None, max_length=300)
 
 
-class Driver(BaseModel):
+class Driver(ApiModel):
     finding_id: str
     title: str
     area: Area
@@ -229,14 +231,14 @@ class Driver(BaseModel):
     points: float
 
 
-class AreaScore(BaseModel):
+class AreaScore(ApiModel):
     area: Area
     label: str
     weight: float
     penalty: int
 
 
-class Score(BaseModel):
+class Score(ApiModel):
     value: int
     band: Band
     band_label: str
@@ -250,7 +252,7 @@ class Score(BaseModel):
     checks_unread: list[CheckKey]
 
 
-class CheckSummary(BaseModel):
+class CheckSummary(ApiModel):
     """One line of a visitor's history: enough to list a check without loading its report."""
 
     id: str
@@ -283,21 +285,21 @@ FamilyFlag = Literal["cirp", "struck_off"]
 FamilyProjectState = Literal["ok", "delayed", "lapsed", "unread"]
 
 
-class FamilyDirector(BaseModel):
+class FamilyDirector(ApiModel):
     """A director by name and DIN only: nothing else about a person is kept (DPDP)."""
 
     name: str
     din: str
 
 
-class FamilyProject(BaseModel):
+class FamilyProject(ApiModel):
     rera_id: str
     name: str | None = None
     details_url: str
     state: FamilyProjectState
 
 
-class FamilyCompany(BaseModel):
+class FamilyCompany(ApiModel):
     name: str
     # The registry status as a page shows it; None when no page naming this company was read.
     status: str | None = None
@@ -306,7 +308,7 @@ class FamilyCompany(BaseModel):
     projects: list[FamilyProject] = []
 
 
-class FamilyTree(BaseModel):
+class FamilyTree(ApiModel):
     """The promoter, its directors, related companies and their UP-RERA projects."""
 
     promoter: str
@@ -316,7 +318,7 @@ class FamilyTree(BaseModel):
     companies: list[FamilyCompany] = []
 
 
-class Report(BaseModel):
+class Report(ApiModel):
     check: Check
     project: Project
     # The classic 0-100 score, shown only as a transparency line in the method section.

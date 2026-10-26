@@ -8,15 +8,17 @@ import type { CheckEvent, CheckStatus, EventType, ScoreSummary } from "@/lib/typ
 
 export type Connection = "live" | "reconnecting" | "polling" | "closed";
 
-const EVENT_TYPES: EventType[] = [
-  "source.started",
-  "source.live_url",
-  "source.progress",
-  "finding.added",
-  "source.blocked",
-  "source.completed",
-  "check.completed",
-];
+// A record keyed by the generated event type: a new event type in the API fails the build here.
+const LISTENED: Record<EventType, true> = {
+  "source.started": true,
+  "source.live_url": true,
+  "source.progress": true,
+  "finding.added": true,
+  "source.blocked": true,
+  "source.completed": true,
+  "check.completed": true,
+};
+const EVENT_TYPES = Object.keys(LISTENED) as EventType[];
 const RECONNECT_DELAYS_MS = [1000, 2000, 4000];
 const POLL_INTERVAL_MS = 4000;
 

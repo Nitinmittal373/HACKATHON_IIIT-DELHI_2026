@@ -1,320 +1,90 @@
-/** The backend's response shapes (backend/app/models.py). Keep the two in step. */
+/**
+ * The API's shapes, named for the app. Each one is an alias of a type generated from the
+ * backend's OpenAPI contract (api-schema.d.ts), so nothing here is written by hand: change a
+ * backend model, run `make contract`, and the compiler shows what the frontend must follow.
+ */
+import type { components } from "@/lib/api-schema";
 
-export type SourceName =
-  | "uprera"
-  | "registry"
-  | "insolvency"
-  | "land"
-  | "consumer"
-  | "news"
-  | "group"
-  | "sarfaesi";
-export type Area = "rera" | "execution" | "legal" | "financial" | "builder_history" | "news";
-export type Reliability = "primary" | "secondary";
-export type Verdict = "ok" | "fail" | "red_flag" | "review" | "context" | "not_found";
-export type Band = "Low" | "Moderate" | "High" | "Critical" | "insufficient_evidence";
-export type CheckStatus = "queued" | "running" | "completed" | "failed";
-export type RunStatus = "running" | "completed" | "blocked" | "failed" | "unavailable";
-export type CheckKey =
-  | "registration"
-  | "completion_date"
-  | "extensions"
-  | "company_status"
-  | "insolvency"
-  | "land_dues"
-  | "consumer_cases";
+type Schemas = components["schemas"];
 
-export interface Project {
-  rera_id: string;
-  name: string | null;
-  promoter: string | null;
-  registered_on: string | null;
-  district: string | null;
-  details_url: string;
-}
+export type Project = Schemas["Project"];
+export type SearchResponse = Schemas["SearchResponse"];
+export type SourceRun = Schemas["SourceRun"];
+export type Check = Schemas["Check"];
+export type Finding = Schemas["Finding"];
 
-export interface SearchResponse {
-  query: string;
-  candidates: Project[];
-}
+export type SourceName = SourceRun["source"];
+export type RunStatus = SourceRun["status"];
+export type CheckKey = SourceRun["checks_read"][number];
+export type CheckStatus = Check["status"];
+export type Reliability = Finding["reliability"];
+export type Verdict = Finding["verdict"];
+export type Area = Schemas["Driver"]["area"];
 
-export interface SourceRun {
-  source: SourceName;
-  status: RunStatus;
-  live_url: string | null;
-  message: string | null;
-  checks_read: CheckKey[];
-}
+/** The classic 0-100 score. Screens show NeevScore (DisplayScore); this is kept for transparency. */
+export type Score = Schemas["Score"];
+export type Band = Score["band"];
+export type Driver = Schemas["Driver"];
+export type AreaScore = Schemas["AreaScore"];
 
-export interface Check {
-  id: string;
-  rera_id: string;
-  details_url: string;
-  status: CheckStatus;
-  started_at: string;
-  completed_at: string | null;
-  sources: SourceRun[];
-  /** Set when an earlier check of the same project was reused instead of starting a new one. */
-  reused?: boolean;
-}
+/** NeevScore v2 (300-900), with its pillars and reason codes. */
+export type ScoreV2 = Schemas["ScoreV2"];
+export type BandV2 = ScoreV2["band"];
+export type PillarId = Schemas["Pillar"]["id"];
+export type Pillar = Schemas["Pillar"];
+export type DriverV2 = Schemas["DriverV2"];
+export type ReasonCode = Schemas["ReasonCode"];
 
-export interface Finding {
-  id: string;
-  source: SourceName;
-  kind: string;
-  title: string;
-  area: Area | null;
-  verdict: Verdict;
-  reliability: Reliability;
-  source_url: string;
-  read_on: string;
-  read_at: string | null;
-  occurred_on: string | null;
-  count: number | null;
-  months: number | null;
-  scope: "company" | "this_project" | "other_project" | null;
-  points?: number | null;
-  /** Share-style facts such as "3 of 5 group projects delayed". */
-  total?: number | null;
-  /** The words on the page behind the claim, at most 300 characters. */
-  snippet?: string | null;
-}
+/** The score every screen shows: value, band and how much was read. */
+export type DisplayScore = Schemas["DisplayScore"];
 
-export interface Driver {
-  finding_id: string;
-  title: string;
-  area: Area;
-  penalty: number;
-  points: number;
-}
+/** GET /api/meta: the score scale, band edges and pillar weights. */
+export type Meta = Schemas["Meta"];
 
-export interface AreaScore {
-  area: Area;
-  label: string;
-  weight: number;
-  penalty: number;
-}
+export type FamilyTree = Schemas["FamilyTree"];
+export type FamilyProject = Schemas["FamilyProject"];
+export type FamilyCompany = Schemas["FamilyCompany"];
+export type FamilyFlag = NonNullable<FamilyCompany["flag"]>;
+export type FamilyProjectState = FamilyProject["state"];
 
-export interface Score {
-  value: number;
-  band: Band;
-  band_label: string;
-  confidence: number;
-  provisional: boolean;
-  hard_stop: boolean;
-  hard_stop_reason: string | null;
-  drivers: Driver[];
-  areas: AreaScore[];
-  checks_unread: CheckKey[];
-}
+export type Report = Schemas["Report"];
 
-export type BandV2 = "Low" | "Watch" | "Elevated" | "High" | "insufficient_evidence";
-export type PillarId = "P1" | "P2" | "P3" | "P4" | "P5" | "P6";
+/** What the app sends: one body type per POST route. */
+export type CheckCreate = Schemas["CheckCreate"];
+export type WatchCreate = Schemas["WatchCreate"];
+export type CorrectionCreate = Schemas["CorrectionCreate"];
 
-export interface Pillar {
-  id: PillarId;
-  name: string;
-  weight: number;
-  /** 0 to 100, after the pillar's cap. */
-  penalty: number;
-  /** Points lost on the 300-900 scale, negative. */
-  points: number;
-}
-
-export interface DriverV2 {
-  finding_id: string;
-  pillar: PillarId;
-  code: string;
-  penalty: number;
-  points: number;
-}
-
-export interface ReasonCode {
-  code: string;
-  label: string;
-  finding_ids: string[];
-  points: number;
-}
-
-/** NeevScore v2 (300-900). Absent on reports made before it existed. */
-export interface ScoreV2 {
-  value: number;
-  band: BandV2;
-  band_label: string;
-  provisional: boolean;
-  hard_stop: boolean;
-  hard_stop_reason: string | null;
-  confidence: number;
-  pillars: Pillar[];
-  reason_codes: ReasonCode[];
-  drivers: DriverV2[];
-  pillars_unread: PillarId[];
-}
-
-export type FamilyFlag = "cirp" | "struck_off";
-export type FamilyProjectState = "ok" | "delayed" | "lapsed" | "unread";
-
-export interface FamilyProject {
-  rera_id: string;
-  name: string | null;
-  details_url: string;
-  state: FamilyProjectState;
-}
-
-export interface FamilyCompany {
-  name: string;
-  status: string | null;
-  status_url: string | null;
-  flag: FamilyFlag | null;
-  projects: FamilyProject[];
-}
-
-/** The builder's group: directors by name and DIN only, related companies and their projects. */
-export interface FamilyTree {
-  promoter: string;
-  source_url: string;
-  directors: { name: string; din: string }[];
-  promoter_projects: FamilyProject[];
-  companies: FamilyCompany[];
-}
-
-export interface Report {
-  check: Check;
-  project: Project;
-  score: Score;
-  findings: Finding[];
-  timeline: Finding[];
-  score_v2?: ScoreV2 | null;
-  family?: FamilyTree | null;
-}
-
-export type EventType =
-  | "source.started"
-  | "source.live_url"
-  | "source.progress"
-  | "finding.added"
-  | "source.blocked"
-  | "source.completed"
-  | "check.completed";
-
-export interface CheckEvent {
-  type: EventType;
-  check_id: string;
-  source: SourceName | "check";
-  ts: string;
-  data: Record<string, unknown>;
-}
-
-/** The score summary sent with check.completed. */
-export interface ScoreSummary {
-  value: number;
-  band: Band;
-  band_label: string;
-  confidence: number;
-  provisional: boolean;
-  hard_stop: boolean;
-}
-
-export interface Watch {
-  id: string;
-  rera_id: string;
-  email: string;
-  language: "en" | "hi";
-  created_at: string;
-}
-
-export interface AlertChange {
-  title: string;
-  source_url: string | null;
-}
-
-export interface Alert {
-  id: string;
-  watch_id: string;
-  rera_id: string;
-  check_id: string;
-  project_name: string | null;
-  created_at: string;
-  old_score: number | null;
-  new_score: number | null;
-  added: AlertChange[];
-  removed: AlertChange[];
-  changed: AlertChange[];
-}
+export type Watch = Schemas["Watch"];
+export type Alert = Schemas["Alert"];
+export type AlertChange = Schemas["FindingChange"];
 
 /** One line of "My reports" (GET /api/checks?ids=). */
-export interface CheckSummary {
-  id: string;
-  rera_id: string;
-  details_url: string;
-  project: string | null;
-  promoter: string | null;
-  status: CheckStatus;
-  score: number | null;
-  band: Band | null;
-  confidence: number | null;
-  created_at: string;
-  completed_at: string | null;
-}
-
+export type CheckSummary = Schemas["CheckSummary"];
 /** A finished check shown on the home page (GET /api/checks/recent). */
-export interface RecentCheck extends CheckSummary {
-  registered_on: string | null;
-  sources_read: number;
-  drivers: Driver[];
-}
+export type RecentCheck = Schemas["RecentCheck"];
 
-export type InsolvencyStatus =
-  | "none_found"
-  | "admitted"
-  | "other_project"
-  | "this_project"
-  | "company"
-  | "unverified";
-
-export interface AreaPoints {
-  area: Area;
-  label: string;
-  lost: number;
-  max: number;
-}
-
-export interface FindingLine {
-  title: string;
-  source_url: string;
-  points: number;
-}
-
+export type AreaPoints = Schemas["AreaPoints"];
+export type PillarPoints = Schemas["PillarPoints"];
+export type FindingLine = Schemas["FindingLine"];
 /** One column of a comparison. null means the check could not read it, never "clean". */
-export interface ComparedProject {
-  check_id: string;
-  project: Project;
-  score: number;
-  band: Band;
-  confidence: number;
-  hard_stop: boolean;
-  areas: AreaPoints[];
-  delay_months: number | null;
-  project_complaints: number | null;
-  promoter_complaints: number | null;
-  insolvency: InsolvencyStatus | null;
-  company_status: string | null;
-  unread: CheckKey[];
-  top_findings: FindingLine[];
-}
-
-export interface Comparison {
-  projects: ComparedProject[];
-  best: string | null;
-  reason: "best_score" | "tie" | "not_enough_evidence";
-}
+export type ComparedProject = Schemas["ComparedProject"];
+export type Comparison = Schemas["Comparison"];
+export type InsolvencyStatus = NonNullable<ComparedProject["insolvency"]>;
 
 /** A promoter's other UP-RERA projects, from Search on up-rera.in (GET /api/promoters/projects). */
-export interface TrackRecord {
-  promoter: string;
-  projects: Project[];
-  searched_at: string;
-}
+export type TrackRecord = Schemas["TrackRecord"];
+export type TrackedProject = Schemas["TrackedProject"];
 
-/** GET /api/meta: the score scale, band edges and pillar weights (backend/app/meta.py). */
-export type Meta = import("@/lib/api-schema").components["schemas"]["Meta"];
+/** One Server-Sent Event of a check; `type` says which payload `data` holds. */
+export type CheckEvent =
+  | Schemas["SourceStartedEvent"]
+  | Schemas["SourceLiveUrlEvent"]
+  | Schemas["SourceProgressEvent"]
+  | Schemas["FindingAddedEvent"]
+  | Schemas["SourceBlockedEvent"]
+  | Schemas["SourceCompletedEvent"]
+  | Schemas["CheckCompletedEvent"];
+export type EventType = CheckEvent["type"];
+export type CheckCompleted = Schemas["CheckCompletedData"];
+/** The classic summary sent with check.completed, kept for older clients. */
+export type ScoreSummary = Schemas["ScoreSummary"];

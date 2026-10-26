@@ -322,14 +322,14 @@ export interface components {
             created_at: string;
             /** Id */
             id: string;
-            new_display_score?: components["schemas"]["DisplayScore"] | null;
+            new_display_score: components["schemas"]["DisplayScore"] | null;
             /** New Score */
             new_score: number | null;
-            old_display_score?: components["schemas"]["DisplayScore"] | null;
+            old_display_score: components["schemas"]["DisplayScore"] | null;
             /** Old Score */
             old_score: number | null;
             /** Project Name */
-            project_name?: string | null;
+            project_name: string | null;
             /** Removed */
             removed: components["schemas"]["FindingChange"][];
             /** Rera Id */
@@ -385,10 +385,10 @@ export interface components {
         /** Check */
         Check: {
             /** Completed At */
-            completed_at?: string | null;
+            completed_at: string | null;
             /** Details Url */
             details_url: string;
-            display_score?: components["schemas"]["DisplayScore"] | null;
+            display_score: components["schemas"]["DisplayScore"] | null;
             /** Id */
             id: string;
             /** Rera Id */
@@ -416,10 +416,10 @@ export interface components {
         };
         /** CheckCompletedData */
         CheckCompletedData: {
-            display_score?: components["schemas"]["DisplayScore"] | null;
+            display_score: components["schemas"]["DisplayScore"] | null;
             /** Message */
-            message?: string | null;
-            score?: components["schemas"]["ScoreSummary"] | null;
+            message: string | null;
+            score: components["schemas"]["ScoreSummary"] | null;
             /**
              * Status
              * @enum {string}
@@ -455,7 +455,7 @@ export interface components {
              * Fresh
              * @default false
              */
-            fresh: boolean;
+            fresh?: boolean;
             /**
              * Rera Id
              * @example UPRERAPRJ8334
@@ -468,11 +468,11 @@ export interface components {
          */
         CheckSummary: {
             /** Band */
-            band?: ("Low" | "Moderate" | "High" | "Critical" | "insufficient_evidence") | null;
+            band: ("Low" | "Moderate" | "High" | "Critical" | "insufficient_evidence") | null;
             /** Completed At */
-            completed_at?: string | null;
+            completed_at: string | null;
             /** Confidence */
-            confidence?: number | null;
+            confidence: number | null;
             /**
              * Created At
              * Format: date-time
@@ -480,7 +480,7 @@ export interface components {
             created_at: string;
             /** Details Url */
             details_url: string;
-            display_score?: components["schemas"]["DisplayScore"] | null;
+            display_score: components["schemas"]["DisplayScore"] | null;
             /** Id */
             id: string;
             /** Project */
@@ -490,7 +490,7 @@ export interface components {
             /** Rera Id */
             rera_id: string;
             /** Score */
-            score?: number | null;
+            score: number | null;
             /**
              * Status
              * @enum {string}
@@ -631,7 +631,7 @@ export interface components {
         /** FamilyCompany */
         FamilyCompany: {
             /** Flag */
-            flag?: ("cirp" | "struck_off") | null;
+            flag: ("cirp" | "struck_off") | null;
             /** Name */
             name: string;
             /**
@@ -640,9 +640,9 @@ export interface components {
              */
             projects: components["schemas"]["FamilyProject"][];
             /** Status */
-            status?: string | null;
+            status: string | null;
             /** Status Url */
-            status_url?: string | null;
+            status_url: string | null;
         };
         /**
          * FamilyDirector
@@ -659,7 +659,7 @@ export interface components {
             /** Details Url */
             details_url: string;
             /** Name */
-            name?: string | null;
+            name: string | null;
             /** Rera Id */
             rera_id: string;
             /**
@@ -693,19 +693,19 @@ export interface components {
         /** Finding */
         Finding: {
             /** Area */
-            area?: ("rera" | "execution" | "legal" | "financial" | "builder_history" | "news") | null;
+            area: ("rera" | "execution" | "legal" | "financial" | "builder_history" | "news") | null;
             /** Count */
-            count?: number | null;
+            count: number | null;
             /** Id */
             id: string;
             /** Kind */
             kind: string;
             /** Months */
-            months?: number | null;
+            months: number | null;
             /** Occurred On */
-            occurred_on?: string | null;
+            occurred_on: string | null;
             /** Read At */
-            read_at?: string | null;
+            read_at: string | null;
             /**
              * Read On
              * Format: date
@@ -717,9 +717,9 @@ export interface components {
              */
             reliability: "primary" | "secondary";
             /** Scope */
-            scope?: ("company" | "this_project" | "other_project") | null;
+            scope: ("company" | "this_project" | "other_project") | null;
             /** Snippet */
-            snippet?: string | null;
+            snippet: string | null;
             /**
              * Source
              * @enum {string}
@@ -730,7 +730,7 @@ export interface components {
             /** Title */
             title: string;
             /** Total */
-            total?: number | null;
+            total: number | null;
             /**
              * Verdict
              * @enum {string}
@@ -761,7 +761,7 @@ export interface components {
         /** FindingChange */
         FindingChange: {
             /** Source Url */
-            source_url?: string | null;
+            source_url: string | null;
             /** Title */
             title: string;
         };
@@ -855,13 +855,13 @@ export interface components {
             /** Details Url */
             details_url: string;
             /** District */
-            district?: string | null;
+            district: string | null;
             /** Name */
-            name?: string | null;
+            name: string | null;
             /** Promoter */
-            promoter?: string | null;
+            promoter: string | null;
             /** Registered On */
-            registered_on?: string | null;
+            registered_on: string | null;
             /** Rera Id */
             rera_id: string;
         };
@@ -887,11 +887,11 @@ export interface components {
          */
         RecentCheck: {
             /** Band */
-            band?: ("Low" | "Moderate" | "High" | "Critical" | "insufficient_evidence") | null;
+            band: ("Low" | "Moderate" | "High" | "Critical" | "insufficient_evidence") | null;
             /** Completed At */
-            completed_at?: string | null;
+            completed_at: string | null;
             /** Confidence */
-            confidence?: number | null;
+            confidence: number | null;
             /**
              * Created At
              * Format: date-time
@@ -899,7 +899,7 @@ export interface components {
             created_at: string;
             /** Details Url */
             details_url: string;
-            display_score?: components["schemas"]["DisplayScore"] | null;
+            display_score: components["schemas"]["DisplayScore"] | null;
             /**
              * Drivers
              * @default []
@@ -917,11 +917,11 @@ export interface components {
              */
             reasons: components["schemas"]["ReasonCode"][];
             /** Registered On */
-            registered_on?: string | null;
+            registered_on: string | null;
             /** Rera Id */
             rera_id: string;
             /** Score */
-            score?: number | null;
+            score: number | null;
             /**
              * Sources Read
              * @default 0
@@ -937,7 +937,7 @@ export interface components {
         Report: {
             check: components["schemas"]["Check"];
             display_score: components["schemas"]["DisplayScore"];
-            family?: components["schemas"]["FamilyTree"] | null;
+            family: components["schemas"]["FamilyTree"] | null;
             /** Findings */
             findings: components["schemas"]["Finding"][];
             project: components["schemas"]["Project"];
@@ -973,7 +973,7 @@ export interface components {
             /** Hard Stop */
             hard_stop: boolean;
             /** Hard Stop Reason */
-            hard_stop_reason?: string | null;
+            hard_stop_reason: string | null;
             /** Provisional */
             provisional: boolean;
             /** Value */
@@ -1016,7 +1016,7 @@ export interface components {
             /** Hard Stop */
             hard_stop: boolean;
             /** Hard Stop Reason */
-            hard_stop_reason?: string | null;
+            hard_stop_reason: string | null;
             /** Pillars */
             pillars: components["schemas"]["Pillar"][];
             /** Pillars Unread */
@@ -1064,7 +1064,7 @@ export interface components {
              */
             checks_read: ("registration" | "completion_date" | "extensions" | "company_status" | "insolvency" | "land_dues" | "consumer_cases")[];
             /** Message */
-            message?: string | null;
+            message: string | null;
             /**
              * Status
              * @enum {string}
@@ -1142,9 +1142,9 @@ export interface components {
              */
             checks_read: ("registration" | "completion_date" | "extensions" | "company_status" | "insolvency" | "land_dues" | "consumer_cases")[];
             /** Live Url */
-            live_url?: string | null;
+            live_url: string | null;
             /** Message */
-            message?: string | null;
+            message: string | null;
             /**
              * Source
              * @enum {string}
@@ -1195,18 +1195,18 @@ export interface components {
          */
         TrackedProject: {
             /** Check Id */
-            check_id?: string | null;
+            check_id: string | null;
             /** Details Url */
             details_url: string;
-            display_score?: components["schemas"]["DisplayScore"] | null;
+            display_score: components["schemas"]["DisplayScore"] | null;
             /** District */
-            district?: string | null;
+            district: string | null;
             /** Name */
-            name?: string | null;
+            name: string | null;
             /** Promoter */
-            promoter?: string | null;
+            promoter: string | null;
             /** Registered On */
-            registered_on?: string | null;
+            registered_on: string | null;
             /** Rera Id */
             rera_id: string;
         };
@@ -1226,7 +1226,7 @@ export interface components {
         /** Watch */
         Watch: {
             /** Baseline Check Id */
-            baseline_check_id?: string | null;
+            baseline_check_id: string | null;
             /**
              * Created At
              * Format: date-time
@@ -1255,7 +1255,7 @@ export interface components {
              * @default en
              * @enum {string}
              */
-            language: "en" | "hi";
+            language?: "en" | "hi";
             /** Rera Id */
             rera_id: string;
         };

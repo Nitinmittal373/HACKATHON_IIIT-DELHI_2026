@@ -10,8 +10,7 @@ import time
 from collections.abc import Callable
 from datetime import datetime
 
-from pydantic import BaseModel
-
+from app.api_model import ApiModel
 from app.matching import blob, legal_name_in, normalize
 from app.models import DisplayScore, Project
 from app.resolve import candidates_from_hits
@@ -32,7 +31,7 @@ class TrackedProject(Project):
     display_score: DisplayScore | None = None
 
 
-class TrackRecord(BaseModel):
+class TrackRecord(ApiModel):
     promoter: str
     projects: list[TrackedProject]
     searched_at: datetime
