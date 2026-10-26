@@ -14,6 +14,7 @@ from app.api import (
     compare,
     corrections,
     events,
+    extract,
     health,
     meta,
     projects,
@@ -40,6 +41,8 @@ from app.track_record import TrackRecords
 
 DEFAULT_CACHE_DIR = BACKEND_DIR / "data" / "cache"
 SOURCE_TIMEOUT_GRACE_SECONDS = 30
+# Files read per minute from one address; each may be 5 MB and 40 pages.
+EXTRACT_PER_MINUTE = 10
 
 
 def create_app(
@@ -69,6 +72,7 @@ def create_app(
         app.state.store.fail_unfinished_checks(clock())
         app.state.hub = EventHub()
         app.state.limiter = RateLimiter(settings.rate_limit_per_minute)
+        app.state.extract_limiter = RateLimiter(EXTRACT_PER_MINUTE)
         app.state.track_records = TrackRecords(app.state.web, clock)
         app.state.orchestrator = Orchestrator(
             app.state.store,
@@ -131,6 +135,7 @@ def create_app(
         meta,
         states,
         projects,
+        extract,
         promoters,
         compare,
         checks,

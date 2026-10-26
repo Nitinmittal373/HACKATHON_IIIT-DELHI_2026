@@ -1118,6 +1118,70 @@
         "title": "DriverV2",
         "type": "object"
       },
+      "ExtractResponse": {
+        "properties": {
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/Project"
+            },
+            "title": "Candidates",
+            "type": "array"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "numbers": {
+            "items": {
+              "$ref": "#/components/schemas/ExtractedNumber"
+            },
+            "title": "Numbers",
+            "type": "array"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "numbers",
+          "candidates",
+          "message"
+        ],
+        "title": "ExtractResponse",
+        "type": "object"
+      },
+      "ExtractedNumber": {
+        "properties": {
+          "line": {
+            "title": "Line",
+            "type": "string"
+          },
+          "rera_id": {
+            "title": "Rera Id",
+            "type": "string"
+          },
+          "state": {
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rera_id",
+          "state",
+          "line"
+        ],
+        "title": "ExtractedNumber",
+        "type": "object"
+      },
       "FamilyCompany": {
         "properties": {
           "flag": {
@@ -3762,6 +3826,53 @@
         "summary": "Create Correction",
         "tags": [
           "corrections"
+        ]
+      }
+    },
+    "/api/extract": {
+      "post": {
+        "description": "RERA numbers in a PDF brochure or agreement, or in the text a QR code held.\n\nThe file is read in memory and never stored. A photo is not accepted: the browser decodes\nits QR code and sends only the text.",
+        "operationId": "extract_numbers_api_extract_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExtractText"
+              }
+            },
+            "application/pdf": {
+              "schema": {
+                "format": "binary",
+                "type": "string"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExtractResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "413": {
+            "description": "The file is larger than 5 MB"
+          },
+          "415": {
+            "description": "Only a PDF, or the text of a QR code, is accepted"
+          },
+          "422": {
+            "description": "The file could not be read"
+          }
+        },
+        "summary": "Extract Numbers",
+        "tags": [
+          "projects"
         ]
       }
     },

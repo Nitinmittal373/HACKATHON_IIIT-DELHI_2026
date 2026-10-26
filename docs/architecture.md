@@ -95,6 +95,10 @@ For buyers whose project has no website to search:
 - `GET /api/promoters/search?q=&state=&city=` (`app/states/promoter_search.py`) takes a builder's name and runs three Searches: the state RERA domains (the named state, the state of the named city, or all of them), company-registry mirrors of MCA data (name and CIN only), and the open web, whose numbers are voted on like a project name's. It returns the registered projects found, each with its number, state, status and the sites that printed it, and the company pages found. Generic words such as "Limited" and "Developers" never decide a match, and different Lodha companies are listed apart, never merged.
 - `GET /api/projects/search?q=&locality=` adds a city or locality ("Sector 150 Noida"). `app/states/places.py` maps about 200 cities and areas to a state, so the portals searched narrow to it; the locality is added to the open-web search and never counts as part of the project's name.
 
+### Brochure, agreement and QR
+
+`POST /api/extract` finds the number in a document the buyer already has. It takes a PDF as the raw request body (`Content-Type: application/pdf`, at most 5 MB, 40 pages read) or `{"text": "..."}` for the address a QR code held; at most ten requests a minute per address. The PDF is read in memory with pypdf and never written to disk, so there is nothing to delete afterwards; only the numbers and the words around each one come back, with phone numbers, e-mail addresses, PAN and Aadhaar numbers replaced by `[removed]`. The numbers are searched on their state's portal like any other (`from_document` until a portal page prints them, then `confirmed`). A photo is never uploaded: the browser decodes its QR code (jsQR) and sends only the text, and no OCR runs anywhere.
+
 ## Sources
 
 Each source is one small module with the same shape: it reads one kind of public record and yields events (progress, live view URL, findings, which key checks it read). It never writes to the database; the orchestrator does.
