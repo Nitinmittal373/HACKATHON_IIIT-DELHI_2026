@@ -174,3 +174,20 @@ def test_which_sources_are_cached_and_for_what() -> None:
     assert entity_for("uprera", PROJECT) is None
     assert entity_for("consumer", PROJECT) is None
     assert entity_for("group", PROJECT.model_copy(update={"promoter": None})) is None
+
+
+def test_the_family_tree_is_kept_with_a_cached_group_read(tmp_path: Path) -> None:
+    from app.models import FamilyDirector, FamilyTree
+
+    sessions = make_session_factory(make_engine(f"sqlite:///{(tmp_path / 'tree.db').as_posix()}"))
+    cache = SourceCache(sessions)
+    tree = FamilyTree(
+        promoter="SUPERTECH LIMITED",
+        source_url="https://www.tofler.in/x",
+        directors=[FamilyDirector(name="A B", din="00000001")],
+    )
+    cache.put("group", "supertech limited", date(2026, 10, 26), NOW, [], (), tree)
+
+    cached = cache.get("group", "supertech limited", date(2026, 10, 26))
+
+    assert cached is not None and cached.family == tree

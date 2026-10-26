@@ -37,4 +37,5 @@ def assemble_report(store: Store, check: Check) -> Report | None:
         findings=findings,
         timeline=timeline,
         score_v2=store.get_score_v2(check.id),
+        family=store.get_family(check.id),
     )

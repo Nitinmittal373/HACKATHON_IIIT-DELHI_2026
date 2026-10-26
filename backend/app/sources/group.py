@@ -15,10 +15,19 @@ from collections.abc import AsyncIterator, Awaitable, Iterable
 from datetime import date, timedelta
 
 from app.matching import blob, legal_name_in
-from app.models import CheckKey, Finding, Project
+from app.models import (
+    CheckKey,
+    FamilyCompany,
+    FamilyDirector,
+    FamilyProject,
+    FamilyTree,
+    Finding,
+    Project,
+)
 from app.parsers.uprera_page import ParseError, UpreraRecord
 from app.sources.base import (
     FoundFinding,
+    GroupTree,
     Progress,
     SourceContext,
     SourceError,
@@ -77,11 +86,16 @@ class GroupSource:
             yield FoundFinding(finding)
 
         yield Progress("Listing the UP-RERA projects of the group")
-        projects = await self._group_projects(promoter, companies, ctx)
+        by_company = await self._group_projects(promoter, companies, ctx)
+        projects = [project for group in by_company.values() for project in group]
         yield Progress(f"Reading {len(projects)} group project pages on UP-RERA")
         reads = await _gather_limited(self._read(project, ctx) for project in projects)
         for finding in project_findings([r for r in reads if r], ctx):
             yield FoundFinding(finding)
+        read_by_id = {p.rera_id: record for p, record in (r for r in reads if r)}
+        yield GroupTree(
+            build_tree(promoter, url, profile, statuses, by_company, read_by_id, ctx.today)
+        )
 
     async def _profile(
         self, promoter: str, ctx: SourceContext
@@ -113,20 +127,23 @@ class GroupSource:
 
     async def _group_projects(
         self, promoter: str, companies: list[str], ctx: SourceContext
-    ) -> list[Project]:
+    ) -> dict[str, list[Project]]:
+        """Projects per company, the promoter first; a project is listed under one company only."""
         records = TrackRecords(ctx.web, lambda: ctx.now)
         own = ctx.project.rera_id
+        names = [promoter, *companies]
         try:
-            found = await _gather_limited(
-                records.find(name, own) for name in [promoter, *companies]
-            )
+            found = await _gather_limited(records.find(name, own) for name in names)
         except WebError:
-            return []
-        seen: dict[str, Project] = {}
-        for record in found:
-            for project in record.projects if record else []:
-                seen.setdefault(project.rera_id, project)
-        return list(seen.values())[:MAX_PROJECTS]
+            return {}
+        by_company: dict[str, list[Project]] = {}
+        seen: set[str] = set()
+        for name, record in zip(names, found, strict=True):
+            kept = [p for p in record.projects if p.rera_id not in seen]
+            kept = kept[: MAX_PROJECTS - len(seen)]
+            seen.update(p.rera_id for p in kept)
+            by_company[name] = kept
+        return by_company
 
     async def _read(
         self, project: Project, ctx: SourceContext
@@ -308,3 +325,59 @@ async def _gather_limited[T](reads: Iterable[Awaitable[T]]) -> list[T]:
             return await read
 
     return list(await asyncio.gather(*(limited(read) for read in reads)))
+
+
+def build_tree(
+    promoter: str,
+    url: str,
+    profile: CompanyProfile,
+    statuses: list[tuple[str, str, str] | None],
+    by_company: dict[str, list[Project]],
+    reads: dict[str, UpreraRecord],
+    today: date,
+) -> FamilyTree:
+    """The tree the report draws; a project that could not be read is shown as unread."""
+    status_of = {entry[0]: entry for entry in statuses if entry}
+
+    def projects(name: str) -> list[FamilyProject]:
+        return [_family_project(p, reads.get(p.rera_id), today) for p in by_company.get(name, [])]
+
+    companies = []
+    for name in profile.related_companies[:MAX_COMPANIES]:
+        entry = status_of.get(name)
+        status = entry[1] if entry else None
+        flag = None
+        if status and IN_INSOLVENCY.search(status):
+            flag = "cirp"
+        elif status and STRUCK_OFF.search(status):
+            flag = "struck_off"
+        companies.append(
+            FamilyCompany(
+                name=name,
+                status=status,
+                status_url=entry[2] if entry else None,
+                flag=flag,
+                projects=projects(name),
+            )
+        )
+    return FamilyTree(
+        promoter=promoter,
+        source_url=url,
+        directors=[FamilyDirector(name=d.name, din=d.din) for d in profile.directors],
+        promoter_projects=projects(promoter),
+        companies=companies,
+    )
+
+
+def _family_project(project: Project, record: UpreraRecord | None, today: date) -> FamilyProject:
+    if record is None:
+        state = "unread"
+    elif LAPSED.search(record.project_type or ""):
+        state = "lapsed"
+    elif is_delayed(record, today):
+        state = "delayed"
+    else:
+        state = "ok"
+    return FamilyProject(
+        rera_id=project.rera_id, name=project.name, details_url=project.details_url, state=state
+    )

@@ -11,7 +11,7 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Protocol
 
-from app.models import CheckKey, Finding, Project, SourceName
+from app.models import CheckKey, FamilyTree, Finding, Project, SourceName
 from app.tinyfish import WebClient
 
 
@@ -66,7 +66,14 @@ class ProjectDetails:
     project: Project
 
 
-SourceEvent = Progress | LiveUrl | FoundFinding | Blocked | ChecksRead | ProjectDetails
+@dataclass(frozen=True)
+class GroupTree:
+    """The builder's family tree, for the report's tree view."""
+
+    tree: FamilyTree
+
+
+SourceEvent = Progress | LiveUrl | FoundFinding | Blocked | ChecksRead | ProjectDetails | GroupTree
 
 
 class Source(Protocol):

@@ -106,6 +106,8 @@ class SourceCacheRow(Base):
     read_at: Mapped[datetime] = mapped_column(UTCDateTime)
     checks_read: Mapped[list[str]] = mapped_column(JSON, default=list)
     findings: Mapped[list[dict[str, object]]] = mapped_column(JSON, default=list)
+    # Whatever else the source produced besides findings, such as the group's family tree.
+    extras: Mapped[dict[str, object]] = mapped_column(JSON, default=dict)
 
 
 class FindingExtraRow(Base):

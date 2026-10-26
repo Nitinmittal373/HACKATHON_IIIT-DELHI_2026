@@ -251,6 +251,43 @@ class ScoreV2(BaseModel):
     pillars_unread: list[PillarId]
 
 
+FamilyFlag = Literal["cirp", "struck_off"]
+FamilyProjectState = Literal["ok", "delayed", "lapsed", "unread"]
+
+
+class FamilyDirector(BaseModel):
+    """A director by name and DIN only: nothing else about a person is kept (DPDP)."""
+
+    name: str
+    din: str
+
+
+class FamilyProject(BaseModel):
+    rera_id: str
+    name: str | None = None
+    details_url: str
+    state: FamilyProjectState
+
+
+class FamilyCompany(BaseModel):
+    name: str
+    # The registry status as a page shows it; None when no page naming this company was read.
+    status: str | None = None
+    status_url: str | None = None
+    flag: FamilyFlag | None = None
+    projects: list[FamilyProject] = []
+
+
+class FamilyTree(BaseModel):
+    """The promoter, its directors, related companies and their UP-RERA projects."""
+
+    promoter: str
+    source_url: str
+    directors: list[FamilyDirector]
+    promoter_projects: list[FamilyProject] = []
+    companies: list[FamilyCompany] = []
+
+
 class Report(BaseModel):
     check: Check
     project: Project
@@ -259,6 +296,8 @@ class Report(BaseModel):
     timeline: list[Finding]
     # The 300-900 score with pillars and reason codes; None for checks made before v2.
     score_v2: ScoreV2 | None = None
+    # Directors, related companies and their projects; None unless the group source ran.
+    family: FamilyTree | None = None
 
 
 class Event(BaseModel):
