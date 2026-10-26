@@ -47,6 +47,8 @@ class ProjectRecord(BaseModel):
     read_at: datetime
     # The exact words each fact came from, for the evidence ledger.
     raw_snippets: list[str] = []
+    # "search_snippet" when no page was opened and the facts came from Search result text.
+    read_via: Literal["search_snippet"] | None = None
 
     @property
     def latest_completion(self) -> date | None:

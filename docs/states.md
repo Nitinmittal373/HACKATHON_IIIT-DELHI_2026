@@ -12,7 +12,11 @@ Where a fact could not be confirmed it says so.
 | `partial` | Fetch reads the project page, but it has only some of the fields or needs a link that Search finds first. |
 | `search_only` | Fetch cannot read the portal (it answers `proxy_error`, `login_required` or a CAPTCHA). NeevCheck reads what Search returns from the portal's own pages and links to the portal. Confidence drops, and the report says "Unable to verify" for what was not read. |
 
-An agent with an India proxy was also tried once on a Haryana page and could not reach the
+A stealth agent with an India proxy was also tried once on a MahaRERA project result page and
+once on a Karnataka certificate page, starting on the deep page, never a homepage. MahaRERA
+showed the same number, name, promoter and district that Search returns, and the project detail
+page behind it shows a CAPTCHA, which is never solved, so MH stays `search_only`. The Karnataka
+page rendered no data. An India-proxy agent was also tried once on a Haryana page and could not reach the
 site either (`ERR_TUNNEL_CONNECTION_FAILED`), so a paid agent does not change a `search_only`
 state. Nothing is bypassed: no CAPTCHA, login or paywall is ever attempted.
 
