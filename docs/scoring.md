@@ -69,7 +69,9 @@ Findings that map to no v2 rule (a registration date, a court order, an unverifi
 
 ## Other states
 
-The rules read only findings, never a state. A state adapter turns its portal into the same findings UP-RERA gives (registration, completion date, delay against the promised date, status, complaints), so the same rules apply. For a state whose portal can only be read through Search snippets, most of those facts are not shown: they stay unread, appear under R12 and lower confidence, and never cost points. The land-dues check exists for Uttar Pradesh only; for any other state it is unread. Such a read is usually *provisional* (too few pillars read), which the report says in plain words. The live proofs in the pull request show this: a Maharashtra, a Haryana and a Karnataka project each score 900 with 33% confidence and no penalty, because little beyond the registration could be read.
+The rules read only findings, never a state. A state adapter turns its portal into the same findings UP-RERA gives (registration, completion date, delay against the promised date, status, complaints), so the same rules apply. For a state whose portal can only be read through Search snippets, most of those facts are not shown: they stay unread, appear under R12 and lower confidence, and never cost points. The land-dues check exists for Uttar Pradesh only; for any other state it is unread. Such a read is usually *provisional* (too few pillars read), which the report says in plain words. 
+
+**No number without evidence.** When fewer than half of the six pillars were read (band `insufficient_evidence`), `display_score.value` is `null` and every screen shows a dash with "Not enough evidence yet · n of 6 record types read". The computed figure is kept as `provisional_value` and appears only in the method section, labelled as provisional. Compare and "best on records" ignore such projects. A Maharashtra, a Haryana and a Karnataka project checked live each read 2 of 6 record types (confidence 33%) and so show no score.
 
 ## Worked example
 
