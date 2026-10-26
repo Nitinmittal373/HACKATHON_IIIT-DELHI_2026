@@ -10,6 +10,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import checks, compare, events, health, projects, promoters, reports, sentinel
+from app.cache import SourceCache
 from app.config import BACKEND_DIR, Settings, load_settings
 from app.db import make_engine, make_session_factory
 from app.events import EventHub
@@ -46,6 +47,8 @@ def create_app(
         )
         engine = make_engine(settings.database_url)
         app.state.store = Store(make_session_factory(engine))
+        # Cached reads belong to the v2 sources: one flag turns both on.
+        source_cache = SourceCache(make_session_factory(engine)) if settings.v2_sources else None
         # A check's agents run inside this process; any it was running before a restart or a
         # redeploy are gone, so those checks can never finish and are failed honestly.
         app.state.store.fail_unfinished_checks(clock())
@@ -62,6 +65,7 @@ def create_app(
             clock=clock,
             sources=lambda: build_sources(settings.v2_sources),
             cache_dir=cache_dir,
+            source_cache=source_cache,
         )
         app.state.sentinel_store = SentinelStore(make_session_factory(engine))
         app.state.sentinel = Sentinel(

@@ -10,12 +10,13 @@ because without it there is nothing to score.
 import asyncio
 import logging
 import uuid
-from collections.abc import Callable
+from collections.abc import AsyncIterator, Callable
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
+from app.cache import CachedRead, SourceCache, entity_for
 from app.events import EventHub
 from app.models import (
     Check,
@@ -40,6 +41,7 @@ from app.sources.base import (
     Source,
     SourceContext,
     SourceError,
+    SourceEvent,
     SourceUnavailable,
 )
 from app.store import Store
@@ -65,6 +67,7 @@ class Orchestrator:
         clock: Callable[[], datetime] = utc_now,
         sources: Callable[[], list[Source]] = build_sources,
         cache_dir: Path | None = None,
+        source_cache: SourceCache | None = None,
     ) -> None:
         self._store = store
         self._hub = hub
@@ -74,15 +77,16 @@ class Orchestrator:
         self._clock = clock
         self._sources = sources
         self._cache_dir = cache_dir
+        self._source_cache = source_cache
         self._tasks: dict[str, asyncio.Task[None]] = {}
 
-    def start(self, project: Project) -> Check:
+    def start(self, project: Project, fresh: bool = False) -> Check:
         """Create the check and run it in the background; returns at once."""
         check_id = uuid.uuid4().hex
         self._store.save_project(_merge(self._store.get_project(project.rera_id), project))
         self._store.create_check(check_id, project.rera_id, self._clock())
         self._hub.open(check_id)
-        task = asyncio.create_task(self._run(check_id, project))
+        task = asyncio.create_task(self._run(check_id, project, fresh))
         self._tasks[check_id] = task
         task.add_done_callback(lambda _: self._tasks.pop(check_id, None))
         check = self._store.get_check(check_id)
@@ -104,7 +108,7 @@ class Orchestrator:
             task.cancel()
         await asyncio.gather(*tasks, return_exceptions=True)
 
-    async def _run(self, check_id: str, project: Project) -> None:
+    async def _run(self, check_id: str, project: Project, fresh: bool = False) -> None:
         self._store.set_check_status(check_id, "running")
         try:
             primary, *others = self._sources()
@@ -117,12 +121,12 @@ class Orchestrator:
                 check_id=check_id,
                 cache_dir=self._cache_dir,
             )
-            ctx, primary_read = await self._run_source(check_id, primary, ctx)
+            ctx, primary_read = await self._run_source(check_id, primary, ctx, fresh)
             if "registration" not in primary_read:
                 self._finish(check_id, "failed", message="UP-RERA could not be read, so no score")
                 return
             others_read = await asyncio.gather(
-                *(self._run_source(check_id, s, ctx) for s in others)
+                *(self._run_source(check_id, s, ctx, fresh) for s in others)
             )
             read = set(primary_read).union(*(checks for _, checks in others_read))
             findings = self._store.list_findings(check_id)
@@ -140,16 +144,20 @@ class Orchestrator:
             self._finish(check_id, "failed", message="Something went wrong while running the check")
 
     async def _run_source(
-        self, check_id: str, source: Source, ctx: SourceContext
+        self, check_id: str, source: Source, ctx: SourceContext, fresh: bool = False
     ) -> tuple[SourceContext, tuple[CheckKey, ...]]:
         async with self._slots:
             run = SourceRun(source=source.name, status="running")
             self._store.save_source_run(check_id, run)
             self._emit(check_id, "source.started", source.name)
             read: tuple[CheckKey, ...] = ()
+            entity = entity_for(source.name, ctx.project) if self._source_cache else None
+            cached = None if fresh else self._cached(source, entity, ctx)
+            collected: list[Finding] = []
             try:
                 async with asyncio.timeout(self._source_timeout):
-                    async for event in source.run(ctx):
+                    events = replay(cached) if cached else source.run(ctx)
+                    async for event in events:
                         match event:
                             case LiveUrl(url=url):
                                 run = run.model_copy(update={"live_url": url})
@@ -158,6 +166,7 @@ class Orchestrator:
                             case Progress(text=text):
                                 self._emit(check_id, "source.progress", source.name, text=text)
                             case FoundFinding(finding=finding):
+                                collected.append(finding)
                                 self._store.add_finding(check_id, finding)
                                 data = finding.model_dump(mode="json")
                                 self._emit(check_id, "finding.added", source.name, finding=data)
@@ -173,6 +182,8 @@ class Orchestrator:
                                 ctx = replace(ctx, project=project)
                 status = "blocked" if run.status == "blocked" else "completed"
                 run = run.model_copy(update={"status": status})
+                if status == "completed" and cached is None and entity and (read or collected):
+                    self._remember(source, entity, ctx, collected, read)
             except SourceUnavailable as error:
                 run = run.model_copy(update={"status": "unavailable", "message": str(error)})
             except (SourceError, WebError) as error:
@@ -199,6 +210,24 @@ class Orchestrator:
                 checks_read=list(read),
             )
             return ctx, read
+
+    def _cached(
+        self, source: Source, entity: str | None, ctx: SourceContext
+    ) -> CachedRead | None:
+        if self._source_cache is None or entity is None:
+            return None
+        return self._source_cache.get(source.name, entity, ctx.today)
+
+    def _remember(
+        self,
+        source: Source,
+        entity: str,
+        ctx: SourceContext,
+        findings: list[Finding],
+        read: tuple[CheckKey, ...],
+    ) -> None:
+        assert self._source_cache is not None
+        self._source_cache.put(source.name, entity, ctx.today, ctx.now, findings, read)
 
     def _save_score_v2(self, check_id: str, findings: list[Finding], read: set[CheckKey]) -> None:
         """v2 sits next to v1; if it ever fails the v1 report must still be delivered."""
@@ -231,6 +260,15 @@ class Orchestrator:
             }
         )
         self._hub.publish(event)
+
+
+async def replay(cached: CachedRead) -> AsyncIterator[SourceEvent]:
+    """A cached read as the same events a live read would give, with its real read time."""
+    stamp = cached.read_at.astimezone(IST).strftime("%d %b %Y, %H:%M IST")
+    yield Progress(f"Reusing the read made on {stamp}; nothing was fetched again")
+    for finding in cached.fresh_copies():
+        yield FoundFinding(finding)
+    yield ChecksRead(cached.checks_read)
 
 
 UNAVAILABLE_LABELS: dict[SourceName, str] = {
