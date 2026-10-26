@@ -94,12 +94,24 @@
             "title": "Rera Id",
             "type": "string"
           },
+          "state": {
+            "default": "UP",
+            "title": "State",
+            "type": "string"
+          },
+          "state_name": {
+            "default": "Uttar Pradesh",
+            "title": "State Name",
+            "type": "string"
+          },
           "watch_id": {
             "title": "Watch Id",
             "type": "string"
           }
         },
         "required": [
+          "state",
+          "state_name",
           "id",
           "watch_id",
           "rera_id",
@@ -285,6 +297,16 @@
             "title": "Started At",
             "type": "string"
           },
+          "state": {
+            "default": "UP",
+            "title": "State",
+            "type": "string"
+          },
+          "state_name": {
+            "default": "Uttar Pradesh",
+            "title": "State Name",
+            "type": "string"
+          },
           "status": {
             "enum": [
               "queued",
@@ -297,6 +319,8 @@
           }
         },
         "required": [
+          "state",
+          "state_name",
           "id",
           "rera_id",
           "details_url",
@@ -418,11 +442,28 @@
           },
           "rera_id": {
             "examples": [
-              "UPRERAPRJ8334"
+              "UPRERAPRJ8334",
+              "P51800000937"
             ],
-            "maxLength": 40,
+            "maxLength": 60,
             "title": "Rera Id",
             "type": "string"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "maxLength": 2,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "examples": [
+              "UP",
+              "MH"
+            ],
+            "title": "State"
           }
         },
         "required": [
@@ -535,6 +576,16 @@
             ],
             "title": "Score"
           },
+          "state": {
+            "default": "UP",
+            "title": "State",
+            "type": "string"
+          },
+          "state_name": {
+            "default": "Uttar Pradesh",
+            "title": "State Name",
+            "type": "string"
+          },
           "status": {
             "enum": [
               "queued",
@@ -547,6 +598,8 @@
           }
         },
         "required": [
+          "state",
+          "state_name",
           "id",
           "rera_id",
           "details_url",
@@ -1313,6 +1366,18 @@
             ],
             "title": "Verdict",
             "type": "string"
+          },
+          "via": {
+            "anyOf": [
+              {
+                "const": "search_snippet",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Via"
           }
         },
         "required": [
@@ -1331,7 +1396,8 @@
           "months",
           "scope",
           "total",
-          "snippet"
+          "snippet",
+          "via"
         ],
         "title": "Finding",
         "type": "object"
@@ -1683,9 +1749,21 @@
           "rera_id": {
             "title": "Rera Id",
             "type": "string"
+          },
+          "state": {
+            "default": "UP",
+            "title": "State",
+            "type": "string"
+          },
+          "state_name": {
+            "default": "Uttar Pradesh",
+            "title": "State Name",
+            "type": "string"
           }
         },
         "required": [
+          "state",
+          "state_name",
           "rera_id",
           "name",
           "promoter",
@@ -1877,6 +1955,16 @@
             "title": "Sources Read",
             "type": "integer"
           },
+          "state": {
+            "default": "UP",
+            "title": "State",
+            "type": "string"
+          },
+          "state_name": {
+            "default": "Uttar Pradesh",
+            "title": "State Name",
+            "type": "string"
+          },
           "status": {
             "enum": [
               "queued",
@@ -1889,6 +1977,8 @@
           }
         },
         "required": [
+          "state",
+          "state_name",
           "id",
           "rera_id",
           "details_url",
@@ -1943,6 +2033,16 @@
           "score_v2": {
             "$ref": "#/components/schemas/ScoreV2"
           },
+          "state": {
+            "default": "UP",
+            "title": "State",
+            "type": "string"
+          },
+          "state_name": {
+            "default": "Uttar Pradesh",
+            "title": "State Name",
+            "type": "string"
+          },
           "timeline": {
             "items": {
               "$ref": "#/components/schemas/Finding"
@@ -1952,6 +2052,8 @@
           }
         },
         "required": [
+          "state",
+          "state_name",
           "check",
           "project",
           "score",
@@ -2224,14 +2326,35 @@
             "title": "Candidates",
             "type": "array"
           },
+          "detected_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detected State"
+          },
           "query": {
             "title": "Query",
             "type": "string"
+          },
+          "searched_states": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Searched States",
+            "type": "array"
           }
         },
         "required": [
           "query",
-          "candidates"
+          "candidates",
+          "detected_state",
+          "searched_states"
         ],
         "title": "SearchResponse",
         "type": "object"
@@ -2583,6 +2706,63 @@
         "title": "SourceStartedEvent",
         "type": "object"
       },
+      "StateInfo": {
+        "description": "One state's RERA portal and how much of it NeevCheck reads.",
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "complaint_url": {
+            "title": "Complaint Url",
+            "type": "string"
+          },
+          "coverage": {
+            "enum": [
+              "full",
+              "partial",
+              "search_only"
+            ],
+            "title": "Coverage",
+            "type": "string"
+          },
+          "examples": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Examples",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "portal_url": {
+            "title": "Portal Url",
+            "type": "string"
+          },
+          "rera_name": {
+            "title": "Rera Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "name",
+          "rera_name",
+          "coverage",
+          "examples",
+          "note",
+          "portal_url",
+          "complaint_url"
+        ],
+        "title": "StateInfo",
+        "type": "object"
+      },
       "TrackRecord": {
         "properties": {
           "projects": {
@@ -2686,9 +2866,21 @@
           "rera_id": {
             "title": "Rera Id",
             "type": "string"
+          },
+          "state": {
+            "default": "UP",
+            "title": "State",
+            "type": "string"
+          },
+          "state_name": {
+            "default": "Uttar Pradesh",
+            "title": "State Name",
+            "type": "string"
           }
         },
         "required": [
+          "state",
+          "state_name",
           "rera_id",
           "name",
           "promoter",
@@ -2778,9 +2970,21 @@
           "rera_id": {
             "title": "Rera Id",
             "type": "string"
+          },
+          "state": {
+            "default": "UP",
+            "title": "State",
+            "type": "string"
+          },
+          "state_name": {
+            "default": "Uttar Pradesh",
+            "title": "State Name",
+            "type": "string"
           }
         },
         "required": [
+          "state",
+          "state_name",
           "id",
           "rera_id",
           "email",
@@ -2821,9 +3025,21 @@
             "type": "string"
           },
           "rera_id": {
-            "maxLength": 40,
+            "maxLength": 60,
             "title": "Rera Id",
             "type": "string"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "maxLength": 2,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State"
           }
         },
         "required": [
@@ -3330,6 +3546,25 @@
               "title": "Q",
               "type": "string"
             }
+          },
+          {
+            "description": "State code such as MH; omit to search every state",
+            "in": "query",
+            "name": "state",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 2,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "State code such as MH; omit to search every state",
+              "title": "State"
+            }
           }
         ],
         "responses": {
@@ -3371,7 +3606,7 @@
     },
     "/api/promoters/projects": {
       "get": {
-        "description": "Up to 10 other UP-RERA projects of a promoter, from Search on up-rera.in; cached a day.",
+        "description": "Up to 10 other projects of a promoter in one state, from Search on its portal.",
         "operationId": "promoter_projects_api_promoters_projects_get",
         "parameters": [
           {
@@ -3395,7 +3630,7 @@
             "schema": {
               "anyOf": [
                 {
-                  "maxLength": 40,
+                  "maxLength": 60,
                   "type": "string"
                 },
                 {
@@ -3404,6 +3639,19 @@
               ],
               "description": "RERA no. to skip",
               "title": "Exclude"
+            }
+          },
+          {
+            "description": "State code; UP when omitted",
+            "in": "query",
+            "name": "state",
+            "required": false,
+            "schema": {
+              "default": "UP",
+              "description": "State code; UP when omitted",
+              "maxLength": 2,
+              "title": "State",
+              "type": "string"
             }
           }
         ],
@@ -3687,6 +3935,32 @@
         "summary": "Remove Watch",
         "tags": [
           "sentinel"
+        ]
+      }
+    },
+    "/api/states": {
+      "get": {
+        "description": "Every state NeevCheck can search, how much of its portal is read, and real examples.",
+        "operationId": "list_states_api_states_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/StateInfo"
+                  },
+                  "title": "Response List States Api States Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List States",
+        "tags": [
+          "states"
         ]
       }
     }

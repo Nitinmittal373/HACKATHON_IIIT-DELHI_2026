@@ -197,7 +197,7 @@ export interface paths {
         };
         /**
          * Promoter Projects
-         * @description Up to 10 other UP-RERA projects of a promoter, from Search on up-rera.in; cached a day.
+         * @description Up to 10 other projects of a promoter in one state, from Search on its portal.
          */
         get: operations["promoter_projects_api_promoters_projects_get"];
         put?: never;
@@ -303,6 +303,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/states": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List States
+         * @description Every state NeevCheck can search, how much of its portal is read, and real examples.
+         */
+        get: operations["list_states_api_states_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -334,6 +354,16 @@ export interface components {
             removed: components["schemas"]["FindingChange"][];
             /** Rera Id */
             rera_id: string;
+            /**
+             * State
+             * @default UP
+             */
+            state: string;
+            /**
+             * State Name
+             * @default Uttar Pradesh
+             */
+            state_name: string;
             /** Watch Id */
             watch_id: string;
         };
@@ -409,6 +439,16 @@ export interface components {
              */
             started_at: string;
             /**
+             * State
+             * @default UP
+             */
+            state: string;
+            /**
+             * State Name
+             * @default Uttar Pradesh
+             */
+            state_name: string;
+            /**
              * Status
              * @enum {string}
              */
@@ -459,8 +499,15 @@ export interface components {
             /**
              * Rera Id
              * @example UPRERAPRJ8334
+             * @example P51800000937
              */
             rera_id: string;
+            /**
+             * State
+             * @example UP
+             * @example MH
+             */
+            state?: string | null;
         };
         /**
          * CheckSummary
@@ -491,6 +538,16 @@ export interface components {
             rera_id: string;
             /** Score */
             score: number | null;
+            /**
+             * State
+             * @default UP
+             */
+            state: string;
+            /**
+             * State Name
+             * @default Uttar Pradesh
+             */
+            state_name: string;
             /**
              * Status
              * @enum {string}
@@ -736,6 +793,8 @@ export interface components {
              * @enum {string}
              */
             verdict: "ok" | "fail" | "red_flag" | "review" | "context" | "not_found";
+            /** Via */
+            via: "search_snippet" | null;
         };
         /** FindingAddedEvent */
         FindingAddedEvent: {
@@ -864,6 +923,16 @@ export interface components {
             registered_on: string | null;
             /** Rera Id */
             rera_id: string;
+            /**
+             * State
+             * @default UP
+             */
+            state: string;
+            /**
+             * State Name
+             * @default Uttar Pradesh
+             */
+            state_name: string;
         };
         /** ReasonCode */
         ReasonCode: {
@@ -928,6 +997,16 @@ export interface components {
              */
             sources_read: number;
             /**
+             * State
+             * @default UP
+             */
+            state: string;
+            /**
+             * State Name
+             * @default Uttar Pradesh
+             */
+            state_name: string;
+            /**
              * Status
              * @enum {string}
              */
@@ -943,6 +1022,16 @@ export interface components {
             project: components["schemas"]["Project"];
             score: components["schemas"]["Score"];
             score_v2: components["schemas"]["ScoreV2"];
+            /**
+             * State
+             * @default UP
+             */
+            state: string;
+            /**
+             * State Name
+             * @default Uttar Pradesh
+             */
+            state_name: string;
             /** Timeline */
             timeline: components["schemas"]["Finding"][];
         };
@@ -1032,8 +1121,15 @@ export interface components {
         SearchResponse: {
             /** Candidates */
             candidates: components["schemas"]["Project"][];
+            /** Detected State */
+            detected_state: string | null;
             /** Query */
             query: string;
+            /**
+             * Searched States
+             * @default []
+             */
+            searched_states: string[];
         };
         /** SourceBlockedEvent */
         SourceBlockedEvent: {
@@ -1177,6 +1273,31 @@ export interface components {
              */
             type: "source.started";
         };
+        /**
+         * StateInfo
+         * @description One state's RERA portal and how much of it NeevCheck reads.
+         */
+        StateInfo: {
+            /** Code */
+            code: string;
+            /** Complaint Url */
+            complaint_url: string;
+            /**
+             * Coverage
+             * @enum {string}
+             */
+            coverage: "full" | "partial" | "search_only";
+            /** Examples */
+            examples: string[];
+            /** Name */
+            name: string;
+            /** Note */
+            note: string;
+            /** Portal Url */
+            portal_url: string;
+            /** Rera Name */
+            rera_name: string;
+        };
         /** TrackRecord */
         TrackRecord: {
             /** Projects */
@@ -1209,6 +1330,16 @@ export interface components {
             registered_on: string | null;
             /** Rera Id */
             rera_id: string;
+            /**
+             * State
+             * @default UP
+             */
+            state: string;
+            /**
+             * State Name
+             * @default Uttar Pradesh
+             */
+            state_name: string;
         };
         /** ValidationError */
         ValidationError: {
@@ -1243,6 +1374,16 @@ export interface components {
             language: "en" | "hi";
             /** Rera Id */
             rera_id: string;
+            /**
+             * State
+             * @default UP
+             */
+            state: string;
+            /**
+             * State Name
+             * @default Uttar Pradesh
+             */
+            state_name: string;
         };
         /** WatchCreate */
         WatchCreate: {
@@ -1258,6 +1399,8 @@ export interface components {
             language?: "en" | "hi";
             /** Rera Id */
             rera_id: string;
+            /** State */
+            state?: string | null;
         };
     };
     responses: never;
@@ -1618,6 +1761,8 @@ export interface operations {
             query: {
                 /** @description RERA number or name */
                 q: string;
+                /** @description State code such as MH; omit to search every state */
+                state?: string | null;
             };
             header?: never;
             path?: never;
@@ -1673,6 +1818,8 @@ export interface operations {
                 name: string;
                 /** @description RERA no. to skip */
                 exclude?: string | null;
+                /** @description State code; UP when omitted */
+                state?: string;
             };
             header?: never;
             path?: never;
@@ -1865,6 +2012,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_states_api_states_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StateInfo"][];
                 };
             };
         };
