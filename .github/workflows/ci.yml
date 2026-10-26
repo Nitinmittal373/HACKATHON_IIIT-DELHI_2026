@@ -32,6 +32,16 @@ jobs:
         run: ruff check .
       - if: steps.present.outputs.yes == 'true'
         working-directory: backend
+        # The frontend's types are generated from this file; a stale copy would hide a break.
+        run: |
+          python -m scripts.export_openapi
+          if [ -n "$(git status --porcelain ../contracts)" ]; then
+            echo "::error::API contract out of date: run make contract"
+            git diff --stat ../contracts
+            exit 1
+          fi
+      - if: steps.present.outputs.yes == 'true'
+        working-directory: backend
         # Tests replay recorded TinyFish responses, so no key is needed.
         run: pytest -q
 
@@ -53,6 +63,15 @@ jobs:
       - if: steps.present.outputs.yes == 'true'
         working-directory: frontend
         run: npm ci
+      - if: steps.present.outputs.yes == 'true'
+        working-directory: frontend
+        run: |
+          npm run gen:api
+          if [ -n "$(git status --porcelain src/lib/api-schema.d.ts)" ]; then
+            echo "::error::API contract out of date: run make contract"
+            git diff --stat src/lib/api-schema.d.ts
+            exit 1
+          fi
       - if: steps.present.outputs.yes == 'true'
         working-directory: frontend
         run: npm run lint

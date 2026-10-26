@@ -28,6 +28,14 @@ See [Getting started](README.md#getting-started) in the README. Checks need a Ti
 
 4. Fill in the pull request template. One maintainer reviews and merges.
 
+## The API contract
+
+The frontend never hand-writes an API type. `contracts/openapi.json` is exported from the FastAPI app and `frontend/src/lib/api-schema.d.ts` is generated from it; CI fails when either is stale.
+
+Change a backend model → `make contract` → commit both generated files with the change.
+
+`make contract` uses `python` by default; run `make contract PYTHON=.venv/bin/python` if your backend dependencies live in a virtual environment.
+
 ## Commit messages
 
 We follow [Conventional Commits](https://www.conventionalcommits.org/):
