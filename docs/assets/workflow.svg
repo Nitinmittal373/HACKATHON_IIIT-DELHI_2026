@@ -1,85 +1,44 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 440" width="1200" height="440" role="img" aria-label="NeevCheck workflow: search, confirm, five TinyFish agents read official sources, evidence, NeevScore, report, Sentinel">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 440" width="1280" height="440" role="img" aria-label="NeevCheck workflow: find the project by name, number, builder, locality, document or QR code; confirm it; the War Room reads six sources in parallel; the NeevScore engine gives a 300 to 900 score with reasons; the report links every point to its source; Sentinel re-checks weekly and alerts only on a change.">
+  <title>NeevCheck workflow</title>
   <style>
-    text { font-family: -apple-system, "Segoe UI", Inter, Helvetica, Arial, sans-serif; fill: #111111; }
-    .t { font-size: 15px; font-weight: 600; }
-    .s { font-size: 12px; fill: #5F5F5F; font-weight: 400; }
-    .m { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; fill: #F26B1D; letter-spacing: .06em; }
-    .box { fill: #FFFFFF; stroke: #EEEAE6; stroke-width: 1.5; }
-    .hot { fill: #FFF5EC; stroke: #F26B1D; stroke-width: 1.5; }
-    .wire { fill: none; stroke: #E8DDD3; stroke-width: 2; }
-    .flow { fill: none; stroke: #F26B1D; stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 8 220; animation: flow 3s linear infinite; }
-    .d1 { animation-delay: .4s } .d2 { animation-delay: .8s } .d3 { animation-delay: 1.2s } .d4 { animation-delay: 1.6s } .d5 { animation-delay: 2s }
-    @keyframes flow { from { stroke-dashoffset: 228; } to { stroke-dashoffset: 0; } }
-    .pulse { fill: #F26B1D; transform-box: fill-box; transform-origin: center; animation: pulse 1.6s ease-out infinite; }
-    @keyframes pulse { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(2.6); } }
-    .lane { animation: lane 6s ease-in-out infinite; }
-    .l1 { animation-delay: 0s } .l2 { animation-delay: .6s } .l3 { animation-delay: 1.2s } .l4 { animation-delay: 1.8s } .l5 { animation-delay: 2.4s }
-    @keyframes lane { 0%, 100% { fill: #FFFFFF; } 15%, 45% { fill: #FFF1E6; } }
-    .ring { fill: none; stroke: #F26B1D; stroke-width: 7; stroke-linecap: round; stroke-dasharray: 151; animation: ring 6s ease-in-out infinite; transform: rotate(-90deg); transform-origin: 1003px 120px; }
-    @keyframes ring { 0% { stroke-dashoffset: 151; } 40%, 100% { stroke-dashoffset: 36; } }
-    .loop { fill: none; stroke: #F26B1D; stroke-width: 1.6; stroke-dasharray: 5 6; animation: loop 1.2s linear infinite; opacity: .7; }
-    @keyframes loop { to { stroke-dashoffset: -22; } }
+    text { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; fill: #111111; }
+    .t { font-size: 17px; font-weight: 600; }
+    .s { font-size: 12.5px; fill: #5F5F5F; }
+    .b { fill: #111111; font-weight: 600; }
+    .n { font-size: 13px; font-weight: 700; fill: #FFFFFF; }
+    .big { font-size: 44px; font-weight: 700; letter-spacing: -0.035em; }
+    .m { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 10.5px; fill: #D9530B; letter-spacing: .04em; }
+    .card { fill: #FFFFFF; stroke: #EEEAE6; stroke-width: 1.6; animation-duration: 18s; animation-iteration-count: infinite; }
+    .c0 { animation-name: a0; } .c1 { animation-name: a1; } .c2 { animation-name: a2; } .c3 { animation-name: a3; } .c4 { animation-name: a4; } .c5 { animation-name: a5; }
+    .chip { fill: #FFE8D6; }
+    .row { fill: #FBF9F6; stroke: #EEEAE6; }
+    .sel { fill: #FFF5EC; stroke: #F26B1D; }
+    .dot { fill: #E0DAD4; } .on { fill: #F26B1D; }
+    .bar { fill: #F26B1D; animation-name: fill; animation-timing-function: ease-in-out; animation-iteration-count: infinite; animation-direction: alternate; }
+    .mark { fill: #FFFFFF; stroke: #111111; stroke-width: 2.5; animation: slide 6s ease-in-out infinite; }
+    .spin { animation: spin 9s linear infinite; }
+    .line { stroke: #E8DDD3; stroke-width: 2.5; fill: none; }
+    .loop { stroke: #F26B1D; stroke-width: 2.2; fill: none; stroke-dasharray: 3 8; stroke-linecap: round; animation: dash 1.4s linear infinite; }
+    .pk { fill: #F26B1D; offset-path: path('M36 60 L1244 60'); offset-rotate: 0deg; animation: travel 18s linear infinite; }
+    @keyframes a0 { 0%, 0% { stroke: #EEEAE6; fill: #FFFFFF; } 3%, 14% { stroke: #F26B1D; fill: #FFF5EC; } 17%, 100% { stroke: #EEEAE6; fill: #FFFFFF; } } @keyframes a1 { 0%, 15% { stroke: #EEEAE6; fill: #FFFFFF; } 18%, 29% { stroke: #F26B1D; fill: #FFF5EC; } 32%, 100% { stroke: #EEEAE6; fill: #FFFFFF; } } @keyframes a2 { 0%, 30% { stroke: #EEEAE6; fill: #FFFFFF; } 33%, 44% { stroke: #F26B1D; fill: #FFF5EC; } 47%, 100% { stroke: #EEEAE6; fill: #FFFFFF; } } @keyframes a3 { 0%, 45% { stroke: #EEEAE6; fill: #FFFFFF; } 48%, 59% { stroke: #F26B1D; fill: #FFF5EC; } 62%, 100% { stroke: #EEEAE6; fill: #FFFFFF; } } @keyframes a4 { 0%, 60% { stroke: #EEEAE6; fill: #FFFFFF; } 63%, 74% { stroke: #F26B1D; fill: #FFF5EC; } 77%, 100% { stroke: #EEEAE6; fill: #FFFFFF; } } @keyframes a5 { 0%, 75% { stroke: #EEEAE6; fill: #FFFFFF; } 78%, 89% { stroke: #F26B1D; fill: #FFF5EC; } 92%, 100% { stroke: #EEEAE6; fill: #FFFFFF; } }
+    @keyframes fill { 0% { transform: scaleX(.12); } 100% { transform: scaleX(1); } }
+    @keyframes slide { 0%, 15% { transform: translateX(0); } 70%, 100% { transform: translateX(var(--run)); } }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes dash { to { stroke-dashoffset: -22; } }
+    @keyframes travel { 0% { offset-distance: 0%; } 100% { offset-distance: 100%; } }
+    @media (prefers-reduced-motion: reduce) {
+      .card, .bar, .mark, .spin, .loop, .pk { animation: none; }
+      .mark { transform: translateX(88px); }
+      .pk { display: none; }
+    }
   </style>
-  <rect width="1200" height="440" rx="24" fill="#FFFCFA"/>
+  <rect width="1280" height="440" fill="#FFFFFF"/>
+  <path class="line" d="M36 60 L1244 60"/>
+  <circle class="pk" r="6"/>
+  <text class="m" x="36" y="42">WHAT HAPPENS WHEN A BUYER SEARCHES</text>
 
-  <!-- wires -->
-  <path class="wire" d="M178 120 H228"/><path class="flow" d="M178 120 H228"/>
-  <path class="wire" d="M372 120 C 410 120, 410 60, 450 60"/><path class="flow d1" d="M372 120 C 410 120, 410 60, 450 60"/>
-  <path class="wire" d="M372 120 C 410 120, 410 120, 450 120"/><path class="flow d2" d="M372 120 H450"/>
-  <path class="wire" d="M372 120 C 410 120, 410 180, 450 180"/><path class="flow d3" d="M372 120 C 410 120, 410 180, 450 180"/>
-  <path class="wire" d="M372 120 C 410 120, 410 240, 450 240"/><path class="flow d4" d="M372 120 C 410 120, 410 240, 450 240"/>
-  <path class="wire" d="M372 120 C 410 120, 410 300, 450 300"/><path class="flow d5" d="M372 120 C 410 120, 410 300, 450 300"/>
-  <path class="wire" d="M690 60 C 730 60, 730 180, 770 180"/><path class="flow d1" d="M690 60 C 730 60, 730 180, 770 180"/>
-  <path class="wire" d="M690 120 C 730 120, 730 180, 770 180"/><path class="flow d2" d="M690 120 C 730 120, 730 180, 770 180"/>
-  <path class="wire" d="M690 180 H770"/><path class="flow d3" d="M690 180 H770"/>
-  <path class="wire" d="M690 240 C 730 240, 730 180, 770 180"/><path class="flow d4" d="M690 240 C 730 240, 730 180, 770 180"/>
-  <path class="wire" d="M690 300 C 730 300, 730 180, 770 180"/><path class="flow d5" d="M690 300 C 730 300, 730 180, 770 180"/>
-  <path class="wire" d="M914 180 C 940 180, 940 120, 950 120"/><path class="flow d2" d="M914 180 C 940 180, 940 120, 950 120"/>
-  <path class="wire" d="M1003 172 V 250"/><path class="flow d3" d="M1003 172 V 250"/>
-  <path class="loop" d="M930 347 C 850 347, 760 312, 696 304"/>
-  <text class="s" x="800" y="380">Sentinel re-checks every week</text>
+  <rect class="card c0" x="36" y="96" width="178" height="250" rx="18"/><circle cx="64" cy="126" r="14" fill="#111111"/><text class="n" x="64" y="131" text-anchor="middle">1</text><text class="t" x="88" y="132">Find it</text><text class="s" x="54" y="162">any way you can</text><rect class="card c1" x="236" y="96" width="178" height="250" rx="18"/><circle cx="264" cy="126" r="14" fill="#111111"/><text class="n" x="264" y="131" text-anchor="middle">2</text><text class="t" x="288" y="132">Confirm</text><text class="s" x="254" y="162">is this your project?</text><rect class="card c2" x="436" y="96" width="178" height="250" rx="18"/><circle cx="464" cy="126" r="14" fill="#111111"/><text class="n" x="464" y="131" text-anchor="middle">3</text><text class="t" x="488" y="132">War Room</text><text class="s" x="454" y="162">six lanes, in parallel</text><rect class="card c3" x="636" y="96" width="178" height="250" rx="18"/><circle cx="664" cy="126" r="14" fill="#111111"/><text class="n" x="664" y="131" text-anchor="middle">4</text><text class="t" x="688" y="132">NeevScore</text><text class="s" x="654" y="162">300–900, with reasons</text><rect class="card c4" x="836" y="96" width="178" height="250" rx="18"/><circle cx="864" cy="126" r="14" fill="#111111"/><text class="n" x="864" y="131" text-anchor="middle">5</text><text class="t" x="888" y="132">Report</text><text class="s" x="854" y="162">proof for every point</text><rect class="card c5" x="1036" y="96" width="178" height="250" rx="18"/><circle cx="1064" cy="126" r="14" fill="#111111"/><text class="n" x="1064" y="131" text-anchor="middle">6</text><text class="t" x="1088" y="132">Sentinel</text><text class="s" x="1054" y="162">weekly re-check</text><rect class="chip" x="54" y="188" width="74" height="24" rx="12"/><text class="m" x="91" y="204" text-anchor="middle">name</text><rect class="chip" x="134" y="188" width="74" height="24" rx="12"/><text class="m" x="171" y="204" text-anchor="middle">number</text><rect class="chip" x="54" y="222" width="74" height="24" rx="12"/><text class="m" x="91" y="238" text-anchor="middle">builder</text><rect class="chip" x="134" y="222" width="74" height="24" rx="12"/><text class="m" x="171" y="238" text-anchor="middle">locality</text><rect class="chip" x="54" y="256" width="74" height="24" rx="12"/><text class="m" x="91" y="272" text-anchor="middle">document</text><rect class="chip" x="134" y="256" width="74" height="24" rx="12"/><text class="m" x="171" y="272" text-anchor="middle">QR code</text><text class="s" x="54" y="314">No website? Still findable.</text><rect class="row sel" x="254" y="188" width="142" height="34" rx="9"/><circle cx="270" cy="205" r="6" class="dot on"/><text class="s b" x="284" y="209">Phase 1</text><text class="m" x="388" y="208" text-anchor="end">portal</text><rect class="row " x="254" y="232" width="142" height="34" rx="9"/><circle cx="270" cy="249" r="6" class="dot"/><text class="s b" x="284" y="253">Phase 2</text><text class="m" x="388" y="252" text-anchor="end">portal</text><rect class="row " x="254" y="276" width="142" height="34" rx="9"/><circle cx="270" cy="293" r="6" class="dot"/><text class="s b" x="284" y="297">Phase 3</text><text class="m" x="388" y="296" text-anchor="end">listings</text><text class="s" x="454" y="193" font-size="11">State RERA</text><rect x="454" y="198" width="142" height="5" rx="2.5" fill="#EEEAE6"/><rect class="bar" x="454" y="198" width="142" height="5" rx="2.5" style="animation-duration:3.00s;transform-origin:454px 200px"/><text class="s" x="454" y="219" font-size="11">Company registry</text><rect x="454" y="224" width="142" height="5" rx="2.5" fill="#EEEAE6"/><rect class="bar" x="454" y="224" width="142" height="5" rx="2.5" style="animation-duration:3.45s;transform-origin:454px 226px"/><text class="s" x="454" y="245" font-size="11">Group companies</text><rect x="454" y="250" width="142" height="5" rx="2.5" fill="#EEEAE6"/><rect class="bar" x="454" y="250" width="142" height="5" rx="2.5" style="animation-duration:3.90s;transform-origin:454px 252px"/><text class="s" x="454" y="271" font-size="11">Insolvency</text><rect x="454" y="276" width="142" height="5" rx="2.5" fill="#EEEAE6"/><rect class="bar" x="454" y="276" width="142" height="5" rx="2.5" style="animation-duration:4.35s;transform-origin:454px 278px"/><text class="s" x="454" y="297" font-size="11">Land authority</text><rect x="454" y="302" width="142" height="5" rx="2.5" fill="#EEEAE6"/><rect class="bar" x="454" y="302" width="142" height="5" rx="2.5" style="animation-duration:4.80s;transform-origin:454px 304px"/><text class="s" x="454" y="323" font-size="11">News and lenders</text><rect x="454" y="328" width="142" height="5" rx="2.5" fill="#EEEAE6"/><rect class="bar" x="454" y="328" width="142" height="5" rx="2.5" style="animation-duration:5.25s;transform-origin:454px 330px"/><text class="big" x="654" y="226">621</text><text class="s b" x="736" y="224">Watch</text><rect x="654" y="248" width="142" height="10" rx="5" fill="#EEEAE6"/><rect x="654" y="248" width="88" height="10" rx="5" fill="#F26B1D"/><circle class="mark" cx="654" cy="253" r="9" style="--run:88px"/><text class="m" x="654" y="282">300</text><text class="m" x="796" y="282" text-anchor="end">900</text><text class="s" x="654" y="312">R05 · R13 · R11 reasons</text><rect class="row" x="854" y="190" width="142" height="30" rx="8"/><text class="s b" x="864" y="209" font-size="11.5">Registered 09 Aug 2017</text><rect class="row" x="854" y="230" width="142" height="30" rx="8"/><text class="s b" x="864" y="249" font-size="11.5">15 complaints · UP-RERA</text><rect class="row" x="854" y="270" width="142" height="30" rx="8"/><text class="s b" x="864" y="289" font-size="11.5">Read on 25 Oct 2026</text><text class="s" x="854" y="320">source link on every line</text><g class="spin" style="transform-origin:1125.0px 246px"><circle cx="1125.0" cy="246" r="42" fill="none" stroke="#E0DAD4" stroke-width="6"/><path d="M1125.0 204 A42 42 0 0 1 1167.0 246" fill="none" stroke="#F26B1D" stroke-width="6" stroke-linecap="round"/></g><text class="s b" x="1125.0" y="251" text-anchor="middle">7 days</text><text class="s" x="1054" y="320">alerts only on a change</text>
 
-  <!-- 1 search -->
-  <rect class="box" x="30" y="84" width="148" height="72" rx="14"/>
-  <text class="m" x="46" y="108">01 · SEARCH</text>
-  <text class="t" x="46" y="130">Project or RERA no.</text>
-  <text class="s" x="46" y="147">No long forms</text>
-
-  <!-- 2 confirm -->
-  <rect class="hot" x="228" y="84" width="144" height="72" rx="14"/>
-  <text class="m" x="244" y="108">02 · CONFIRM</text>
-  <text class="t" x="244" y="130">“Is this the one?”</text>
-  <text class="s" x="244" y="147">Matches from UP-RERA</text>
-
-  <!-- 3 agents -->
-  <text class="m" x="450" y="30">03 · TINYFISH BROWSER AGENTS (LIVE)</text>
-  <rect class="box lane l1" x="450" y="38" width="240" height="44" rx="12"/><text class="t" x="468" y="65">UP-RERA</text><text class="s" x="560" y="65">dates, extensions</text>
-  <rect class="box lane l2" x="450" y="98" width="240" height="44" rx="12"/><text class="t" x="468" y="125">Company registry</text><text class="s" x="604" y="125">status</text>
-  <rect class="box lane l3" x="450" y="158" width="240" height="44" rx="12"/><text class="t" x="468" y="185">IBBI · NCLT</text><text class="s" x="566" y="185">insolvency scope</text>
-  <rect class="box lane l4" x="450" y="218" width="240" height="44" rx="12"/><text class="t" x="468" y="245">Land authority</text><text class="s" x="590" y="245">dues lists</text>
-  <rect class="box lane l5" x="450" y="278" width="240" height="44" rx="12"/><text class="t" x="468" y="305">Courts &amp; news</text><text class="s" x="584" y="305">orders, rulings</text>
-  <circle class="pulse" cx="676" cy="60" r="4"/><circle class="pulse" cx="676" cy="120" r="4" style="animation-delay:.4s"/><circle class="pulse" cx="676" cy="180" r="4" style="animation-delay:.8s"/><circle class="pulse" cx="676" cy="240" r="4" style="animation-delay:1.2s"/><circle class="pulse" cx="676" cy="300" r="4" style="animation-delay:1.6s"/>
-  <text class="s" x="450" y="350">CAPTCHA? The agent stops and marks “Unable to verify”.</text>
-
-  <!-- 4 evidence -->
-  <rect class="box" x="770" y="144" width="144" height="72" rx="14"/>
-  <text class="m" x="786" y="168">04 · EVIDENCE</text>
-  <text class="t" x="786" y="190">Source + read time</text>
-  <text class="s" x="786" y="207">No source, no claim</text>
-
-  <!-- 5 score -->
-  <circle cx="1003" cy="120" r="24" fill="none" stroke="#F3EEE9" stroke-width="7"/>
-  <circle class="ring" cx="1003" cy="120" r="24"/>
-  <text x="1003" y="126" text-anchor="middle" style="font-size:17px;font-weight:700">76</text>
-  <text class="m" x="1040" y="108">05 · NEEVSCORE</text>
-  <text class="t" x="1040" y="130">100 − findings</text>
-  <text class="s" x="1040" y="147">Weighted, explained</text>
-
-  <!-- 6 report -->
-  <rect class="hot" x="930" y="250" width="146" height="72" rx="14"/>
-  <text class="m" x="946" y="274">06 · REPORT</text>
-  <text class="t" x="946" y="296">Score, proof, steps</text>
-  <text class="s" x="946" y="313">EN · हिंदी</text>
-  <rect class="box" x="930" y="332" width="176" height="30" rx="10"/>
-  <text class="m" x="944" y="352">07 · SENTINEL ALERTS</text>
+  <path class="loop" d="M1125.0 346 C 1125.0 422 525.0 422 525.0 346"/>
+  <text class="s" x="825.0" y="414" text-anchor="middle">a changed record re-runs the War Room</text>
 </svg>

@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 700" width="1280" height="700" role="img" aria-label="NeevCheck architecture: the browser (Next.js on Vercel) talks to FastAPI on Render; the resolver finds the project from the open web, a document or a QR code; the orchestrator sends TinyFish Search, Fetch and Agent to the state RERA portals, MCA, IBBI and NCLT, land authorities, orders and news in six parallel War Room lanes; the NeevScore engine writes the result to Postgres and the report goes back to the browser.">
+  <title>NeevCheck architecture</title>
+  <style>
+    text { font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; fill: #111111; }
+    .t { font-size: 16px; font-weight: 600; }
+    .s { font-size: 12.5px; fill: #5F5F5F; }
+    .m { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 10.5px; fill: #D9530B; letter-spacing: .05em; }
+    .h { font-size: 12px; font-weight: 600; fill: #5F5F5F; letter-spacing: .1em; }
+    .node { fill: #FFFFFF; stroke: #EEEAE6; stroke-width: 1.5; }
+    .hot { fill: #FFF5EC; stroke: #F26B1D; stroke-width: 1.5; }
+    .zone { fill: none; stroke: #E0DAD4; stroke-width: 1.5; stroke-dasharray: 5 7; }
+    .chip { fill: #FFE8D6; }
+    .wire { fill: none; stroke: #E8DDD3; stroke-width: 2; }
+    .pk { fill: #F26B1D; offset-rotate: 0deg; animation-name: travel; animation-timing-function: linear; animation-iteration-count: infinite; }
+    .lane { fill: #F26B1D; transform-box: fill-box; transform-origin: center; animation: pulse 2.4s ease-out infinite; }
+    .beat { transform-box: fill-box; transform-origin: center; animation: beat 3s ease-in-out infinite; }
+    @keyframes travel { 0% { offset-distance: 0%; opacity: 0; } 12% { opacity: 1; } 88% { opacity: 1; } 100% { offset-distance: 100%; opacity: 0; } }
+    @keyframes pulse { 0% { opacity: 1; transform: scale(1); } 70%, 100% { opacity: .15; transform: scale(2.2); } }
+    @keyframes beat { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.015); } }
+    @media (prefers-reduced-motion: reduce) {
+      .pk { display: none; }
+      .lane, .beat { animation: none; }
+    }
+  </style>
+  <rect width="1280" height="700" fill="#FFFFFF"/>
+
+  <text class="h" x="40" y="52">BUYER</text>
+  <text class="h" x="330" y="52">API · FASTAPI ON RENDER</text>
+  <text class="h" x="700" y="52">TINYFISH</text>
+  <text class="h" x="1000" y="52">PUBLIC SOURCES · SIX LANES</text>
+
+  <rect class="zone" x="310" y="68" width="320" height="600" rx="20"/>
+  <rect class="zone" x="680" y="68" width="240" height="600" rx="20"/>
+
+  <path class="wire" d="M250 340 C 280 340 290 160 330 160"/><path class="wire" d="M250 360 C 285 360 290 290 330 290"/><path class="wire" d="M610 160 C 650 160 660 205 700 205"/><path class="wire" d="M610 290 C 650 290 660 315 700 315"/><path class="wire" d="M610 300 C 650 300 660 425 700 425"/><path class="wire" d="M920 330 C 960 330 960 121 1000 121"/><path class="wire" d="M920 330 C 960 330 960 213 1000 213"/><path class="wire" d="M920 330 C 960 330 960 305 1000 305"/><path class="wire" d="M920 330 C 960 330 960 397 1000 397"/><path class="wire" d="M920 330 C 960 330 960 489 1000 489"/><path class="wire" d="M920 330 C 960 330 960 581 1000 581"/><path class="wire" d="M470 326 L470 364"/><path class="wire" d="M470 440 L470 478"/><path class="wire" d="M330 520 C 150 520 145 440 145 430"/>
+
+  <g class="beat"><rect class="node" x="40" y="300" width="210" height="130" rx="14"/><text class="t" x="56" y="327">Browser</text><text class="s" x="56" y="347">Next.js 15 · Vercel</text></g>
+  <text class="s" x="56" y="406">Search · Confirm</text>
+  <text class="s" x="56" y="423">War Room · Report (EN, हिंदी)</text>
+  <rect class="chip" x="56" y="360" width="112" height="22" rx="11"/><text class="m" x="112.0" y="375" text-anchor="middle">SSE LIVE VIEW</text>
+
+  <g ><rect class="hot" x="330" y="100" width="280" height="124" rx="14"/><text class="t" x="346" y="127">Resolver</text><text class="s" x="346" y="147">finds the project, any state</text></g>
+  <rect class="chip" x="346" y="164" width="56" height="22" rx="11"/><text class="m" x="374.0" y="179" text-anchor="middle">NAME</text><rect class="chip" x="408" y="164" width="66" height="22" rx="11"/><text class="m" x="441.0" y="179" text-anchor="middle">NUMBER</text><rect class="chip" x="480" y="164" width="70" height="22" rx="11"/><text class="m" x="515.0" y="179" text-anchor="middle">BUILDER</text><rect class="chip" x="346" y="192" width="104" height="22" rx="11"/><text class="m" x="398.0" y="207" text-anchor="middle">OPEN-WEB VOTE</text><rect class="chip" x="456" y="192" width="108" height="22" rx="11"/><text class="m" x="510.0" y="207" text-anchor="middle">DOCUMENT · QR</text>
+  <g ><rect class="node" x="330" y="262" width="280" height="64" rx="14"/><text class="t" x="346" y="289">Check orchestrator</text><text class="s" x="346" y="309">six lanes, live events</text></g>
+  <g ><rect class="hot" x="330" y="364" width="280" height="76" rx="14"/><text class="t" x="346" y="391">NeevScore engine</text><text class="s" x="346" y="411">300–900 · reason codes · proof</text></g>
+  <g ><rect class="node" x="330" y="478" width="280" height="64" rx="14"/><text class="t" x="346" y="505">Postgres</text><text class="s" x="346" y="525">checks · evidence ledger</text></g>
+  <g ><rect class="node" x="330" y="580" width="280" height="64" rx="14"/><text class="t" x="346" y="607">Neev Sentinel</text><text class="s" x="346" y="627">weekly re-check, alerts on change</text></g>
+
+  <g ><rect class="node" x="700" y="170" width="200" height="70" rx="14"/><text class="t" x="716" y="197">Search</text><text class="s" x="716" y="217">free · tried first</text></g>
+  <g ><rect class="node" x="700" y="280" width="200" height="70" rx="14"/><text class="t" x="716" y="307">Fetch</text><text class="s" x="716" y="327">free · pages and PDFs</text></g>
+  <g ><rect class="hot" x="700" y="390" width="200" height="70" rx="14"/><text class="t" x="716" y="417">Browser Agent</text><text class="s" x="716" y="437">paid · the last step</text></g>
+  <g ><rect class="node" x="700" y="500" width="200" height="70" rx="14"/><text class="t" x="716" y="527">Monitors</text><text class="s" x="716" y="547">page and news watches</text></g>
+
+  <g ><rect class="node" x="1000" y="88" width="240" height="66" rx="14"/><text class="t" x="1016" y="115">State RERA portals</text><text class="s" x="1016" y="135">23 states and territories</text></g><circle class="lane" cx="1218" cy="110" r="6" style="animation-delay:0.0s"/><g ><rect class="node" x="1000" y="180" width="240" height="66" rx="14"/><text class="t" x="1016" y="207">Company registry</text><text class="s" x="1016" y="227">MCA and mirrors: name, CIN</text></g><circle class="lane" cx="1218" cy="202" r="6" style="animation-delay:0.5s"/><g ><rect class="node" x="1000" y="272" width="240" height="66" rx="14"/><text class="t" x="1016" y="299">IBBI and NCLT</text><text class="s" x="1016" y="319">insolvency, orders</text></g><circle class="lane" cx="1218" cy="294" r="6" style="animation-delay:1.0s"/><g ><rect class="node" x="1000" y="364" width="240" height="66" rx="14"/><text class="t" x="1016" y="391">Land authorities</text><text class="s" x="1016" y="411">dues lists</text></g><circle class="lane" cx="1218" cy="386" r="6" style="animation-delay:1.5s"/><g ><rect class="node" x="1000" y="456" width="240" height="66" rx="14"/><text class="t" x="1016" y="483">Orders and courts</text><text class="s" x="1016" y="503">RERA orders, judgments</text></g><circle class="lane" cx="1218" cy="478" r="6" style="animation-delay:2.0s"/><g ><rect class="node" x="1000" y="548" width="240" height="66" rx="14"/><text class="t" x="1016" y="575">News and lenders</text><text class="s" x="1016" y="595">delay stories, auction notices</text></g><circle class="lane" cx="1218" cy="570" r="6" style="animation-delay:2.5s"/>
+
+  <circle class="pk" r="5" style="offset-path:path('M250 340 C 280 340 290 160 330 160');animation-duration:3.2s;animation-delay:0.0s"/><circle class="pk" r="5" style="offset-path:path('M250 360 C 285 360 290 290 330 290');animation-duration:3.2s;animation-delay:1.1s"/><circle class="pk" r="5" style="offset-path:path('M610 160 C 650 160 660 205 700 205');animation-duration:3.0s;animation-delay:0.5s"/><circle class="pk" r="5" style="offset-path:path('M610 290 C 650 290 660 315 700 315');animation-duration:3.0s;animation-delay:1.6s"/><circle class="pk" r="5" style="offset-path:path('M610 300 C 650 300 660 425 700 425');animation-duration:3.0s;animation-delay:2.2s"/><circle class="pk" r="5" style="offset-path:path('M920 330 C 960 330 960 121 1000 121');animation-duration:2.6s;animation-delay:0.4s"/><circle class="pk" r="5" style="offset-path:path('M920 330 C 960 330 960 213 1000 213');animation-duration:2.6s;animation-delay:0.8500000000000001s"/><circle class="pk" r="5" style="offset-path:path('M920 330 C 960 330 960 305 1000 305');animation-duration:2.6s;animation-delay:1.3s"/><circle class="pk" r="5" style="offset-path:path('M920 330 C 960 330 960 397 1000 397');animation-duration:2.6s;animation-delay:1.75s"/><circle class="pk" r="5" style="offset-path:path('M920 330 C 960 330 960 489 1000 489');animation-duration:2.6s;animation-delay:2.2s"/><circle class="pk" r="5" style="offset-path:path('M920 330 C 960 330 960 581 1000 581');animation-duration:2.6s;animation-delay:2.65s"/><circle class="pk" r="5" style="offset-path:path('M470 326 L470 364');animation-duration:1.2s;animation-delay:1.0s"/><circle class="pk" r="5" style="offset-path:path('M470 440 L470 478');animation-duration:1.2s;animation-delay:1.6s"/><circle class="pk" r="5" style="offset-path:path('M330 520 C 150 520 145 440 145 430');animation-duration:3.4s;animation-delay:1.8s"/>
+
+  <path class="wire" d="M470 542 L470 580"/>
+  <path class="wire" d="M900 325 L920 330"/>
+  <circle class="lane" cx="1008" cy="672" r="5"/>
+  <text class="s" x="1024" y="676">a pulsing dot is one lane at work</text>
+  <text class="s" x="40" y="500" fill="#5F5F5F">The report goes back along</text>
+  <text class="s" x="40" y="518">the same road, with every point linked to its source.</text>
+  <text class="s" x="40" y="648">No CAPTCHA, login or paywall is ever bypassed:</text>
+  <text class="s" x="40" y="666">that lane says "Unable to verify".</text>
+</svg>
