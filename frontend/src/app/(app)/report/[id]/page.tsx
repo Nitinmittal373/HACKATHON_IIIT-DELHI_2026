@@ -6,6 +6,7 @@ import { ApiProblem } from "@/components/ApiProblem";
 import { PageMessage } from "@/components/PageMessage";
 import { ActionPlan } from "@/components/report/ActionPlan";
 import { BuilderQuestions } from "@/components/report/BuilderQuestions";
+import { ComplaintDraft } from "@/components/report/ComplaintDraft";
 import { CreditHeader } from "@/components/report/CreditHeader";
 import { DriversCard } from "@/components/report/DriversCard";
 import { EvidenceList } from "@/components/report/EvidenceList";
@@ -71,6 +72,7 @@ export default async function ReportPage({ params }: Props) {
         <aside className={styles.column}>
           <ActionPlan report={report} t={t} />
           <BuilderQuestions report={report} t={t} />
+          <ComplaintDraft report={report} />
           {report.project.promoter && (
             <TrackRecord promoter={report.project.promoter} reraId={report.project.rera_id} />
           )}

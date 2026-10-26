@@ -62,3 +62,15 @@
     transition: none !important;
   }
 }
+
+/* "Print or save as PDF" on the complaint draft prints that draft alone. */
+@media print {
+  body[data-print="complaint"] [class*="report_grid"] .card:not(.complaintCard),
+  body[data-print="complaint"] [class*="ReportHeader"] {
+    display: none !important;
+  }
+
+  body[data-print="complaint"] [class*="ComplaintDraft_sheet"] {
+    display: block;
+  }
+}
