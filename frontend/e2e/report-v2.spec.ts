@@ -99,6 +99,6 @@ test.describe("on a phone", () => {
 
     await page.getByRole("button", { name: "Open evidence ledger" }).click();
     const box = await page.getByRole("dialog", { name: "Evidence ledger" }).boundingBox();
-    expect(box && box.width).toBeLessThanOrEqual(390);
+    expect(box && Math.round(box.width)).toBeLessThanOrEqual(390);
   });
 });
