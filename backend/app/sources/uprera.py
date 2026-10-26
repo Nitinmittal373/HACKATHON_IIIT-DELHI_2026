@@ -8,6 +8,7 @@ Old-format projects have two pages: the details page (dates, documents) and
 a Projectsummary page (complaint counts) that only search can find.
 """
 
+import re
 from collections.abc import AsyncIterator
 from datetime import date, datetime
 
@@ -113,6 +114,9 @@ class UpreraSource:
 
         yield Progress("Reading complaint counts on the UP-RERA summary page")
         summary, url = await self._summary(project, record, ctx.web)
+        records = [record] if summary is None else [record, summary]
+        for finding in delay_vs_promised_findings(records, project.details_url, ctx.today, ctx.now):
+            yield FoundFinding(finding)
         extensions_read = False
         if summary and url:
             for finding in extension_findings(summary, url, ctx.today, ctx.now):
@@ -194,6 +198,8 @@ def findings_from_record(
             )
         )
 
+    findings.extend(registration_status_findings(record, url, today, now))
+
     latest = record.latest_end_date
     if latest is None:
         return findings
@@ -227,6 +233,64 @@ def findings_from_record(
             )
         )
     return findings
+
+
+REGISTRATION_ENDED = re.compile(r"lapse|revok", re.IGNORECASE)
+# NeevScore v2 counts a revised date this many months after the promised one.
+MIN_REPORTED_SLIP_MONTHS = 1
+
+
+def registration_status_findings(
+    record: UpreraRecord, url: str, today: date, now: datetime
+) -> list[Finding]:
+    """A hard stop, but only when UP-RERA's own status text says lapsed or revoked."""
+    status = (record.project_type or "").strip()
+    if not REGISTRATION_ENDED.search(status):
+        return []
+    return [
+        _finding(
+            "registration_revoked",
+            "rera",
+            f"UP-RERA lists the project status as '{status}' as of {_day(today)}",
+            "red_flag",
+            url,
+            today,
+            now,
+            snippet=f"Project type: {status}",
+        )
+    ]
+
+
+def delay_vs_promised_findings(
+    records: list[UpreraRecord], url: str, today: date, now: datetime
+) -> list[Finding]:
+    """How far the latest approved date sits after the date first promised to buyers.
+
+    The details page holds the promised date and permits, the summary page the extensions,
+    so the latest date is taken across both.
+    """
+    promised = next((r.end_date for r in records if r.end_date), None)
+    latest = max((d for r in records if (d := r.latest_end_date)), default=None)
+    if promised is None or latest is None:
+        return []
+    months = months_between(promised, latest)
+    if months < MIN_REPORTED_SLIP_MONTHS:
+        return []
+    return [
+        _finding(
+            "delay_vs_promised",
+            "execution",
+            f"Completion date moved from {_day(promised)} to {_day(latest)}, "
+            f"{months} months later than first promised",
+            "fail" if months > 12 else "review",
+            url,
+            today,
+            now,
+            occurred_on=latest,
+            months=months,
+            snippet=f"Original end date {_day(promised)}; latest approved end date {_day(latest)}",
+        )
+    ]
 
 
 def extension_findings(

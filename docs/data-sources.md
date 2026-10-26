@@ -27,3 +27,17 @@ NeevCheck reads only public records. Each source has a reliability level that de
 - Bypass a CAPTCHA, login or paywall
 - Collect personal data beyond what a public register publishes
 - Show a claim without its source
+
+## NeevScore v2 signals: what UP-RERA actually shows
+
+Investigated with free Search and Fetch on 25 Oct 2026, project UPRERAPRJ8334.
+
+| Signal | Access reality | Method | Status |
+| --- | --- | --- | --- |
+| Registration lapsed or revoked | Shown only through the project status text; read when it says lapsed or revoked | Fetch + parser | Read (`registration_revoked`) |
+| Revised vs promised completion date | Original end date on the details/summary page; extensions on the summary page | Fetch + parser | Read (`delay_vs_promised`) |
+| Extensions | "Extension Granted" table on the summary page | Fetch + parser | Read (already in v1) |
+| Quarterly progress reports (QPR) filed or missed | UP-RERA publishes the QPR rules, deadlines and a "Default on QPR" tag for non-compliant projects, but no per-project QPR table was found in the pages Fetch returns | Fetch finds nothing; an agent run returned no answer | **Not read.** Stays unread and appears under R12 |
+| Penalty orders against a project | Orders are published as PDFs and press releases, not as a per-project list we could confirm | none | **Not read.** Stays unread and appears under R12 |
+
+Nothing is guessed: a signal that cannot be read adds no points and lowers confidence.
