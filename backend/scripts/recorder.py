@@ -37,6 +37,8 @@ class RecordingWebClient:
         self._inner = inner
         self.searches: list[dict[str, Any]] = []
         self.texts: dict[str, str] = {}
+        # UP-RERA pages read by group projects, which no fixture file holds beforehand.
+        self.pages: dict[str, str] = {}
         self.unreadable: list[str] = []
         self.agents: list[dict[str, Any]] = []
 
@@ -62,7 +64,9 @@ class RecordingWebClient:
         return hits
 
     async def fetch_html(self, url: str, *, selectors: list[str], purpose: str) -> FetchedPage:
-        return await self._inner.fetch_html(url, selectors=selectors, purpose=purpose)
+        page = await self._inner.fetch_html(url, selectors=selectors, purpose=purpose)
+        self.pages[url] = page.html
+        return page
 
     async def fetch_text(self, url: str, *, purpose: str) -> FetchedText:
         try:
@@ -91,6 +95,7 @@ class RecordingWebClient:
         return {
             "searches": self.searches,
             "texts": self.texts,
+            "pages": self.pages,
             "unreadable": self.unreadable,
             "agents": self.agents,
         }
