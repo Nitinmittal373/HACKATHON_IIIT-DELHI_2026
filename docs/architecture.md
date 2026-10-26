@@ -99,6 +99,10 @@ For buyers whose project has no website to search:
 
 `POST /api/extract` finds the number in a document the buyer already has. It takes a PDF as the raw request body (`Content-Type: application/pdf`, at most 5 MB, 40 pages read) or `{"text": "..."}` for the address a QR code held; at most ten requests a minute per address. The PDF is read in memory with pypdf and never written to disk, so there is nothing to delete afterwards; only the numbers and the words around each one come back, with phone numbers, e-mail addresses, PAN and Aadhaar numbers replaced by `[removed]`. The numbers are searched on their state's portal like any other (`from_document` until a portal page prints them, then `confirmed`). A photo is never uploaded: the browser decodes its QR code (jsQR) and sends only the text, and no OCR runs anywhere.
 
+### Public orders
+
+Only when the portals, the open web and the buyer's documents found nothing, `app/states/orders.py` searches for orders that name the project (`<q> RERA order`, `<q> judgment` on indiankanoon.org, `<q> NCLT order` on nclt.gov.in). An order published as a PDF (a court, tribunal or government site) is opened with Fetch, up to two a query, and read for a registration number next to the project's name; those numbers are `from_order` candidates with the order's link in `found_in`. Fetch cannot read every court site, so a page it fails to read falls back to its snippet and no number is invented. When an order only names the builder ("X vs Mahagun India Pvt. Ltd."), the search answers with an `order_leads` entry (builder, order title and link) and the app offers that builder's registered projects. Orders are only a way to find the project; they are never a finding in a report.
+
 ## Sources
 
 Each source is one small module with the same shape: it reads one kind of public record and yields events (progress, live view URL, findings, which key checks it read). It never writes to the database; the orchestrator does.

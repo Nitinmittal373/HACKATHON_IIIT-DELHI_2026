@@ -970,6 +970,18 @@ export interface components {
         };
         /** NoData */
         NoData: Record<string, never>;
+        /**
+         * OrderLead
+         * @description A builder that a public order names as the respondent in a case about the project.
+         */
+        OrderLead: {
+            /** Builder */
+            builder: string;
+            /** Order Title */
+            order_title: string;
+            /** Order Url */
+            order_url: string;
+        };
         /** Pillar */
         Pillar: {
             /**
@@ -1033,6 +1045,8 @@ export interface components {
             details_url: string;
             /** District */
             district: string | null;
+            /** Found In */
+            found_in: string | null;
             /** Name */
             name: string | null;
             /** Promoter */
@@ -1293,6 +1307,11 @@ export interface components {
             /** Detected State */
             detected_state: string | null;
             /**
+             * Order Leads
+             * @default []
+             */
+            order_leads: components["schemas"]["OrderLead"][];
+            /**
              * Pre Rera
              * @default []
              */
@@ -1500,6 +1519,8 @@ export interface components {
             display_score: components["schemas"]["DisplayScore"] | null;
             /** District */
             district: string | null;
+            /** Found In */
+            found_in: string | null;
             /** Name */
             name: string | null;
             /** Promoter */

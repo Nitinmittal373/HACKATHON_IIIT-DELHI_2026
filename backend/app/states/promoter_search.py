@@ -25,12 +25,12 @@ from app.states.openweb import (
     cached_search,
     candidates_from,
     domain_of,
+    hits_by_state,
     name_words,
     share_of,
 )
 from app.states.places import state_of_place
 from app.states.registry import ADAPTERS, BY_CODE
-from app.states.resolver import hits_by_state
 from app.states.search_adapter import SearchStateAdapter
 from app.states.text import clean, squash
 from app.tinyfish import SearchHit, WebClient

@@ -41,7 +41,7 @@ EXTRA_FIELDS = ("snippet", "total", "via")
 # The state is not stored: every number format belongs to exactly one state's RERA.
 STATE_FIELDS = {"state", "state_name", "rera_name"}
 # What search learned about a candidate; the stored project is the portal-confirmed record.
-CANDIDATE_FIELDS = {"status", "sources"}
+CANDIDATE_FIELDS = {"status", "sources", "found_in"}
 RECENT_DRIVERS = 3
 RECENT_REASONS = 3
 

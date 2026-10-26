@@ -10,9 +10,8 @@
 
 import asyncio
 from dataclasses import dataclass, field
-from urllib.parse import urlsplit
 
-from app.models import PreReraNote, Project
+from app.models import OrderLead, PreReraNote, Project
 from app.states.builder import identify_builder
 from app.states.confirm import confirm_on_portals
 from app.states.names import DEFAULT_STATE
@@ -20,10 +19,12 @@ from app.states.openweb import (
     NAME_SHARE,
     candidates_from,
     domain_of,
+    hits_by_state,
     name_words,
     open_web_hits,
     share_of,
 )
+from app.states.orders import find_in_orders
 from app.states.places import state_of_place
 from app.states.prerera import pre_rera_notes
 from app.states.registry import ADAPTERS, BY_CODE, detect_state
@@ -44,6 +45,7 @@ class Resolved:
     detected_state: str | None
     searched_states: list[str]
     pre_rera: list[PreReraNote] = field(default_factory=list)
+    order_leads: list[OrderLead] = field(default_factory=list)
 
 
 async def resolve_any(
@@ -71,12 +73,23 @@ async def resolve_any(
         hits = []  # The portals answered; a failed open-web search only means fewer candidates.
     found = candidates_from(hits, query) + portal_pages_in(hits, query)
     wanted = [p for p in found if wanted_state(p, state) and wanted_number(p, query)]
+    notes = pre_rera_notes(hits, query)
+    leads: list[OrderLead] = []
+    if not portals.candidates and not wanted and not notes:
+        wanted, leads = await orders_candidates(query, web)
     merged = merge(portals.candidates, wanted, query)
     merged = ordered(await confirm_on_portals(merged, web), query)
     merged = await name_the_builder_of_a_typed_number(merged, query, web)
-    return Resolved(
-        merged, portals.detected_state, portals.searched_states, pre_rera_notes(hits, query)
-    )
+    return Resolved(merged, portals.detected_state, portals.searched_states, notes, leads)
+
+
+async def orders_candidates(query: str, web: WebClient) -> tuple[list[Project], list[OrderLead]]:
+    """Last resort: public orders that name the project. A failure here is just 'nothing'."""
+    try:
+        found = await find_in_orders(query, web)
+    except WebError:
+        return [], []
+    return found.projects, found.leads
 
 
 def wanted_state(project: Project, state: str | None) -> bool:
@@ -182,14 +195,3 @@ async def resolve_name_everywhere(query: str, web: WebClient) -> Resolved:
             found[project.rera_id] = project
     ranked = rank(list(found.values()), query)[:MAX_CANDIDATES]
     return Resolved(ranked, None, top)
-
-
-def hits_by_state(hits: list[SearchHit]) -> dict[str, list[SearchHit]]:
-    grouped: dict[str, list[SearchHit]] = {}
-    for hit in hits:
-        host = urlsplit(hit.url).hostname or ""
-        for adapter in ADAPTERS:
-            if any(host == d or host.endswith("." + d) for d in adapter.domains):
-                grouped.setdefault(adapter.code, []).append(hit)
-                break
-    return grouped

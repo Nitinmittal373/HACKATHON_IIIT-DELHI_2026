@@ -1723,6 +1723,30 @@
         "title": "NoData",
         "type": "object"
       },
+      "OrderLead": {
+        "description": "A builder that a public order names as the respondent in a case about the project.",
+        "properties": {
+          "builder": {
+            "title": "Builder",
+            "type": "string"
+          },
+          "order_title": {
+            "title": "Order Title",
+            "type": "string"
+          },
+          "order_url": {
+            "title": "Order Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "builder",
+          "order_title",
+          "order_url"
+        ],
+        "title": "OrderLead",
+        "type": "object"
+      },
       "Pillar": {
         "properties": {
           "id": {
@@ -1880,6 +1904,17 @@
             ],
             "title": "District"
           },
+          "found_in": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Found In"
+          },
           "name": {
             "anyOf": [
               {
@@ -1970,7 +2005,8 @@
           "district",
           "details_url",
           "status",
-          "sources"
+          "sources",
+          "found_in"
         ],
         "title": "Project",
         "type": "object"
@@ -2622,6 +2658,14 @@
             ],
             "title": "Detected State"
           },
+          "order_leads": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/OrderLead"
+            },
+            "title": "Order Leads",
+            "type": "array"
+          },
           "pre_rera": {
             "default": [],
             "items": {
@@ -2648,7 +2692,8 @@
           "candidates",
           "detected_state",
           "searched_states",
-          "pre_rera"
+          "pre_rera",
+          "order_leads"
         ],
         "title": "SearchResponse",
         "type": "object"
@@ -3136,6 +3181,17 @@
             ],
             "title": "District"
           },
+          "found_in": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Found In"
+          },
           "name": {
             "anyOf": [
               {
@@ -3227,6 +3283,7 @@
           "details_url",
           "status",
           "sources",
+          "found_in",
           "check_id",
           "display_score"
         ],

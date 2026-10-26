@@ -107,6 +107,16 @@ class Project(StateTagged):
     status: CandidateStatus | None = None
     # Where the number was seen: site names, or "your document".
     sources: list[str] = []
+    # The order that named this project, when that is how it was found.
+    found_in: str | None = None
+
+
+class OrderLead(ApiModel):
+    """A builder that a public order names as the respondent in a case about the project."""
+
+    builder: str
+    order_title: str
+    order_url: str
 
 
 class PreReraNote(ApiModel):
@@ -127,6 +137,8 @@ class SearchResponse(ApiModel):
     searched_states: list[str] = []
     # Projects public pages say are older than RERA; they get a builder-only check.
     pre_rera: list[PreReraNote] = []
+    # Builders that public orders name for the project, when nothing else found it.
+    order_leads: list[OrderLead] = []
 
 
 class StateInfo(ApiModel):
