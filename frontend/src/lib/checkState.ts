@@ -1,4 +1,4 @@
-import { SOURCE_ORDER } from "@/lib/sources";
+import { ALL_SOURCES, EXTRA_SOURCES, SOURCE_ORDER } from "@/lib/sources";
 import type { Check, CheckEvent, Finding, ScoreSummary, SourceName, SourceRun } from "@/lib/types";
 
 /** What the Agent Cam shows for one source. "unread" means the source could not be read. */
@@ -36,7 +36,7 @@ const BLANK_SOURCE: SourceView = {
 
 export function initialState(): CamState {
   const sources = Object.fromEntries(
-    SOURCE_ORDER.map((name) => [name, { ...BLANK_SOURCE }]),
+    ALL_SOURCES.map((name) => [name, { ...BLANK_SOURCE }]),
   ) as Record<SourceName, SourceView>;
   return { sources, findings: [], outcome: null };
 }
@@ -130,10 +130,18 @@ function applyRun(state: CamState, run: SourceRun): CamState {
   return patch(state, run.source, { status, liveUrl, reason: run.message });
 }
 
+/** The six usual sources, plus any v2 source the backend has actually started. */
+export function visibleSources(state: CamState): SourceName[] {
+  return [
+    ...SOURCE_ORDER,
+    ...EXTRA_SOURCES.filter((name) => state.sources[name].status !== "waiting"),
+  ];
+}
+
 /** Overall progress, 0 to 100: a finished source counts fully, a running one partly. */
 export function progressPercent(state: CamState): number {
   if (state.outcome) return 100;
-  const views = Object.values(state.sources);
+  const views = visibleSources(state).map((name) => state.sources[name]);
   const running = views.filter((view) => view.status === "running").length;
   const waiting = views.filter((view) => view.status === "waiting").length;
   const finished = views.length - running - waiting;
@@ -142,8 +150,8 @@ export function progressPercent(state: CamState): number {
 
 /** The source the Agent Cam follows by default: the one working now, else the last to start. */
 export function activeSource(state: CamState): SourceName {
-  const running = SOURCE_ORDER.find((name) => state.sources[name].status === "running");
+  const running = visibleSources(state).find((name) => state.sources[name].status === "running");
   if (running) return running;
-  const started = SOURCE_ORDER.filter((name) => state.sources[name].status !== "waiting");
+  const started = visibleSources(state).filter((name) => state.sources[name].status !== "waiting");
   return started[started.length - 1] ?? "uprera";
 }

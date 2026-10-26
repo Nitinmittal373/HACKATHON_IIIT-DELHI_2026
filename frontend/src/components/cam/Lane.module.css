@@ -1,0 +1,147 @@
+.lane {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--ln);
+  border-radius: var(--r-md);
+  background: #fff;
+  transition:
+    border-color 0.2s var(--ease-out),
+    box-shadow 0.2s var(--ease-out);
+}
+
+.lane:hover {
+  border-color: var(--ln2);
+}
+
+.open {
+  border-color: var(--o);
+  box-shadow: 0 0 0 3px var(--o-glow);
+}
+
+.button {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  font: inherit;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.name {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--mu);
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+}
+
+.waiting,
+.skipped {
+  background: var(--ln2);
+}
+
+.running {
+  background: var(--o);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+.done {
+  background: var(--low-text);
+}
+
+/* Half filled: some of this lane was read, some could not be. */
+.partial {
+  background: linear-gradient(90deg, var(--low-text) 50%, transparent 50%);
+  box-shadow: inset 0 0 0 1.5px var(--fa);
+}
+
+.blocked {
+  background: var(--critical);
+}
+
+/* Not colour alone: a hollow ring says "could not be read". */
+.unread {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--fa);
+}
+
+.ticker {
+  min-height: 2.6em;
+  color: var(--mu);
+  font-size: 12.5px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.count {
+  color: var(--ink2);
+  font-size: 12px;
+}
+
+.expand {
+  color: var(--o-text);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.live {
+  display: block;
+  width: 100%;
+  height: 120px;
+  border: 0;
+  border-top: 1px solid var(--ln);
+  pointer-events: none;
+  background: var(--soft);
+}
+
+@media (max-width: 640px) {
+  .live {
+    display: none;
+  }
+
+  .ticker {
+    min-height: 0;
+  }
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .running {
+    animation: none;
+  }
+}

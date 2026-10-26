@@ -6,7 +6,8 @@ import { BrowserWindow } from "@/components/cam/BrowserWindow";
 import { FindingsPanel } from "@/components/cam/FindingsPanel";
 import { ResultCard } from "@/components/cam/ResultCard";
 import { SourceTabs } from "@/components/cam/SourceTabs";
-import { activeSource, progressPercent, type CamState } from "@/lib/checkState";
+import { WarRoom } from "@/components/cam/WarRoom";
+import { activeSource, progressPercent, visibleSources, type CamState } from "@/lib/checkState";
 import { useLang } from "@/lib/LangProvider";
 import { SOURCE_INFO } from "@/lib/sources";
 import type { SourceName } from "@/lib/types";
@@ -45,7 +46,15 @@ export function AgentCam({ checkId, reraId, detailsUrl }: Props) {
       {connection === "reconnecting" && <p className={styles.notice} role="status">{t.cam.reconnecting}</p>}
       {connection === "polling" && <p className={styles.notice} role="status">{t.cam.polling}</p>}
 
-      <SourceTabs sources={state.sources} selected={shown} onSelect={setPicked} t={t} />
+      <WarRoom state={state} shown={shown} onOpen={setPicked} t={t} />
+
+      <SourceTabs
+        sources={state.sources}
+        names={visibleSources(state)}
+        selected={shown}
+        onSelect={setPicked}
+        t={t}
+      />
 
       <div className={styles.grid}>
         <BrowserWindow
