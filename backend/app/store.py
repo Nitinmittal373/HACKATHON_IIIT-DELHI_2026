@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 EXTRA_DETAIL = ("v2", "family")
 
 # Finding fields stored in finding_extras instead of the findings table.
-EXTRA_FIELDS = ("snippet", "total")
+EXTRA_FIELDS = ("snippet", "total", "via")
 
 # The home page card shows the three biggest reasons behind a score.
 # The state is not stored: every number format belongs to exactly one state's RERA.

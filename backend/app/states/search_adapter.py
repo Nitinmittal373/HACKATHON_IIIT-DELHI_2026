@@ -104,7 +104,8 @@ class SearchStateAdapter:
         evidence = [
             (h.url, clean(f"{h.title}. {h.snippet}")) for h in hits if self._names(h, wanted)
         ]
-        evidence += await self._fetched_page(project, evidence, web)
+        opened = await self._fetched_page(project, evidence, web)
+        evidence += opened
         if not evidence:
             return None
         facts = Facts()
@@ -131,6 +132,7 @@ class SearchStateAdapter:
             read_on=now.astimezone(IST).date(),
             read_at=now,
             raw_snippets=raw[:3],
+            read_via=None if opened else "search_snippet",
         )
 
     async def _search(self, query: str, web: WebClient) -> list[SearchHit]:

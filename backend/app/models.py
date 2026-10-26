@@ -274,6 +274,8 @@ class Finding(ApiModel):
     total: int | None = None
     # The exact words on the page behind the claim, for the evidence ledger.
     snippet: str | None = Field(default=None, max_length=300)
+    # Set when the fact was read from a Search result's text, not from the opened page.
+    via: Literal["search_snippet"] | None = None
 
 
 class Driver(ApiModel):

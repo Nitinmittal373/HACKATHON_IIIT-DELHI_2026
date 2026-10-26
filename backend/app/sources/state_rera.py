@@ -83,6 +83,7 @@ def findings_from_record(
             today=today,
             now=now,
             snippet=(record.raw_snippets[0] if record.raw_snippets else None),
+            via=record.read_via,
             **facts,
         )
 
