@@ -9,6 +9,7 @@ import pytest
 
 from app.states.openweb import (
     CACHE,
+    SEARCH_TEMPLATES,
     SearchCache,
     brand_tokens,
     candidates_from,
@@ -122,10 +123,10 @@ def test_search_answers_are_kept_for_a_day() -> None:
     web = FakeWebClient(searches={"Q RERA": [hit("https://a.example", "x")]})
     asyncio.run(search_open_web("Q", web, cache))
     asyncio.run(search_open_web("Q", web, cache))
-    assert len(web.calls) == 2  # two templates, searched once
+    assert len(web.calls) == len(SEARCH_TEMPLATES)  # each wording searched once
     now[0] = 24 * 3600 + 1
     asyncio.run(search_open_web("Q", web, cache))
-    assert len(web.calls) == 4
+    assert len(web.calls) == 2 * len(SEARCH_TEMPLATES)
 
 
 def test_resolve_any_adds_open_web_numbers_to_the_portal_ones() -> None:
@@ -150,3 +151,34 @@ def test_a_typed_number_keeps_only_that_number() -> None:
     )
     resolved = asyncio.run(resolve_any(MH_A, web))
     assert [p.rera_id for p in resolved.candidates] == [MH_A]
+
+
+def test_a_word_counts_whole_not_as_the_start_of_another_project() -> None:
+    from app.states.openweb import share_of
+
+    words = {"godrej", "woods"}
+    assert share_of(words, "godrej woods phase 1") == 1.0
+    assert share_of(words, "godrej woodscapes, bengaluru") == 0.5
+
+
+def test_names_spelled_apart_or_together_match() -> None:
+    from app.states.openweb import share_of
+
+    assert share_of({"mahagun", "mywoods"}, "mahagun my wood, noida") == 1.0
+    assert share_of({"m3m", "golf", "estate"}, "the rera number for m3m golfestate") == 1.0
+    assert share_of({"lodha", "world", "towers"}, "lodha world one, worli") < 0.75
+
+
+def test_a_city_in_the_query_puts_that_states_projects_first() -> None:
+    from app.models import Project
+    from app.states.resolver import ordered
+
+    def godrej(state: str, rera_id: str, status: str) -> Project:
+        return Project(
+            state=state, rera_id=rera_id, name="Godrej Woods", details_url="x", status=status
+        )  # type: ignore[arg-type]
+
+    bengaluru = godrej("KA", "PRM/KA/RERA/1251/472/PR/121125/008248", "confirmed")
+    noida = godrej("UP", "UPRERAPRJ773536", "listings_only")
+    assert [p.state for p in ordered([bengaluru, noida], "Godrej Woods Noida")] == ["UP", "KA"]
+    assert [p.state for p in ordered([bengaluru, noida], "Godrej Woods")] == ["KA", "UP"]

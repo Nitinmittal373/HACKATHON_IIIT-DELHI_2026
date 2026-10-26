@@ -13,10 +13,12 @@ from pathlib import Path
 
 from app.config import load_settings
 from app.states.openweb import SEARCH_TEMPLATES
-from app.tinyfish import LiveWebClient
+from app.tinyfish import LiveWebClient, WebError
 from scripts.famous_projects import FAMOUS
 from scripts.recorder import RecordingWebClient, scrub
 
+# Two seconds a search stays under the limit.
+RATE_PAUSE_SECONDS = 2.2
 OUTPUT = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "openweb_famous.json"
 
 
@@ -29,10 +31,24 @@ async def main() -> None:
     try:
         for famous in FAMOUS:
             for template in SEARCH_TEMPLATES:
-                await web.search(template.format(q=famous.query), purpose="Record a fixture")
+                await search(web, template.format(q=famous.query))
+                await asyncio.sleep(RATE_PAUSE_SECONDS)  # TinyFish allows 30 searches a minute
     finally:
         await web.aclose()
     save(web.recording(), key)
+
+
+async def search(web: RecordingWebClient, text: str) -> None:
+    """One Search; a rate-limit answer is waited out, as the answer says, and tried again."""
+    for _ in range(5):
+        try:
+            await web.search(text, purpose="Record a fixture")
+            return
+        except WebError as error:
+            if error.code != "rate_limited":
+                raise
+            await asyncio.sleep(error.retry_after or 20)
+    raise WebError("Search stayed rate limited", "rate_limited")
 
 
 def save(recording: dict, key: str) -> None:

@@ -157,9 +157,14 @@ def merge(portal: list[Project], open_web: list[Project], query: str) -> list[Pr
 
 
 def ordered(projects: list[Project], query: str) -> list[Project]:
-    """Portal-confirmed numbers first; within each group the closest name first."""
+    """A place in the query puts its state first, then confirmed numbers, then the closest name."""
+    place = state_of_place(query)
+
+    def other_state(project: Project) -> bool:
+        return place is not None and project.state != place
+
     ranked = rank(projects, query)
-    return sorted(ranked, key=lambda p: p.status != "confirmed")
+    return sorted(ranked, key=lambda p: (other_state(p), p.status != "confirmed"))
 
 
 async def resolve_on_portals(query: str, web: WebClient, state: str | None = None) -> Resolved:

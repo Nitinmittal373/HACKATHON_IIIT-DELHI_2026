@@ -28,7 +28,14 @@ from app.states.registry import ADAPTERS
 from app.states.text import clean, distinctive_words, squash
 from app.tinyfish import SearchHit, WebClient
 
-SEARCH_TEMPLATES = ("{q} RERA registration number", "{q} RERA")
+# Four wordings, because Search answers each with different pages: a builder's page prints the
+# number under "registration number", a listing's FAQ under "What is the RERA number of ...".
+SEARCH_TEMPLATES = (
+    "{q} RERA registration number",
+    "{q} RERA",
+    "{q} RERA number",
+    "What is the RERA number of {q}",
+)
 SEARCH_PURPOSE = "Find the RERA registration number of a project a homebuyer named, on the open web"
 CACHE_SECONDS = 24 * 3600
 # How far from a number its project's name may stand and still be "next to" it.
@@ -204,10 +211,47 @@ def names_project(
 
 
 def share_of(words: set[str], text: str) -> float:
-    """The share of the words the text holds, whether it spells them apart ("My Wood") or not."""
-    flat = re.sub(r"[^a-z0-9]", "", text)
-    present = {w for w in words if w in text or (len(w) > 4 and w.rstrip("s") in flat)}
+    """The share of the words the text holds as whole words; a plural counts, "Woodscapes" does not.
+
+    Names are spelled apart or together ("My Wood", "Mywoods", "Golf Estate", "Golfestate"), so two
+    neighbouring words, or one word made only of the query's words, hold them too.
+    """
+    raw = re.findall(r"[a-z0-9]+", text.lower())
+    stems = {_stem(word): word for word in words}
+    tokens = {_stem(token) for token in raw} | {
+        _stem(a + b) for a, b in zip(raw, raw[1:], strict=False)
+    }
+    present = {word for stem, word in stems.items() if stem in tokens}
+    for token in raw:
+        present |= {stems[stem] for stem in _joined(token, set(stems))}
     return len(present) / len(words)
+
+
+def _stem(word: str) -> str:
+    return word[:-1] if len(word) > 4 and word.endswith("s") else word
+
+
+def _joined(token: str, stems: set[str]) -> set[str]:
+    """The stems a token is made of when it is nothing but those stems written together."""
+    for stem in stems:
+        if token == stem:
+            return set()  # one whole word: already counted
+        if token.startswith(stem):
+            rest = _joined_all(token[len(stem) :], stems)
+            if rest is not None:
+                return {stem} | rest
+    return set()
+
+
+def _joined_all(token: str, stems: set[str]) -> set[str] | None:
+    if not token:
+        return set()
+    for stem in stems:
+        if token.startswith(stem):
+            rest = _joined_all(token[len(stem) :], stems)
+            if rest is not None:
+                return {stem} | rest
+    return None
 
 
 def brand_tokens(query: str) -> set[str]:
