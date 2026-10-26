@@ -6,6 +6,7 @@ itself). Whatever a snippet does not show stays None, so a thin read lowers conf
 instead of inventing a fact.
 """
 
+import asyncio
 import re
 from dataclasses import dataclass, fields
 from datetime import date, datetime
@@ -91,7 +92,15 @@ class SearchStateAdapter:
 
     async def read(self, project: Project, web: WebClient, now: datetime) -> ProjectRecord | None:
         wanted = squash(project.rera_id)
-        hits = await self._search(f"{project.rera_id} {self.spec.query_name} project", web)
+        # Search shows the passages that match the words asked: the bare number finds the
+        # portal's page for it, the other wordings bring up dates and the promoter.
+        queries = [
+            project.rera_id,
+            f"{project.rera_id} {self.spec.query_name} project",
+            f"{project.rera_id} promoter completion date status",
+        ]
+        found = await asyncio.gather(*(self._search(q, web) for q in queries))
+        hits = [hit for group in found for hit in group]
         evidence = [
             (h.url, clean(f"{h.title}. {h.snippet}")) for h in hits if self._names(h, wanted)
         ]
