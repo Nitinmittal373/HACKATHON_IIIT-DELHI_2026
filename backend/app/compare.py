@@ -8,8 +8,18 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from app.models import Area, Band, CheckKey, Finding, Project, Report
-from app.scoring.weights import KEY_CHECKS, MIN_CONFIDENCE_FOR_BAND
+from app.models import (
+    Area,
+    Band,
+    CheckKey,
+    DisplayScore,
+    Finding,
+    PillarId,
+    Project,
+    Report,
+)
+from app.scoring.v2 import weights as v2
+from app.scoring.weights import KEY_CHECKS
 
 InsolvencyStatus = Literal[
     "none_found", "admitted", "other_project", "this_project", "company", "unverified"
@@ -28,6 +38,14 @@ class AreaPoints(BaseModel):
     max: float
 
 
+class PillarPoints(BaseModel):
+    id: PillarId
+    name: str
+    # Points this pillar took off the 300-900 score, and the most it could take.
+    lost: float
+    max: float
+
+
 class FindingLine(BaseModel):
     title: str
     source_url: str
@@ -37,6 +55,9 @@ class FindingLine(BaseModel):
 class ComparedProject(BaseModel):
     check_id: str
     project: Project
+    # The score to show and rank by; `score`, `band` and `areas` are the classic 0-100 view.
+    display_score: DisplayScore
+    pillars: list[PillarPoints]
     score: int
     band: Band
     confidence: float
@@ -65,12 +86,12 @@ def compare(reports: list[Report]) -> Comparison:
 
 
 def best_on_records(projects: list[ComparedProject]) -> tuple[str | None, BestReason]:
-    """Rank only checks that read at least half the key records; a thin check proves little."""
-    ranked = [p for p in projects if p.confidence >= MIN_CONFIDENCE_FOR_BAND]
+    """Rank only checks that read at least half the pillars; a thin check proves little."""
+    ranked = [p for p in projects if p.display_score.confidence >= v2.MIN_CONFIDENCE_FOR_BAND]
     if len(ranked) < 2:
         return None, "not_enough_evidence"
-    top = max(p.score for p in ranked)
-    leaders = [p for p in ranked if p.score == top]
+    top = max(p.display_score.value for p in ranked)
+    leaders = [p for p in ranked if p.display_score.value == top]
     if len(leaders) > 1:
         return None, "tie"
     return leaders[0].check_id, "best_score"
@@ -82,6 +103,16 @@ def compared(report: Report) -> ComparedProject:
     return ComparedProject(
         check_id=report.check.id,
         project=report.project,
+        display_score=report.display_score,
+        pillars=[
+            PillarPoints(
+                id=pillar.id,
+                name=pillar.name,
+                lost=abs(pillar.points),
+                max=round(v2.POINTS_PER_PENALTY * pillar.weight * 100, 2),
+            )
+            for pillar in report.score_v2.pillars
+        ],
         score=report.score.value,
         band=report.score.band,
         confidence=report.score.confidence,
@@ -140,12 +171,17 @@ def company_status(by_kind: dict[str, Finding], read: set[CheckKey]) -> str | No
 def top_findings(report: Report) -> list[FindingLine]:
     """The findings that cost the most points, then other red flags and items to review."""
     by_id = {finding.id: finding for finding in report.findings}
+    # Drivers are sorted biggest loss first, in points of the 300-900 score.
     lines = [
-        FindingLine(title=d.title, source_url=by_id[d.finding_id].source_url, points=d.points)
-        for d in report.score.drivers
+        FindingLine(
+            title=by_id[d.finding_id].title,
+            source_url=by_id[d.finding_id].source_url,
+            points=d.points,
+        )
+        for d in report.score_v2.drivers
         if d.finding_id in by_id
     ]
-    driven = {d.finding_id for d in report.score.drivers}
+    driven = {d.finding_id for d in report.score_v2.drivers}
     for verdict in NOTABLE:
         lines += [
             FindingLine(title=f.title, source_url=f.source_url, points=0)

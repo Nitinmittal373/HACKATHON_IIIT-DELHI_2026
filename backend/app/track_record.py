@@ -13,7 +13,7 @@ from datetime import datetime
 from pydantic import BaseModel
 
 from app.matching import blob, legal_name_in, normalize
-from app.models import Project
+from app.models import DisplayScore, Project
 from app.resolve import candidates_from_hits
 from app.tinyfish import SearchHit, WebClient
 from app.uprera_links import UPRERA_DOMAIN
@@ -25,9 +25,16 @@ MAX_CACHED = 2000
 PURPOSE = "List the other UP-RERA registered projects of one promoter company"
 
 
+class TrackedProject(Project):
+    """A project from the search, with its NeevScore when NeevCheck has already checked it."""
+
+    check_id: str | None = None
+    display_score: DisplayScore | None = None
+
+
 class TrackRecord(BaseModel):
     promoter: str
-    projects: list[Project]
+    projects: list[TrackedProject]
     searched_at: datetime
 
 
@@ -67,9 +74,8 @@ class TrackRecords:
                 )
             )
             hits = [hit for group in found for hit in group]
-            record = TrackRecord(
-                promoter=promoter, projects=projects_of(promoter, hits), searched_at=self._now()
-            )
+            projects = [TrackedProject(**p.model_dump()) for p in projects_of(promoter, hits)]
+            record = TrackRecord(promoter=promoter, projects=projects, searched_at=self._now())
             if len(self._cache) >= MAX_CACHED:
                 self._cache.clear()
             cached = (self._clock(), record)

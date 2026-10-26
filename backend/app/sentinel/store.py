@@ -7,6 +7,7 @@ from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.db import AlertRow, MonitorRow, ProjectRow, WatchRow, WebhookReceiptRow
+from app.models import DisplayScore
 from app.sentinel.models import Alert, Diff, FindingChange, Language, Watch
 
 
@@ -107,6 +108,8 @@ class SentinelStore:
         created_at: datetime,
         old_score: int | None,
         new_score: int | None,
+        old_display: DisplayScore | None,
+        new_display: DisplayScore | None,
         diff: Diff,
     ) -> str:
         alert_id = uuid.uuid4().hex
@@ -119,7 +122,14 @@ class SentinelStore:
                     created_at=created_at,
                     old_score=old_score,
                     new_score=new_score,
-                    diff=diff.model_dump(mode="json"),
+                    # The 300-900 scores are kept inside the diff, which has no fixed columns.
+                    diff={
+                        **diff.model_dump(mode="json"),
+                        "display": {
+                            "old": old_display.model_dump(mode="json") if old_display else None,
+                            "new": new_display.model_dump(mode="json") if new_display else None,
+                        },
+                    },
                 )
             )
         return alert_id
@@ -158,7 +168,12 @@ def _changes(items: object) -> list[FindingChange]:
     return [FindingChange.model_validate(item) for item in items or []]  # type: ignore[attr-defined]
 
 
+def _display(value: object) -> DisplayScore | None:
+    return DisplayScore.model_validate(value) if value else None
+
+
 def _alert(alert: AlertRow, watch: WatchRow, project: ProjectRow) -> Alert:
+    scores = alert.diff.get("display") or {}
     return Alert(
         id=alert.id,
         watch_id=alert.watch_id,
@@ -168,6 +183,8 @@ def _alert(alert: AlertRow, watch: WatchRow, project: ProjectRow) -> Alert:
         created_at=alert.created_at,
         old_score=alert.old_score,
         new_score=alert.new_score,
+        old_display_score=_display(scores.get("old")),  # type: ignore[attr-defined]
+        new_display_score=_display(scores.get("new")),  # type: ignore[attr-defined]
         added=_changes(alert.diff.get("added")),
         removed=_changes(alert.diff.get("removed")),
         changed=_changes(alert.diff.get("changed")),

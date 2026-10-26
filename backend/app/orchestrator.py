@@ -30,7 +30,7 @@ from app.models import (
     SourceRun,
 )
 from app.scoring.engine import score
-from app.scoring.v2 import pillars_read, score_v2
+from app.scoring.v2.from_runs import score_from_runs
 from app.sources import build_sources
 from app.sources.base import (
     Blocked,
@@ -136,12 +136,17 @@ class Orchestrator:
             findings = self._store.list_findings(check_id)
             result = score(findings, read)
             self._store.save_score(check_id, result)
-            self._save_score_v2(check_id, findings, read)
+            self._save_score_v2(check_id, findings)
             family = self._families.pop(check_id, None)
             if family is not None:
                 self._store.save_family(check_id, family)
+            scored = self._store.get_check(check_id)
+            display = scored.display_score if scored else None
             self._finish(
-                check_id, "completed", score=result.model_dump(mode="json", include=SUMMARY)
+                check_id,
+                "completed",
+                score=result.model_dump(mode="json", include=SUMMARY),
+                display_score=display.model_dump(mode="json") if display else None,
             )
         except asyncio.CancelledError:
             self._finish(check_id, "failed", message="The server stopped before the check finished")
@@ -241,19 +246,12 @@ class Orchestrator:
         assert self._source_cache is not None
         self._source_cache.put(source.name, entity, ctx.today, ctx.now, findings, read, family)
 
-    def _save_score_v2(self, check_id: str, findings: list[Finding], read: set[CheckKey]) -> None:
+    def _save_score_v2(self, check_id: str, findings: list[Finding]) -> None:
         """v2 sits next to v1; if it ever fails the v1 report must still be delivered."""
         try:
             check = self._store.get_check(check_id)
             runs = check.sources if check else []
-            completed = [run.source for run in runs if run.status == "completed"]
-            unavailable = [
-                f"{UNAVAILABLE_LABELS[run.source]}" + (f" ({run.message})" if run.message else "")
-                for run in runs
-                if run.status != "completed" and run.source in UNAVAILABLE_LABELS
-            ]
-            result = score_v2(findings, pillars_read(read, completed), unavailable)
-            self._store.save_score_v2(check_id, result)
+            self._store.save_score_v2(check_id, score_from_runs(findings, runs))
         except Exception:
             logger.exception("v2 score failed for check %s", check_id)
 
@@ -285,15 +283,6 @@ async def replay(cached: CachedRead) -> AsyncIterator[SourceEvent]:
     yield ChecksRead(cached.checks_read)
 
 
-UNAVAILABLE_LABELS: dict[SourceName, str] = {
-    "registry": "Company registry",
-    "insolvency": "Insolvency records",
-    "land": "Land authority lists",
-    "consumer": "Consumer cases (e-Jagriti)",
-    "news": "News",
-    "group": "Group companies",
-    "sarfaesi": "Lender auction notices",
-}
 SUMMARY = {"value", "band", "band_label", "confidence", "provisional", "hard_stop"}
 
 

@@ -6,7 +6,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from app.models import is_new_format, is_uprera_url, normalize_rera_id
+from app.models import DisplayScore, is_new_format, is_uprera_url, normalize_rera_id
 
 Language = Literal["en", "hi"]
 # Deliberately simple: one @, something on both sides, a dot in the domain.
@@ -83,8 +83,12 @@ class Alert(BaseModel):
     project_name: str | None = None
     check_id: str
     created_at: datetime
+    # The classic 0-100 scores, kept for older clients; screens show the display scores.
     old_score: int | None
     new_score: int | None
+    # The 300-900 scores the project had before and after the change, as they were then.
+    old_display_score: DisplayScore | None = None
+    new_display_score: DisplayScore | None = None
     added: list[FindingChange]
     removed: list[FindingChange]
     changed: list[FindingChange]

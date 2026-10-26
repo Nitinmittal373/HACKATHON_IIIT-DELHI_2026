@@ -30,6 +30,16 @@
             "title": "Id",
             "type": "string"
           },
+          "new_display_score": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DisplayScore"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "new_score": {
             "anyOf": [
               {
@@ -40,6 +50,16 @@
               }
             ],
             "title": "New Score"
+          },
+          "old_display_score": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DisplayScore"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "old_score": {
             "anyOf": [
@@ -166,6 +186,48 @@
         "title": "AreaScore",
         "type": "object"
       },
+      "BandRange": {
+        "properties": {
+          "key": {
+            "enum": [
+              "Low",
+              "Watch",
+              "Elevated",
+              "High"
+            ],
+            "title": "Key",
+            "type": "string"
+          },
+          "max": {
+            "title": "Max",
+            "type": "integer"
+          },
+          "min": {
+            "title": "Min",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "min",
+          "max"
+        ],
+        "title": "BandRange",
+        "type": "object"
+      },
+      "BlockedData": {
+        "properties": {
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "BlockedData",
+        "type": "object"
+      },
       "Check": {
         "properties": {
           "completed_at": {
@@ -183,6 +245,16 @@
           "details_url": {
             "title": "Details Url",
             "type": "string"
+          },
+          "display_score": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DisplayScore"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "id": {
             "title": "Id",
@@ -229,6 +301,89 @@
           "started_at"
         ],
         "title": "Check",
+        "type": "object"
+      },
+      "CheckCompletedData": {
+        "properties": {
+          "display_score": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DisplayScore"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScoreSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "enum": [
+              "completed",
+              "failed"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "CheckCompletedData",
+        "type": "object"
+      },
+      "CheckCompletedEvent": {
+        "properties": {
+          "check_id": {
+            "title": "Check Id",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/CheckCompletedData"
+          },
+          "source": {
+            "const": "check",
+            "title": "Source",
+            "type": "string"
+          },
+          "ts": {
+            "format": "date-time",
+            "title": "Ts",
+            "type": "string"
+          },
+          "type": {
+            "const": "check.completed",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "check_id",
+          "ts",
+          "type",
+          "source",
+          "data"
+        ],
+        "title": "CheckCompletedEvent",
         "type": "object"
       },
       "CheckCreate": {
@@ -318,6 +473,16 @@
           "details_url": {
             "title": "Details Url",
             "type": "string"
+          },
+          "display_score": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DisplayScore"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "id": {
             "title": "Id",
@@ -433,6 +598,9 @@
             ],
             "title": "Delay Months"
           },
+          "display_score": {
+            "$ref": "#/components/schemas/DisplayScore"
+          },
           "hard_stop": {
             "title": "Hard Stop",
             "type": "boolean"
@@ -455,6 +623,13 @@
               }
             ],
             "title": "Insolvency"
+          },
+          "pillars": {
+            "items": {
+              "$ref": "#/components/schemas/PillarPoints"
+            },
+            "title": "Pillars",
+            "type": "array"
           },
           "project": {
             "$ref": "#/components/schemas/Project"
@@ -512,6 +687,8 @@
         "required": [
           "check_id",
           "project",
+          "display_score",
+          "pillars",
           "score",
           "band",
           "confidence",
@@ -667,6 +844,47 @@
           "message"
         ],
         "title": "CorrectionCreate",
+        "type": "object"
+      },
+      "DisplayScore": {
+        "description": "The score every screen shows: NeevScore v2 on the 300-900 scale, without the detail.",
+        "properties": {
+          "band": {
+            "enum": [
+              "Low",
+              "Watch",
+              "Elevated",
+              "High",
+              "insufficient_evidence"
+            ],
+            "title": "Band",
+            "type": "string"
+          },
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "hard_stop": {
+            "title": "Hard Stop",
+            "type": "boolean"
+          },
+          "provisional": {
+            "title": "Provisional",
+            "type": "boolean"
+          },
+          "value": {
+            "title": "Value",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "value",
+          "band",
+          "hard_stop",
+          "confidence",
+          "provisional"
+        ],
+        "title": "DisplayScore",
         "type": "object"
       },
       "Driver": {
@@ -1088,6 +1306,50 @@
         "title": "Finding",
         "type": "object"
       },
+      "FindingAddedEvent": {
+        "properties": {
+          "check_id": {
+            "title": "Check Id",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/FindingData"
+          },
+          "source": {
+            "enum": [
+              "uprera",
+              "registry",
+              "insolvency",
+              "land",
+              "consumer",
+              "news",
+              "group",
+              "sarfaesi"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "ts": {
+            "format": "date-time",
+            "title": "Ts",
+            "type": "string"
+          },
+          "type": {
+            "const": "finding.added",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "check_id",
+          "ts",
+          "type",
+          "source",
+          "data"
+        ],
+        "title": "FindingAddedEvent",
+        "type": "object"
+      },
       "FindingChange": {
         "properties": {
           "source_url": {
@@ -1110,6 +1372,18 @@
           "title"
         ],
         "title": "FindingChange",
+        "type": "object"
+      },
+      "FindingData": {
+        "properties": {
+          "finding": {
+            "$ref": "#/components/schemas/Finding"
+          }
+        },
+        "required": [
+          "finding"
+        ],
+        "title": "FindingData",
         "type": "object"
       },
       "FindingLine": {
@@ -1146,6 +1420,66 @@
           }
         },
         "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "LiveUrlData": {
+        "properties": {
+          "url": {
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "title": "LiveUrlData",
+        "type": "object"
+      },
+      "Meta": {
+        "properties": {
+          "bands": {
+            "items": {
+              "$ref": "#/components/schemas/BandRange"
+            },
+            "title": "Bands",
+            "type": "array"
+          },
+          "pillars": {
+            "items": {
+              "$ref": "#/components/schemas/PillarWeight"
+            },
+            "title": "Pillars",
+            "type": "array"
+          },
+          "reason_codes": {
+            "items": {
+              "$ref": "#/components/schemas/ReasonCodeId"
+            },
+            "title": "Reason Codes",
+            "type": "array"
+          },
+          "scale": {
+            "$ref": "#/components/schemas/Scale"
+          },
+          "score_version": {
+            "const": "v2",
+            "title": "Score Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "scale",
+          "bands",
+          "pillars",
+          "reason_codes",
+          "score_version"
+        ],
+        "title": "Meta",
+        "type": "object"
+      },
+      "NoData": {
+        "properties": {},
+        "title": "NoData",
         "type": "object"
       },
       "Pillar": {
@@ -1187,6 +1521,81 @@
           "points"
         ],
         "title": "Pillar",
+        "type": "object"
+      },
+      "PillarPoints": {
+        "properties": {
+          "id": {
+            "enum": [
+              "P1",
+              "P2",
+              "P3",
+              "P4",
+              "P5",
+              "P6"
+            ],
+            "title": "Id",
+            "type": "string"
+          },
+          "lost": {
+            "title": "Lost",
+            "type": "number"
+          },
+          "max": {
+            "title": "Max",
+            "type": "number"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "lost",
+          "max"
+        ],
+        "title": "PillarPoints",
+        "type": "object"
+      },
+      "PillarWeight": {
+        "properties": {
+          "id": {
+            "enum": [
+              "P1",
+              "P2",
+              "P3",
+              "P4",
+              "P5",
+              "P6"
+            ],
+            "title": "Id",
+            "type": "string"
+          },
+          "weight": {
+            "title": "Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "weight"
+        ],
+        "title": "PillarWeight",
+        "type": "object"
+      },
+      "ProgressData": {
+        "properties": {
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "ProgressData",
         "type": "object"
       },
       "Project": {
@@ -1283,6 +1692,19 @@
         "title": "ReasonCode",
         "type": "object"
       },
+      "ReasonCodeId": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "ReasonCodeId",
+        "type": "object"
+      },
       "RecentCheck": {
         "description": "A finished check shown on the home page. Only public-record facts, never who asked.",
         "properties": {
@@ -1336,6 +1758,16 @@
             "title": "Details Url",
             "type": "string"
           },
+          "display_score": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DisplayScore"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "drivers": {
             "default": [],
             "items": {
@@ -1369,6 +1801,14 @@
               }
             ],
             "title": "Promoter"
+          },
+          "reasons": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ReasonCode"
+            },
+            "title": "Reasons",
+            "type": "array"
           },
           "registered_on": {
             "anyOf": [
@@ -1430,6 +1870,9 @@
           "check": {
             "$ref": "#/components/schemas/Check"
           },
+          "display_score": {
+            "$ref": "#/components/schemas/DisplayScore"
+          },
           "family": {
             "anyOf": [
               {
@@ -1454,14 +1897,7 @@
             "$ref": "#/components/schemas/Score"
           },
           "score_v2": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/ScoreV2"
-              },
-              {
-                "type": "null"
-              }
-            ]
+            "$ref": "#/components/schemas/ScoreV2"
           },
           "timeline": {
             "items": {
@@ -1476,9 +1912,29 @@
           "project",
           "score",
           "findings",
-          "timeline"
+          "timeline",
+          "display_score",
+          "score_v2"
         ],
         "title": "Report",
+        "type": "object"
+      },
+      "Scale": {
+        "properties": {
+          "max": {
+            "title": "Max",
+            "type": "integer"
+          },
+          "min": {
+            "title": "Min",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "min",
+          "max"
+        ],
+        "title": "Scale",
         "type": "object"
       },
       "Score": {
@@ -1568,6 +2024,52 @@
           "checks_unread"
         ],
         "title": "Score",
+        "type": "object"
+      },
+      "ScoreSummary": {
+        "description": "The classic 0-100 summary sent with check.completed, kept for older clients.",
+        "properties": {
+          "band": {
+            "enum": [
+              "Low",
+              "Moderate",
+              "High",
+              "Critical",
+              "insufficient_evidence"
+            ],
+            "title": "Band",
+            "type": "string"
+          },
+          "band_label": {
+            "title": "Band Label",
+            "type": "string"
+          },
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "hard_stop": {
+            "title": "Hard Stop",
+            "type": "boolean"
+          },
+          "provisional": {
+            "title": "Provisional",
+            "type": "boolean"
+          },
+          "value": {
+            "title": "Value",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "value",
+          "band",
+          "band_label",
+          "confidence",
+          "provisional",
+          "hard_stop"
+        ],
+        "title": "ScoreSummary",
         "type": "object"
       },
       "ScoreV2": {
@@ -1687,6 +2189,230 @@
         "title": "SearchResponse",
         "type": "object"
       },
+      "SourceBlockedEvent": {
+        "properties": {
+          "check_id": {
+            "title": "Check Id",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/BlockedData"
+          },
+          "source": {
+            "enum": [
+              "uprera",
+              "registry",
+              "insolvency",
+              "land",
+              "consumer",
+              "news",
+              "group",
+              "sarfaesi"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "ts": {
+            "format": "date-time",
+            "title": "Ts",
+            "type": "string"
+          },
+          "type": {
+            "const": "source.blocked",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "check_id",
+          "ts",
+          "type",
+          "source",
+          "data"
+        ],
+        "title": "SourceBlockedEvent",
+        "type": "object"
+      },
+      "SourceCompletedData": {
+        "properties": {
+          "checks_read": {
+            "default": [],
+            "items": {
+              "enum": [
+                "registration",
+                "completion_date",
+                "extensions",
+                "company_status",
+                "insolvency",
+                "land_dues",
+                "consumer_cases"
+              ],
+              "type": "string"
+            },
+            "title": "Checks Read",
+            "type": "array"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "status": {
+            "enum": [
+              "running",
+              "completed",
+              "blocked",
+              "failed",
+              "unavailable"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "SourceCompletedData",
+        "type": "object"
+      },
+      "SourceCompletedEvent": {
+        "properties": {
+          "check_id": {
+            "title": "Check Id",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/SourceCompletedData"
+          },
+          "source": {
+            "enum": [
+              "uprera",
+              "registry",
+              "insolvency",
+              "land",
+              "consumer",
+              "news",
+              "group",
+              "sarfaesi"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "ts": {
+            "format": "date-time",
+            "title": "Ts",
+            "type": "string"
+          },
+          "type": {
+            "const": "source.completed",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "check_id",
+          "ts",
+          "type",
+          "source",
+          "data"
+        ],
+        "title": "SourceCompletedEvent",
+        "type": "object"
+      },
+      "SourceLiveUrlEvent": {
+        "properties": {
+          "check_id": {
+            "title": "Check Id",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/LiveUrlData"
+          },
+          "source": {
+            "enum": [
+              "uprera",
+              "registry",
+              "insolvency",
+              "land",
+              "consumer",
+              "news",
+              "group",
+              "sarfaesi"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "ts": {
+            "format": "date-time",
+            "title": "Ts",
+            "type": "string"
+          },
+          "type": {
+            "const": "source.live_url",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "check_id",
+          "ts",
+          "type",
+          "source",
+          "data"
+        ],
+        "title": "SourceLiveUrlEvent",
+        "type": "object"
+      },
+      "SourceProgressEvent": {
+        "properties": {
+          "check_id": {
+            "title": "Check Id",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ProgressData"
+          },
+          "source": {
+            "enum": [
+              "uprera",
+              "registry",
+              "insolvency",
+              "land",
+              "consumer",
+              "news",
+              "group",
+              "sarfaesi"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "ts": {
+            "format": "date-time",
+            "title": "Ts",
+            "type": "string"
+          },
+          "type": {
+            "const": "source.progress",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "check_id",
+          "ts",
+          "type",
+          "source",
+          "data"
+        ],
+        "title": "SourceProgressEvent",
+        "type": "object"
+      },
       "SourceRun": {
         "properties": {
           "checks_read": {
@@ -1761,11 +2487,55 @@
         "title": "SourceRun",
         "type": "object"
       },
+      "SourceStartedEvent": {
+        "properties": {
+          "check_id": {
+            "title": "Check Id",
+            "type": "string"
+          },
+          "data": {
+            "$ref": "#/components/schemas/NoData"
+          },
+          "source": {
+            "enum": [
+              "uprera",
+              "registry",
+              "insolvency",
+              "land",
+              "consumer",
+              "news",
+              "group",
+              "sarfaesi"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "ts": {
+            "format": "date-time",
+            "title": "Ts",
+            "type": "string"
+          },
+          "type": {
+            "const": "source.started",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "check_id",
+          "ts",
+          "type",
+          "source",
+          "data"
+        ],
+        "title": "SourceStartedEvent",
+        "type": "object"
+      },
       "TrackRecord": {
         "properties": {
           "projects": {
             "items": {
-              "$ref": "#/components/schemas/Project"
+              "$ref": "#/components/schemas/TrackedProject"
             },
             "title": "Projects",
             "type": "array"
@@ -1786,6 +2556,91 @@
           "searched_at"
         ],
         "title": "TrackRecord",
+        "type": "object"
+      },
+      "TrackedProject": {
+        "description": "A project from the search, with its NeevScore when NeevCheck has already checked it.",
+        "properties": {
+          "check_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Check Id"
+          },
+          "details_url": {
+            "title": "Details Url",
+            "type": "string"
+          },
+          "display_score": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DisplayScore"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "district": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "District"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "promoter": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Promoter"
+          },
+          "registered_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Registered On"
+          },
+          "rera_id": {
+            "title": "Rera Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rera_id",
+          "details_url"
+        ],
+        "title": "TrackedProject",
         "type": "object"
       },
       "ValidationError": {
@@ -2147,9 +3002,49 @@
         "responses": {
           "200": {
             "content": {
-              "text/event-stream": {}
+              "text/event-stream": {
+                "schema": {
+                  "discriminator": {
+                    "mapping": {
+                      "check.completed": "#/components/schemas/CheckCompletedEvent",
+                      "finding.added": "#/components/schemas/FindingAddedEvent",
+                      "source.blocked": "#/components/schemas/SourceBlockedEvent",
+                      "source.completed": "#/components/schemas/SourceCompletedEvent",
+                      "source.live_url": "#/components/schemas/SourceLiveUrlEvent",
+                      "source.progress": "#/components/schemas/SourceProgressEvent",
+                      "source.started": "#/components/schemas/SourceStartedEvent"
+                    },
+                    "propertyName": "type"
+                  },
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/SourceStartedEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SourceLiveUrlEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SourceProgressEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/FindingAddedEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SourceBlockedEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/SourceCompletedEvent"
+                    },
+                    {
+                      "$ref": "#/components/schemas/CheckCompletedEvent"
+                    }
+                  ],
+                  "title": "Response 200 Stream Events Api Checks  Check Id  Events Get",
+                  "type": "string"
+                }
+              }
             },
-            "description": "Successful Response"
+            "description": "One StreamEvent per SSE message"
           },
           "422": {
             "content": {
@@ -2335,6 +3230,28 @@
         "summary": "Health",
         "tags": [
           "health"
+        ]
+      }
+    },
+    "/api/meta": {
+      "get": {
+        "description": "The score scale, band edges and pillar weights, so no client hard-codes them.",
+        "operationId": "get_meta_api_meta_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Meta"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Meta",
+        "tags": [
+          "meta"
         ]
       }
     },
