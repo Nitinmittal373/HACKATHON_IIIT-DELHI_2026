@@ -19,8 +19,10 @@ export const home: typeof en = {
   recent: {
     title: "NeevCheck पर हाल में जाँचे गए",
     lead: "दूसरे खरीदारों की असली जाँचें। हर एक अपनी पूरी रिपोर्ट और हर स्रोत के साथ खुलती है।",
-    item: (name: string, score: number, band: string, date: string) =>
-      `${name}: NeevScore ${score}, ${band}, ${date} को जाँचा गया`,
+    item: (name: string, score: number | null, band: string, date: string) =>
+      score === null
+        ? `${name}: अभी पर्याप्त प्रमाण नहीं, ${date} को जाँचा गया`
+        : `${name}: NeevScore ${score}, ${band}, ${date} को जाँचा गया`,
   },
   problem: {
     eyebrow: "समस्या",

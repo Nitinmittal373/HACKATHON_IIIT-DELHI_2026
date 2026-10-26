@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import { NeevScore } from "@/components/NeevScore";
+import { UnratedNote } from "@/components/UnratedNote";
 import { formatDay } from "@/lib/format";
 import { useLang } from "@/lib/LangProvider";
 import { useRecentChecks } from "@/lib/useRecentChecks";
@@ -36,15 +37,16 @@ export function RecentStrip() {
                 className={styles.item}
                 aria-label={t.home.recent.item(name, display.value, band, date)}
               >
-                <NeevScore value={display.value} band={display.band} size={56} delay={0.1} />
+                <NeevScore score={display} size={56} delay={0.1} />
                 <span className={styles.text}>
                   <span className={styles.name}>{name}</span>
                   <span className={`mono ${styles.meta}`}>
                     {check.rera_id} · {date}
                   </span>
                   <span className={styles.band}>
-                    <NeevScore value={display.value} band={display.band} variant="chip" showValue={false} />
+                    <NeevScore score={display} variant="chip" showValue={false} />
                   </span>
+                  <UnratedNote score={display} />
                 </span>
               </Link>
             </li>

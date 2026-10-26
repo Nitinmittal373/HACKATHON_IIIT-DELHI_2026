@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { NeevScore } from "@/components/NeevScore";
+import { UnratedNote } from "@/components/UnratedNote";
 import type { HeroCard } from "@/lib/heroCard";
 import type { Strings } from "@/lib/i18n";
 import styles from "./ReportStage.module.css";
@@ -37,12 +38,13 @@ function RealCard({ card, t }: { card: HeroCard; t: Strings }) {
     >
       <div className={styles.top}>
         <span className={`mono ${styles.kicker}`}>{t.home.report.kicker(card.readOn.toUpperCase())}</span>
-        <NeevScore value={card.display.value} band={card.display.band} variant="chip" showValue={false} />
+        <NeevScore score={card.display} variant="chip" showValue={false} />
       </div>
       <div className={styles.body}>
-        <NeevScore value={card.display.value} band={card.display.band} />
+        <NeevScore score={card.display} />
         <div>
           <p className={styles.name}>{card.name}</p>
+          <UnratedNote score={card.display} />
           <p className={`mono ${styles.id}`}>
             {card.reraId}
             {card.promoter && ` · ${card.promoter}`}

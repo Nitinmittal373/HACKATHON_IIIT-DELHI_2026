@@ -17,7 +17,7 @@ export function ScoreCard({ report, t }: Props) {
   return (
     <section className={`card ${styles.card}`} aria-label={t.report.summaryLabel}>
       <div className={styles.head}>
-        <NeevScore value={display.value} band={display.band} variant="chip" />
+        <NeevScore score={display} variant="chip" />
         {display.provisional && <span className={styles.provisional}>{t.report.provisional}</span>}
       </div>
       <p className={styles.summary}>{summarize(report, t)}</p>

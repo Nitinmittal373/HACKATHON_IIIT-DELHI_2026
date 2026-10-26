@@ -34,10 +34,12 @@ export function ResultCard({ outcome, checkId, reraId, t }: Props) {
   const band = score ? t.score.bands[score.band] : "";
   return (
     <section className={`card ${styles.card}`} aria-live="polite">
-      {score && <NeevScore value={score.value} band={score.band} size={96} delay={0.1} />}
+      {score && <NeevScore score={score} size={96} delay={0.1} />}
       <div className={styles.text}>
         <h2 className={styles.title}>
-          {score && !provisional ? t.score.short(score.value, band) : t.cam.resultProvisional}
+          {score && !provisional && score.value !== null
+            ? t.score.short(score.value, band)
+            : t.cam.resultProvisional}
         </h2>
         <p className={styles.note}>
           {provisional ? t.cam.resultProvisionalNote : t.cam.resultNote}

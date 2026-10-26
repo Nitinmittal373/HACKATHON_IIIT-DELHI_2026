@@ -6,12 +6,13 @@ import styles from "./Compare.module.css";
 export function BestSummary({ comparison, t }: { comparison: Comparison; t: Strings }) {
   const best = comparison.projects.find((project) => project.check_id === comparison.best);
   let text = t.compare.notEnough;
-  if (best) text = t.compare.best(best.project.name ?? best.project.rera_id, best.display_score.value);
+  const value = best?.display_score.value ?? null;
+  if (best && value !== null) text = t.compare.best(best.project.name ?? best.project.rera_id, value);
   else if (comparison.reason === "tie") text = t.compare.tie;
 
   return (
     <p className={styles.summary} role="status">
-      {best && <b>{t.compare.bestTitle}: </b>}
+      {best && value !== null && <b>{t.compare.bestTitle}: </b>}
       {text}
     </p>
   );

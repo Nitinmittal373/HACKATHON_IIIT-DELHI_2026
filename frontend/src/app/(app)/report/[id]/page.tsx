@@ -48,7 +48,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const report = CHECK_ID_PATTERN.test(id) ? await load(id) : null;
   if (!report || report instanceof ApiError) return { title: "NeevCheck report" };
   const name = report.project.name ?? report.project.rera_id;
-  return { title: `${name}: NeevScore ${report.display_score.value} · NeevCheck` };
+  const { value } = report.display_score;
+  const rated = value === null ? "not enough evidence yet" : `NeevScore ${value}`;
+  return { title: `${name}: ${rated} · NeevCheck` };
 }
 
 export default async function ReportPage({ params }: Props) {

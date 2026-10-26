@@ -45,6 +45,10 @@ export const credit = {
     `NeevScore starts at ${max} and loses points only for records we found, in six weighted pillars. A record we could not read never adds points; it only lowers confidence. The full method is in docs/scoring.md in the project repository.`,
   classicLine: (value: number) =>
     `Classic score (0–100): ${value}. The first version of the score, kept for transparency; NeevScore above is the score to use.`,
+  provisionalLine: (value: number, max: number, read: number, total: number) =>
+    `Provisional figure, not a score: ${value} out of ${max}, computed from only ${read} of ${total} record types. It is shown here to explain the method and is not used anywhere else.`,
+  narrativeUnrated: (read: number, total: number) =>
+    `Not enough evidence yet: only ${read} of ${total} record types could be read, so no score is given. Nothing that was read counts against the project, and nothing that was not read does either.`,
   narrative: (value: number, max: number, band: string, reasons: string[], unreadCount: number, total: number) =>
     `Scored ${value} out of ${max} (${band}).` +
     (reasons.length > 0 ? ` The biggest reasons: ${reasons.join("; ")}.` : " No record we read cost any points.") +

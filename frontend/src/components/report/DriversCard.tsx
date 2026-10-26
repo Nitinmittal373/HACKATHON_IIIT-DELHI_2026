@@ -17,7 +17,7 @@ export function DriversCard({ report, ids, meta, t }: Props) {
   return (
     <section className={`card ${styles.card}`} aria-labelledby="why-title">
       <h2 id="why-title" className={styles.title}>
-        {t.report.why(display.value)}
+        {display.value === null ? t.report.whyUnrated : t.report.why(display.value)}
       </h2>
       <p className={styles.lead}>{t.report.whyLead(meta.scale.max)}</p>
       {score.drivers.length === 0 ? (

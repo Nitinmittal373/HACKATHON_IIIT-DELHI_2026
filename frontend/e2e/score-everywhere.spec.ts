@@ -133,8 +133,11 @@ test("My reports: each card draws the NeevScore and its band", async ({ page }) 
   const avenue = page.getByRole("article", { name: /14th Avenue/ });
   const thin = AVENUE.display_score;
   expect(thin?.provisional).toBe(true);
+  // Too little was read, so the card draws a dash and the reason instead of a number.
+  expect(thin?.value).toBeNull();
   await expect(avenue).toContainText(BANDS_EN.insufficient_evidence);
-  expect((await drawnScores(page)).sort()).toEqual([SCORE.value, thin?.value ?? 0].sort());
+  await expect(avenue).toContainText(/Not enough evidence yet · \d of 6 record types read/);
+  expect(await drawnScores(page)).toEqual([SCORE.value]);
   await noOldScale(page);
 });
 

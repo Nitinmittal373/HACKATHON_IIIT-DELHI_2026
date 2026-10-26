@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { NeevScore } from "@/components/NeevScore";
+import { UnratedNote } from "@/components/UnratedNote";
 import { StateBadge } from "@/components/StateBadge";
 import { ExternalLinkIcon } from "@/components/report/ExternalLinkIcon";
 import { bestColumn, companyRank, insolvencyRank, pillarLost, pillarsComparable } from "@/lib/compare";
@@ -53,9 +54,10 @@ export function compareRows(comparison: Comparison, t: Strings, lang: Lang): Com
       label: c.rows.score,
       cells: projects.map((p) => (
         <div key={p.check_id} className={styles.score}>
-          <NeevScore value={p.display_score.value} band={p.display_score.band} size={72} delay={0.1} />
+          <NeevScore score={p.display_score} size={72} delay={0.1} />
           <div>
-            <NeevScore value={p.display_score.value} band={p.display_score.band} variant="chip" showValue={false} />
+            <NeevScore score={p.display_score} variant="chip" showValue={false} />
+            <UnratedNote score={p.display_score} />
             <p className={styles.small}>{c.confidence(Math.round(p.display_score.confidence * 100))}</p>
           </div>
         </div>

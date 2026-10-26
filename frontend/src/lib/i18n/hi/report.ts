@@ -48,6 +48,7 @@ export const report: typeof en = {
   keyChecks: (read: number, total: number) => `${total} में से ${read} मुख्य जाँचें पढ़ी गईं`,
   records: (records: number, sources: number) => `${records} रिकॉर्ड · ${sources} स्रोत`,
   why: (value: number) => `${value} क्यों`,
+  whyUnrated: "अभी स्कोर क्यों नहीं है",
   whyLead: (max: number) => `सब ${max} से शुरू करते हैं। अंक सिर्फ़ उन रिकॉर्ड के लिए कटते हैं जो हमें मिले।`,
   noDrivers: "हमारे पढ़े किसी रिकॉर्ड से कोई अंक नहीं कटा।",
   evidence: "सबूत",

@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { NeevScore } from "@/components/NeevScore";
+import { UnratedNote } from "@/components/UnratedNote";
 import { StateBadge } from "@/components/StateBadge";
 import { dayOf } from "@/lib/format";
 import type { Lang, Strings } from "@/lib/i18n";
@@ -31,14 +32,15 @@ export function AlertCard({ alert, t, lang }: Props) {
           <h2 className={styles.project}>
             {alert.project_name ?? alert.rera_id} <StateBadge code={alert.state} name={alert.state_name} rera={alert.rera_name} t={t} lang={lang} />
           </h2>
+          {after && <UnratedNote score={after} />}
           <span className={`mono ${styles.when}`}>
             {t.alerts.when} {dayOf(alert.created_at, lang)}
           </span>
         </div>
-        <span className={styles.score} aria-label={t.alerts.scoreChange(before?.value, after?.value)}>
-          {before ? <NeevScore value={before.value} band={before.band} variant="chip" /> : <span aria-hidden="true">–</span>}
+        <span className={styles.score} aria-label={t.alerts.scoreChange(before?.value ?? undefined, after?.value ?? undefined)}>
+          {before ? <NeevScore score={before} variant="chip" /> : <span aria-hidden="true">–</span>}
           <span aria-hidden="true">→</span>
-          {after ? <NeevScore value={after.value} band={after.band} variant="chip" /> : <span aria-hidden="true">–</span>}
+          {after ? <NeevScore score={after} variant="chip" /> : <span aria-hidden="true">–</span>}
         </span>
       </header>
       {groups.map(([label, changes, kind]) =>

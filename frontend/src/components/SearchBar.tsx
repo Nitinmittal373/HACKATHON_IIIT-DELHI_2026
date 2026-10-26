@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useId, useRef, useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 
 import { useLang } from "@/lib/LangProvider";
 import { detectState, stateLabel } from "@/lib/states";
@@ -33,9 +33,18 @@ export function SearchBar({ label, placeholder, submitLabel }: Props) {
   const [chosenByHand, setChosenByHand] = useState(false);
   const states = load.status === "ready" ? load.states : [];
 
+  function follow(text: string) {
+    if (!chosenByHand) setState(detectState(text, states)?.code ?? ALL_INDIA);
+  }
+
+  // The list can arrive after the visitor has started typing; look at what is there then.
+  useEffect(() => {
+    if (load.status === "ready") follow(input.current?.value ?? "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [load.status]);
+
   function typed(event: ChangeEvent<HTMLInputElement>) {
-    if (chosenByHand) return;
-    setState(detectState(event.target.value, states)?.code ?? ALL_INDIA);
+    follow(event.target.value);
   }
 
   function pick(event: ChangeEvent<HTMLSelectElement>) {
