@@ -12,7 +12,7 @@ data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","s
 
 id: 4
 event: finding.added
-data: {"type":"finding.added","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"uprera","ts":"2026-10-25T04:00:00Z","data":{"finding":{"id":"fab645af672a4e20ad73ae092869db25","source":"uprera","kind":"registration","title":"Registration number appears on MahaRERA","area":"rera","verdict":"ok","reliability":"primary","source_url":"https://maharera.maharashtra.gov.in/projects-search-result?certificate_no=P99000055716","read_on":"2026-10-25","read_at":"2026-10-25T04:00:00Z","occurred_on":null,"count":null,"months":null,"scope":null,"total":null,"snippet":"P99000055716. SRI BALAJI RESIDENCY. Bhupesh Vasudev Bari. Dahanu. State. MAHARASHTRA. Pincode. 401602. Certificate. District. Palghar. Last Modified.","via":"search_snippet"}}}
+data: {"type":"finding.added","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"uprera","ts":"2026-10-25T04:00:00Z","data":{"finding":{"id":"82aa87a4aad345ffb62c5cac7a5d150b","source":"uprera","kind":"registration","title":"Registration number appears on MahaRERA","area":"rera","verdict":"ok","reliability":"primary","source_url":"https://maharera.maharashtra.gov.in/projects-search-result?certificate_no=P99000055716","read_on":"2026-10-25","read_at":"2026-10-25T04:00:00Z","occurred_on":null,"count":null,"months":null,"scope":null,"total":null,"snippet":"P99000055716. SRI BALAJI RESIDENCY. Bhupesh Vasudev Bari. Dahanu. State. MAHARASHTRA. Pincode. 401602. Certificate. District. Palghar. Last Modified.","via":"search_snippet"}}}
 
 id: 5
 event: source.completed
@@ -92,93 +92,81 @@ data: {"type":"source.live_url","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","s
 
 id: 24
 event: source.progress
-data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Navigate to e-Jagriti case search page"}}
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Navigate to e-Jagriti advance case search page"}}
 
 id: 25
 event: source.progress
-data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Understand search options available on the page"}}
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Switch to More Advance Search option"}}
 
 id: 26
 event: source.progress
-data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Understand the search form layout and options"}}
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Check for opposite party search option in dropdown"}}
 
 id: 27
 event: source.progress
-data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Select More Advance Search option to find opposite party search"}}
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Open Search By dropdown to see available options"}}
 
 id: 28
 event: source.progress
-data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Understand Search By dropdown options"}}
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Select RESPONDENT / OPPOSITE PARTY search option"}}
 
 id: 29
 event: source.progress
-data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Open Search By dropdown to find opposite party option"}}
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Input opposite party name Bhupesh Vasudev Bari"}}
 
 id: 30
 event: source.progress
-data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Select Respondent/Opposite Party search option"}}
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Find the search/submit button to submit the form"}}
 
 id: 31
 event: source.progress
-data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Type the party name Bhupesh Vasudev Bari"}}
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Find search or submit button on the page"}}
 
 id: 32
 event: source.progress
-data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Find the submit button to proceed with search"}}
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Find SUBMIT button element ID"}}
 
 id: 33
 event: source.progress
-data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Find submit button"}}
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Check for SUBMIT button on the page"}}
 
 id: 34
 event: source.progress
-data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Find all buttons on the page"}}
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Extract submit button details from page"}}
 
 id: 35
 event: source.progress
-data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Find submit button ID"}}
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"See full page layout and find SUBMIT button"}}
 
 id: 36
 event: source.progress
-data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Find submit button element ID"}}
+data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Look for SUBMIT button below captcha"}}
 
 id: 37
-event: source.progress
-data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"List all elements with IDs to find submit button"}}
-
-id: 38
-event: source.progress
-data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Find submit button visually"}}
-
-id: 39
-event: source.progress
-data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"text":"Stop due to CAPTCHA on search form"}}
-
-id: 40
 event: source.blocked
 data: {"type":"source.blocked","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"reason":"This page asks for a CAPTCHA. We never bypass one"}}
 
-id: 41
+id: 38
 event: source.completed
 data: {"type":"source.completed","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"consumer","ts":"2026-10-25T04:00:00Z","data":{"status":"blocked","message":"This page asks for a CAPTCHA. We never bypass one","checks_read":[]}}
 
-id: 42
+id: 39
 event: source.started
 data: {"type":"source.started","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"news","ts":"2026-10-25T04:00:00Z","data":{}}
 
-id: 43
+id: 40
 event: source.progress
 data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"news","ts":"2026-10-25T04:00:00Z","data":{"text":"Searching news for delay coverage"}}
 
-id: 44
+id: 41
 event: source.progress
 data: {"type":"source.progress","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"news","ts":"2026-10-25T04:00:00Z","data":{"text":"Checking whether the Supreme Court's NBCC order names this project"}}
 
-id: 45
+id: 42
 event: source.completed
 data: {"type":"source.completed","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"news","ts":"2026-10-25T04:00:00Z","data":{"status":"completed","message":null,"checks_read":[]}}
 
-id: 46
+id: 43
 event: check.completed
 data: {"type":"check.completed","check_id":"a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1","source":"check","ts":"2026-10-25T04:00:00Z","data":{"status":"completed","score":{"value":100,"band":"insufficient_evidence","band_label":"Not enough evidence yet","confidence":0.14,"provisional":true,"hard_stop":false},"display_score":{"value":null,"provisional_value":900,"band":"insufficient_evidence","hard_stop":false,"confidence":0.33,"provisional":true,"records_read":2,"records_total":6}}}
 

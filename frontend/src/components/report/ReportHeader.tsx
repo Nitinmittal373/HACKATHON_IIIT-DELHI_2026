@@ -3,6 +3,7 @@ import { StateBadge } from "@/components/StateBadge";
 import { RecheckNote } from "@/components/report/RecheckNote";
 import { ReportActions } from "@/components/report/ReportActions";
 import { dayOf, hoursSince } from "@/lib/format";
+import { builderFromListings } from "@/lib/reportView";
 import type { Lang, Strings } from "@/lib/i18n";
 import type { Report } from "@/lib/types";
 import styles from "./ReportHeader.module.css";
@@ -38,6 +39,9 @@ export function ReportHeader({ report, t, lang }: Props) {
               withName
             />
           </p>
+          {builderFromListings(report.findings) && (
+            <p className={styles.meta}>{t.states.builderFromListings(report.rera_name)}</p>
+          )}
           <CoverageNote
             coverage={report.coverage}
             rera={report.rera_name}

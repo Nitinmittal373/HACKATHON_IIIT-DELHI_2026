@@ -16,6 +16,8 @@ export const states = {
     searchOnly: (rera: string) =>
       `From the official portal's search results. Open the full record on ${rera}`,
   },
+  builderFromListings: (rera: string) =>
+    `Builder identified from public listings; verify on ${rera}.`,
   openOn: (rera: string) => `Open on ${rera}`,
   notYetChecked: "Not yet checked on the portal",
   coverage: {
