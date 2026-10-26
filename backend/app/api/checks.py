@@ -20,8 +20,9 @@ from app.config import Settings
 from app.models import Check, CheckCreate, CheckSummary, Project, RecentCheck
 from app.orchestrator import Orchestrator
 from app.ratelimit import RateLimiter
+from app.states.names import DEFAULT_STATE
+from app.states.registry import adapter_for
 from app.store import Store
-from app.uprera_links import details_url_for
 
 router = APIRouter(tags=["checks"])
 
@@ -78,10 +79,10 @@ async def create_check(
             headers={"Retry-After": str(wait)},
         )
     # The page search confirmed for this number; a number sent alone gets its stable page.
-    details_url = body.details_url or details_url_for(body.rera_id)
-    assert details_url is not None  # CheckCreate requires a link for new-format numbers
+    adapter = adapter_for(body.state or DEFAULT_STATE)
+    asked = Project(rera_id=body.rera_id, state=adapter.code, details_url=body.details_url or "")
     check = orchestrator.start(
-        Project(rera_id=body.rera_id, details_url=details_url), fresh=body.fresh
+        asked.model_copy(update={"details_url": adapter.details_url(asked)}), fresh=body.fresh
     )
     response.headers["Location"] = f"/api/checks/{check.id}"
     return check

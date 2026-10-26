@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session, sessionmaker
 from app.db import SourceCacheRow
 from app.matching import normalize
 from app.models import CheckKey, FamilyTree, Finding, Project, SourceName
+from app.states.names import DEFAULT_STATE
 
 # How many days a result is reused. Company-level group facts change slowly.
 TTL_DAYS: dict[SourceName, int] = {
@@ -45,11 +46,14 @@ def entity_for(source: SourceName, project: Project) -> str | None:
     promoter = normalize(project.promoter)
     if source not in TTL_DAYS or not promoter:
         return None
+    # UP keys stay as they were; every other state is kept apart, since a group lists its own
+    # state's projects.
+    state = "" if project.state == DEFAULT_STATE else f"{project.state}|"
     if source in ("insolvency", "news"):
-        return f"{promoter}|{project.rera_id}"
+        return f"{state}{promoter}|{project.rera_id}"
     if source == "land":
-        return f"{promoter}|{normalize(project.district)}"
-    return promoter
+        return f"{state}{promoter}|{normalize(project.district)}"
+    return f"{state}{promoter}"
 
 
 class SourceCache:

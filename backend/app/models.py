@@ -10,9 +10,10 @@ from datetime import date, datetime
 from typing import Any, Literal
 from urllib.parse import urlsplit
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.api_model import ApiModel
+from app.states.names import DEFAULT_STATE, state_name
 
 SourceName = Literal[
     "uprera", "registry", "insolvency", "land", "consumer", "news", "group", "sarfaesi"
@@ -64,7 +65,21 @@ def is_uprera_url(url: str) -> bool:
     return parts.scheme == "https" and parts.hostname in UPRERA_HOSTS
 
 
-class Project(ApiModel):
+class StateTagged(ApiModel):
+    """A record that belongs to one state's RERA. Records made before all-India support are UP."""
+
+    state: str = DEFAULT_STATE
+    state_name: str = state_name(DEFAULT_STATE)
+
+    @model_validator(mode="before")
+    @classmethod
+    def name_the_state(cls, data: Any) -> Any:
+        if isinstance(data, dict) and "state_name" not in data:
+            return {**data, "state_name": state_name(data.get("state", DEFAULT_STATE))}
+        return data
+
+
+class Project(StateTagged):
     rera_id: str
     name: str | None = None
     promoter: str | None = None
@@ -76,38 +91,76 @@ class Project(ApiModel):
 class SearchResponse(ApiModel):
     query: str
     candidates: list[Project]
+    # The state the number's format pointed at; None for a name or a number of no known state.
+    detected_state: str | None = None
+    # The states whose portals were searched, so the page can say where it looked.
+    searched_states: list[str] = []
+
+
+CoverageLevel = Literal["full", "partial", "search_only"]
+
+
+class StateInfo(ApiModel):
+    """One state's RERA portal and how much of it NeevCheck reads."""
+
+    code: str
+    name: str
+    rera_name: str
+    coverage: CoverageLevel
+    # Real registration numbers read from the portal, for the search box's try-chips.
+    examples: list[str]
+    # What is read there, in a sentence.
+    note: str
+    portal_url: str
+    complaint_url: str
 
 
 class CheckCreate(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    rera_id: str = Field(max_length=40, examples=["UPRERAPRJ8334"])
-    # The page search returned. Required for new-format numbers, whose pages have no stable
+    rera_id: str = Field(max_length=60, examples=["UPRERAPRJ8334", "P51800000937"])
+    # Which state's RERA the number belongs to. Optional: the number's format tells, and
+    # UP numbers, the only ones before all-India support, default to "UP".
+    state: str | None = Field(default=None, max_length=2, examples=["UP", "MH"])
+    # The page search returned. Required for new-format UP numbers, whose pages have no stable
     # address; send it for every number, since many later numbers have no stable page either.
     details_url: str | None = Field(default=None, max_length=500)
     # Skip the 24-hour reuse of a recent check ("Re-check now"). The daily cap still applies.
     fresh: bool = False
 
-    @field_validator("rera_id")
-    @classmethod
-    def valid_rera_id(cls, value: str) -> str:
-        normalized = normalize_rera_id(value)
-        if normalized is None:
-            raise ValueError("must be a UP-RERA project number such as UPRERAPRJ8334")
-        return normalized
-
-    @field_validator("details_url")
-    @classmethod
-    def uprera_url_only(cls, value: str | None) -> str | None:
-        if value is not None and not is_uprera_url(value):
-            raise ValueError("must be an https link on up-rera.in")
-        return value
-
     @model_validator(mode="after")
-    def new_format_needs_url(self) -> "CheckCreate":
-        if is_new_format(self.rera_id) and self.details_url is None:
-            raise ValueError("new-format numbers need the details_url returned by search")
+    def valid_for_its_state(self) -> "CheckCreate":
+        self.state, self.rera_id = check_project_number(self.rera_id, self.state, self.details_url)
         return self
+
+
+def check_project_number(
+    rera_id: str, state: str | None, details_url: str | None
+) -> tuple[str, str]:
+    """(state, canonical number) of a number a visitor sent, or a ValueError saying what is wrong.
+
+    The state is the one named, else the one whose number format matches. A link is accepted
+    only on that state's own RERA site, so a check never reads a page we did not choose.
+    """
+    # Imported here: the state registry imports these models.
+    from app.states.registry import BY_CODE, detect_state
+
+    found = detect_state(rera_id)
+    adapter = BY_CODE.get(state or (found[0].code if found else ""))
+    canonical = adapter.canonical_id(rera_id) if adapter else None
+    if adapter is None or canonical is None:
+        raise ValueError("must be a RERA project number of a supported state, e.g. UPRERAPRJ8334")
+    if details_url is not None and not _on_portal(details_url, adapter.domains):
+        raise ValueError(f"must be an https link on {adapter.rera_name}'s own site")
+    if adapter.code == DEFAULT_STATE and is_new_format(canonical) and not details_url:
+        raise ValueError("new-format numbers need the details_url returned by search")
+    return adapter.code, canonical
+
+
+def _on_portal(url: str, domains: tuple[str, ...]) -> bool:
+    parts = urlsplit(url)
+    host = parts.hostname or ""
+    return parts.scheme == "https" and any(host == d or host.endswith("." + d) for d in domains)
 
 
 class SourceRun(ApiModel):
@@ -186,7 +239,7 @@ class DisplayScore(ApiModel):
         )
 
 
-class Check(ApiModel):
+class Check(StateTagged):
     id: str
     rera_id: str
     details_url: str
@@ -252,7 +305,7 @@ class Score(ApiModel):
     checks_unread: list[CheckKey]
 
 
-class CheckSummary(ApiModel):
+class CheckSummary(StateTagged):
     """One line of a visitor's history: enough to list a check without loading its report."""
 
     id: str
@@ -318,7 +371,7 @@ class FamilyTree(ApiModel):
     companies: list[FamilyCompany] = []
 
 
-class Report(ApiModel):
+class Report(StateTagged):
     check: Check
     project: Project
     # The classic 0-100 score, shown only as a transparency line in the method section.

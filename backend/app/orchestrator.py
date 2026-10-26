@@ -46,6 +46,9 @@ from app.sources.base import (
     SourceEvent,
     SourceUnavailable,
 )
+from app.sources.state_rera import StateReraSource
+from app.states.names import DEFAULT_STATE
+from app.states.registry import adapter_for
 from app.store import Store
 from app.tinyfish import WebClient, WebError
 
@@ -116,6 +119,9 @@ class Orchestrator:
         self._store.set_check_status(check_id, "running")
         try:
             primary, *others = self._sources()
+            adapter = adapter_for(project.state)
+            if project.state != DEFAULT_STATE:
+                primary = StateReraSource(adapter)
             now = self._clock()
             ctx = SourceContext(
                 project=project,
@@ -127,7 +133,8 @@ class Orchestrator:
             )
             ctx, primary_read = await self._run_source(check_id, primary, ctx, fresh)
             if "registration" not in primary_read:
-                self._finish(check_id, "failed", message="UP-RERA could not be read, so no score")
+                message = f"{adapter.rera_name} could not be read, so no score"
+                self._finish(check_id, "failed", message=message)
                 return
             others_read = await asyncio.gather(
                 *(self._run_source(check_id, s, ctx, fresh) for s in others)
@@ -227,9 +234,7 @@ class Orchestrator:
             )
             return ctx, read
 
-    def _cached(
-        self, source: Source, entity: str | None, ctx: SourceContext
-    ) -> CachedRead | None:
+    def _cached(self, source: Source, entity: str | None, ctx: SourceContext) -> CachedRead | None:
         if self._source_cache is None or entity is None:
             return None
         return self._source_cache.get(source.name, entity, ctx.today)

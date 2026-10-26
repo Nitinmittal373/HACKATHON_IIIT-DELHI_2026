@@ -5,7 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.api.deps import get_web
 from app.models import SearchResponse
-from app.resolve import resolve
+from app.states.registry import known_state
+from app.states.resolver import resolve_any
 from app.tinyfish import WebClient, WebError
 
 router = APIRouter(tags=["projects"])
@@ -26,14 +27,27 @@ ERROR_STATUS = {"timeout": 504, "rate_limited": 429}
 async def search_projects(
     q: Annotated[str, Query(min_length=2, max_length=120, description="RERA number or name")],
     web: Annotated[WebClient, Depends(get_web)],
+    state: Annotated[
+        str | None,
+        Query(max_length=2, description="State code such as MH; omit to search every state"),
+    ] = None,
 ) -> SearchResponse:
+    if state is not None and not known_state(state.upper()):
+        raise HTTPException(status_code=422, detail=f"{state} is not a supported state code")
     try:
-        candidates = await asyncio.wait_for(resolve(q, web), SEARCH_BUDGET_SECONDS)
+        found = await asyncio.wait_for(
+            resolve_any(q, web, state.upper() if state else None), SEARCH_BUDGET_SECONDS
+        )
     except TimeoutError:
-        raise search_error(WebError("UP-RERA did not answer in time", "timeout")) from None
+        raise search_error(WebError("The RERA portals did not answer in time", "timeout")) from None
     except WebError as error:
         raise search_error(error) from None
-    return SearchResponse(query=q, candidates=candidates)
+    return SearchResponse(
+        query=q,
+        candidates=found.candidates,
+        detected_state=found.detected_state,
+        searched_states=found.searched_states,
+    )
 
 
 def search_error(error: WebError) -> HTTPException:

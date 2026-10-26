@@ -20,6 +20,7 @@ from app.api import (
     promoters,
     reports,
     sentinel,
+    states,
 )
 from app.cache import SourceCache
 from app.config import BACKEND_DIR, Settings, load_settings
@@ -128,6 +129,7 @@ def create_app(
     for module in (
         health,
         meta,
+        states,
         projects,
         promoters,
         compare,

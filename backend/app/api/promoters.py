@@ -1,10 +1,10 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 
 from app.api.deps import get_store
 from app.api.projects import search_error
-from app.models import normalize_rera_id
+from app.states.registry import adapter_for, known_state
 from app.store import Store
 from app.tinyfish import WebError
 from app.track_record import TrackedProject, TrackRecord, TrackRecords
@@ -24,11 +24,16 @@ async def promoter_projects(
     name: Annotated[str, Query(min_length=3, max_length=300, description="Promoter's legal name")],
     records: Annotated[TrackRecords, Depends(get_track_records)],
     store: Annotated[Store, Depends(get_store)],
-    exclude: Annotated[str | None, Query(max_length=40, description="RERA no. to skip")] = None,
+    exclude: Annotated[str | None, Query(max_length=60, description="RERA no. to skip")] = None,
+    state: Annotated[str, Query(max_length=2, description="State code; UP when omitted")] = "UP",
 ) -> TrackRecord:
-    """Up to 10 other UP-RERA projects of a promoter, from Search on up-rera.in; cached a day."""
+    """Up to 10 other projects of a promoter in one state, from Search on its portal."""
+    if not known_state(state.upper()):
+        raise HTTPException(status_code=422, detail=f"{state} is not a supported state code")
+    code = state.upper()
     try:
-        record = await records.find(name.strip(), normalize_rera_id(exclude or ""))
+        skip = adapter_for(code).canonical_id(exclude or "") if exclude else None
+        record = await records.find(name.strip(), skip, code)
     except WebError as error:
         raise search_error(error) from None
     return record.model_copy(update={"projects": [with_score(p, store) for p in record.projects]})
