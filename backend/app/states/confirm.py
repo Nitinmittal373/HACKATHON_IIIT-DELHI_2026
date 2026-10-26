@@ -15,11 +15,13 @@ from app.tinyfish import WebClient, WebError
 
 # TinyFish allows 30 searches a minute; confirming more than this would starve the buyer's next try.
 MAX_CONFIRMATIONS = 4
+# Numbers no portal page has printed yet: from listing sites, a buyer's file or a public order.
+UNCONFIRMED = ("listings_only", "from_document", "from_order")
 
 
 async def confirm_on_portals(candidates: list[Project], web: WebClient) -> list[Project]:
     """The candidates, with each listings-only number checked on its portal (best first)."""
-    pending = [p for p in candidates if p.status == "listings_only"][:MAX_CONFIRMATIONS]
+    pending = [p for p in candidates if p.status in UNCONFIRMED][:MAX_CONFIRMATIONS]
     answers = await asyncio.gather(*(confirmed(p, web) for p in pending))
     replaced = {squash(p.rera_id): answer for p, answer in zip(pending, answers, strict=True)}
     updated = [replaced.get(squash(p.rera_id)) or p for p in candidates]
