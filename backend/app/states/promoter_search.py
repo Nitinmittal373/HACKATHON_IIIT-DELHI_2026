@@ -132,13 +132,19 @@ def companies_in(hits: Iterable[SearchHit], words: set[str]) -> list[CompanyHit]
     for hit in hits:
         text = hit_text(hit)
         for match in COMPANY.finditer(text):
-            name = match.group(1).strip()
+            name = _once(match.group(1).strip())
             if share_of(words, name.lower()) < NAME_SHARE:
                 continue
             cin = CIN.search(text)
             company = CompanyHit(name=name, cin=cin.group(0) if cin else None, source_url=hit.url)
             found.setdefault(squash(name), company)
     return list(found.values())[:MAX_COMPANIES]
+
+
+def _once(name: str) -> str:
+    """A title and its first sentence repeat the name: "X LIMITED. X LIMITED" is "X LIMITED"."""
+    repeated = re.fullmatch(r"(.+?)\.?\s+\1", name, re.IGNORECASE)
+    return repeated.group(1) if repeated else name
 
 
 def one_each(projects: list[Project]) -> list[Project]:
