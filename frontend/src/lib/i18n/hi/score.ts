@@ -9,7 +9,10 @@ export const score: typeof English = {
     High: "ज़्यादा जोखिम",
     insufficient_evidence: "अभी पर्याप्त प्रमाण नहीं",
   },
-  label: (value, max, band) => `नींवस्कोर ${max} में से ${value}, ${band}`,
+  label: (value, max, band) =>
+    value === null ? `नींवस्कोर नहीं दिया गया, ${band}` : `नींवस्कोर ${max} में से ${value}, ${band}`,
   outOf: (max) => `${max} में से`,
-  short: (value, band) => `नींवस्कोर ${value} · ${band}`,
+  short: (value, band) => (value === null ? band : `नींवस्कोर ${value} · ${band}`),
+  dash: "—",
+  unrated: (read, total) => `अभी पर्याप्त प्रमाण नहीं · ${total} में से ${read} तरह के रिकॉर्ड पढ़े गए`,
 };

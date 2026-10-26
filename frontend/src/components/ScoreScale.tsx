@@ -15,7 +15,7 @@ export function ScoreScale() {
   const meta = useMeta();
   const recent = useRecentChecks();
   const latest =
-    recent.status === "ready" ? recent.checks.find((check) => check.display_score !== null) : undefined;
+    recent.status === "ready" ? recent.checks.find((check) => check.display_score?.value != null) : undefined;
   const display = latest?.display_score ?? null;
   // The scale reads left to right from the highest risk to the lowest.
   const bands = [...meta.bands].reverse();
@@ -35,7 +35,7 @@ export function ScoreScale() {
 
         <div
           className={styles.scale}
-          style={display ? { ["--at" as string]: `${scalePosition(meta, display.value) * 100}%` } : undefined}
+          style={display ? { ["--at" as string]: `${scalePosition(meta, display.value ?? meta.scale.min) * 100}%` } : undefined}
         >
           <ol
             className={styles.bands}

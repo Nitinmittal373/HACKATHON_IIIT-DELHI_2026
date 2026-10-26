@@ -1,0 +1,6 @@
+.note {
+  display: block;
+  color: var(--mu);
+  font-size: 12.5px;
+  line-height: 1.4;
+}

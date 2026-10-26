@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 
 import { NeevScore } from "@/components/NeevScore";
+import { UnratedNote } from "@/components/UnratedNote";
 import { StateBadge } from "@/components/StateBadge";
 import { describeApiError } from "@/lib/apiMessages";
 import { dayOf } from "@/lib/format";
@@ -50,7 +51,7 @@ export function ReportCard({ check, picked, canPick, onTogglePicked, onRemove }:
   return (
     <article className={`card ${styles.card}`} aria-labelledby={titleId}>
       {display ? (
-        <NeevScore value={display.value} band={display.band} size={84} delay={0.1} />
+        <NeevScore score={display} size={84} delay={0.1} />
       ) : (
         <span className={styles.noRing} aria-hidden="true" />
       )}
@@ -63,12 +64,13 @@ export function ReportCard({ check, picked, canPick, onTogglePicked, onRemove }:
           {check.rera_id} <StateBadge code={check.state} name={check.state_name} rera={check.rera_name} t={t} lang={lang} />
         </p>
         <p className={styles.tags}>
-          {display && <NeevScore value={display.value} band={display.band} variant="chip" showValue={false} />}
+          {display && <NeevScore score={display} variant="chip" showValue={false} />}
           <span className={styles.status} data-status={status}>
             {t.reports.status[check.status]}
           </span>
           <span className={styles.date}>{t.reports.checkedOn(dayOf(check.created_at, lang))}</span>
         </p>
+        {display && <UnratedNote score={display} />}
         {!display && (
           <p className={styles.hint}>
             {check.status === "failed" ? t.reports.noScoreFailed : t.reports.noScoreRunning}

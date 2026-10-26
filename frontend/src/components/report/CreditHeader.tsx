@@ -22,14 +22,17 @@ export function CreditHeader({ report, ids, meta, t }: Props) {
   const read = total - score.pillars_unread.length;
   // Built from the reason codes by a template; no model writes it and none can change the score.
   const costing = topReasons(score).filter((reason) => reason.code !== "R12" && reason.points < 0);
-  const narrative = t.credit.narrative(
-    display.value,
-    meta.scale.max,
-    band,
-    costing.map((reason) => t.credit.codes[reason.code] ?? reason.label),
-    score.pillars_unread.length,
-    total,
-  );
+  const narrative =
+    display.value === null
+      ? t.credit.narrativeUnrated(read, total)
+      : t.credit.narrative(
+          display.value,
+          meta.scale.max,
+          band,
+          costing.map((reason) => t.credit.codes[reason.code] ?? reason.label),
+          score.pillars_unread.length,
+          total,
+        );
 
   return (
     <section className={`card ${styles.card}`} aria-label={t.credit.title}>
@@ -40,7 +43,7 @@ export function CreditHeader({ report, ids, meta, t }: Props) {
       )}
       <div className={styles.top}>
         <div className={styles.dial}>
-          <NeevScore value={display.value} band={display.band} variant="dial" />
+          <NeevScore score={display} variant="dial" />
           <span className={styles.band} data-tone={BAND_TONE[display.band]}>
             {band}
           </span>

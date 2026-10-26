@@ -48,6 +48,7 @@ export const report = {
   records: (records: number, sources: number) =>
     `${records} ${records === 1 ? "record" : "records"} · ${sources} ${sources === 1 ? "source" : "sources"}`,
   why: (value: number) => `Why ${value}`,
+  whyUnrated: "Why there is no score yet",
   whyLead: (max: number) => `Everyone starts at ${max}. Points come off only for records we found.`,
   noDrivers: "No record we read cost any points.",
   evidence: "Evidence",

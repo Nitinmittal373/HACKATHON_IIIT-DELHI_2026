@@ -20,8 +20,13 @@ export default async function Image({ params }: { params: Promise<{ id: string }
     try {
       const report = await getReport(id);
       name = report.project.name ?? report.project.rera_id;
-      score = String(report.display_score.value);
-      band = STRINGS.en.score.bands[report.display_score.band];
+      const display = report.display_score;
+      // An unrated project gets no number on the picture either.
+      score = display.value === null ? "" : String(display.value);
+      band =
+        display.value === null
+          ? STRINGS.en.score.unrated(display.records_read, display.records_total)
+          : STRINGS.en.score.bands[display.band];
     } catch (error) {
       if (!(error instanceof ApiError)) throw error;
     }

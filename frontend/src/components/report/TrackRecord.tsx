@@ -75,7 +75,7 @@ export function TrackRecord({
                   </span>
                 </div>
                 {project.display_score && (
-                  <NeevScore value={project.display_score.value} band={project.display_score.band} variant="chip" />
+                  <NeevScore score={project.display_score} variant="chip" />
                 )}
                 <Link
                   href={`/check?q=${encodeURIComponent(project.rera_id)}`}

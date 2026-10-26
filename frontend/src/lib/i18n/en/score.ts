@@ -11,7 +11,13 @@ const bands: Record<BandV2, string> = {
 /** The words for NeevScore: one band map, used by every screen. The scale comes from /api/meta. */
 export const score = {
   bands,
-  label: (value: number, max: number, band: string) => `NeevScore ${value} out of ${max}, ${band}`,
+  label: (value: number | null, max: number, band: string) =>
+    value === null ? `NeevScore not given, ${band}` : `NeevScore ${value} out of ${max}, ${band}`,
   outOf: (max: number) => `out of ${max}`,
-  short: (value: number, band: string) => `NeevScore ${value} · ${band}`,
+  short: (value: number | null, band: string) =>
+    value === null ? band : `NeevScore ${value} · ${band}`,
+  /** Stands where the number would be when too little was read to give one. */
+  dash: "—",
+  unrated: (read: number, total: number) =>
+    `Not enough evidence yet · ${read} of ${total} record types read`,
 };

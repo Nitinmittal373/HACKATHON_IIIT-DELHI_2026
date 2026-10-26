@@ -17,8 +17,10 @@ export const home = {
   recent: {
     title: "Recently checked on NeevCheck",
     lead: "Real checks run by other buyers. Each one opens its full report, with every source.",
-    item: (name: string, score: number, band: string, date: string) =>
-      `${name}: NeevScore ${score}, ${band}, checked ${date}`,
+    item: (name: string, score: number | null, band: string, date: string) =>
+      score === null
+        ? `${name}: not enough evidence yet, checked ${date}`
+        : `${name}: NeevScore ${score}, ${band}, checked ${date}`,
   },
   problem: {
     eyebrow: "The problem",

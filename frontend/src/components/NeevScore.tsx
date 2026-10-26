@@ -3,16 +3,14 @@
 import { useLang } from "@/lib/LangProvider";
 import { useMeta } from "@/lib/MetaProvider";
 import { BAND_TONE, scalePosition } from "@/lib/neevScore";
-import type { BandV2 } from "@/lib/types";
+import type { DisplayScore } from "@/lib/types";
 import styles from "./NeevScore.module.css";
 
 export type NeevScoreVariant = "dial" | "ring" | "chip";
 
 interface Props {
-  /** display_score.value */
-  value: number;
-  /** display_score.band */
-  band: BandV2;
+  /** The display score. With no value (too little read) a dash and the reason are drawn. */
+  score: Pick<DisplayScore, "value" | "band" | "records_read" | "records_total">;
   variant?: NeevScoreVariant;
   /** Pixel width of the dial or ring; a chip sizes itself. */
   size?: number;
@@ -34,18 +32,22 @@ const DIAL_RADIUS = 80;
  * reader's language, so no screen carries its own idea of 300, 900 or the band edges. Colour
  * never stands alone: the band is always written out.
  */
-export function NeevScore({ value, band, variant = "ring", size, delay = 0.2, showValue = true }: Props) {
+export function NeevScore({ score, variant = "ring", size, delay = 0.2, showValue = true }: Props) {
+  const { value, band } = score;
   const { t } = useLang();
   const meta = useMeta();
   const label = t.score.bands[band];
   const tone = BAND_TONE[band];
-  const position = scalePosition(meta, value);
-  const aria = t.score.label(value, meta.scale.max, label);
+  const rated = value !== null;
+  const position = rated ? scalePosition(meta, value) : 0;
+  const reason = t.score.unrated(score.records_read, score.records_total);
+  const aria = rated ? t.score.label(value, meta.scale.max, label) : `${label}. ${reason}`;
+  const shown = rated ? value : t.score.dash;
 
   if (variant === "chip") {
     return (
       <span className={styles.chip} data-tone={tone} data-band={band}>
-        {showValue && <b className="num">{value}</b>}
+        {showValue && <b className="num">{shown}</b>}
         <span>{label}</span>
       </span>
     );
@@ -73,8 +75,8 @@ export function NeevScore({ value, band, variant = "ring", size, delay = 0.2, sh
           />
         </svg>
         <div className={styles.read} aria-hidden="true">
-          <span className={`num ${styles.dialValue}`}>{value}</span>
-          <span className={`mono ${styles.of}`}>{t.score.outOf(meta.scale.max)}</span>
+          <span className={`num ${styles.dialValue}`}>{shown}</span>
+          <span className={`mono ${styles.of}`}>{rated ? t.score.outOf(meta.scale.max) : reason}</span>
         </div>
         <div className={`mono ${styles.ends}`} aria-hidden="true">
           <span>{meta.scale.min}</span>
@@ -109,9 +111,9 @@ export function NeevScore({ value, band, variant = "ring", size, delay = 0.2, sh
       </svg>
       <div className={styles.ringLabel} aria-hidden="true">
         <span className={`num ${styles.ringValue}`} style={{ fontSize: pixels * 0.3 }}>
-          {value}
+          {shown}
         </span>
-        <span className={`mono ${styles.ringOf}`}>/ {meta.scale.max}</span>
+        {rated && <span className={`mono ${styles.ringOf}`}>/ {meta.scale.max}</span>}
       </div>
     </div>
   );
