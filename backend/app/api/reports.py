@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.api.deps import CheckId, find_check, get_store
 from app.models import Check, DisplayScore, Report
+from app.states.registry import adapter_for
 from app.store import Store
 
 router = APIRouter(tags=["checks"])
@@ -32,9 +33,11 @@ def assemble_report(store: Store, check: Check) -> Report | None:
     points = {driver.finding_id: driver.points for driver in score.drivers}
     findings.sort(key=lambda f: points.get(f.id, 0))
     timeline = sorted((f for f in findings if f.occurred_on), key=lambda f: f.occurred_on)
+    adapter = adapter_for(project.state)
     return Report(
         state=project.state,
         state_name=project.state_name,
+        rera_name=project.rera_name,
         check=check,
         project=project,
         score=score,
@@ -43,4 +46,7 @@ def assemble_report(store: Store, check: Check) -> Report | None:
         display_score=DisplayScore.of(score_v2),
         score_v2=score_v2,
         family=store.get_family(check.id),
+        coverage=adapter.coverage,
+        portal_url=adapter.search_url,
+        complaint_url=adapter.complaint_url,
     )

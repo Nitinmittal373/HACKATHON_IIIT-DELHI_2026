@@ -170,6 +170,7 @@ def test_my_reports_lists_known_checks_in_the_order_asked(client: TestClient) ->
         "rera_id": "UPRERAPRJ8334",
         "state": "UP",
         "state_name": "Uttar Pradesh",
+        "rera_name": "UP-RERA",
         "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
         "project": "SUPERTECH ECO VILLAGE-I PHASE I-C",
         "promoter": "SUPERTECH LIMITED",

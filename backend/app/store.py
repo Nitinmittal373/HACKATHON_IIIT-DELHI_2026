@@ -39,7 +39,7 @@ EXTRA_FIELDS = ("snippet", "total", "via")
 
 # The home page card shows the three biggest reasons behind a score.
 # The state is not stored: every number format belongs to exactly one state's RERA.
-STATE_FIELDS = {"state", "state_name"}
+STATE_FIELDS = {"state", "state_name", "rera_name"}
 RECENT_DRIVERS = 3
 RECENT_REASONS = 3
 

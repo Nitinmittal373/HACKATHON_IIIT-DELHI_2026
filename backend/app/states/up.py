@@ -25,6 +25,7 @@ class UpAdapter:
     examples = ("UPRERAPRJ8334", "UPRERAPRJ2634")
     complaint_url = "https://www.up-rera.in/ComplaintHome"
     search_url = "https://www.up-rera.in/"
+    unverified_format = False
     note = (
         "Fetch reads the project page and its summary page: promoter, dates, extensions, "
         "status and complaint counts."

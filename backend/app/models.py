@@ -15,6 +15,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from app.api_model import ApiModel
 from app.states.names import DEFAULT_STATE, state_name
 
+CoverageLevel = Literal["full", "partial", "search_only"]
 SourceName = Literal[
     "uprera", "registry", "insolvency", "land", "consumer", "news", "group", "sarfaesi"
 ]
@@ -70,13 +71,24 @@ class StateTagged(ApiModel):
 
     state: str = DEFAULT_STATE
     state_name: str = state_name(DEFAULT_STATE)
+    # The state's authority as its own pages call it, such as "MahaRERA".
+    rera_name: str = "UP-RERA"
 
     @model_validator(mode="before")
     @classmethod
     def name_the_state(cls, data: Any) -> Any:
-        if isinstance(data, dict) and "state_name" not in data:
-            return {**data, "state_name": state_name(data.get("state", DEFAULT_STATE))}
-        return data
+        if not isinstance(data, dict):
+            return data
+        # Imported here: the state registry imports these models.
+        from app.states.registry import BY_CODE
+
+        code = data.get("state", DEFAULT_STATE)
+        adapter = BY_CODE.get(code)
+        filled = {
+            "state_name": state_name(code),
+            "rera_name": adapter.rera_name if adapter else "RERA",
+        }
+        return {**filled, **data}
 
 
 class Project(StateTagged):
@@ -97,9 +109,6 @@ class SearchResponse(ApiModel):
     searched_states: list[str] = []
 
 
-CoverageLevel = Literal["full", "partial", "search_only"]
-
-
 class StateInfo(ApiModel):
     """One state's RERA portal and how much of it NeevCheck reads."""
 
@@ -113,6 +122,11 @@ class StateInfo(ApiModel):
     note: str
     portal_url: str
     complaint_url: str
+    # Patterns the registration numbers of this state match, so a page can pick the state while
+    # a visitor types. Written for Python, and valid in JavaScript with the "i" flag.
+    id_patterns: list[str]
+    # False while no real number of this state has been read from its portal.
+    format_verified: bool
 
 
 class CheckCreate(BaseModel):
@@ -385,6 +399,10 @@ class Report(StateTagged):
     score_v2: ScoreV2
     # Directors, related companies and their projects; None unless the group source ran.
     family: FamilyTree | None = None
+    # Where this state's portal is, how much of it is read, and where a complaint is filed.
+    coverage: CoverageLevel = "full"
+    portal_url: str = "https://www.up-rera.in/"
+    complaint_url: str = "https://www.up-rera.in/ComplaintHome"
 
 
 class Event(BaseModel):

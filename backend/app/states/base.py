@@ -86,6 +86,8 @@ class StateSpec:
     positional_in: str = ""
     # Name of a parser (app.states.lists) for the project list that Fetch can read.
     row_parser: str | None = None
+    # More (address part, pattern) pairs for other pages that print values by position.
+    extra_positional: tuple[tuple[str, str], ...] = ()
     # How sure a number that fits the pattern is to belong to this state, when formats overlap.
     detect_confidence: float = 0.9
     unverified_format: bool = field(default=False)
@@ -106,6 +108,7 @@ class StateAdapter(Protocol):
     complaint_url: str
     search_url: str
     note: str
+    unverified_format: bool
 
     def detect(self, query: str) -> float:
         """0 when the text is not this state's number; up to 1 when it surely is."""

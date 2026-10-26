@@ -19,7 +19,10 @@ ADAPTER = SearchStateAdapter(
         search_url="https://haryanarera.gov.in/assistancecontrol/project_search_public/2",
         query_name="HRERA Haryana",
         positional_in="view_certificate",
-        positional=r"M/s\.? (?P<promoter>[A-Z][\w &'.\-]{2,70}?(?:Ltd|Limited|LLP))",
+        positional=(
+            r"Date[.|\s]+(?:M/s\.? )?"
+            r"(?P<promoter>[A-Z][\w &'.\-]{2,70}?(?:Ltd|Limited|LLP))"
+        ),
         note=(
             "Fetch and an India-proxy agent both fail on this portal; Search returns "
             "approval date, status and promoter."
