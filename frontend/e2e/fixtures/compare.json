@@ -15,10 +15,13 @@
       },
       "display_score": {
         "value": 741,
+        "provisional_value": null,
         "band": "Watch",
         "hard_stop": false,
         "confidence": 0.67,
-        "provisional": false
+        "provisional": false,
+        "records_read": 4,
+        "records_total": 6
       },
       "pillars": [
         {
@@ -128,7 +131,7 @@
       ]
     },
     {
-      "check_id": "add238f5962343d59c119e8571b6602d",
+      "check_id": "0da04d7b616b405483f3263356e815bd",
       "project": {
         "state": "UP",
         "state_name": "Uttar Pradesh",
@@ -141,11 +144,14 @@
         "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=6742"
       },
       "display_score": {
-        "value": 900,
+        "value": null,
+        "provisional_value": 900,
         "band": "insufficient_evidence",
         "hard_stop": false,
         "confidence": 0.33,
-        "provisional": true
+        "provisional": true,
+        "records_read": 2,
+        "records_total": 6
       },
       "pillars": [
         {

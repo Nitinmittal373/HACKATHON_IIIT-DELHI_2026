@@ -63,9 +63,12 @@
   "reused": false,
   "display_score": {
     "value": 741,
+    "provisional_value": null,
     "band": "Watch",
     "hard_stop": false,
     "confidence": 0.67,
-    "provisional": false
+    "provisional": false,
+    "records_read": 4,
+    "records_total": 6
   }
 }

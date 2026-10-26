@@ -649,6 +649,10 @@ export interface components {
         /**
          * DisplayScore
          * @description The score every screen shows: NeevScore v2 on the 300-900 scale, without the detail.
+         *
+         *     When too little was read to rate the project (band insufficient_evidence) there is no number
+         *     to show: `value` is null, and the computed one is kept as `provisional_value` for the
+         *     method section only. A number nobody can stand behind is worse than none.
          */
         DisplayScore: {
             /**
@@ -662,8 +666,20 @@ export interface components {
             hard_stop: boolean;
             /** Provisional */
             provisional: boolean;
+            /** Provisional Value */
+            provisional_value: number | null;
+            /**
+             * Records Read
+             * @default 0
+             */
+            records_read: number;
+            /**
+             * Records Total
+             * @default 6
+             */
+            records_total: number;
             /** Value */
-            value: number;
+            value: number | null;
         };
         /** Driver */
         Driver: {

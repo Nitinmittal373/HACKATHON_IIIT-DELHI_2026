@@ -41,7 +41,8 @@ def build_message(settings: Settings, to: str, language: Language, alert: Alert)
     project = alert.project_name or alert.rera_id
     old, new = alert.old_display_score, alert.new_display_score
     scores = SCORE_LINE[language].format(
-        old=old.value if old else NOT_RATED, new=new.value if new else NOT_RATED
+        old=old.value if old and old.value is not None else NOT_RATED,
+        new=new.value if new and new.value is not None else NOT_RATED,
     )
     lines = [scores, ""]
     for name, changes in (

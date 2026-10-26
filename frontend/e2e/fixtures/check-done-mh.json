@@ -70,10 +70,13 @@
   ],
   "reused": false,
   "display_score": {
-    "value": 900,
+    "value": null,
+    "provisional_value": 900,
     "band": "insufficient_evidence",
     "hard_stop": false,
     "confidence": 0.33,
-    "provisional": true
+    "provisional": true,
+    "records_read": 2,
+    "records_total": 6
   }
 }
