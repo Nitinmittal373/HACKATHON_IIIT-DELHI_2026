@@ -6,7 +6,7 @@ the starting point that the open-web search has to beat; see docs/baseline-famou
 
 import asyncio
 
-from app.states.resolver import resolve_any
+from app.states.resolver import resolve_on_portals
 from scripts.famous_projects import FAMOUS
 from tests.fakes import FakeWebClient, load_recording
 
@@ -27,7 +27,7 @@ def test_portal_only_resolver_finds_nine_of_fifteen() -> None:
     web = FakeWebClient().replay(load_recording("baseline_famous.json"))
     found = set()
     for famous in FAMOUS:
-        resolved = asyncio.run(resolve_any(famous.query, web))
+        resolved = asyncio.run(resolve_on_portals(famous.query, web))
         if any(famous.matches(project) for project in resolved.candidates):
             found.add(famous.query)
     assert found == BASELINE_FOUND

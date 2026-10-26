@@ -935,6 +935,18 @@ export interface components {
             /** Weight */
             weight: number;
         };
+        /**
+         * PreReraNote
+         * @description A project that public pages say was finished before RERA, so it has no number to find.
+         */
+        PreReraNote: {
+            /** Name */
+            name: string;
+            /** Source Url */
+            source_url: string;
+            /** Statement */
+            statement: string;
+        };
         /** ProgressData */
         ProgressData: {
             /** Text */
@@ -960,6 +972,11 @@ export interface components {
              */
             rera_name: string;
             /**
+             * Sources
+             * @default []
+             */
+            sources: string[];
+            /**
              * State
              * @default UP
              */
@@ -969,6 +986,8 @@ export interface components {
              * @default Uttar Pradesh
              */
             state_name: string;
+            /** Status */
+            status: ("confirmed" | "listings_only" | "from_document" | "from_order") | null;
         };
         /** ReasonCode */
         ReasonCode: {
@@ -1185,6 +1204,11 @@ export interface components {
             candidates: components["schemas"]["Project"][];
             /** Detected State */
             detected_state: string | null;
+            /**
+             * Pre Rera
+             * @default []
+             */
+            pre_rera: components["schemas"]["PreReraNote"][];
             /** Query */
             query: string;
             /**
@@ -1402,6 +1426,11 @@ export interface components {
              */
             rera_name: string;
             /**
+             * Sources
+             * @default []
+             */
+            sources: string[];
+            /**
              * State
              * @default UP
              */
@@ -1411,6 +1440,8 @@ export interface components {
              * @default Uttar Pradesh
              */
             state_name: string;
+            /** Status */
+            status: ("confirmed" | "listings_only" | "from_document" | "from_order") | null;
         };
         /** ValidationError */
         ValidationError: {

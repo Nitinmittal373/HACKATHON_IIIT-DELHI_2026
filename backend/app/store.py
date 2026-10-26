@@ -40,6 +40,8 @@ EXTRA_FIELDS = ("snippet", "total", "via")
 # The home page card shows the three biggest reasons behind a score.
 # The state is not stored: every number format belongs to exactly one state's RERA.
 STATE_FIELDS = {"state", "state_name", "rera_name"}
+# What search learned about a candidate; the stored project is the portal-confirmed record.
+CANDIDATE_FIELDS = {"status", "sources"}
 RECENT_DRIVERS = 3
 RECENT_REASONS = 3
 
@@ -50,7 +52,7 @@ class Store:
 
     def save_project(self, project: Project) -> None:
         with self._sessions.begin() as session:
-            session.merge(ProjectRow(**project.model_dump(exclude=STATE_FIELDS)))
+            session.merge(ProjectRow(**project.model_dump(exclude=STATE_FIELDS | CANDIDATE_FIELDS)))
 
     def get_project(self, rera_id: str) -> Project | None:
         with self._sessions() as session:

@@ -4,6 +4,8 @@
 - A name is searched on every state portal with one combined Search first (TinyFish allows 30
   searches a minute); only the states that answered then get a search of their own.
 - A buyer who picked a state searches only that state.
+- Beside the portals, the open web is searched and its numbers voted on (app.states.openweb),
+  because many portals cannot be read but the builder and listing sites print the number.
 """
 
 import asyncio
@@ -12,10 +14,11 @@ from urllib.parse import urlsplit
 
 from app.models import Project
 from app.states.names import DEFAULT_STATE
+from app.states.openweb import domain_of, search_open_web
 from app.states.registry import ADAPTERS, BY_CODE, detect_state
 from app.states.search_adapter import SearchStateAdapter
-from app.states.text import rank
-from app.tinyfish import SearchHit, WebClient
+from app.states.text import rank, squash
+from app.tinyfish import SearchHit, WebClient, WebError
 
 COMBINED_PURPOSE = "Find a housing project a homebuyer named on any state's RERA portal"
 # States whose own portal gets a second, focused search after the combined one.
@@ -32,6 +35,51 @@ class Resolved:
 
 
 async def resolve_any(query: str, web: WebClient, state: str | None = None) -> Resolved:
+    """Portal candidates and open-web candidates together, each number once."""
+    portals, found = await asyncio.gather(
+        resolve_on_portals(query, web, state), search_open_web(query, web), return_exceptions=True
+    )
+    if isinstance(portals, BaseException):
+        raise portals
+    if isinstance(found, WebError) and not portals.candidates:
+        raise found
+    if isinstance(found, BaseException):
+        if not isinstance(found, WebError):
+            raise found
+        found = []  # The portals answered; a failed open-web search only means fewer candidates.
+    typed = detect_state(query)
+    typed_number = squash(typed[0].canonical_id(query) or "") if typed else ""
+    wanted = [
+        p
+        for p in found
+        if (state not in BY_CODE or p.state == state)
+        and (not typed_number or squash(p.rera_id) == typed_number)
+    ]
+    merged = merge(portals.candidates, wanted, query)
+    return Resolved(merged, portals.detected_state, portals.searched_states)
+
+
+def merge(portal: list[Project], open_web: list[Project], query: str) -> list[Project]:
+    """Portal candidates are confirmed by their own page; open-web ones add what they found."""
+    by_number: dict[str, Project] = {}
+    for project in portal:
+        by_number[squash(project.rera_id)] = project.model_copy(
+            update={"status": "confirmed", "sources": [domain_of(project.details_url)]}
+        )
+    for project in open_web:
+        known = by_number.get(squash(project.rera_id))
+        if known is None:
+            by_number[squash(project.rera_id)] = project
+            continue
+        gaps = {k: v for k, v in project.model_dump().items() if getattr(known, k) is None}
+        sources = list(dict.fromkeys([*known.sources, *project.sources]))
+        by_number[squash(project.rera_id)] = known.model_copy(update={**gaps, "sources": sources})
+    ranked = rank(list(by_number.values()), query)
+    ranked.sort(key=lambda p: p.status != "confirmed")
+    return ranked[:MAX_CANDIDATES]
+
+
+async def resolve_on_portals(query: str, web: WebClient, state: str | None = None) -> Resolved:
     if state in BY_CODE:
         adapter = BY_CODE[state]
         return Resolved(await adapter.resolve(query, web), None, [adapter.code])

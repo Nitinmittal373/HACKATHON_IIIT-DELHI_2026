@@ -11,6 +11,7 @@ ADAPTER = SearchStateAdapter(
         domains=("haryanarera.gov.in",),
         id_patterns=(
             r"HE?RERA-[A-Z]{3}-[A-Z]{2,4}-\d+-\d{4}",
+            r"RERA-GRG-\d+-\d{4}",
             r"RC/REP/HARERA/GGM/\d+(?:/\d+)*",
         ),
         coverage="search_only",

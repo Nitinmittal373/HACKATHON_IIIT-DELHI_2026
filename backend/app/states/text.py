@@ -129,6 +129,11 @@ def _words(text: str) -> set[str]:
     return {w for w in words if len(w) > 1 and w not in COMMON_WORDS}
 
 
+def distinctive_words(text: str) -> set[str]:
+    """The words of a project name that tell it from other projects."""
+    return _words(text)
+
+
 def rank[T: _Named](candidates: Sequence[T], query: str) -> list[T]:
     """Projects whose name or promoter holds more of the query's words come first."""
 
