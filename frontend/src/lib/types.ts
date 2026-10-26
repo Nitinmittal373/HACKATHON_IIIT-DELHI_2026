@@ -1,6 +1,14 @@
 /** The backend's response shapes (backend/app/models.py). Keep the two in step. */
 
-export type SourceName = "uprera" | "registry" | "insolvency" | "land" | "consumer" | "news";
+export type SourceName =
+  | "uprera"
+  | "registry"
+  | "insolvency"
+  | "land"
+  | "consumer"
+  | "news"
+  | "group"
+  | "sarfaesi";
 export type Area = "rera" | "execution" | "legal" | "financial" | "builder_history" | "news";
 export type Reliability = "primary" | "secondary";
 export type Verdict = "ok" | "fail" | "red_flag" | "review" | "context" | "not_found";
