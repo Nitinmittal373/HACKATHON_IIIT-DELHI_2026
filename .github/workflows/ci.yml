@@ -80,6 +80,10 @@ jobs:
         run: npm run typecheck
       - if: steps.present.outputs.yes == 'true'
         working-directory: frontend
+        # Plain Node tests: the score scale, and a guard against the classic 0-100 score returning.
+        run: npm run test:unit
+      - if: steps.present.outputs.yes == 'true'
+        working-directory: frontend
         run: npm run build
       - if: steps.present.outputs.yes == 'true'
         working-directory: frontend
