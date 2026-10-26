@@ -9,9 +9,20 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import checks, compare, events, health, projects, promoters, reports, sentinel
+from app.api import (
+    checks,
+    compare,
+    corrections,
+    events,
+    health,
+    projects,
+    promoters,
+    reports,
+    sentinel,
+)
 from app.cache import SourceCache
 from app.config import BACKEND_DIR, Settings, load_settings
+from app.corrections import CorrectionStore
 from app.db import make_engine, make_session_factory
 from app.events import EventHub
 from app.orchestrator import Orchestrator, utc_now
@@ -69,6 +80,7 @@ def create_app(
             cache_dir=cache_dir,
             source_cache=source_cache,
         )
+        app.state.corrections = CorrectionStore(make_session_factory(engine))
         app.state.sentinel_store = SentinelStore(make_session_factory(engine))
         app.state.sentinel = Sentinel(
             app.state.store,
@@ -112,7 +124,17 @@ def create_app(
         expose_headers=["Retry-After"],
     )
     # compare before checks: /api/checks/compare must not be read as a check id.
-    for module in (health, projects, promoters, compare, checks, events, reports, sentinel):
+    for module in (
+        health,
+        projects,
+        promoters,
+        compare,
+        checks,
+        events,
+        reports,
+        sentinel,
+        corrections,
+    ):
         app.include_router(module.router)
     return app
 

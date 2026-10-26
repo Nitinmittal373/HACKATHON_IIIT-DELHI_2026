@@ -1,0 +1,20 @@
+.qr {
+  display: none;
+  width: 32mm;
+  margin: 6mm 0 0;
+  font-size: 8.5pt;
+  color: #555;
+  text-align: center;
+}
+
+.qr svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@media print {
+  .qr {
+    display: block;
+  }
+}

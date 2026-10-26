@@ -91,6 +91,7 @@ export function WatchDialog({ project, open, onClose }: Props) {
             <option value="en">{t.sentinel.english}</option>
             <option value="hi">{t.sentinel.hindi}</option>
           </select>
+          <p className={styles.consent}>{t.legal.consent}</p>
           {problem && (
             <p className={styles.problem} role="alert">
               {problem}

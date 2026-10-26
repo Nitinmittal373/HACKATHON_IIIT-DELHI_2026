@@ -7,10 +7,12 @@ import { PageMessage } from "@/components/PageMessage";
 import { ActionPlan } from "@/components/report/ActionPlan";
 import { BuilderQuestions } from "@/components/report/BuilderQuestions";
 import { ComplaintDraft } from "@/components/report/ComplaintDraft";
+import { CorrectionForm } from "@/components/report/CorrectionForm";
 import { CreditHeader } from "@/components/report/CreditHeader";
 import { DriversCard } from "@/components/report/DriversCard";
 import { EvidenceList } from "@/components/report/EvidenceList";
 import { FamilyTree } from "@/components/report/FamilyTree";
+import { PrintQr } from "@/components/report/PrintQr";
 import { SentinelCard } from "@/components/report/SentinelCard";
 import { ReportHeader } from "@/components/report/ReportHeader";
 import { ScoreCard } from "@/components/report/ScoreCard";
@@ -78,7 +80,9 @@ export default async function ReportPage({ params }: Props) {
           )}
           <Timeline events={report.timeline} t={t} lang={lang} />
           <SentinelCard project={report.project} t={t} />
+          <CorrectionForm reportId={report.check.id} findings={report.findings} />
           <p className={styles.disclaimer}>{t.report.disclaimer(readDate)}</p>
+          <PrintQr />
         </aside>
       </div>
     </>

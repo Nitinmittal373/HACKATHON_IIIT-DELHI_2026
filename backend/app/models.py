@@ -136,7 +136,8 @@ class Finding(BaseModel):
     area: Area | None = None
     verdict: Verdict
     reliability: Reliability
-    source_url: str
+    # No source, no claim: a finding without a web address cannot exist.
+    source_url: str = Field(pattern=r"^https?://\S+$")
     read_on: date
     read_at: datetime | None = None
     occurred_on: date | None = None
