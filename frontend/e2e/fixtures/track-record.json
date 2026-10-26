@@ -7,7 +7,9 @@
       "promoter": "SUPERTECH LIMITED",
       "registered_on": "2017-08-14",
       "district": null,
-      "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8267"
+      "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8267",
+      "check_id": null,
+      "display_score": null
     },
     {
       "rera_id": "UPRERAPRJ5017",
@@ -15,7 +17,9 @@
       "promoter": "SUPERTECH LIMITED",
       "registered_on": "2017-08-10",
       "district": null,
-      "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=5017"
+      "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=5017",
+      "check_id": null,
+      "display_score": null
     },
     {
       "rera_id": "UPRERAPRJ408",
@@ -23,7 +27,9 @@
       "promoter": "SUPERTECH LIMITED",
       "registered_on": "2017-08-11",
       "district": null,
-      "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=408"
+      "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=408",
+      "check_id": null,
+      "display_score": null
     },
     {
       "rera_id": "UPRERAPRJ5582",
@@ -31,7 +37,9 @@
       "promoter": "SUPERTECH LIMITED",
       "registered_on": "2017-08-08",
       "district": null,
-      "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=5582"
+      "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=5582",
+      "check_id": null,
+      "display_score": null
     }
   ],
   "searched_at": "2026-10-25T04:00:00Z"

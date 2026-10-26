@@ -1,13 +1,6 @@
 import type { report as en } from "@/lib/i18n/en/report";
 
 export const report: typeof en = {
-  bands: {
-    Low: "कम जोखिम",
-    Moderate: "मध्यम जोखिम",
-    High: "ऊँचा जोखिम",
-    Critical: "गंभीर जोखिम",
-    insufficient_evidence: "अभी पर्याप्त सबूत नहीं",
-  },
   areas: {
     rera: "UP-RERA अनुपालन",
     execution: "प्रोजेक्ट का निर्माण",
@@ -46,8 +39,7 @@ export const report: typeof en = {
     return `${Math.floor(hours / 24)} दिन पहले जाँचा गया`;
   },
   recheck: "अभी दोबारा जाँचें",
-  outOf: "100 में से",
-  scoreLabel: (value: number, band: string) => `NeevScore 100 में से ${value}, ${band}`,
+  summaryLabel: "आसान शब्दों में",
   provisional: "अनंतिम: अभी पर्याप्त सबूत नहीं",
   noHardStop: "कोई हार्ड स्टॉप नहीं",
   hardStop: "हार्ड स्टॉप",
@@ -55,7 +47,7 @@ export const report: typeof en = {
   keyChecks: (read: number, total: number) => `${total} में से ${read} मुख्य जाँचें पढ़ी गईं`,
   records: (records: number, sources: number) => `${records} रिकॉर्ड · ${sources} स्रोत`,
   why: (value: number) => `${value} क्यों`,
-  whyLead: "सब 100 से शुरू करते हैं। अंक सिर्फ़ उन रिकॉर्ड के लिए कटते हैं जो हमें मिले।",
+  whyLead: (max: number) => `सब ${max} से शुरू करते हैं। अंक सिर्फ़ उन रिकॉर्ड के लिए कटते हैं जो हमें मिले।`,
   noDrivers: "हमारे पढ़े किसी रिकॉर्ड से कोई अंक नहीं कटा।",
   evidence: "सबूत",
   readOn: (date: string, time: string | null) => `पढ़ा गया ${date}${time ? `, ${time}` : ""}`,

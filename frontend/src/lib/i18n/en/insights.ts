@@ -12,8 +12,8 @@ export const insights = {
   },
   whatsapp: {
     button: "Share on WhatsApp",
-    text: (project: string, score: number, band: string, link: string) =>
-      `NeevCheck: ${project} scored ${score}/100 (${band}) on public records. ${link}`,
+    text: (project: string, score: string, link: string) =>
+      `NeevCheck: ${project}, ${score}, on public records. ${link}`,
   },
   questions: {
     title: "Questions to ask the builder",

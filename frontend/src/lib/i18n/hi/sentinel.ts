@@ -29,8 +29,8 @@ export const alerts: typeof alertsEn = {
   emailLabel: "ईमेल",
   show: "अलर्ट दिखाएँ",
   empty: "अभी कोई अलर्ट नहीं। Sentinel तभी बताता है जब कोई रिकॉर्ड सच में बदलता है।",
-  scoreChange: (before: number | null, after: number | null) =>
-    `NeevScore ${before ?? "–"} → ${after ?? "–"}`,
+  scoreChange: (before: number | undefined, after: number | undefined) =>
+    `NeevScore ${before ?? "रेटिंग नहीं"} से ${after ?? "रेटिंग नहीं"}`,
   added: "नया",
   removed: "अब नहीं मिला",
   changed: "बदला",

@@ -14,9 +14,8 @@ test("the report leads with the 300-900 score, its reasons and the classic score
   await expect(page.getByRole("img", { name: "NeevScore 621 out of 900, Watch" })).toBeVisible();
   await expect(page.getByText("5 of 6 record types read")).toBeVisible();
   await expect(page.getByText("Risk indicator based on public records — not a credit rating.")).toBeVisible();
-  // The classic score is kept, smaller, and says so.
-  await expect(page.getByText("Classic score (0–100)")).toBeVisible();
-  await expect(page.getByLabel("NeevScore 68 out of 100, Moderate risk")).toBeVisible();
+  // The classic score is kept as one line in the method section, and says so.
+  await expect(page.getByText(/^Classic score \(0–100\): 68\./)).toBeVisible();
   await expect(page.getByRole("alert").filter({ hasText: "Hard stop" })).toHaveCount(0);
 
   const chips = page.getByRole("button", { name: /^R\d\d:/ });
@@ -79,7 +78,7 @@ test("the credit header is in Hindi", async ({ page }) => {
   await page.goto(REPORT);
 
   await expect(page.getByRole("img", { name: "नींवस्कोर 900 में से 621, निगरानी रखें" })).toBeVisible();
-  await expect(page.getByText("क्लासिक स्कोर (0–100)")).toBeVisible();
+  await expect(page.getByText(/^क्लासिक स्कोर \(0–100\): 68/)).toBeVisible();
   await expect(page.getByRole("button", { name: /^R13:/ })).toContainText("उसी समूह के अन्य प्रोजेक्ट देरी में");
   await page.getByRole("button", { name: "प्रमाण बही खोलें" }).click();
   await expect(page.getByRole("dialog", { name: "प्रमाण बही" })).toBeVisible();

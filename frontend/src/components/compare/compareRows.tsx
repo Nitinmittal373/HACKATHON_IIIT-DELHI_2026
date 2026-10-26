@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
 
-import { ScoreRing } from "@/components/ScoreRing";
+import { NeevScore } from "@/components/NeevScore";
 import { ExternalLinkIcon } from "@/components/report/ExternalLinkIcon";
-import { areaLost, areasComparable, bestColumn, companyRank, insolvencyRank } from "@/lib/compare";
+import { bestColumn, companyRank, insolvencyRank, pillarLost, pillarsComparable } from "@/lib/compare";
 import { formatDay } from "@/lib/format";
 import type { Lang, Strings } from "@/lib/i18n";
-import type { Area, Comparison, ComparedProject } from "@/lib/types";
+import type { Comparison, ComparedProject, PillarId } from "@/lib/types";
 import styles from "./Compare.module.css";
 
 export interface CompareRow {
@@ -18,7 +18,10 @@ export interface CompareRow {
   best: number | null;
 }
 
-const AREAS: Area[] = ["rera", "execution", "legal", "financial", "builder_history", "news"];
+/** The pillars of the first project, in the backend's order; every project has the same six. */
+function pillarIds(projects: ComparedProject[]): PillarId[] {
+  return (projects[0]?.pillars ?? []).map((pillar) => pillar.id);
+}
 
 /** Every row of the comparison, in the order a buyer reads them. */
 export function compareRows(comparison: Comparison, t: Strings, lang: Lang): CompareRow[] {
@@ -29,7 +32,7 @@ export function compareRows(comparison: Comparison, t: Strings, lang: Lang): Com
   const count = (value: number | null) => (value === null ? unread : value.toLocaleString("en-IN"));
   const column = (pick: (project: ComparedProject) => number | null) => projects.map(pick);
   const bestIndex = projects.findIndex((project) => project.check_id === comparison.best);
-  const compareAreas = areasComparable(projects);
+  const comparePillars = pillarsComparable(projects);
 
   return [
     { key: "rera", label: c.rows.rera, cells: projects.map((p) => <span key={p.check_id} className="mono">{p.project.rera_id}</span>), best: null },
@@ -46,34 +49,32 @@ export function compareRows(comparison: Comparison, t: Strings, lang: Lang): Com
       label: c.rows.score,
       cells: projects.map((p) => (
         <div key={p.check_id} className={styles.score}>
-          <ScoreRing value={p.score} band={p.band} size={72} delay={0.1} />
+          <NeevScore value={p.display_score.value} band={p.display_score.band} size={72} delay={0.1} />
           <div>
-            <span className="bandTag" data-band={p.band}>
-              {t.report.bands[p.band]}
-            </span>
-            <p className={styles.small}>{c.confidence(Math.round(p.confidence * 100))}</p>
+            <NeevScore value={p.display_score.value} band={p.display_score.band} variant="chip" showValue={false} />
+            <p className={styles.small}>{c.confidence(Math.round(p.display_score.confidence * 100))}</p>
           </div>
         </div>
       )),
       best: bestIndex >= 0 ? bestIndex : null,
     },
-    ...AREAS.map((area) => ({
-      key: `area-${area}`,
-      label: t.report.areas[area],
+    ...pillarIds(projects).map((id) => ({
+      key: `pillar-${id}`,
+      label: t.credit.pillars[id],
       group: c.rows.areas,
       cells: projects.map((p) => {
-        const points = p.areas.find((item) => item.area === area);
+        const points = p.pillars.find((item) => item.id === id);
         if (!points) return unread;
         return (
           <div key={p.check_id} className={styles.area}>
             <i className={styles.bar} aria-hidden="true">
               <b style={{ width: `${points.max ? (points.lost / points.max) * 100 : 0}%` }} />
             </i>
-            <span className="num">{c.lost(points.lost, points.max)}</span>
+            <span className="num">{c.lost(Math.round(points.lost), Math.round(points.max))}</span>
           </div>
         );
       }),
-      best: compareAreas ? bestColumn(column((p) => areaLost(p, area)), "lower") : null,
+      best: comparePillars ? bestColumn(column((p) => pillarLost(p, id)), "lower") : null,
     })),
     {
       key: "delay",

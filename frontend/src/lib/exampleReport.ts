@@ -1,21 +1,5 @@
-import type { BandKey } from "@/components/ScoreRing";
-
 /** Colour of a small status dot: a risk signal, except "brand" which marks NeevCheck itself. */
 export type Tone = "ok" | "warn" | "bad" | "brand";
-
-export interface ExampleDriver {
-  label: string;
-  /** Share of the bar to fill, 0 to 100. */
-  fill: number;
-  points: number;
-  tone: Tone;
-}
-
-export interface ExampleFinding {
-  tone: Tone;
-  bold: string;
-  text: string;
-}
 
 /** One line of "what the records say", with where it came from. */
 export interface RecordFact {
@@ -43,12 +27,8 @@ export interface ExampleReport {
   name: string;
   reraId: string;
   promoter: string;
+  /** The NeevScore of that check (display_score.value), shown only where the page says "example". */
   score: number;
-  band: BandKey;
-  bandLabel: string;
-  confidencePercent: number;
-  drivers: ExampleDriver[];
-  findings: ExampleFinding[];
   facts: RecordFact[];
   register: RegisterPage;
 }

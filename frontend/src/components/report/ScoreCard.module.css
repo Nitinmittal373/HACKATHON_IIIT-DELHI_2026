@@ -1,59 +1,15 @@
 .card {
-  display: grid;
-  grid-template-columns: 200px minmax(0, 1fr);
-  gap: 30px;
+  padding: 18px 22px;
+}
+
+.head {
+  display: flex;
   align-items: center;
-  padding: 26px;
-}
-
-.compact {
-  grid-template-columns: 120px minmax(0, 1fr);
-  gap: 20px;
-  padding: 16px 20px;
-}
-
-.compact .summary {
-  margin-top: 8px;
-  font-size: 14px;
-}
-
-.classic {
-  margin: 0 0 8px;
-  color: var(--mu);
-  font-size: 13px;
-}
-
-.band {
-  display: inline-block;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: #f3eee9;
-  color: var(--mu);
-  font-weight: 600;
-}
-
-.band[data-band="Low"] {
-  background: var(--low-bg);
-  color: var(--low-text);
-}
-
-.band[data-band="Moderate"] {
-  background: var(--moderate-bg);
-  color: var(--moderate);
-}
-
-.band[data-band="High"] {
-  background: var(--high-bg);
-  color: var(--high);
-}
-
-.band[data-band="Critical"] {
-  background: var(--critical-bg);
-  color: var(--critical);
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .provisional {
-  margin-left: 8px;
   padding: 5px 10px;
   border: 1px dashed var(--ln2);
   border-radius: 999px;
@@ -62,14 +18,14 @@
 }
 
 .summary {
-  margin-top: 14px;
+  margin: 12px 0 0;
   color: var(--ink2);
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.6;
 }
 
 .hardStop {
-  margin-top: 10px;
+  margin: 10px 0 0;
   color: var(--critical);
   font-size: 14px;
 }
@@ -83,12 +39,4 @@
   list-style: none;
   color: var(--mu);
   font-size: 13.5px;
-}
-
-@media (max-width: 960px) {
-  .card {
-    grid-template-columns: 1fr;
-    justify-items: start;
-    gap: 20px;
-  }
 }

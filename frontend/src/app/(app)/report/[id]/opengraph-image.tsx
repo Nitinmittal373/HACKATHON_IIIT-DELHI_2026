@@ -1,19 +1,13 @@
 import { ImageResponse } from "next/og";
 
 import { ApiError, getReport } from "@/lib/api";
+import { STRINGS } from "@/lib/i18n";
 import { CHECK_ID_PATTERN } from "@/lib/ids";
+import { loadMeta } from "@/lib/meta";
 
 export const alt = "NeevCheck report";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-
-const BAND_LABELS = {
-  Low: "Low risk",
-  Moderate: "Moderate risk",
-  High: "High risk",
-  Critical: "Critical risk",
-  insufficient_evidence: "Not enough evidence yet",
-} as const;
 
 /** The picture shown when a report link is shared: project, score and band. */
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
@@ -21,12 +15,13 @@ export default async function Image({ params }: { params: Promise<{ id: string }
   let name = "NeevCheck";
   let score = "";
   let band = "Know your builder before you book.";
+  const meta = await loadMeta();
   if (CHECK_ID_PATTERN.test(id)) {
     try {
       const report = await getReport(id);
       name = report.project.name ?? report.project.rera_id;
-      score = String(report.score.value);
-      band = BAND_LABELS[report.score.band];
+      score = String(report.display_score.value);
+      band = STRINGS.en.score.bands[report.display_score.band];
     } catch (error) {
       if (!(error instanceof ApiError)) throw error;
     }
@@ -52,10 +47,10 @@ export default async function Image({ params }: { params: Promise<{ id: string }
           NeevCheck
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 60, fontWeight: 700, lineHeight: 1.1, maxWidth: 900 }}>{name}</div>
+          <div style={{ fontSize: 60, fontWeight: 700, lineHeight: 1.1, maxWidth: 880 }}>{name}</div>
           <div style={{ display: "flex", alignItems: "baseline", marginTop: 28 }}>
             {score && <div style={{ fontSize: 150, fontWeight: 700, color: "#F26B1D" }}>{score}</div>}
-            {score && <div style={{ fontSize: 40, color: "#5F5F5F", marginLeft: 12 }}>/ 100</div>}
+            {score && <div style={{ fontSize: 40, color: "#5F5F5F", marginLeft: 12 }}>{`/ ${meta.scale.max}`}</div>}
             <div style={{ fontSize: 44, fontWeight: 600, marginLeft: score ? 36 : 0 }}>{band}</div>
           </div>
         </div>

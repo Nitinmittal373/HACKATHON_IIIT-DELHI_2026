@@ -1,0 +1,175 @@
+/* One set of risk colours for every variant; the tone comes from the band. */
+.dial,
+.ring,
+.chip {
+  --tone: var(--o);
+  --tone-bg: #f3eee9;
+  --tone-fg: var(--ink2);
+}
+
+.dial[data-tone="low"],
+.ring[data-tone="low"],
+.chip[data-tone="low"] {
+  --tone: var(--low);
+  --tone-bg: var(--low-bg);
+  --tone-fg: var(--low-text);
+}
+
+.dial[data-tone="moderate"],
+.ring[data-tone="moderate"],
+.chip[data-tone="moderate"] {
+  --tone: var(--moderate);
+  --tone-bg: var(--moderate-bg);
+  --tone-fg: var(--moderate);
+}
+
+.dial[data-tone="high"],
+.ring[data-tone="high"],
+.chip[data-tone="high"] {
+  --tone: var(--high);
+  --tone-bg: var(--high-bg);
+  --tone-fg: var(--high);
+}
+
+.dial[data-tone="critical"],
+.ring[data-tone="critical"],
+.chip[data-tone="critical"] {
+  --tone: var(--critical);
+  --tone-bg: var(--critical-bg);
+  --tone-fg: var(--critical);
+}
+
+.dial[data-tone="neutral"],
+.ring[data-tone="neutral"],
+.chip[data-tone="neutral"] {
+  --tone: var(--fa);
+}
+
+.dial {
+  position: relative;
+  width: 100%;
+  max-width: 280px;
+}
+
+.dial svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.track,
+.fill {
+  fill: none;
+  stroke-width: 14;
+  stroke-linecap: round;
+}
+
+.track,
+.ringTrack {
+  stroke: #f3eee9;
+}
+
+.fill,
+.ringFill {
+  stroke: var(--tone);
+  animation: draw 1.1s var(--ease-out) both;
+}
+
+/* A score without enough evidence is provisional: drawn pale so it never reads as a verdict. */
+.dial[data-tone="neutral"] .fill,
+.ring[data-tone="neutral"] .ringFill {
+  opacity: 0.45;
+}
+
+.read {
+  position: absolute;
+  inset: auto 0 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+}
+
+.dialValue {
+  font-size: 54px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+.of {
+  margin-top: 4px;
+  color: var(--fa);
+  font-size: 12px;
+}
+
+.ends {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 6px;
+  color: var(--fa);
+  font-size: 11.5px;
+}
+
+.ring {
+  position: relative;
+  flex: none;
+}
+
+.ringTrack,
+.ringFill {
+  fill: none;
+  stroke-width: 9;
+  stroke-linecap: round;
+}
+
+.ringLabel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ringValue {
+  font-weight: 650;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+
+.ringOf {
+  font-size: 10px;
+  color: var(--fa);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: var(--tone-bg);
+  color: var(--tone-fg);
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.chip b {
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+}
+
+@keyframes draw {
+  from {
+    stroke-dashoffset: var(--len);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill,
+  .ringFill {
+    animation: none;
+  }
+}

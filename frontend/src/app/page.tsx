@@ -25,7 +25,7 @@ export default async function HomePage() {
       <SourcesMarquee label={t.home.marqueeLabel} />
       <BrochureVsRecords report={EXAMPLE_REPORT} t={t} />
       <AgentDemo report={EXAMPLE_REPORT} t={t} />
-      <ScoreScale score={EXAMPLE_REPORT.score} t={t} />
+      <ScoreScale />
       <SentinelPhone project={EXAMPLE_REPORT.shortName} score={EXAMPLE_REPORT.score} t={t} />
       <Faq title={t.home.faq.title} items={t.home.faq.items} />
       <CtaBand t={t} />

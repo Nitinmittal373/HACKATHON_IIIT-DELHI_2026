@@ -3,14 +3,15 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { NeevScore } from "@/components/NeevScore";
 import { Skeleton } from "@/components/Skeleton";
 import { promoterProjects } from "@/lib/api";
 import { formatDay } from "@/lib/format";
 import { useLang } from "@/lib/LangProvider";
-import type { Project } from "@/lib/types";
+import type { TrackedProject } from "@/lib/types";
 import styles from "./TrackRecord.module.css";
 
-type Loaded = { status: "loading" } | { status: "ready"; projects: Project[] } | { status: "failed" };
+type Loaded = { status: "loading" } | { status: "ready"; projects: TrackedProject[] } | { status: "failed" };
 
 /** The promoter's other UP-RERA projects, each one a click away from its own live check. */
 export function TrackRecord({ promoter, reraId }: { promoter: string; reraId: string }) {
@@ -61,6 +62,9 @@ export function TrackRecord({ promoter, reraId }: { promoter: string; reraId: st
                       ` · ${t.insights.track.registered(formatDay(project.registered_on, lang))}`}
                   </span>
                 </div>
+                {project.display_score && (
+                  <NeevScore value={project.display_score.value} band={project.display_score.band} variant="chip" />
+                )}
                 <Link
                   href={`/check?q=${encodeURIComponent(project.rera_id)}`}
                   className="btn2"

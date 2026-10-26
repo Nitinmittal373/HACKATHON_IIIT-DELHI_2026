@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { EvidenceLedger } from "@/components/report/EvidenceLedger";
 import { useLang } from "@/lib/LangProvider";
-import type { LedgerRow } from "@/lib/scoreV2";
+import { reasonLabel, type LedgerRow } from "@/lib/scoreV2";
 import type { ReasonCode } from "@/lib/types";
 import styles from "./ReasonChips.module.css";
 
@@ -39,12 +39,12 @@ export function ReasonChips({ reasons, rows }: Props) {
                 type="button"
                 className={styles.chip}
                 data-unread={reason.code === "R12"}
-                aria-label={`${reason.code}: ${label(reason, t.credit.codes, lang)}. ${t.credit.reasonOpen(reason.code)}`}
+                aria-label={`${reason.code}: ${reasonLabel(reason, t.credit.codes, lang)}. ${t.credit.reasonOpen(reason.code)}`}
                 aria-haspopup="dialog"
                 onClick={() => show(reason.code)}
               >
                 <span className={`mono ${styles.code}`}>{reason.code}</span>
-                <span className={styles.label}>{label(reason, t.credit.codes, lang)}</span>
+                <span className={styles.label}>{reasonLabel(reason, t.credit.codes, lang)}</span>
                 <span className={`num ${styles.points}`}>
                   {reason.points ? `−${Math.abs(Math.round(reason.points))}` : t.credit.unread}
                 </span>
@@ -67,9 +67,4 @@ export function ReasonChips({ reasons, rows }: Props) {
       />
     </section>
   );
-}
-
-/** English shows the backend's own label, which carries the counts; Hindi shows the fixed label. */
-function label(reason: ReasonCode, codes: Record<string, string>, lang: "en" | "hi"): string {
-  return lang === "en" ? reason.label : (codes[reason.code] ?? reason.label);
 }

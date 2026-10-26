@@ -1,0 +1,23 @@
+.card {
+  padding: 20px 22px;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.body {
+  margin: 8px 0 0;
+  color: var(--ink2);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.classic {
+  margin: 10px 0 0;
+  color: var(--fa);
+  font-size: 12.5px;
+  line-height: 1.5;
+}

@@ -34,7 +34,7 @@ export function ReportHeader({ report, t, lang }: Props) {
             project={project}
           />
         </div>
-        <ReportActions reportId={check.id} project={project} score={report.score.value} band={report.score.band} />
+        <ReportActions reportId={check.id} project={project} score={report.display_score} />
       </div>
     </header>
   );

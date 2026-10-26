@@ -10,6 +10,51 @@
         "district": "Gautam Buddha Nagar",
         "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334"
       },
+      "display_score": {
+        "value": 741,
+        "band": "Watch",
+        "hard_stop": false,
+        "confidence": 0.67,
+        "provisional": false
+      },
+      "pillars": [
+        {
+          "id": "P1",
+          "name": "Regulatory compliance (RERA)",
+          "lost": 0.0,
+          "max": 180.0
+        },
+        {
+          "id": "P2",
+          "name": "Delivery track record",
+          "lost": 0.0,
+          "max": 120.0
+        },
+        {
+          "id": "P3",
+          "name": "Legal and insolvency",
+          "lost": 150.0,
+          "max": 150.0
+        },
+        {
+          "id": "P4",
+          "name": "Financial and corporate health",
+          "lost": 0.0,
+          "max": 90.0
+        },
+        {
+          "id": "P5",
+          "name": "Land authority and approvals",
+          "lost": 0.0,
+          "max": 30.0
+        },
+        {
+          "id": "P6",
+          "name": "Sentiment and news",
+          "lost": 9.0,
+          "max": 30.0
+        }
+      ],
       "score": 68,
       "band": "Moderate",
       "confidence": 0.71,
@@ -63,24 +108,24 @@
       ],
       "top_findings": [
         {
-          "title": "Completion date on record (30 Dec 2017) passed 105 months ago; project still listed as Ongoing",
-          "source_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
-          "points": -14.0
-        },
-        {
-          "title": "2803 complaints on UP-RERA against the promoter, across all its projects",
-          "source_url": "https://up-rera.in/Projectsummary?UI0aPA1ISD=fwOn88bfRpA=&hfFlag=9emr4VdBw22M7BGjKtJWMPDI4s5cHQZP&NPJ6RAme=gUoAr6nOB9CeG4WCZ3sI8xdst3G+GkrZUR6kve89n8F2pfuywUDJcw==&PaURJEMAN4=ZL9MNERkNdZ1OH5DIB2u4Q==&IRSAHEB=D6PY3lyims8=",
-          "points": -9.0
-        },
-        {
           "title": "15 complaints on UP-RERA about this project",
           "source_url": "https://up-rera.in/Projectsummary?UI0aPA1ISD=fwOn88bfRpA=&hfFlag=9emr4VdBw22M7BGjKtJWMPDI4s5cHQZP&NPJ6RAme=gUoAr6nOB9CeG4WCZ3sI8xdst3G+GkrZUR6kve89n8F2pfuywUDJcw==&PaURJEMAN4=ZL9MNERkNdZ1OH5DIB2u4Q==&IRSAHEB=D6PY3lyims8=",
-          "points": -6.0
+          "points": -150.0
+        },
+        {
+          "title": "News on delays, about the promoter: 16 years, Rs 50 lakh lost: How Supertech delays are costing homebuyers lakhs (published about 1 month ago)",
+          "source_url": "https://indianexpress.com/article/cities/delhi/noida-supertech-homebuyers-wait-delay-nclat-nbcc-status-report-10863197/",
+          "points": -3.0
+        },
+        {
+          "title": "News on delays, about the promoter: NBCC to resume work on 16 stalled Supertech projects in Jan (published about 4 weeks ago)",
+          "source_url": "https://timesofindia.indiatimes.com/city/noida/nbcc-to-resume-work-on-16-stalled-supertech-projects-in-jan/articleshow/134525503.cms",
+          "points": -3.0
         }
       ]
     },
     {
-      "check_id": "0e6fc437928f4336b54ba8f76697e9f0",
+      "check_id": "402acab56e2840e9b5804afe65d8c3bb",
       "project": {
         "rera_id": "UPRERAPRJ6742",
         "name": "14th Avenue (Group Housing) - Gaur City",
@@ -89,6 +134,51 @@
         "district": "Gautam Buddha Nagar",
         "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=6742"
       },
+      "display_score": {
+        "value": 900,
+        "band": "insufficient_evidence",
+        "hard_stop": false,
+        "confidence": 0.33,
+        "provisional": true
+      },
+      "pillars": [
+        {
+          "id": "P1",
+          "name": "Regulatory compliance (RERA)",
+          "lost": 0.0,
+          "max": 180.0
+        },
+        {
+          "id": "P2",
+          "name": "Delivery track record",
+          "lost": 0.0,
+          "max": 120.0
+        },
+        {
+          "id": "P3",
+          "name": "Legal and insolvency",
+          "lost": 0.0,
+          "max": 150.0
+        },
+        {
+          "id": "P4",
+          "name": "Financial and corporate health",
+          "lost": 0.0,
+          "max": 90.0
+        },
+        {
+          "id": "P5",
+          "name": "Land authority and approvals",
+          "lost": 0.0,
+          "max": 30.0
+        },
+        {
+          "id": "P6",
+          "name": "Sentiment and news",
+          "lost": 0.0,
+          "max": 30.0
+        }
+      ],
       "score": 86,
       "band": "insufficient_evidence",
       "confidence": 0.29,
@@ -147,7 +237,7 @@
         {
           "title": "Completion date on record (26 Mar 2023) passed 42 months ago; project still listed as Ongoing",
           "source_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=6742",
-          "points": -14.0
+          "points": 0.0
         }
       ]
     }

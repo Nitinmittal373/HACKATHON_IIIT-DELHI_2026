@@ -5,5 +5,7 @@
   "status": "queued",
   "started_at": "2026-10-25T04:00:00Z",
   "completed_at": null,
-  "sources": []
+  "sources": [],
+  "reused": false,
+  "display_score": null
 }

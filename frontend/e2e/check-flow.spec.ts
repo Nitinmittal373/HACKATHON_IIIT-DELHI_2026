@@ -26,7 +26,7 @@ test("search, confirm, live check and report show the recorded score", async ({ 
 
   await expect(page.getByRole("heading", { name: "Findings so far" })).toBeVisible();
   await expect(page.getByText("11 records")).toBeVisible();
-  await expect(page.getByText("NeevScore 68 · Moderate risk")).toBeVisible();
+  await expect(page.getByText("NeevScore 741 · Watch")).toBeVisible();
   // The CAPTCHA source stopped, and says so instead of guessing.
   await page.getByRole("button", { name: /Consumer cases/ }).click();
   await expect(page.getByText(/Agent stopped: this page asks for a CAPTCHA/)).toBeVisible();
@@ -34,7 +34,7 @@ test("search, confirm, live check and report show the recorded score", async ({ 
   await page.getByRole("link", { name: "See report" }).click();
   await expect(page).toHaveURL(/\/report\/[0-9a-f]{32}$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("SUPERTECH ECO VILLAGE-I PHASE I-C");
-  await expect(page.getByLabel("NeevScore 68 out of 100, Moderate risk")).toBeVisible();
+  await expect(page.getByRole("img", { name: "NeevScore 621 out of 900, Watch" })).toBeVisible();
   await expect(page.getByText("5 of 7 key checks read")).toBeVisible();
   await expect(page.getByText("Consumer cases: Not read")).toBeVisible();
   await expect(page.getByRole("link", { name: "How to check this yourself" }).first()).toBeVisible();
@@ -77,7 +77,7 @@ test.describe("on a phone", () => {
 
   test("the browser window sits above the findings and nothing overflows sideways", async ({ page }) => {
     await startCheck(page);
-    await expect(page.getByText("NeevScore 68 · Moderate risk")).toBeVisible();
+    await expect(page.getByText("NeevScore 741 · Watch")).toBeVisible();
     const browser = await page.getByRole("region", { name: /./ }).first().boundingBox();
     const findings = await page.getByRole("region", { name: "Findings so far" }).boundingBox();
     expect(browser && findings && browser.y < findings.y).toBe(true);

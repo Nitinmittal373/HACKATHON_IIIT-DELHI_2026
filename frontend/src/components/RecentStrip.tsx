@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { NeevScore } from "@/components/NeevScore";
 import { formatDay } from "@/lib/format";
 import { useLang } from "@/lib/LangProvider";
 import { useRecentChecks } from "@/lib/useRecentChecks";
@@ -12,8 +13,10 @@ export function RecentStrip() {
   const { lang, t } = useLang();
   const recent = useRecentChecks();
   if (recent.status !== "ready") return null;
-  const checks = recent.checks.filter((check) => check.score !== null && check.band !== null);
-  if (checks.length === 0) return null;
+  const rated = recent.checks.flatMap((check) =>
+    check.display_score ? [{ check, display: check.display_score }] : [],
+  );
+  if (rated.length === 0) return null;
 
   return (
     <section className={`wrap ${styles.strip}`} aria-labelledby="recent-title">
@@ -22,25 +25,25 @@ export function RecentStrip() {
       </h2>
       <p className={styles.lead}>{t.home.recent.lead}</p>
       <ul className={styles.list}>
-        {checks.map((check) => {
+        {rated.map(({ check, display }) => {
           const name = check.project ?? check.rera_id;
-          const band = t.report.bands[check.band ?? "insufficient_evidence"];
+          const band = t.score.bands[display.band];
           const date = formatDay((check.completed_at ?? check.created_at).slice(0, 10), lang);
           return (
             <li key={check.id}>
               <Link
                 href={`/report/${check.id}`}
                 className={styles.item}
-                aria-label={t.home.recent.item(name, check.score ?? 0, band, date)}
+                aria-label={t.home.recent.item(name, display.value, band, date)}
               >
-                <span className={`num ${styles.score}`}>{check.score}</span>
+                <NeevScore value={display.value} band={display.band} size={56} delay={0.1} />
                 <span className={styles.text}>
                   <span className={styles.name}>{name}</span>
                   <span className={`mono ${styles.meta}`}>
                     {check.rera_id} · {date}
                   </span>
-                  <span className={`bandTag ${styles.band}`} data-band={check.band}>
-                    {band}
+                  <span className={styles.band}>
+                    <NeevScore value={display.value} band={display.band} variant="chip" showValue={false} />
                   </span>
                 </span>
               </Link>

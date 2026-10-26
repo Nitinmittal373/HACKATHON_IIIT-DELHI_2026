@@ -27,8 +27,8 @@ export const alerts = {
   emailLabel: "Email",
   show: "Show alerts",
   empty: "No alerts yet. Sentinel only tells you when a record really changes.",
-  scoreChange: (before: number | null, after: number | null) =>
-    `NeevScore ${before ?? "–"} → ${after ?? "–"}`,
+  scoreChange: (before: number | undefined, after: number | undefined) =>
+    `NeevScore ${before ?? "not rated"} to ${after ?? "not rated"}`,
   added: "New",
   removed: "No longer found",
   changed: "Changed",

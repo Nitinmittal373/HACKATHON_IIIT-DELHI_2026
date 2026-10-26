@@ -1,4 +1,4 @@
-import type { ComparedProject, InsolvencyStatus } from "@/lib/types";
+import type { ComparedProject, InsolvencyStatus, PillarId } from "@/lib/types";
 
 /**
  * The column holding the single best value of a row, or null. A row with an unread value is
@@ -32,18 +32,15 @@ export function companyRank(project: ComparedProject): number | null {
   return project.company_status.toLowerCase() === "active" ? 0 : 1;
 }
 
-// The share of key checks a score needs before it gets a band (MIN_CONFIDENCE_FOR_BAND).
-const ENOUGH_EVIDENCE = 0.5;
-
 /**
- * Zero points lost in an area can mean nothing was found or nothing was read, so area rows are
- * only compared when every check read at least half of its key records.
+ * Zero points lost in a pillar can mean nothing was found or nothing was read, so pillar rows are
+ * only compared when every score is rated, not provisional.
  */
-export function areasComparable(projects: ComparedProject[]): boolean {
-  return projects.every((project) => project.confidence >= ENOUGH_EVIDENCE);
+export function pillarsComparable(projects: ComparedProject[]): boolean {
+  return projects.every((project) => !project.display_score.provisional);
 }
 
-/** Points the area took off, or null when the column has no such area. */
-export function areaLost(project: ComparedProject, area: string): number | null {
-  return project.areas.find((points) => points.area === area)?.lost ?? null;
+/** Points the pillar took off, or null when the column has no such pillar. */
+export function pillarLost(project: ComparedProject, id: PillarId): number | null {
+  return project.pillars.find((pillar) => pillar.id === id)?.lost ?? null;
 }
