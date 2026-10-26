@@ -23,7 +23,7 @@ See [Getting started](README.md#getting-started) in the README. Checks need a Ti
    # backend
    cd backend && ruff check . && pytest -q
    # frontend
-   cd frontend && npm run lint && npm run typecheck && npm run build
+   cd frontend && npm run lint && npm run typecheck && npm run test:unit && npm run build
    ```
 
 4. Fill in the pull request template. One maintainer reviews and merges.

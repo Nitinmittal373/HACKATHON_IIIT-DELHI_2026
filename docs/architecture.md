@@ -102,17 +102,18 @@ Interactive docs are served at `/docs`.
 | Method and path | Success | Errors |
 | --- | --- | --- |
 | `GET /api/health` | `200 {"status": "ok"}` | |
+| `GET /api/meta` | `200 {scale, bands[], pillars[], reason_codes[], score_version}`: the NeevScore scale (300 to 900), band edges, pillar weights and reason codes, read from the scoring constants | |
 | `GET /api/projects/search?q=` | `200 {query, candidates[]}`, at most 8; answers within 90 seconds | `422` query shorter than 2 characters; `502` TinyFish failed, `504` too slow, `429` TinyFish rate limit (with `Retry-After`). Each error's `detail.code` names the reason: `tinyfish_key`, `wallet_empty`, `rate_limited`, `timeout`, `unreachable` or `upstream` |
-| `GET /api/promoters/projects?name=&exclude=` | `200 {promoter, projects[], searched_at}`: up to 10 other UP-RERA projects whose up-rera.in search results carry the promoter's full legal name; Search only, cached per promoter for 24 hours | `422` name shorter than 3 characters; `502` with `detail.code` when TinyFish fails |
+| `GET /api/promoters/projects?name=&exclude=` | `200 {promoter, projects[], searched_at}`: up to 10 other UP-RERA projects whose up-rera.in search results carry the promoter's full legal name, each with its `display_score` when NeevCheck already holds a finished check of it; Search only, cached per promoter for 24 hours | `422` name shorter than 3 characters; `502` with `detail.code` when TinyFish fails |
 | `POST /api/checks` `{rera_id, details_url?, fresh?}` | `202` check, `Location` header; `200` with `reused: true` when a check of the same project finished in the last 24 hours (send `fresh: true` to re-check) | `422` bad input, `429` over `RATE_LIMIT_PER_MINUTE` or over `MAX_CHECKS_PER_DAY` (`detail.code` is `daily_cap`; both send `Retry-After`) |
-| `GET /api/checks?ids=a,b,c` | `200` a summary of each known check (`id`, `rera_id`, `details_url`, `project`, `promoter`, `status`, `score`, `band`, `confidence`, `created_at`, `completed_at`), in the order asked; ids the server does not have are left out | `422` more than 50 ids or a malformed one |
-| `GET /api/checks/recent` | `200` the latest finished check of up to 12 projects, newest first, each with its top three drivers, registration date and sources read. No emails or IP addresses | |
-| `GET /api/checks/compare?ids=a,b,c` | `200` two or three finished checks side by side: score, band, confidence, points lost per area, months past the completion date, complaint counts, insolvency, company status, unread checks and top three findings with links (`null` where a check could not read something), plus `best` and `reason` (`best_score`, `tie`, `not_enough_evidence`) | `422` not two or three valid ids, `404` unknown check, `409` a check with no score |
-| `GET /api/checks/{id}` | `200` check with each source's status | `404`, `422` malformed id |
+| `GET /api/checks?ids=a,b,c` | `200` a summary of each known check (`id`, `rera_id`, `details_url`, `project`, `promoter`, `status`, `display_score`, `created_at`, `completed_at`, plus the classic `score`, `band` and `confidence`), in the order asked; ids the server does not have are left out | `422` more than 50 ids or a malformed one |
+| `GET /api/checks/recent` | `200` the latest finished check of up to 12 projects, newest first, each with its `display_score`, top three reasons, registration date and sources read. No emails or IP addresses | |
+| `GET /api/checks/compare?ids=a,b,c` | `200` two or three finished checks side by side: `display_score`, points lost per pillar, months past the completion date, complaint counts, insolvency, company status, unread checks and top three findings with links (`null` where a check could not read something), plus `best` and `reason` (`best_score`, `tie`, `not_enough_evidence`) | `422` not two or three valid ids, `404` unknown check, `409` a check with no score |
+| `GET /api/checks/{id}` | `200` check with each source's status and, once it has one, its `display_score` | `404`, `422` malformed id |
 | `GET /api/checks/{id}/events` | `200 text/event-stream` | `404` |
-| `GET /api/checks/{id}/report` | `200` score, drivers, findings, timeline | `404`, `409` still running or failed |
+| `GET /api/checks/{id}/report` | `200` `display_score`, `score_v2` (pillars, reason codes, drivers), the classic `score`, findings, timeline | `404`, `409` still running or failed |
 | `POST /api/sentinel` `{rera_id, details_url?, email, language}` | `201` watch (`200` if the same email already watches it) | `422` bad input, `409` more than 3 watches for one email, `429` rate limit |
-| `GET /api/sentinel/alerts?email=` | `200` alerts, newest first | `422` bad email |
+| `GET /api/sentinel/alerts?email=` | `200` alerts, newest first, each with `old_display_score` and `new_display_score` | `422` bad email |
 | `POST /api/sentinel/run` with header `X-Webhook-Secret` | `202` `{started}`; starts a re-check run for an external cron | `401` missing or wrong secret (always, when `WEBHOOK_SECRET` is not set) |
 | `POST /api/sentinel/webhook` with header `X-Webhook-Secret` or `?secret=` | `202` `{status}`: `accepted` (the project is re-checked in the background), `duplicate` (a delivery already handled) or `ignored` (a monitor we do not know). Called by TinyFish monitors | `401` missing or wrong secret, `413` payload over 200 kB |
 | `DELETE /api/sentinel/{watch_id}` | `204`; removes the watch and cancels its TinyFish monitors | `404` unknown watch |
@@ -120,6 +121,10 @@ Interactive docs are served at `/docs`.
 | `GET /api/corrections` with header `X-Webhook-Secret` | `200` the latest corrections, newest first (admin log) | `401` missing or wrong secret |
 
 `rera_id` accepts `UPRERAPRJ8334` and new-format numbers such as `UPRERAPRJ188811/08/2024` (case, spaces, hyphens and dots are ignored). Send the `details_url` that search returned; it must be an `https` link on up-rera.in. It is required for new-format numbers, and a number sent without one gets its stable details page, which only numbers registered in 2017-18 have.
+
+### The score in every answer
+
+The backend owns the scale. Every answer that shows a score carries `display_score`, the NeevScore v2 summary (300 to 900), and the frontend draws nothing else; the classic 0–100 `score` fields are kept for older clients and for one line in the report's method section. A check stored before NeevScore existed has no stored v2 result, so the store re-scores it from its findings and source runs when it is read (same engine, nothing written back), and no screen falls back to the old number.
 
 ### Events
 
@@ -133,7 +138,18 @@ Every event is sent as `event: <type>` with JSON `data` holding `type`, `check_i
 | `finding.added` | `finding` (with `source_url`, `read_on`, `read_at`) |
 | `source.blocked` | `reason` (for example a CAPTCHA) |
 | `source.completed` | `status` (`completed`, `blocked`, `failed`, `unavailable`), `message`, `checks_read` |
-| `check.completed` | `status` (`completed` or `failed`), `score` summary (`value`, `band`, `band_label`, `confidence`, `provisional`, `hard_stop`) or `message`; `source` is `check` |
+| `check.completed` | `status` (`completed` or `failed`), `display_score` (`value`, `band`, `hard_stop`, `confidence`, `provisional`), the classic `score` summary, or `message`; `source` is `check` |
+
+### API contract
+
+The API's shape is written down once and checked everywhere:
+
+1. Every route returns a Pydantic model, and every response model derives from `ApiModel`, which marks defaulted fields as required in the schema because an answer always carries them. The server-sent events have one model per type (`app/stream_events.py`, published under `StreamEvent`).
+2. `backend/scripts/export_openapi.py` writes [`contracts/openapi.json`](../contracts/openapi.json) from the app, with sorted keys, no server and no network. It also writes `frontend/src/lib/meta.fallback.ts`, what `GET /api/meta` answers, for when the API cannot be reached.
+3. `npm run gen:api` turns the contract into `frontend/src/lib/api-schema.d.ts` with `openapi-typescript`. `frontend/src/lib/types.ts` only names those generated types, and `api.ts`, `checkState.ts` and `useCheckEvents.ts` are typed from them, so a backend change that breaks the frontend fails `tsc`.
+4. CI regenerates both files and fails with *API contract out of date: run `make contract`* if either differs from what is committed. A backend test also checks that every route is in the contract and that the recorded browser-test answers (`frontend/e2e/fixtures/`) still match the models.
+
+To change the API: edit the backend model, run `make contract` at the repository root, and commit the generated files with the change. The score scale itself is not a type but data: the frontend reads it from `GET /api/meta` on the server (cached for an hour, with the generated fallback) and never writes 300, 900, a band edge or a weight in code; a test enforces it.
 
 ## Data model
 
@@ -199,7 +215,7 @@ Each re-check is a normal check. It is compared with the check the watch last sa
 - Only sources that both checks read are compared. Unread to unread is never a change; a source that went unreadable does not make its records "removed", and a source read for the first time does not make them "added".
 - The first finished check of a project is a baseline, not a change.
 
-An alert stores the old and new score and the diff, and is shown at `/alerts?email=`. If `SMTP_HOST` and `SMTP_FROM` are set it is also emailed, to the watch's address only; without them it is stored and shown in the app.
+An alert stores the old and new NeevScore and the diff, and is shown at `/alerts?email=`. If `SMTP_HOST` and `SMTP_FROM` are set it is also emailed, to the watch's address only; without them it is stored and shown in the app.
 
 ### Cost guards
 
@@ -259,13 +275,13 @@ NeevCheck has no sign-in. The app keeps the ids of the checks a visitor starts i
 
 ## Compare
 
-`app/compare.py` builds the comparison from each check's report. A value a check could not read is `null`, never zero. "Best on the records" is the highest score among checks that read at least half of their key records (the same bar a score needs for a risk band); with fewer than two such checks the answer is "not enough evidence to rank", and equal scores are a tie. The app tints the better value of each row in orange only when every column has a value, and compares the six scoring areas only when every check has enough evidence, because zero points lost can mean nothing was found or nothing was read. Picks are kept in `localStorage` (`neevcheck-compare`, at most three), shared by My reports and each report's **Add to compare** button.
+`app/compare.py` builds the comparison from each check's report. A value a check could not read is `null`, never zero. "Best on the records" is the highest `display_score.value` among checks whose NeevScore read at least half of the six pillars (the same bar a score needs for a risk band); with fewer than two such checks the answer is "not enough evidence to rank", and equal scores are a tie. The app tints the better value of each row in orange only when every column has a value, and compares the six pillars only when every check is rated, because zero points lost can mean nothing was found or nothing was read. Picks are kept in `localStorage` (`neevcheck-compare`, at most three), shared by My reports and each report's **Add to compare** button.
 
 ## Report extras
 
 - **Builder track record**: `app/track_record.py` runs two TinyFish Searches on up-rera.in for the promoter's legal name and keeps only results that carry that full name, so "Supertech Limited" never collects a sister company's projects. Snippets are often cut short, so the list can be incomplete, and the report says so. Each project has a **Check** button that opens its confirm step.
 - **Questions to ask the builder**: five questions chosen by rules in `frontend/src/lib/builderQuestions.ts` (a delay asks for the revised possession date in writing, complaints ask what they were about, insolvency asks about the NCLT order's scope, an unread e-Jagriti asks about pending cases; the RERA collection account number is always asked), with a copy-all button.
-- **Share on WhatsApp** opens `wa.me` with a short text: project, score, band and the report link.
+- **Share on WhatsApp** opens `wa.me` with a short text: project, NeevScore with its scale and band, and the report link.
 
 ## Resuming a check
 
