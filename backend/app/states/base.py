@@ -84,6 +84,8 @@ class StateSpec:
     positional: str | None = None
     # Part of the address of the pages that print values in that order.
     positional_in: str = ""
+    # Name of a parser (app.states.lists) for the project list that Fetch can read.
+    row_parser: str | None = None
     # How sure a number that fits the pattern is to belong to this state, when formats overlap.
     detect_confidence: float = 0.9
     unverified_format: bool = field(default=False)
