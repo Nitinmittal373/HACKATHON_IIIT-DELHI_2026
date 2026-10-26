@@ -47,10 +47,14 @@ def test_rows_come_from_the_records_and_unread_stays_unknown(client: TestClient)
     assert first["insolvency"] == "unverified"
     assert first["company_status"] == "Active"
     assert first["unread"] == ["land_dues", "consumer_cases"]
-    assert [f["points"] for f in first["top_findings"]] == [-14.0, -9.0, -6.0]
+    # Points are on the 300-900 scale: 15 project complaints take the whole legal pillar.
+    assert [f["points"] for f in first["top_findings"]] == [-150.0, -3.0, -3.0]
     assert all(f["source_url"].startswith("https://") for f in first["top_findings"])
     execution = next(a for a in first["areas"] if a["area"] == "execution")
     assert (execution["lost"], execution["max"]) == (14.0, 20.0)
+    assert first["display_score"]["band"] == "Watch"
+    legal = next(p for p in first["pillars"] if p["id"] == "P3")
+    assert (legal["lost"], legal["max"]) == (150.0, 150.0)
 
     assert second["project"]["rera_id"] == "UPRERAPRJ6742"
     assert second["delay_months"] is not None
@@ -62,7 +66,9 @@ def test_a_thin_check_is_never_ranked_against_a_full_one(client: TestClient) -> 
     eco, avenue = finished_check(client, "UPRERAPRJ8334"), finished_check(client, "UPRERAPRJ6742")
     body = client.get("/api/checks/compare", params={"ids": f"{eco},{avenue}"}).json()
 
-    confidences = {p["project"]["rera_id"]: p["confidence"] for p in body["projects"]}
+    confidences = {
+        p["project"]["rera_id"]: p["display_score"]["confidence"] for p in body["projects"]
+    }
     assert confidences["UPRERAPRJ6742"] < 0.5
     assert (body["best"], body["reason"]) == (None, "not_enough_evidence")
 
@@ -78,9 +84,10 @@ def test_the_best_score_wins_among_checks_read_well_enough(client: TestClient) -
     eco = finished_check(client, "UPRERAPRJ8334")
     report = Report.model_validate(client.get(f"/api/checks/{eco}/report").json())
     base = compared(report)
-    better = base.model_copy(update={"check_id": "b" * 32, "score": 81})
-    thin = {"check_id": "c" * 32, "score": 95, "confidence": 0.29}
-    higher_but_thin = base.model_copy(update=thin)
+    better_score = base.display_score.model_copy(update={"value": base.display_score.value + 60})
+    better = base.model_copy(update={"check_id": "b" * 32, "display_score": better_score})
+    thin_score = base.display_score.model_copy(update={"value": 890, "confidence": 0.17})
+    higher_but_thin = base.model_copy(update={"check_id": "c" * 32, "display_score": thin_score})
 
     assert best_on_records([base, better, higher_but_thin]) == ("b" * 32, "best_score")
 

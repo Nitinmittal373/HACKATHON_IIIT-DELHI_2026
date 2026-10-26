@@ -315,3 +315,6 @@ export interface TrackRecord {
   projects: Project[];
   searched_at: string;
 }
+
+/** GET /api/meta: the score scale, band edges and pillar weights (backend/app/meta.py). */
+export type Meta = import("@/lib/api-schema").components["schemas"]["Meta"];

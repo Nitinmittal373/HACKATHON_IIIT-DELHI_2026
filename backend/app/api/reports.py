@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.api.deps import CheckId, find_check, get_store
-from app.models import Check, Report
+from app.models import Check, DisplayScore, Report
 from app.store import Store
 
 router = APIRouter(tags=["checks"])
@@ -24,7 +24,9 @@ def assemble_report(store: Store, check: Check) -> Report | None:
     """The report of a finished check, or None when it failed and has no score."""
     score = store.get_score(check.id)
     project = store.get_project(check.rera_id)
-    if check.status != "completed" or score is None or project is None:
+    # Checks made before v2 are re-scored by the store, so a finished check always has one.
+    score_v2 = store.get_score_v2(check.id, check)
+    if check.status != "completed" or score is None or project is None or score_v2 is None:
         return None
     findings = store.list_findings(check.id)
     points = {driver.finding_id: driver.points for driver in score.drivers}
@@ -36,6 +38,7 @@ def assemble_report(store: Store, check: Check) -> Report | None:
         score=score,
         findings=findings,
         timeline=timeline,
-        score_v2=store.get_score_v2(check.id),
+        display_score=DisplayScore.of(score_v2),
+        score_v2=score_v2,
         family=store.get_family(check.id),
     )

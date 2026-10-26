@@ -175,6 +175,13 @@ def test_my_reports_lists_known_checks_in_the_order_asked(client: TestClient) ->
         "score": 71,
         "band": "insufficient_evidence",
         "confidence": 0.43,
+        "display_score": {
+            "value": 750,
+            "band": "insufficient_evidence",
+            "hard_stop": False,
+            "confidence": 0.33,
+            "provisional": True,
+        },
         "created_at": listed[1]["created_at"],
         "completed_at": listed[1]["completed_at"],
     }

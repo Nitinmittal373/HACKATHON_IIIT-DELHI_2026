@@ -124,6 +124,8 @@ class Sentinel:
             created_at=self._clock(),
             old_score=old_score.value if old_score else None,
             new_score=new_score.value if new_score else None,
+            old_display=old_check.display_score,
+            new_display=new_check.display_score,
             diff=diff,
         )
         await self._deliver(watch, alert_id)

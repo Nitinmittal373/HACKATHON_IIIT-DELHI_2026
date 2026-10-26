@@ -116,6 +116,74 @@ class SourceRun(BaseModel):
     checks_read: list[CheckKey] = []
 
 
+PillarId = Literal["P1", "P2", "P3", "P4", "P5", "P6"]
+BandV2 = Literal["Low", "Watch", "Elevated", "High", "insufficient_evidence"]
+
+
+class Pillar(BaseModel):
+    id: PillarId
+    name: str
+    weight: float
+    # 0-100, after the pillar's cap.
+    penalty: int
+    # Points lost on the 300-900 scale, negative like the v1 drivers.
+    points: float
+
+
+class DriverV2(BaseModel):
+    """One finding's share of the score, so the evidence ledger can show it."""
+
+    finding_id: str
+    pillar: PillarId
+    code: str
+    penalty: int
+    points: float
+
+
+class ReasonCode(BaseModel):
+    code: str
+    label: str
+    finding_ids: list[str]
+    points: float
+
+
+class ScoreV2(BaseModel):
+    value: int
+    band: BandV2
+    band_label: str
+    # True when too few pillars were read to rate the project; the value is shown but not banded.
+    provisional: bool
+    hard_stop: bool
+    hard_stop_reason: str | None = None
+    # Share of the six pillars with at least one source read.
+    confidence: float
+    pillars: list[Pillar]
+    reason_codes: list[ReasonCode]
+    drivers: list[DriverV2]
+    pillars_unread: list[PillarId]
+
+
+class DisplayScore(BaseModel):
+    """The score every screen shows: NeevScore v2 on the 300-900 scale, without the detail."""
+
+    value: int
+    band: BandV2
+    hard_stop: bool
+    confidence: float
+    # True when too little was read to rate the project; the value is shown but not banded.
+    provisional: bool
+
+    @classmethod
+    def of(cls, score: ScoreV2) -> "DisplayScore":
+        return cls(
+            value=score.value,
+            band=score.band,
+            hard_stop=score.hard_stop,
+            confidence=score.confidence,
+            provisional=score.provisional,
+        )
+
+
 class Check(BaseModel):
     id: str
     rera_id: str
@@ -126,6 +194,8 @@ class Check(BaseModel):
     sources: list[SourceRun] = []
     # True when an earlier finished check of the same project was returned instead of a new one.
     reused: bool = False
+    # Set once the check has a score.
+    display_score: DisplayScore | None = None
 
 
 class Finding(BaseModel):
@@ -190,9 +260,11 @@ class CheckSummary(BaseModel):
     project: str | None
     promoter: str | None
     status: CheckStatus
+    # The classic 0-100 score, kept for older clients; screens show display_score.
     score: int | None = None
     band: Band | None = None
     confidence: float | None = None
+    display_score: DisplayScore | None = None
     created_at: datetime
     completed_at: datetime | None = None
 
@@ -203,53 +275,8 @@ class RecentCheck(CheckSummary):
     registered_on: date | None = None
     sources_read: int = 0
     drivers: list[Driver] = []
-
-
-PillarId = Literal["P1", "P2", "P3", "P4", "P5", "P6"]
-BandV2 = Literal["Low", "Watch", "Elevated", "High", "insufficient_evidence"]
-
-
-class Pillar(BaseModel):
-    id: PillarId
-    name: str
-    weight: float
-    # 0-100, after the pillar's cap.
-    penalty: int
-    # Points lost on the 300-900 scale, negative like the v1 drivers.
-    points: float
-
-
-class DriverV2(BaseModel):
-    """One finding's share of the score, so the evidence ledger can show it."""
-
-    finding_id: str
-    pillar: PillarId
-    code: str
-    penalty: int
-    points: float
-
-
-class ReasonCode(BaseModel):
-    code: str
-    label: str
-    finding_ids: list[str]
-    points: float
-
-
-class ScoreV2(BaseModel):
-    value: int
-    band: BandV2
-    band_label: str
-    # True when too few pillars were read to rate the project; the value is shown but not banded.
-    provisional: bool
-    hard_stop: bool
-    hard_stop_reason: str | None = None
-    # Share of the six pillars with at least one source read.
-    confidence: float
-    pillars: list[Pillar]
-    reason_codes: list[ReasonCode]
-    drivers: list[DriverV2]
-    pillars_unread: list[PillarId]
+    # The biggest reasons behind the 300-900 score, with the points each one cost.
+    reasons: list[ReasonCode] = []
 
 
 FamilyFlag = Literal["cirp", "struck_off"]
@@ -292,11 +319,13 @@ class FamilyTree(BaseModel):
 class Report(BaseModel):
     check: Check
     project: Project
+    # The classic 0-100 score, shown only as a transparency line in the method section.
     score: Score
     findings: list[Finding]
     timeline: list[Finding]
-    # The 300-900 score with pillars and reason codes; None for checks made before v2.
-    score_v2: ScoreV2 | None = None
+    # The score screens show. Checks made before v2 are re-scored from their stored findings.
+    display_score: DisplayScore
+    score_v2: ScoreV2
     # Directors, related companies and their projects; None unless the group source ran.
     family: FamilyTree | None = None
 

@@ -136,11 +136,20 @@ async def remove_watch(
 def list_alerts(
     email: Annotated[str, Query(max_length=254)],
     watches: Annotated[SentinelStore, Depends(get_sentinel_store)],
+    store: Annotated[Store, Depends(get_store)],
 ) -> list[Alert]:
     address = email.strip().lower()
     if not EMAIL_PATTERN.match(address):
         raise HTTPException(status_code=422, detail="Enter a valid email address")
-    return watches.alerts_for_email(address)
+    return [with_new_score(alert, store) for alert in watches.alerts_for_email(address)]
+
+
+def with_new_score(alert: Alert, store: Store) -> Alert:
+    """Alerts stored before v2 have no 300-900 scores; the new check can still be scored."""
+    if alert.new_display_score is not None:
+        return alert
+    check = store.get_check(alert.check_id)
+    return alert.model_copy(update={"new_display_score": check.display_score if check else None})
 
 
 @router.post("/api/sentinel/run", status_code=202)

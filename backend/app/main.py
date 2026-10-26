@@ -15,6 +15,7 @@ from app.api import (
     corrections,
     events,
     health,
+    meta,
     projects,
     promoters,
     reports,
@@ -126,6 +127,7 @@ def create_app(
     # compare before checks: /api/checks/compare must not be read as a check id.
     for module in (
         health,
+        meta,
         projects,
         promoters,
         compare,

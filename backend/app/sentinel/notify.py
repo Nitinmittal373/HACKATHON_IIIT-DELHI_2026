@@ -26,6 +26,7 @@ SCORE_LINE: dict[Language, str] = {
     "en": "NeevScore: {old} -> {new}",
     "hi": "NeevScore: {old} -> {new}",
 }
+NOT_RATED = "-"
 FOOTER: dict[Language, str] = {
     "en": "Public records as read by NeevCheck. Not legal or financial advice.",
     "hi": "NeevCheck द्वारा पढ़े गए सार्वजनिक रिकॉर्ड। यह कानूनी या वित्तीय सलाह नहीं है।",
@@ -38,7 +39,11 @@ def smtp_configured(settings: Settings) -> bool:
 
 def build_message(settings: Settings, to: str, language: Language, alert: Alert) -> EmailMessage:
     project = alert.project_name or alert.rera_id
-    lines = [SCORE_LINE[language].format(old=alert.old_score, new=alert.new_score), ""]
+    old, new = alert.old_display_score, alert.new_display_score
+    scores = SCORE_LINE[language].format(
+        old=old.value if old else NOT_RATED, new=new.value if new else NOT_RATED
+    )
+    lines = [scores, ""]
     for name, changes in (
         ("added", alert.added),
         ("removed", alert.removed),

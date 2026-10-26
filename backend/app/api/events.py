@@ -11,15 +11,20 @@ from app.api.deps import CheckId, find_check, get_hub, get_store
 from app.events import EventHub
 from app.models import Check, Event
 from app.store import Store
+from app.stream_events import StreamEvent
 
 router = APIRouter(tags=["checks"])
 HEARTBEAT_SECONDS = 15
 
 
+class EventStreamResponse(StreamingResponse):
+    media_type = "text/event-stream"
+
+
 @router.get(
     "/api/checks/{check_id}/events",
-    response_class=StreamingResponse,
-    responses={200: {"content": {"text/event-stream": {}}}},
+    response_class=EventStreamResponse,
+    responses={200: {"model": StreamEvent, "description": "One StreamEvent per SSE message"}},
 )
 def stream_events(
     check_id: CheckId,
@@ -53,7 +58,12 @@ async def _replay_finished(check: Check) -> AsyncIterator[str]:
         check_id=check.id,
         source="check",
         ts=check.completed_at or datetime.now(UTC),
-        data={"status": check.status},
+        data={
+            "status": check.status,
+            "display_score": check.display_score.model_dump(mode="json")
+            if check.display_score
+            else None,
+        },
     )
     yield format_event(event, 1)
 

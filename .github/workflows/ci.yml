@@ -35,9 +35,9 @@ jobs:
         # The frontend's types are generated from this file; a stale copy would hide a break.
         run: |
           python -m scripts.export_openapi
-          if [ -n "$(git status --porcelain ../contracts)" ]; then
+          if [ -n "$(git status --porcelain ../contracts ../frontend/src/lib/meta.fallback.ts)" ]; then
             echo "::error::API contract out of date: run make contract"
-            git diff --stat ../contracts
+            git diff --stat ../contracts ../frontend/src/lib/meta.fallback.ts
             exit 1
           fi
       - if: steps.present.outputs.yes == 'true'

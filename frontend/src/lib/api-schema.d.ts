@@ -151,6 +151,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/meta": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Meta
+         * @description The score scale, band edges and pillar weights, so no client hard-codes them.
+         */
+        get: operations["get_meta_api_meta_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/projects/search": {
         parameters: {
             query?: never;
@@ -302,8 +322,10 @@ export interface components {
             created_at: string;
             /** Id */
             id: string;
+            new_display_score?: components["schemas"]["DisplayScore"] | null;
             /** New Score */
             new_score: number | null;
+            old_display_score?: components["schemas"]["DisplayScore"] | null;
             /** Old Score */
             old_score: number | null;
             /** Project Name */
@@ -343,12 +365,30 @@ export interface components {
             /** Weight */
             weight: number;
         };
+        /** BandRange */
+        BandRange: {
+            /**
+             * Key
+             * @enum {string}
+             */
+            key: "Low" | "Watch" | "Elevated" | "High";
+            /** Max */
+            max: number;
+            /** Min */
+            min: number;
+        };
+        /** BlockedData */
+        BlockedData: {
+            /** Reason */
+            reason: string;
+        };
         /** Check */
         Check: {
             /** Completed At */
             completed_at?: string | null;
             /** Details Url */
             details_url: string;
+            display_score?: components["schemas"]["DisplayScore"] | null;
             /** Id */
             id: string;
             /** Rera Id */
@@ -373,6 +413,39 @@ export interface components {
              * @enum {string}
              */
             status: "queued" | "running" | "completed" | "failed";
+        };
+        /** CheckCompletedData */
+        CheckCompletedData: {
+            display_score?: components["schemas"]["DisplayScore"] | null;
+            /** Message */
+            message?: string | null;
+            score?: components["schemas"]["ScoreSummary"] | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "completed" | "failed";
+        };
+        /** CheckCompletedEvent */
+        CheckCompletedEvent: {
+            /** Check Id */
+            check_id: string;
+            data: components["schemas"]["CheckCompletedData"];
+            /**
+             * Source
+             * @constant
+             */
+            source: "check";
+            /**
+             * Ts
+             * Format: date-time
+             */
+            ts: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "check.completed";
         };
         /** CheckCreate */
         CheckCreate: {
@@ -407,6 +480,7 @@ export interface components {
             created_at: string;
             /** Details Url */
             details_url: string;
+            display_score?: components["schemas"]["DisplayScore"] | null;
             /** Id */
             id: string;
             /** Project */
@@ -440,10 +514,13 @@ export interface components {
             confidence: number;
             /** Delay Months */
             delay_months: number | null;
+            display_score: components["schemas"]["DisplayScore"];
             /** Hard Stop */
             hard_stop: boolean;
             /** Insolvency */
             insolvency: ("none_found" | "admitted" | "other_project" | "this_project" | "company" | "unverified") | null;
+            /** Pillars */
+            pillars: components["schemas"]["PillarPoints"][];
             project: components["schemas"]["Project"];
             /** Project Complaints */
             project_complaints: number | null;
@@ -496,6 +573,25 @@ export interface components {
             message: string;
             /** Report Id */
             report_id: string;
+        };
+        /**
+         * DisplayScore
+         * @description The score every screen shows: NeevScore v2 on the 300-900 scale, without the detail.
+         */
+        DisplayScore: {
+            /**
+             * Band
+             * @enum {string}
+             */
+            band: "Low" | "Watch" | "Elevated" | "High" | "insufficient_evidence";
+            /** Confidence */
+            confidence: number;
+            /** Hard Stop */
+            hard_stop: boolean;
+            /** Provisional */
+            provisional: boolean;
+            /** Value */
+            value: number;
         };
         /** Driver */
         Driver: {
@@ -641,12 +737,37 @@ export interface components {
              */
             verdict: "ok" | "fail" | "red_flag" | "review" | "context" | "not_found";
         };
+        /** FindingAddedEvent */
+        FindingAddedEvent: {
+            /** Check Id */
+            check_id: string;
+            data: components["schemas"]["FindingData"];
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "uprera" | "registry" | "insolvency" | "land" | "consumer" | "news" | "group" | "sarfaesi";
+            /**
+             * Ts
+             * Format: date-time
+             */
+            ts: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "finding.added";
+        };
         /** FindingChange */
         FindingChange: {
             /** Source Url */
             source_url?: string | null;
             /** Title */
             title: string;
+        };
+        /** FindingData */
+        FindingData: {
+            finding: components["schemas"]["Finding"];
         };
         /** FindingLine */
         FindingLine: {
@@ -662,6 +783,28 @@ export interface components {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
+        /** LiveUrlData */
+        LiveUrlData: {
+            /** Url */
+            url: string;
+        };
+        /** Meta */
+        Meta: {
+            /** Bands */
+            bands: components["schemas"]["BandRange"][];
+            /** Pillars */
+            pillars: components["schemas"]["PillarWeight"][];
+            /** Reason Codes */
+            reason_codes: components["schemas"]["ReasonCodeId"][];
+            scale: components["schemas"]["Scale"];
+            /**
+             * Score Version
+             * @constant
+             */
+            score_version: "v2";
+        };
+        /** NoData */
+        NoData: Record<string, never>;
         /** Pillar */
         Pillar: {
             /**
@@ -677,6 +820,35 @@ export interface components {
             points: number;
             /** Weight */
             weight: number;
+        };
+        /** PillarPoints */
+        PillarPoints: {
+            /**
+             * Id
+             * @enum {string}
+             */
+            id: "P1" | "P2" | "P3" | "P4" | "P5" | "P6";
+            /** Lost */
+            lost: number;
+            /** Max */
+            max: number;
+            /** Name */
+            name: string;
+        };
+        /** PillarWeight */
+        PillarWeight: {
+            /**
+             * Id
+             * @enum {string}
+             */
+            id: "P1" | "P2" | "P3" | "P4" | "P5" | "P6";
+            /** Weight */
+            weight: number;
+        };
+        /** ProgressData */
+        ProgressData: {
+            /** Text */
+            text: string;
         };
         /** Project */
         Project: {
@@ -704,6 +876,11 @@ export interface components {
             /** Points */
             points: number;
         };
+        /** ReasonCodeId */
+        ReasonCodeId: {
+            /** Code */
+            code: string;
+        };
         /**
          * RecentCheck
          * @description A finished check shown on the home page. Only public-record facts, never who asked.
@@ -722,6 +899,7 @@ export interface components {
             created_at: string;
             /** Details Url */
             details_url: string;
+            display_score?: components["schemas"]["DisplayScore"] | null;
             /**
              * Drivers
              * @default []
@@ -733,6 +911,11 @@ export interface components {
             project: string | null;
             /** Promoter */
             promoter: string | null;
+            /**
+             * Reasons
+             * @default []
+             */
+            reasons: components["schemas"]["ReasonCode"][];
             /** Registered On */
             registered_on?: string | null;
             /** Rera Id */
@@ -753,14 +936,22 @@ export interface components {
         /** Report */
         Report: {
             check: components["schemas"]["Check"];
+            display_score: components["schemas"]["DisplayScore"];
             family?: components["schemas"]["FamilyTree"] | null;
             /** Findings */
             findings: components["schemas"]["Finding"][];
             project: components["schemas"]["Project"];
             score: components["schemas"]["Score"];
-            score_v2?: components["schemas"]["ScoreV2"] | null;
+            score_v2: components["schemas"]["ScoreV2"];
             /** Timeline */
             timeline: components["schemas"]["Finding"][];
+        };
+        /** Scale */
+        Scale: {
+            /** Max */
+            max: number;
+            /** Min */
+            min: number;
         };
         /** Score */
         Score: {
@@ -783,6 +974,27 @@ export interface components {
             hard_stop: boolean;
             /** Hard Stop Reason */
             hard_stop_reason?: string | null;
+            /** Provisional */
+            provisional: boolean;
+            /** Value */
+            value: number;
+        };
+        /**
+         * ScoreSummary
+         * @description The classic 0-100 summary sent with check.completed, kept for older clients.
+         */
+        ScoreSummary: {
+            /**
+             * Band
+             * @enum {string}
+             */
+            band: "Low" | "Moderate" | "High" | "Critical" | "insufficient_evidence";
+            /** Band Label */
+            band_label: string;
+            /** Confidence */
+            confidence: number;
+            /** Hard Stop */
+            hard_stop: boolean;
             /** Provisional */
             provisional: boolean;
             /** Value */
@@ -823,6 +1035,105 @@ export interface components {
             /** Query */
             query: string;
         };
+        /** SourceBlockedEvent */
+        SourceBlockedEvent: {
+            /** Check Id */
+            check_id: string;
+            data: components["schemas"]["BlockedData"];
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "uprera" | "registry" | "insolvency" | "land" | "consumer" | "news" | "group" | "sarfaesi";
+            /**
+             * Ts
+             * Format: date-time
+             */
+            ts: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "source.blocked";
+        };
+        /** SourceCompletedData */
+        SourceCompletedData: {
+            /**
+             * Checks Read
+             * @default []
+             */
+            checks_read: ("registration" | "completion_date" | "extensions" | "company_status" | "insolvency" | "land_dues" | "consumer_cases")[];
+            /** Message */
+            message?: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "running" | "completed" | "blocked" | "failed" | "unavailable";
+        };
+        /** SourceCompletedEvent */
+        SourceCompletedEvent: {
+            /** Check Id */
+            check_id: string;
+            data: components["schemas"]["SourceCompletedData"];
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "uprera" | "registry" | "insolvency" | "land" | "consumer" | "news" | "group" | "sarfaesi";
+            /**
+             * Ts
+             * Format: date-time
+             */
+            ts: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "source.completed";
+        };
+        /** SourceLiveUrlEvent */
+        SourceLiveUrlEvent: {
+            /** Check Id */
+            check_id: string;
+            data: components["schemas"]["LiveUrlData"];
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "uprera" | "registry" | "insolvency" | "land" | "consumer" | "news" | "group" | "sarfaesi";
+            /**
+             * Ts
+             * Format: date-time
+             */
+            ts: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "source.live_url";
+        };
+        /** SourceProgressEvent */
+        SourceProgressEvent: {
+            /** Check Id */
+            check_id: string;
+            data: components["schemas"]["ProgressData"];
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "uprera" | "registry" | "insolvency" | "land" | "consumer" | "news" | "group" | "sarfaesi";
+            /**
+             * Ts
+             * Format: date-time
+             */
+            ts: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "source.progress";
+        };
         /** SourceRun */
         SourceRun: {
             /**
@@ -845,10 +1156,31 @@ export interface components {
              */
             status: "running" | "completed" | "blocked" | "failed" | "unavailable";
         };
+        /** SourceStartedEvent */
+        SourceStartedEvent: {
+            /** Check Id */
+            check_id: string;
+            data: components["schemas"]["NoData"];
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "uprera" | "registry" | "insolvency" | "land" | "consumer" | "news" | "group" | "sarfaesi";
+            /**
+             * Ts
+             * Format: date-time
+             */
+            ts: string;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "source.started";
+        };
         /** TrackRecord */
         TrackRecord: {
             /** Projects */
-            projects: components["schemas"]["Project"][];
+            projects: components["schemas"]["TrackedProject"][];
             /** Promoter */
             promoter: string;
             /**
@@ -856,6 +1188,27 @@ export interface components {
              * Format: date-time
              */
             searched_at: string;
+        };
+        /**
+         * TrackedProject
+         * @description A project from the search, with its NeevScore when NeevCheck has already checked it.
+         */
+        TrackedProject: {
+            /** Check Id */
+            check_id?: string | null;
+            /** Details Url */
+            details_url: string;
+            display_score?: components["schemas"]["DisplayScore"] | null;
+            /** District */
+            district?: string | null;
+            /** Name */
+            name?: string | null;
+            /** Promoter */
+            promoter?: string | null;
+            /** Registered On */
+            registered_on?: string | null;
+            /** Rera Id */
+            rera_id: string;
         };
         /** ValidationError */
         ValidationError: {
@@ -1093,13 +1446,13 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Successful Response */
+            /** @description One StreamEvent per SSE message */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "text/event-stream": unknown;
+                    "text/event-stream": string & (components["schemas"]["SourceStartedEvent"] | components["schemas"]["SourceLiveUrlEvent"] | components["schemas"]["SourceProgressEvent"] | components["schemas"]["FindingAddedEvent"] | components["schemas"]["SourceBlockedEvent"] | components["schemas"]["SourceCompletedEvent"] | components["schemas"]["CheckCompletedEvent"]);
                 };
             };
             /** @description Validation Error */
@@ -1236,6 +1589,26 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    get_meta_api_meta_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Meta"];
                 };
             };
         };
