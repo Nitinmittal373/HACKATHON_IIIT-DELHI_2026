@@ -16,6 +16,8 @@ export const states: typeof en = {
     searchOnly: (rera: string) =>
       `आधिकारिक पोर्टल के खोज परिणामों से। पूरा रिकॉर्ड ${rera} पर खोलें`,
   },
+  builderFromListings: (rera: string) =>
+    `बिल्डर की पहचान सार्वजनिक लिस्टिंग से हुई; ${rera} पर जाँच लें।`,
   openOn: (rera: string) => `${rera} पर खोलें`,
   notYetChecked: "पोर्टल पर अभी जाँचा नहीं गया",
   coverage: {

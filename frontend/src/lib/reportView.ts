@@ -13,6 +13,11 @@ const CHECK_SOURCE: Record<CheckKey, SourceName> = {
 
 export const KEY_CHECK_COUNT = Object.keys(CHECK_SOURCE).length;
 
+/** True when the builder's name came from public listings, not from the RERA portal's page. */
+export function builderFromListings(findings: Pick<Finding, "kind">[]): boolean {
+  return findings.some((finding) => finding.kind === "builder_identity");
+}
+
 /** "E1", "E2", ... in the order the evidence list shows them. */
 export function evidenceIds(findings: Finding[]): Map<string, string> {
   return new Map(findings.map((finding, index) => [finding.id, `E${index + 1}`]));
