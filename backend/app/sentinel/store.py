@@ -3,10 +3,10 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session, sessionmaker
 
-from app.db import AlertRow, ProjectRow, WatchRow
+from app.db import AlertRow, MonitorRow, ProjectRow, WatchRow, WebhookReceiptRow
 from app.sentinel.models import Alert, Diff, FindingChange, Language, Watch
 
 
@@ -46,6 +46,44 @@ class SentinelStore:
         with self._sessions.begin() as session:
             session.add(row)
         return _watch(row)
+
+    def get_watch(self, watch_id: str) -> Watch | None:
+        with self._sessions() as session:
+            row = session.get(WatchRow, watch_id)
+            return _watch(row) if row else None
+
+    def remove_watch(self, watch_id: str) -> list[str]:
+        """Delete a watch with its alerts; returns the TinyFish monitors to cancel."""
+        with self._sessions.begin() as session:
+            monitor_ids = list(
+                session.scalars(
+                    select(MonitorRow.monitor_id).where(MonitorRow.watch_id == watch_id)
+                )
+            )
+            session.execute(delete(MonitorRow).where(MonitorRow.watch_id == watch_id))
+            session.execute(delete(AlertRow).where(AlertRow.watch_id == watch_id))
+            session.execute(delete(WatchRow).where(WatchRow.id == watch_id))
+            return monitor_ids
+
+    def add_monitor(self, watch_id: str, monitor_id: str, kind: str) -> None:
+        with self._sessions.begin() as session:
+            session.add(MonitorRow(monitor_id=monitor_id, watch_id=watch_id, kind=kind))
+
+    def project_for_monitor(self, monitor_id: str) -> str | None:
+        with self._sessions() as session:
+            return session.scalar(
+                select(WatchRow.rera_id)
+                .join(MonitorRow, MonitorRow.watch_id == WatchRow.id)
+                .where(MonitorRow.monitor_id == monitor_id)
+            )
+
+    def claim_delivery(self, key: str, received_at: datetime) -> bool:
+        """True the first time a delivery key is seen, False for every repeat."""
+        with self._sessions.begin() as session:
+            if session.get(WebhookReceiptRow, key):
+                return False
+            session.add(WebhookReceiptRow(key=key, received_at=received_at))
+            return True
 
     def watches_for_project(self, rera_id: str) -> list[Watch]:
         with self._sessions() as session:

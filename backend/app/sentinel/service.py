@@ -75,6 +75,17 @@ class Sentinel:
                 summary.projects_checked += 1
         return summary
 
+    async def recheck_project(self, rera_id: str) -> int:
+        """Re-check one project now, as a monitor's webhook asks. 0 when the daily cap is hit."""
+        async with self._running:
+            wait = seconds_until_cap_resets(
+                self._store, self._settings.max_checks_per_day, self._clock()
+            )
+            if wait is not None:
+                logger.info("Webhook re-check skipped: the daily check cap was reached")
+                return 0
+            return await self._recheck(rera_id)
+
     async def _recheck(self, rera_id: str) -> int:
         project = self._store.get_project(rera_id)
         if project is None:
@@ -124,4 +135,3 @@ class Sentinel:
         )
         if alert and await send_alert(self._settings, watch.email, watch.language, alert):
             self._watches.mark_emailed(alert_id)
-
