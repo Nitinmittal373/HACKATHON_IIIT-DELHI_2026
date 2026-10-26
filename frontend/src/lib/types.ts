@@ -74,6 +74,10 @@ export interface Finding {
   months: number | null;
   scope: "company" | "this_project" | "other_project" | null;
   points?: number | null;
+  /** Share-style facts such as "3 of 5 group projects delayed". */
+  total?: number | null;
+  /** The words on the page behind the claim, at most 300 characters. */
+  snippet?: string | null;
 }
 
 export interface Driver {
@@ -104,12 +108,56 @@ export interface Score {
   checks_unread: CheckKey[];
 }
 
+export type BandV2 = "Low" | "Watch" | "Elevated" | "High" | "insufficient_evidence";
+export type PillarId = "P1" | "P2" | "P3" | "P4" | "P5" | "P6";
+
+export interface Pillar {
+  id: PillarId;
+  name: string;
+  weight: number;
+  /** 0 to 100, after the pillar's cap. */
+  penalty: number;
+  /** Points lost on the 300-900 scale, negative. */
+  points: number;
+}
+
+export interface DriverV2 {
+  finding_id: string;
+  pillar: PillarId;
+  code: string;
+  penalty: number;
+  points: number;
+}
+
+export interface ReasonCode {
+  code: string;
+  label: string;
+  finding_ids: string[];
+  points: number;
+}
+
+/** NeevScore v2 (300-900). Absent on reports made before it existed. */
+export interface ScoreV2 {
+  value: number;
+  band: BandV2;
+  band_label: string;
+  provisional: boolean;
+  hard_stop: boolean;
+  hard_stop_reason: string | null;
+  confidence: number;
+  pillars: Pillar[];
+  reason_codes: ReasonCode[];
+  drivers: DriverV2[];
+  pillars_unread: PillarId[];
+}
+
 export interface Report {
   check: Check;
   project: Project;
   score: Score;
   findings: Finding[];
   timeline: Finding[];
+  score_v2?: ScoreV2 | null;
 }
 
 export type EventType =

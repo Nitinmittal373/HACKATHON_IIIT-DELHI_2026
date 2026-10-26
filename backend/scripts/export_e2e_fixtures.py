@@ -85,8 +85,30 @@ def export_track_record() -> None:
     save_json("track-record.json", record)
 
 
+def export_v2_report() -> None:
+    """report.json again, with the v2 sources on: the 300-900 score, reason codes and the group.
+
+    The check keeps the id the other fixtures use, so every page still finds its report.
+    """
+    path = OUT / "report.json"
+    e2e_id = json.loads(path.read_text(encoding="utf-8"))["check"]["id"]
+    web = make_web().replay(load_recording("check_8334.json"))
+    web.replay(load_recording("group_8334.json")).replay(load_recording("sarfaesi_8334.json"))
+    with tempfile.TemporaryDirectory() as folder:
+        settings = make_settings(Path(folder), v2_sources=True)
+        app = create_app(settings, web=web, clock=lambda: FIXED_NOW, cache_dir=None)
+        with TestClient(app) as client:
+            check_id = client.post("/api/checks", json={"rera_id": "UPRERAPRJ8334"}).json()["id"]
+            with client.stream("GET", f"/api/checks/{check_id}/events") as response:
+                response.read()
+            report = client.get(f"/api/checks/{check_id}/report").json()
+    save("report.json", json.dumps(report, indent=2, ensure_ascii=False).replace(check_id, e2e_id) + "\n")
+
+
 if __name__ == "__main__":
-    if sys.argv[1:] == ["extras"]:
+    if sys.argv[1:] == ["v2"]:
+        export_v2_report()
+    elif sys.argv[1:] == ["extras"]:
         export_compare()
         export_track_record()
     else:
