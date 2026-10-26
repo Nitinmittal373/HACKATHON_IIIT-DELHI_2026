@@ -31,12 +31,16 @@ async def search_projects(
         str | None,
         Query(max_length=2, description="State code such as MH; omit to search every state"),
     ] = None,
+    locality: Annotated[
+        str | None,
+        Query(max_length=80, description="City or locality such as 'Sector 43 Noida'"),
+    ] = None,
 ) -> SearchResponse:
     if state is not None and not known_state(state.upper()):
         raise HTTPException(status_code=422, detail=f"{state} is not a supported state code")
     try:
         found = await asyncio.wait_for(
-            resolve_any(q, web, state.upper() if state else None), SEARCH_BUDGET_SECONDS
+            resolve_any(q, web, state.upper() if state else None, locality), SEARCH_BUDGET_SECONDS
         )
     except TimeoutError:
         raise search_error(WebError("The RERA portals did not answer in time", "timeout")) from None

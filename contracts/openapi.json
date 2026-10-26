@@ -634,6 +634,37 @@
         "title": "CheckSummary",
         "type": "object"
       },
+      "CompanyHit": {
+        "description": "A company-registry page that names a company like the builder's.",
+        "properties": {
+          "cin": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cin"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "source_url": {
+            "title": "Source Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "cin",
+          "source_url"
+        ],
+        "title": "CompanyHit",
+        "type": "object"
+      },
       "ComparedProject": {
         "properties": {
           "areas": {
@@ -1878,6 +1909,55 @@
           "sources"
         ],
         "title": "Project",
+        "type": "object"
+      },
+      "PromoterSearchResponse": {
+        "properties": {
+          "companies": {
+            "items": {
+              "$ref": "#/components/schemas/CompanyHit"
+            },
+            "title": "Companies",
+            "type": "array"
+          },
+          "projects": {
+            "items": {
+              "$ref": "#/components/schemas/Project"
+            },
+            "title": "Projects",
+            "type": "array"
+          },
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "searched_states": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Searched States",
+            "type": "array"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State"
+          }
+        },
+        "required": [
+          "query",
+          "state",
+          "companies",
+          "projects",
+          "searched_states"
+        ],
+        "title": "PromoterSearchResponse",
         "type": "object"
       },
       "ReasonCode": {
@@ -3767,6 +3847,25 @@
               "description": "State code such as MH; omit to search every state",
               "title": "State"
             }
+          },
+          {
+            "description": "City or locality such as 'Sector 43 Noida'",
+            "in": "query",
+            "name": "locality",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 80,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "City or locality such as 'Sector 43 Noida'",
+              "title": "Locality"
+            }
           }
         ],
         "responses": {
@@ -3883,6 +3982,94 @@
           }
         },
         "summary": "Promoter Projects",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/promoters/search": {
+      "get": {
+        "description": "The registered projects and company pages Search finds for a builder's name.",
+        "operationId": "search_promoters_api_promoters_search_get",
+        "parameters": [
+          {
+            "description": "Builder or company name",
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "description": "Builder or company name",
+              "maxLength": 120,
+              "minLength": 3,
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "description": "State code to limit to",
+            "in": "query",
+            "name": "state",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 2,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "State code to limit to",
+              "title": "State"
+            }
+          },
+          {
+            "description": "City or locality",
+            "in": "query",
+            "name": "city",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 80,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "City or locality",
+              "title": "City"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromoterSearchResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "502": {
+            "description": "TinyFish failed; `detail.code` says why"
+          }
+        },
+        "summary": "Search Promoters",
         "tags": [
           "projects"
         ]

@@ -24,6 +24,7 @@ from app.states.openweb import (
     open_web_hits,
     share_of,
 )
+from app.states.places import state_of_place
 from app.states.prerera import pre_rera_notes
 from app.states.registry import ADAPTERS, BY_CODE, detect_state
 from app.states.search_adapter import SearchStateAdapter
@@ -45,10 +46,20 @@ class Resolved:
     pre_rera: list[PreReraNote] = field(default_factory=list)
 
 
-async def resolve_any(query: str, web: WebClient, state: str | None = None) -> Resolved:
-    """Portal candidates and open-web candidates together, each number once."""
+async def resolve_any(
+    query: str, web: WebClient, state: str | None = None, locality: str | None = None
+) -> Resolved:
+    """Portal candidates and open-web candidates together, each number once.
+
+    A locality ("Sector 43 Noida") narrows the portals to its state when that is known, and is
+    added to the open-web search; it never counts as part of the project's name.
+    """
+    state = state or (state_of_place(locality) if locality else None)
+    asked = f"{query} {locality}" if locality else query
     portals, hits = await asyncio.gather(
-        resolve_on_portals(query, web, state), open_web_hits(query, web), return_exceptions=True
+        resolve_on_portals(query, web, state),
+        open_web_hits(asked, web),
+        return_exceptions=True,
     )
     if isinstance(portals, BaseException):
         raise portals
@@ -61,7 +72,7 @@ async def resolve_any(query: str, web: WebClient, state: str | None = None) -> R
     found = candidates_from(hits, query) + portal_pages_in(hits, query)
     wanted = [p for p in found if wanted_state(p, state) and wanted_number(p, query)]
     merged = merge(portals.candidates, wanted, query)
-    merged = await confirm_on_portals(merged, web)
+    merged = ordered(await confirm_on_portals(merged, web), query)
     merged = await name_the_builder_of_a_typed_number(merged, query, web)
     return Resolved(
         merged, portals.detected_state, portals.searched_states, pre_rera_notes(hits, query)
@@ -129,9 +140,13 @@ def merge(portal: list[Project], open_web: list[Project], query: str) -> list[Pr
         gaps = {k: v for k, v in project.model_dump().items() if getattr(known, k) is None}
         sources = list(dict.fromkeys([*known.sources, *project.sources]))
         by_number[squash(project.rera_id)] = known.model_copy(update={**gaps, "sources": sources})
-    ranked = rank(list(by_number.values()), query)
-    ranked.sort(key=lambda p: p.status != "confirmed")
-    return ranked[:MAX_CANDIDATES]
+    return ordered(list(by_number.values()), query)[:MAX_CANDIDATES]
+
+
+def ordered(projects: list[Project], query: str) -> list[Project]:
+    """Portal-confirmed numbers first; within each group the closest name first."""
+    ranked = rank(projects, query)
+    return sorted(ranked, key=lambda p: p.status != "confirmed")
 
 
 async def resolve_on_portals(query: str, web: WebClient, state: str | None = None) -> Resolved:
