@@ -6,6 +6,7 @@ import { complaint as complaintEn } from "@/lib/i18n/en/complaint";
 import { credit as creditEn } from "@/lib/i18n/en/credit";
 import { legal as legalEn } from "@/lib/i18n/en/legal";
 import { family as familyEn } from "@/lib/i18n/en/family";
+import { find as findEn } from "@/lib/i18n/en/find";
 import { compare as compareEn } from "@/lib/i18n/en/compare";
 import { report as reportEn } from "@/lib/i18n/en/report";
 import { reports as reportsEn } from "@/lib/i18n/en/reports";
@@ -20,6 +21,7 @@ import { complaint as complaintHi } from "@/lib/i18n/hi/complaint";
 import { credit as creditHi } from "@/lib/i18n/hi/credit";
 import { legal as legalHi } from "@/lib/i18n/hi/legal";
 import { family as familyHi } from "@/lib/i18n/hi/family";
+import { find as findHi } from "@/lib/i18n/hi/find";
 import { compare as compareHi } from "@/lib/i18n/hi/compare";
 import { report as reportHi } from "@/lib/i18n/hi/report";
 import { reports as reportsHi } from "@/lib/i18n/hi/reports";
@@ -36,6 +38,7 @@ const en = {
   credit: creditEn,
   complaint: complaintEn,
   family: familyEn,
+  find: findEn,
   legal: legalEn,
   report: reportEn,
   reports: reportsEn,
@@ -57,6 +60,7 @@ const hi: Strings = {
   credit: creditHi,
   complaint: complaintHi,
   family: familyHi,
+  find: findHi,
   legal: legalHi,
   report: reportHi,
   reports: reportsHi,

@@ -13,6 +13,7 @@ ADAPTER = SearchStateAdapter(
         coverage="search_only",
         examples=("PRM/KA/RERA/1251/309/PR/190517/002554", "PRM/KA/RERA/1251/446/PR/170915/000176"),
         complaint_url="https://rera.karnataka.gov.in/",
+        unregistered_url="https://rera.karnataka.gov.in/home?language=en",
         search_url="https://rera.karnataka.gov.in/viewAllProjects",
         query_name="Karnataka RERA",
         note=(

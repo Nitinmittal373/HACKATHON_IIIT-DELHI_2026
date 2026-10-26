@@ -116,3 +116,16 @@ def test_the_search_endpoint_takes_a_locality(tmp_path: Path) -> None:
         )
     assert response.status_code == 200
     assert response.json()["searched_states"] == ["UP"]
+
+
+def test_every_state_says_where_to_report_a_project_without_a_number() -> None:
+    for adapter in BY_CODE.values():
+        assert adapter.unregistered_url.startswith("https://"), adapter.code
+    assert BY_CODE["UP"].unregistered_url == "https://www.up-rera.in/NonRegistration"
+    assert BY_CODE["MH"].unregistered_url.endswith("/complaint-against-unregistered-project")
+
+
+def test_the_states_endpoint_carries_those_links(tmp_path: Path) -> None:
+    with TestClient(create_app(make_settings(tmp_path), web=FakeWebClient())) as client:
+        states = client.get("/api/states").json()
+    assert all(state["unregistered_url"].startswith("https://") for state in states)

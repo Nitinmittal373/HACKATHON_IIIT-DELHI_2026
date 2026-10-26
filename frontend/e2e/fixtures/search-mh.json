@@ -10,11 +10,18 @@
       "promoter": "Bhupesh Vasudev Bari",
       "registered_on": null,
       "district": "Palghar",
-      "details_url": "https://maharera.maharashtra.gov.in/projects-search-result?certificate_no=P99000055716"
+      "details_url": "https://maharera.maharashtra.gov.in/projects-search-result?certificate_no=P99000055716",
+      "status": "confirmed",
+      "sources": [
+        "maharera.maharashtra.gov.in"
+      ],
+      "found_in": null
     }
   ],
   "detected_state": "MH",
   "searched_states": [
     "MH"
-  ]
+  ],
+  "pre_rera": [],
+  "order_leads": []
 }

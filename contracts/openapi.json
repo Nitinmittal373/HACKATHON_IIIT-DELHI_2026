@@ -3098,6 +3098,10 @@
           "rera_name": {
             "title": "Rera Name",
             "type": "string"
+          },
+          "unregistered_url": {
+            "title": "Unregistered Url",
+            "type": "string"
           }
         },
         "required": [
@@ -3109,6 +3113,7 @@
           "note",
           "portal_url",
           "complaint_url",
+          "unregistered_url",
           "id_patterns",
           "format_verified"
         ],

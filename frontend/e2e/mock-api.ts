@@ -123,7 +123,17 @@ createServer(async (req, res) => {
 
   if (path === "/api/projects/search") {
     const query = url.searchParams.get("q") ?? "";
-    if (/nothing/i.test(query)) return send(res, 200, { query, candidates: [] });
+    if (/nothing/i.test(query)) {
+      const none: Schemas["SearchResponse"] = {
+        query,
+        candidates: [],
+        detected_state: null,
+        searched_states: ["UP"],
+        pre_rera: [],
+        order_leads: [],
+      };
+      return send(res, 200, none);
+    }
     if (query === MH_NUMBER) return send(res, 200, json("search-mh.json"));
     if (/prestige/i.test(query)) return send(res, 200, json("search-grouped.json"));
     return send(res, 200, { ...json("search.json"), query });

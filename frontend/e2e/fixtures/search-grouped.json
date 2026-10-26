@@ -10,7 +10,12 @@
       "promoter": null,
       "registered_on": "2017-09-15",
       "district": null,
-      "details_url": "https://rera.karnataka.gov.in/reraCertificate?CER_NO=PRM/KA/RERA/1251/446/PR/170915/000176"
+      "details_url": "https://rera.karnataka.gov.in/reraCertificate?CER_NO=PRM/KA/RERA/1251/446/PR/170915/000176",
+      "status": "confirmed",
+      "sources": [
+        "rera.karnataka.gov.in"
+      ],
+      "found_in": null
     },
     {
       "state": "KA",
@@ -21,7 +26,12 @@
       "promoter": "Prestige Office Ventures",
       "registered_on": null,
       "district": "Bengaluru Urban",
-      "details_url": "https://rera.karnataka.gov.in/reraCertificate?CER_NO=PRM/KA/RERA/1251/446/PR/190723/006078"
+      "details_url": "https://rera.karnataka.gov.in/reraCertificate?CER_NO=PRM/KA/RERA/1251/446/PR/190723/006078",
+      "status": "confirmed",
+      "sources": [
+        "rera.karnataka.gov.in"
+      ],
+      "found_in": null
     },
     {
       "state": "KA",
@@ -32,7 +42,12 @@
       "promoter": "PRESTIGE ESTATES PROJECTS LTD",
       "registered_on": null,
       "district": "Bengaluru Urban",
-      "details_url": "https://rera.karnataka.gov.in/reraCertificate?CER_NO=PRM/KA/RERA/1251/446/PR/250123/005667"
+      "details_url": "https://rera.karnataka.gov.in/reraCertificate?CER_NO=PRM/KA/RERA/1251/446/PR/250123/005667",
+      "status": "confirmed",
+      "sources": [
+        "rera.karnataka.gov.in"
+      ],
+      "found_in": null
     },
     {
       "state": "UP",
@@ -43,12 +58,19 @@
       "promoter": "PRESTIGE PROJECTS PVT. LTD.",
       "registered_on": "2025-04-28",
       "district": "Ghaziabad",
-      "details_url": "https://www.up-rera.in/Projectsummary?UI0aPA1ISD=AzgGvrYIEvQ=&hfFlag=q5Tk0QUeJB8oatkp/Oqbxw==&NPJ6RAme=nEDN2pzlfLVWf12YyDYjb/bYdga9OWo0FHlonJxdeqA=&PaURJEMAN4=ZL9MNERkNdacAXhbtFQ7XUEsi8PdAxnQ&IRSAHEB=D6PY3lyims8="
+      "details_url": "https://www.up-rera.in/Projectsummary?UI0aPA1ISD=AzgGvrYIEvQ=&hfFlag=q5Tk0QUeJB8oatkp/Oqbxw==&NPJ6RAme=nEDN2pzlfLVWf12YyDYjb/bYdga9OWo0FHlonJxdeqA=&PaURJEMAN4=ZL9MNERkNdacAXhbtFQ7XUEsi8PdAxnQ&IRSAHEB=D6PY3lyims8=",
+      "status": "confirmed",
+      "sources": [
+        "up-rera.in"
+      ],
+      "found_in": null
     }
   ],
   "detected_state": null,
   "searched_states": [
     "KA",
     "UP"
-  ]
+  ],
+  "pre_rera": [],
+  "order_leads": []
 }

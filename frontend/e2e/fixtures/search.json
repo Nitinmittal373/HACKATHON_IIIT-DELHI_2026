@@ -10,7 +10,12 @@
       "promoter": "SUPERTECH LIMITED",
       "registered_on": "2017-08-09",
       "district": "Gautam Buddha Nagar",
-      "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334"
+      "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
+      "status": "confirmed",
+      "sources": [
+        "up-rera.in"
+      ],
+      "found_in": null
     },
     {
       "state": "UP",
@@ -21,11 +26,18 @@
       "promoter": null,
       "registered_on": "2017-08-09",
       "district": null,
-      "details_url": "https://up-rera.in/Projectsummary?UI0aPA1ISD=vXyLysTo9vQ=&hfFlag=9emr4VdBw22M7BGjKtJWMPDI4s5cHQZP&NPJ6RAme=gUoAr6nOB9CeG4WCZ3sI8xdst3G+GkrZR79ym5PL3PS1IvxTOpSD3g==&PaURJEMAN4=ZL9MNERkNdYXHzr0oPx/kw==&IRSAHEB=D6PY3lyims8="
+      "details_url": "https://up-rera.in/Projectsummary?UI0aPA1ISD=vXyLysTo9vQ=&hfFlag=9emr4VdBw22M7BGjKtJWMPDI4s5cHQZP&NPJ6RAme=gUoAr6nOB9CeG4WCZ3sI8xdst3G+GkrZR79ym5PL3PS1IvxTOpSD3g==&PaURJEMAN4=ZL9MNERkNdYXHzr0oPx/kw==&IRSAHEB=D6PY3lyims8=",
+      "status": "confirmed",
+      "sources": [
+        "up-rera.in"
+      ],
+      "found_in": null
     }
   ],
   "detected_state": null,
   "searched_states": [
     "UP"
-  ]
+  ],
+  "pre_rera": [],
+  "order_leads": []
 }

@@ -59,10 +59,13 @@ test("the confirm list and its buttons work from the keyboard", async ({ page })
   expect(outline).not.toBe("none");
 });
 
-test("an unknown project gets a friendly answer with tips", async ({ page }) => {
+test("an unknown project gets factual guidance, not an accusation", async ({ page }) => {
   await page.goto("/check?q=nothing%20here");
-  await expect(page.getByRole("heading", { name: "No RERA project found" })).toBeVisible();
-  await expect(page.getByText(/Search by the RERA number/)).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "We couldn't find a RERA registration for this project in public records." }),
+  ).toBeVisible();
+  await expect(page.getByText(/Ask the builder for the RERA registration number in writing/)).toBeVisible();
+  await expect(page.locator("main")).not.toContainText(/illegal|fraud|unregistered/i);
 });
 
 test("a rate-limited visitor sees how long to wait", async ({ page }) => {

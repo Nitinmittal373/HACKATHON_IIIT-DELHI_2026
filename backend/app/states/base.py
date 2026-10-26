@@ -71,6 +71,9 @@ class StateSpec:
     # Real numbers read from the portal, for the search box's try-chips. May be empty.
     examples: tuple[str, ...]
     complaint_url: str
+    # Where a buyer reports a project that should be registered and is not; the complaint page
+    # when the authority has no separate form.
+    unregistered_url: str = ""
     # Where a project's page lives when its address can be built from the number alone.
     details_template: str | None = None
     # The portal's own search page, used when no project page is known.
@@ -106,6 +109,7 @@ class StateAdapter(Protocol):
     coverage: Coverage
     examples: tuple[str, ...]
     complaint_url: str
+    unregistered_url: str
     search_url: str
     note: str
     unverified_format: bool

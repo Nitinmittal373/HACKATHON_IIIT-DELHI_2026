@@ -5,7 +5,9 @@ import type {
   CheckSummary,
   Comparison,
   CorrectionCreate,
+  ExtractResponse,
   Project,
+  PromoterSearchResponse,
   RecentCheck,
   Report,
   SearchResponse,
@@ -46,16 +48,21 @@ export const UNREACHABLE = 0;
 
 async function request<T>(
   path: string,
-  options: { method?: "GET" | "POST"; body?: unknown; timeoutMs?: number } = {},
+  options: { method?: "GET" | "POST"; body?: unknown; file?: File; timeoutMs?: number } = {},
 ): Promise<T> {
-  const { method = "GET", body, timeoutMs = REQUEST_TIMEOUT_MS } = options;
+  const { method = "GET", body, file, timeoutMs = REQUEST_TIMEOUT_MS } = options;
   let response: Response;
   try {
     response = await fetch(`${API_URL}${path}`, {
       method,
       cache: "no-store",
-      headers: body === undefined ? undefined : { "Content-Type": "application/json" },
-      body: body === undefined ? undefined : JSON.stringify(body),
+      headers: file
+        ? { "Content-Type": "application/pdf" }
+        : body === undefined
+          ? undefined
+          : { "Content-Type": "application/json" },
+      // A file goes as the raw request body, so the server needs no multipart parser.
+      body: file ?? (body === undefined ? undefined : JSON.stringify(body)),
       signal: AbortSignal.timeout(timeoutMs),
     });
   } catch (error) {
@@ -132,10 +139,15 @@ export function isTransient(error: unknown): boolean {
 }
 
 /** Runs in the browser, straight to the API, and tries once more after a transient failure. */
-export async function searchProjects(query: string, state?: string): Promise<SearchResponse> {
+export async function searchProjects(
+  query: string,
+  state?: string,
+  locality?: string,
+): Promise<SearchResponse> {
   const scope = state ? `&state=${encodeURIComponent(state)}` : "";
+  const place = locality ? `&locality=${encodeURIComponent(locality)}` : "";
   const search = () =>
-    request<SearchResponse>(`/api/projects/search?q=${encodeURIComponent(query)}${scope}`, {
+    request<SearchResponse>(`/api/projects/search?q=${encodeURIComponent(query)}${scope}${place}`, {
       timeoutMs: SEARCH_TIMEOUT_MS,
     });
   try {
@@ -144,6 +156,37 @@ export async function searchProjects(query: string, state?: string): Promise<Sea
     if (!isTransient(error)) throw error;
     return search();
   }
+}
+
+/** A builder's registered projects and company pages, from the portals and the open web. */
+export function searchBuilder(
+  builder: string,
+  city?: string,
+  state?: string,
+): Promise<PromoterSearchResponse> {
+  const extra = (city ? `&city=${encodeURIComponent(city)}` : "") + (state ? `&state=${state}` : "");
+  return request<PromoterSearchResponse>(
+    `/api/promoters/search?q=${encodeURIComponent(builder)}${extra}`,
+    { timeoutMs: SEARCH_TIMEOUT_MS },
+  );
+}
+
+/** Numbers in a PDF the visitor chose. The file is read in memory by the server and not kept. */
+export function extractFromPdf(file: File): Promise<ExtractResponse> {
+  return request<ExtractResponse>("/api/extract", {
+    method: "POST",
+    file,
+    timeoutMs: SEARCH_TIMEOUT_MS,
+  });
+}
+
+/** Numbers in the text a QR code held; the picture itself never leaves the device. */
+export function extractFromText(text: string): Promise<ExtractResponse> {
+  return request<ExtractResponse>("/api/extract", {
+    method: "POST",
+    body: { text },
+    timeoutMs: SEARCH_TIMEOUT_MS,
+  });
 }
 
 /** `fresh` skips the reuse of a check from the last 24 hours ("Re-check now"). */
