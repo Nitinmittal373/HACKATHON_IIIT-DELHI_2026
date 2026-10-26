@@ -1,0 +1,2718 @@
+{
+  "components": {
+    "schemas": {
+      "Alert": {
+        "properties": {
+          "added": {
+            "items": {
+              "$ref": "#/components/schemas/FindingChange"
+            },
+            "title": "Added",
+            "type": "array"
+          },
+          "changed": {
+            "items": {
+              "$ref": "#/components/schemas/FindingChange"
+            },
+            "title": "Changed",
+            "type": "array"
+          },
+          "check_id": {
+            "title": "Check Id",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "new_score": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Score"
+          },
+          "old_score": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Old Score"
+          },
+          "project_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Name"
+          },
+          "removed": {
+            "items": {
+              "$ref": "#/components/schemas/FindingChange"
+            },
+            "title": "Removed",
+            "type": "array"
+          },
+          "rera_id": {
+            "title": "Rera Id",
+            "type": "string"
+          },
+          "watch_id": {
+            "title": "Watch Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "watch_id",
+          "rera_id",
+          "check_id",
+          "created_at",
+          "old_score",
+          "new_score",
+          "added",
+          "removed",
+          "changed"
+        ],
+        "title": "Alert",
+        "type": "object"
+      },
+      "AreaPoints": {
+        "properties": {
+          "area": {
+            "enum": [
+              "rera",
+              "execution",
+              "legal",
+              "financial",
+              "builder_history",
+              "news"
+            ],
+            "title": "Area",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "lost": {
+            "title": "Lost",
+            "type": "number"
+          },
+          "max": {
+            "title": "Max",
+            "type": "number"
+          }
+        },
+        "required": [
+          "area",
+          "label",
+          "lost",
+          "max"
+        ],
+        "title": "AreaPoints",
+        "type": "object"
+      },
+      "AreaScore": {
+        "properties": {
+          "area": {
+            "enum": [
+              "rera",
+              "execution",
+              "legal",
+              "financial",
+              "builder_history",
+              "news"
+            ],
+            "title": "Area",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "penalty": {
+            "title": "Penalty",
+            "type": "integer"
+          },
+          "weight": {
+            "title": "Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "area",
+          "label",
+          "weight",
+          "penalty"
+        ],
+        "title": "AreaScore",
+        "type": "object"
+      },
+      "Check": {
+        "properties": {
+          "completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "details_url": {
+            "title": "Details Url",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "rera_id": {
+            "title": "Rera Id",
+            "type": "string"
+          },
+          "reused": {
+            "default": false,
+            "title": "Reused",
+            "type": "boolean"
+          },
+          "sources": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/SourceRun"
+            },
+            "title": "Sources",
+            "type": "array"
+          },
+          "started_at": {
+            "format": "date-time",
+            "title": "Started At",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "completed",
+              "failed"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "rera_id",
+          "details_url",
+          "status",
+          "started_at"
+        ],
+        "title": "Check",
+        "type": "object"
+      },
+      "CheckCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "details_url": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Details Url"
+          },
+          "fresh": {
+            "default": false,
+            "title": "Fresh",
+            "type": "boolean"
+          },
+          "rera_id": {
+            "examples": [
+              "UPRERAPRJ8334"
+            ],
+            "maxLength": 40,
+            "title": "Rera Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rera_id"
+        ],
+        "title": "CheckCreate",
+        "type": "object"
+      },
+      "CheckSummary": {
+        "description": "One line of a visitor's history: enough to list a check without loading its report.",
+        "properties": {
+          "band": {
+            "anyOf": [
+              {
+                "enum": [
+                  "Low",
+                  "Moderate",
+                  "High",
+                  "Critical",
+                  "insufficient_evidence"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Band"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "details_url": {
+            "title": "Details Url",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "project": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project"
+          },
+          "promoter": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Promoter"
+          },
+          "rera_id": {
+            "title": "Rera Id",
+            "type": "string"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "completed",
+              "failed"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "rera_id",
+          "details_url",
+          "project",
+          "promoter",
+          "status",
+          "created_at"
+        ],
+        "title": "CheckSummary",
+        "type": "object"
+      },
+      "ComparedProject": {
+        "properties": {
+          "areas": {
+            "items": {
+              "$ref": "#/components/schemas/AreaPoints"
+            },
+            "title": "Areas",
+            "type": "array"
+          },
+          "band": {
+            "enum": [
+              "Low",
+              "Moderate",
+              "High",
+              "Critical",
+              "insufficient_evidence"
+            ],
+            "title": "Band",
+            "type": "string"
+          },
+          "check_id": {
+            "title": "Check Id",
+            "type": "string"
+          },
+          "company_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Status"
+          },
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "delay_months": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delay Months"
+          },
+          "hard_stop": {
+            "title": "Hard Stop",
+            "type": "boolean"
+          },
+          "insolvency": {
+            "anyOf": [
+              {
+                "enum": [
+                  "none_found",
+                  "admitted",
+                  "other_project",
+                  "this_project",
+                  "company",
+                  "unverified"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Insolvency"
+          },
+          "project": {
+            "$ref": "#/components/schemas/Project"
+          },
+          "project_complaints": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project Complaints"
+          },
+          "promoter_complaints": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Promoter Complaints"
+          },
+          "score": {
+            "title": "Score",
+            "type": "integer"
+          },
+          "top_findings": {
+            "items": {
+              "$ref": "#/components/schemas/FindingLine"
+            },
+            "title": "Top Findings",
+            "type": "array"
+          },
+          "unread": {
+            "items": {
+              "enum": [
+                "registration",
+                "completion_date",
+                "extensions",
+                "company_status",
+                "insolvency",
+                "land_dues",
+                "consumer_cases"
+              ],
+              "type": "string"
+            },
+            "title": "Unread",
+            "type": "array"
+          }
+        },
+        "required": [
+          "check_id",
+          "project",
+          "score",
+          "band",
+          "confidence",
+          "hard_stop",
+          "areas",
+          "delay_months",
+          "project_complaints",
+          "promoter_complaints",
+          "insolvency",
+          "company_status",
+          "unread",
+          "top_findings"
+        ],
+        "title": "ComparedProject",
+        "type": "object"
+      },
+      "Comparison": {
+        "properties": {
+          "best": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Best"
+          },
+          "projects": {
+            "items": {
+              "$ref": "#/components/schemas/ComparedProject"
+            },
+            "title": "Projects",
+            "type": "array"
+          },
+          "reason": {
+            "enum": [
+              "best_score",
+              "tie",
+              "not_enough_evidence"
+            ],
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "projects",
+          "best",
+          "reason"
+        ],
+        "title": "Comparison",
+        "type": "object"
+      },
+      "Correction": {
+        "additionalProperties": false,
+        "properties": {
+          "contact": {
+            "anyOf": [
+              {
+                "maxLength": 254,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "finding_id": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finding Id"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "message": {
+            "maxLength": 2000,
+            "minLength": 5,
+            "title": "Message",
+            "type": "string"
+          },
+          "report_id": {
+            "pattern": "^[0-9a-f]{32}$",
+            "title": "Report Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "report_id",
+          "message",
+          "id",
+          "created_at"
+        ],
+        "title": "Correction",
+        "type": "object"
+      },
+      "CorrectionCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "contact": {
+            "anyOf": [
+              {
+                "maxLength": 254,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contact"
+          },
+          "finding_id": {
+            "anyOf": [
+              {
+                "maxLength": 100,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finding Id"
+          },
+          "message": {
+            "maxLength": 2000,
+            "minLength": 5,
+            "title": "Message",
+            "type": "string"
+          },
+          "report_id": {
+            "pattern": "^[0-9a-f]{32}$",
+            "title": "Report Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "report_id",
+          "message"
+        ],
+        "title": "CorrectionCreate",
+        "type": "object"
+      },
+      "Driver": {
+        "properties": {
+          "area": {
+            "enum": [
+              "rera",
+              "execution",
+              "legal",
+              "financial",
+              "builder_history",
+              "news"
+            ],
+            "title": "Area",
+            "type": "string"
+          },
+          "finding_id": {
+            "title": "Finding Id",
+            "type": "string"
+          },
+          "penalty": {
+            "title": "Penalty",
+            "type": "integer"
+          },
+          "points": {
+            "title": "Points",
+            "type": "number"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "finding_id",
+          "title",
+          "area",
+          "penalty",
+          "points"
+        ],
+        "title": "Driver",
+        "type": "object"
+      },
+      "DriverV2": {
+        "description": "One finding's share of the score, so the evidence ledger can show it.",
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "finding_id": {
+            "title": "Finding Id",
+            "type": "string"
+          },
+          "penalty": {
+            "title": "Penalty",
+            "type": "integer"
+          },
+          "pillar": {
+            "enum": [
+              "P1",
+              "P2",
+              "P3",
+              "P4",
+              "P5",
+              "P6"
+            ],
+            "title": "Pillar",
+            "type": "string"
+          },
+          "points": {
+            "title": "Points",
+            "type": "number"
+          }
+        },
+        "required": [
+          "finding_id",
+          "pillar",
+          "code",
+          "penalty",
+          "points"
+        ],
+        "title": "DriverV2",
+        "type": "object"
+      },
+      "FamilyCompany": {
+        "properties": {
+          "flag": {
+            "anyOf": [
+              {
+                "enum": [
+                  "cirp",
+                  "struck_off"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Flag"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "projects": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/FamilyProject"
+            },
+            "title": "Projects",
+            "type": "array"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "status_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status Url"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "FamilyCompany",
+        "type": "object"
+      },
+      "FamilyDirector": {
+        "description": "A director by name and DIN only: nothing else about a person is kept (DPDP).",
+        "properties": {
+          "din": {
+            "title": "Din",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "din"
+        ],
+        "title": "FamilyDirector",
+        "type": "object"
+      },
+      "FamilyProject": {
+        "properties": {
+          "details_url": {
+            "title": "Details Url",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "rera_id": {
+            "title": "Rera Id",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "ok",
+              "delayed",
+              "lapsed",
+              "unread"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rera_id",
+          "details_url",
+          "state"
+        ],
+        "title": "FamilyProject",
+        "type": "object"
+      },
+      "FamilyTree": {
+        "description": "The promoter, its directors, related companies and their UP-RERA projects.",
+        "properties": {
+          "companies": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/FamilyCompany"
+            },
+            "title": "Companies",
+            "type": "array"
+          },
+          "directors": {
+            "items": {
+              "$ref": "#/components/schemas/FamilyDirector"
+            },
+            "title": "Directors",
+            "type": "array"
+          },
+          "promoter": {
+            "title": "Promoter",
+            "type": "string"
+          },
+          "promoter_projects": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/FamilyProject"
+            },
+            "title": "Promoter Projects",
+            "type": "array"
+          },
+          "source_url": {
+            "title": "Source Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "promoter",
+          "source_url",
+          "directors"
+        ],
+        "title": "FamilyTree",
+        "type": "object"
+      },
+      "Finding": {
+        "properties": {
+          "area": {
+            "anyOf": [
+              {
+                "enum": [
+                  "rera",
+                  "execution",
+                  "legal",
+                  "financial",
+                  "builder_history",
+                  "news"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Area"
+          },
+          "count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Count"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "months": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Months"
+          },
+          "occurred_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Occurred On"
+          },
+          "read_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Read At"
+          },
+          "read_on": {
+            "format": "date",
+            "title": "Read On",
+            "type": "string"
+          },
+          "reliability": {
+            "enum": [
+              "primary",
+              "secondary"
+            ],
+            "title": "Reliability",
+            "type": "string"
+          },
+          "scope": {
+            "anyOf": [
+              {
+                "enum": [
+                  "company",
+                  "this_project",
+                  "other_project"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scope"
+          },
+          "snippet": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snippet"
+          },
+          "source": {
+            "enum": [
+              "uprera",
+              "registry",
+              "insolvency",
+              "land",
+              "consumer",
+              "news",
+              "group",
+              "sarfaesi"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "source_url": {
+            "pattern": "^https?://\\S+$",
+            "title": "Source Url",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total"
+          },
+          "verdict": {
+            "enum": [
+              "ok",
+              "fail",
+              "red_flag",
+              "review",
+              "context",
+              "not_found"
+            ],
+            "title": "Verdict",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "source",
+          "kind",
+          "title",
+          "verdict",
+          "reliability",
+          "source_url",
+          "read_on"
+        ],
+        "title": "Finding",
+        "type": "object"
+      },
+      "FindingChange": {
+        "properties": {
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "title": "FindingChange",
+        "type": "object"
+      },
+      "FindingLine": {
+        "properties": {
+          "points": {
+            "title": "Points",
+            "type": "number"
+          },
+          "source_url": {
+            "title": "Source Url",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "source_url",
+          "points"
+        ],
+        "title": "FindingLine",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "Pillar": {
+        "properties": {
+          "id": {
+            "enum": [
+              "P1",
+              "P2",
+              "P3",
+              "P4",
+              "P5",
+              "P6"
+            ],
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "penalty": {
+            "title": "Penalty",
+            "type": "integer"
+          },
+          "points": {
+            "title": "Points",
+            "type": "number"
+          },
+          "weight": {
+            "title": "Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "weight",
+          "penalty",
+          "points"
+        ],
+        "title": "Pillar",
+        "type": "object"
+      },
+      "Project": {
+        "properties": {
+          "details_url": {
+            "title": "Details Url",
+            "type": "string"
+          },
+          "district": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "District"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "promoter": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Promoter"
+          },
+          "registered_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Registered On"
+          },
+          "rera_id": {
+            "title": "Rera Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rera_id",
+          "details_url"
+        ],
+        "title": "Project",
+        "type": "object"
+      },
+      "ReasonCode": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "finding_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Finding Ids",
+            "type": "array"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "points": {
+            "title": "Points",
+            "type": "number"
+          }
+        },
+        "required": [
+          "code",
+          "label",
+          "finding_ids",
+          "points"
+        ],
+        "title": "ReasonCode",
+        "type": "object"
+      },
+      "RecentCheck": {
+        "description": "A finished check shown on the home page. Only public-record facts, never who asked.",
+        "properties": {
+          "band": {
+            "anyOf": [
+              {
+                "enum": [
+                  "Low",
+                  "Moderate",
+                  "High",
+                  "Critical",
+                  "insufficient_evidence"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Band"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "details_url": {
+            "title": "Details Url",
+            "type": "string"
+          },
+          "drivers": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Driver"
+            },
+            "title": "Drivers",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "project": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Project"
+          },
+          "promoter": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Promoter"
+          },
+          "registered_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Registered On"
+          },
+          "rera_id": {
+            "title": "Rera Id",
+            "type": "string"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "sources_read": {
+            "default": 0,
+            "title": "Sources Read",
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "completed",
+              "failed"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "rera_id",
+          "details_url",
+          "project",
+          "promoter",
+          "status",
+          "created_at"
+        ],
+        "title": "RecentCheck",
+        "type": "object"
+      },
+      "Report": {
+        "properties": {
+          "check": {
+            "$ref": "#/components/schemas/Check"
+          },
+          "family": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FamilyTree"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/Finding"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "project": {
+            "$ref": "#/components/schemas/Project"
+          },
+          "score": {
+            "$ref": "#/components/schemas/Score"
+          },
+          "score_v2": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScoreV2"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "timeline": {
+            "items": {
+              "$ref": "#/components/schemas/Finding"
+            },
+            "title": "Timeline",
+            "type": "array"
+          }
+        },
+        "required": [
+          "check",
+          "project",
+          "score",
+          "findings",
+          "timeline"
+        ],
+        "title": "Report",
+        "type": "object"
+      },
+      "Score": {
+        "properties": {
+          "areas": {
+            "items": {
+              "$ref": "#/components/schemas/AreaScore"
+            },
+            "title": "Areas",
+            "type": "array"
+          },
+          "band": {
+            "enum": [
+              "Low",
+              "Moderate",
+              "High",
+              "Critical",
+              "insufficient_evidence"
+            ],
+            "title": "Band",
+            "type": "string"
+          },
+          "band_label": {
+            "title": "Band Label",
+            "type": "string"
+          },
+          "checks_unread": {
+            "items": {
+              "enum": [
+                "registration",
+                "completion_date",
+                "extensions",
+                "company_status",
+                "insolvency",
+                "land_dues",
+                "consumer_cases"
+              ],
+              "type": "string"
+            },
+            "title": "Checks Unread",
+            "type": "array"
+          },
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "drivers": {
+            "items": {
+              "$ref": "#/components/schemas/Driver"
+            },
+            "title": "Drivers",
+            "type": "array"
+          },
+          "hard_stop": {
+            "title": "Hard Stop",
+            "type": "boolean"
+          },
+          "hard_stop_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hard Stop Reason"
+          },
+          "provisional": {
+            "title": "Provisional",
+            "type": "boolean"
+          },
+          "value": {
+            "title": "Value",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "value",
+          "band",
+          "band_label",
+          "confidence",
+          "provisional",
+          "hard_stop",
+          "drivers",
+          "areas",
+          "checks_unread"
+        ],
+        "title": "Score",
+        "type": "object"
+      },
+      "ScoreV2": {
+        "properties": {
+          "band": {
+            "enum": [
+              "Low",
+              "Watch",
+              "Elevated",
+              "High",
+              "insufficient_evidence"
+            ],
+            "title": "Band",
+            "type": "string"
+          },
+          "band_label": {
+            "title": "Band Label",
+            "type": "string"
+          },
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "drivers": {
+            "items": {
+              "$ref": "#/components/schemas/DriverV2"
+            },
+            "title": "Drivers",
+            "type": "array"
+          },
+          "hard_stop": {
+            "title": "Hard Stop",
+            "type": "boolean"
+          },
+          "hard_stop_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hard Stop Reason"
+          },
+          "pillars": {
+            "items": {
+              "$ref": "#/components/schemas/Pillar"
+            },
+            "title": "Pillars",
+            "type": "array"
+          },
+          "pillars_unread": {
+            "items": {
+              "enum": [
+                "P1",
+                "P2",
+                "P3",
+                "P4",
+                "P5",
+                "P6"
+              ],
+              "type": "string"
+            },
+            "title": "Pillars Unread",
+            "type": "array"
+          },
+          "provisional": {
+            "title": "Provisional",
+            "type": "boolean"
+          },
+          "reason_codes": {
+            "items": {
+              "$ref": "#/components/schemas/ReasonCode"
+            },
+            "title": "Reason Codes",
+            "type": "array"
+          },
+          "value": {
+            "title": "Value",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "value",
+          "band",
+          "band_label",
+          "provisional",
+          "hard_stop",
+          "confidence",
+          "pillars",
+          "reason_codes",
+          "drivers",
+          "pillars_unread"
+        ],
+        "title": "ScoreV2",
+        "type": "object"
+      },
+      "SearchResponse": {
+        "properties": {
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/Project"
+            },
+            "title": "Candidates",
+            "type": "array"
+          },
+          "query": {
+            "title": "Query",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query",
+          "candidates"
+        ],
+        "title": "SearchResponse",
+        "type": "object"
+      },
+      "SourceRun": {
+        "properties": {
+          "checks_read": {
+            "default": [],
+            "items": {
+              "enum": [
+                "registration",
+                "completion_date",
+                "extensions",
+                "company_status",
+                "insolvency",
+                "land_dues",
+                "consumer_cases"
+              ],
+              "type": "string"
+            },
+            "title": "Checks Read",
+            "type": "array"
+          },
+          "live_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Live Url"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "source": {
+            "enum": [
+              "uprera",
+              "registry",
+              "insolvency",
+              "land",
+              "consumer",
+              "news",
+              "group",
+              "sarfaesi"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "running",
+              "completed",
+              "blocked",
+              "failed",
+              "unavailable"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "status"
+        ],
+        "title": "SourceRun",
+        "type": "object"
+      },
+      "TrackRecord": {
+        "properties": {
+          "projects": {
+            "items": {
+              "$ref": "#/components/schemas/Project"
+            },
+            "title": "Projects",
+            "type": "array"
+          },
+          "promoter": {
+            "title": "Promoter",
+            "type": "string"
+          },
+          "searched_at": {
+            "format": "date-time",
+            "title": "Searched At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "promoter",
+          "projects",
+          "searched_at"
+        ],
+        "title": "TrackRecord",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "Watch": {
+        "properties": {
+          "baseline_check_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Baseline Check Id"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "language": {
+            "enum": [
+              "en",
+              "hi"
+            ],
+            "title": "Language",
+            "type": "string"
+          },
+          "rera_id": {
+            "title": "Rera Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "rera_id",
+          "email",
+          "language",
+          "created_at"
+        ],
+        "title": "Watch",
+        "type": "object"
+      },
+      "WatchCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "details_url": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Details Url"
+          },
+          "email": {
+            "maxLength": 254,
+            "title": "Email",
+            "type": "string"
+          },
+          "language": {
+            "default": "en",
+            "enum": [
+              "en",
+              "hi"
+            ],
+            "title": "Language",
+            "type": "string"
+          },
+          "rera_id": {
+            "maxLength": 40,
+            "title": "Rera Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rera_id",
+          "email"
+        ],
+        "title": "WatchCreate",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "NeevCheck API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/checks": {
+      "get": {
+        "description": "The checks a visitor started, for \"My reports\". Ids the server no longer has are left out.",
+        "operationId": "list_checks_api_checks_get",
+        "parameters": [
+          {
+            "description": "Comma-separated ids",
+            "in": "query",
+            "name": "ids",
+            "required": true,
+            "schema": {
+              "description": "Comma-separated ids",
+              "maxLength": 1650,
+              "title": "Ids",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CheckSummary"
+                  },
+                  "title": "Response List Checks Api Checks Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "A malformed id, or more than 50"
+          }
+        },
+        "summary": "List Checks",
+        "tags": [
+          "checks"
+        ]
+      },
+      "post": {
+        "operationId": "create_check_api_checks_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "A check from the last 24 hours was reused"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Check"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Check",
+        "tags": [
+          "checks"
+        ]
+      }
+    },
+    "/api/checks/compare": {
+      "get": {
+        "operationId": "compare_checks_api_checks_compare_get",
+        "parameters": [
+          {
+            "description": "Two or three check ids",
+            "in": "query",
+            "name": "ids",
+            "required": true,
+            "schema": {
+              "description": "Two or three check ids",
+              "maxLength": 120,
+              "title": "Ids",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comparison"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "One of the checks does not exist"
+          },
+          "409": {
+            "description": "One of the checks has no report"
+          },
+          "422": {
+            "description": "Not two or three valid ids"
+          }
+        },
+        "summary": "Compare Checks",
+        "tags": [
+          "checks"
+        ]
+      }
+    },
+    "/api/checks/recent": {
+      "get": {
+        "description": "The latest finished check of up to 12 projects, for the home page. No emails or IPs.",
+        "operationId": "recent_checks_api_checks_recent_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RecentCheck"
+                  },
+                  "title": "Response Recent Checks Api Checks Recent Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Recent Checks",
+        "tags": [
+          "checks"
+        ]
+      }
+    },
+    "/api/checks/{check_id}": {
+      "get": {
+        "operationId": "get_check_api_checks__check_id__get",
+        "parameters": [
+          {
+            "description": "Check id",
+            "in": "path",
+            "name": "check_id",
+            "required": true,
+            "schema": {
+              "description": "Check id",
+              "pattern": "^[0-9a-f]{32}$",
+              "title": "Check Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Check"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Check",
+        "tags": [
+          "checks"
+        ]
+      }
+    },
+    "/api/checks/{check_id}/events": {
+      "get": {
+        "operationId": "stream_events_api_checks__check_id__events_get",
+        "parameters": [
+          {
+            "description": "Check id",
+            "in": "path",
+            "name": "check_id",
+            "required": true,
+            "schema": {
+              "description": "Check id",
+              "pattern": "^[0-9a-f]{32}$",
+              "title": "Check Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/event-stream": {}
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Stream Events",
+        "tags": [
+          "checks"
+        ]
+      }
+    },
+    "/api/checks/{check_id}/report": {
+      "get": {
+        "operationId": "get_report_api_checks__check_id__report_get",
+        "parameters": [
+          {
+            "description": "Check id",
+            "in": "path",
+            "name": "check_id",
+            "required": true,
+            "schema": {
+              "description": "Check id",
+              "pattern": "^[0-9a-f]{32}$",
+              "title": "Check Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Report"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "description": "No report yet"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Report",
+        "tags": [
+          "checks"
+        ]
+      }
+    },
+    "/api/corrections": {
+      "get": {
+        "description": "Admin log, protected by WEBHOOK_SECRET.",
+        "operationId": "list_corrections_api_corrections_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-webhook-secret",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Webhook-Secret"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Correction"
+                  },
+                  "title": "Response List Corrections Api Corrections Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Corrections",
+        "tags": [
+          "corrections"
+        ]
+      },
+      "post": {
+        "operationId": "create_correction_api_corrections_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CorrectionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Create Correction Api Corrections Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Correction",
+        "tags": [
+          "corrections"
+        ]
+      }
+    },
+    "/api/health": {
+      "get": {
+        "operationId": "health_api_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Health Api Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/api/projects/search": {
+      "get": {
+        "operationId": "search_projects_api_projects_search_get",
+        "parameters": [
+          {
+            "description": "RERA number or name",
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "description": "RERA number or name",
+              "maxLength": 120,
+              "minLength": 2,
+              "title": "Q",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "429": {
+            "description": "TinyFish rate limit; `Retry-After` says how long to wait"
+          },
+          "502": {
+            "description": "TinyFish failed; `detail.code` says why"
+          },
+          "504": {
+            "description": "The search took too long"
+          }
+        },
+        "summary": "Search Projects",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/promoters/projects": {
+      "get": {
+        "description": "Up to 10 other UP-RERA projects of a promoter, from Search on up-rera.in; cached a day.",
+        "operationId": "promoter_projects_api_promoters_projects_get",
+        "parameters": [
+          {
+            "description": "Promoter's legal name",
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "Promoter's legal name",
+              "maxLength": 300,
+              "minLength": 3,
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "description": "RERA no. to skip",
+            "in": "query",
+            "name": "exclude",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 40,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "RERA no. to skip",
+              "title": "Exclude"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackRecord"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          },
+          "502": {
+            "description": "TinyFish failed; `detail.code` says why"
+          }
+        },
+        "summary": "Promoter Projects",
+        "tags": [
+          "projects"
+        ]
+      }
+    },
+    "/api/sentinel": {
+      "post": {
+        "operationId": "create_watch_api_sentinel_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WatchCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Watch"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Watch",
+        "tags": [
+          "sentinel"
+        ]
+      }
+    },
+    "/api/sentinel/alerts": {
+      "get": {
+        "operationId": "list_alerts_api_sentinel_alerts_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "email",
+            "required": true,
+            "schema": {
+              "maxLength": 254,
+              "title": "Email",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Alert"
+                  },
+                  "title": "Response List Alerts Api Sentinel Alerts Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Alerts",
+        "tags": [
+          "sentinel"
+        ]
+      }
+    },
+    "/api/sentinel/run": {
+      "post": {
+        "description": "For an external cron. Needs the WEBHOOK_SECRET; with none configured nobody gets in.",
+        "operationId": "run_sentinel_api_sentinel_run_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-webhook-secret",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Webhook-Secret"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "boolean"
+                  },
+                  "title": "Response Run Sentinel Api Sentinel Run Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Run Sentinel",
+        "tags": [
+          "sentinel"
+        ]
+      }
+    },
+    "/api/sentinel/webhook": {
+      "post": {
+        "description": "Called by a TinyFish monitor, which can only be given a URL, so the secret may come in\nthe query string. A repeated delivery is acknowledged and ignored.",
+        "operationId": "monitor_webhook_api_sentinel_webhook_post",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "secret",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Secret"
+            }
+          },
+          {
+            "in": "header",
+            "name": "x-webhook-secret",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Webhook-Secret"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Monitor Webhook Api Sentinel Webhook Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Monitor Webhook",
+        "tags": [
+          "sentinel"
+        ]
+      }
+    },
+    "/api/sentinel/{watch_id}": {
+      "delete": {
+        "description": "Stop watching. The watch id is unguessable and is the only proof needed.",
+        "operationId": "remove_watch_api_sentinel__watch_id__delete",
+        "parameters": [
+          {
+            "description": "Watch id",
+            "in": "path",
+            "name": "watch_id",
+            "required": true,
+            "schema": {
+              "description": "Watch id",
+              "pattern": "^[0-9a-f]{32}$",
+              "title": "Watch Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Remove Watch",
+        "tags": [
+          "sentinel"
+        ]
+      }
+    }
+  }
+}
