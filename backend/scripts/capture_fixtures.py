@@ -8,6 +8,7 @@ page:
     python -m scripts.capture_fixtures                          # pages and searches
     python -m scripts.capture_fixtures uprera_summary_8334.html  # named files only
     python -m scripts.capture_fixtures check_8334.json          # one full live check
+    python -m scripts.capture_fixtures check_mh.json            # the same for another state
 
 The full check runs every source of UPRERAPRJ8334 for real, so it uses paid
 agent runs. It is never part of the default run: ask for it by name.
@@ -35,7 +36,13 @@ from scripts.recorder import RecordingWebClient, scrub
 FIXTURES = Path(__file__).resolve().parents[1] / "tests" / "fixtures"
 PURPOSE = "Record a UP-RERA response as a parser test fixture"
 CHECK_FIXTURE = "check_8334.json"
-CHECKED_RERA_ID = "UPRERAPRJ8334"
+# One full live check per fixture; the number is the one to check (see docs/states.md).
+LIVE_CHECKS = {
+    CHECK_FIXTURE: "UPRERAPRJ8334",
+    "check_mh.json": "P99000055716",
+    "check_hr.json": "RC/REP/HARERA/GGM/1059/791/2026/31",
+    "check_ka.json": "PRM/KA/RERA/1251/446/PR/170915/000176",
+}
 
 SEARCHES = {
     "search_gaur_city.json": "Gaur City UP RERA project",
@@ -93,8 +100,9 @@ def summary_link(search_fixture: str, rera_id: str) -> str:
     sys.exit(f"No Projectsummary link for {rera_id} in {search_fixture}")
 
 
-def capture_check(settings: Settings) -> None:
+def capture_check(settings: Settings, fixture: str) -> None:
     """Run every source for one project against the real sites and record what they answered."""
+    rera_id = LIVE_CHECKS[fixture]
     key = settings.tinyfish_api_key.get_secret_value()
     recorder = RecordingWebClient(
         LiveWebClient(
@@ -108,21 +116,24 @@ def capture_check(settings: Settings) -> None:
         database = f"sqlite:///{Path(folder, 'capture.db').as_posix()}"
         app = create_app(settings.model_copy(update={"database_url": database}), web=recorder)
         with TestClient(app) as client:
-            check_id = client.post("/api/checks", json={"rera_id": CHECKED_RERA_ID}).json()["id"]
+            check_id = client.post("/api/checks", json={"rera_id": rera_id}).json()["id"]
             events = follow_events(client, check_id)
             report = client.get(f"/api/checks/{check_id}/report").json()
     payload = {
-        "rera_id": CHECKED_RERA_ID,
+        "rera_id": rera_id,
         "captured_at": events[0]["ts"],
         **recorder.recording(),
         "outcome": {
             "score": report["score"]["value"],
             "band": report["score"]["band"],
             "confidence": report["score"]["confidence"],
+            "state": report["state"],
+            "display_score": report["display_score"],
+            "reasons": [r["label"] for r in report["score_v2"]["reason_codes"]][:5],
             "sources": {run["source"]: run["status"] for run in report["check"]["sources"]},
         },
     }
-    save(CHECK_FIXTURE, scrub(json.dumps(payload, indent=2, ensure_ascii=False)), key)
+    save(fixture, scrub(json.dumps(payload, indent=2, ensure_ascii=False)), key)
 
 
 def follow_events(client: TestClient, check_id: str) -> list[dict[str, str]]:
@@ -172,9 +183,10 @@ async def main(wanted: set[str]) -> None:
 
 if __name__ == "__main__":
     names = set(sys.argv[1:])
-    if CHECK_FIXTURE in names:
-        capture_check(load_settings())
-        names.discard(CHECK_FIXTURE)
-        if not names:
-            sys.exit(0)
+    for fixture in LIVE_CHECKS:
+        if fixture in names:
+            capture_check(load_settings(), fixture)
+            names.discard(fixture)
+    if not names and len(sys.argv) > 1:
+        sys.exit(0)
     asyncio.run(main(names))

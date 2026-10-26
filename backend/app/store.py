@@ -27,6 +27,7 @@ from app.models import (
 )
 from app.scoring.v2.from_runs import score_from_runs
 from app.scoring.v2.reasons import DATA_UNAVAILABLE
+from app.states.registry import state_of
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +38,8 @@ EXTRA_DETAIL = ("v2", "family")
 EXTRA_FIELDS = ("snippet", "total")
 
 # The home page card shows the three biggest reasons behind a score.
+# The state is not stored: every number format belongs to exactly one state's RERA.
+STATE_FIELDS = {"state", "state_name"}
 RECENT_DRIVERS = 3
 RECENT_REASONS = 3
 
@@ -47,7 +50,7 @@ class Store:
 
     def save_project(self, project: Project) -> None:
         with self._sessions.begin() as session:
-            session.merge(ProjectRow(**project.model_dump()))
+            session.merge(ProjectRow(**project.model_dump(exclude=STATE_FIELDS)))
 
     def get_project(self, rera_id: str) -> Project | None:
         with self._sessions() as session:
@@ -95,13 +98,14 @@ class Store:
                 return None
             project = session.get_one(ProjectRow, row.rera_id)
             runs = session.scalars(
-                select(SourceRunRow).where(SourceRunRow.check_id == check_id).order_by(
-                    SourceRunRow.id
-                )
+                select(SourceRunRow)
+                .where(SourceRunRow.check_id == check_id)
+                .order_by(SourceRunRow.id)
             )
             return Check(
                 id=row.id,
                 rera_id=row.rera_id,
+                state=state_of(row.rera_id),
                 details_url=project.details_url,
                 status=row.status,  # type: ignore[arg-type]  # written only from CheckStatus
                 started_at=row.started_at,
@@ -112,9 +116,12 @@ class Store:
     def count_checks_since(self, since: datetime) -> int:
         """How many checks were started since then; each one costs live agent runs."""
         with self._sessions() as session:
-            return session.scalar(
-                select(func.count()).select_from(CheckRow).where(CheckRow.started_at >= since)
-            ) or 0
+            return (
+                session.scalar(
+                    select(func.count()).select_from(CheckRow).where(CheckRow.started_at >= since)
+                )
+                or 0
+            )
 
     def latest_completed_check(self, rera_id: str, since: datetime | None = None) -> Check | None:
         """The newest finished check of a project, optionally only if it finished after `since`."""
@@ -190,9 +197,9 @@ class Store:
             extras = {
                 extra.finding_id: extra.data
                 for extra in session.scalars(
-                    select(FindingExtraRow).join(
-                        FindingRow, FindingRow.id == FindingExtraRow.finding_id
-                    ).where(FindingRow.check_id == check_id)
+                    select(FindingExtraRow)
+                    .join(FindingRow, FindingRow.id == FindingExtraRow.finding_id)
+                    .where(FindingRow.check_id == check_id)
                 )
             }
             return [_finding(row, extras.get(row.id, {})) for row in rows]
@@ -283,6 +290,7 @@ class Store:
             {
                 "id": check.id,
                 "rera_id": check.rera_id,
+                "state": state_of(check.rera_id),
                 "details_url": project.details_url,
                 "project": project.name,
                 "promoter": project.promoter,
@@ -331,6 +339,7 @@ def _summary_query() -> Select[tuple[CheckRow, ProjectRow, ScoreRow]]:
 def _project(row: ProjectRow) -> Project:
     return Project(
         rera_id=row.rera_id,
+        state=state_of(row.rera_id),
         name=row.name,
         promoter=row.promoter,
         registered_on=row.registered_on,

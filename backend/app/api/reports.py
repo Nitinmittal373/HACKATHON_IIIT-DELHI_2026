@@ -33,6 +33,8 @@ def assemble_report(store: Store, check: Check) -> Report | None:
     findings.sort(key=lambda f: points.get(f.id, 0))
     timeline = sorted((f for f in findings if f.occurred_on), key=lambda f: f.occurred_on)
     return Report(
+        state=project.state,
+        state_name=project.state_name,
         check=check,
         project=project,
         score=score,

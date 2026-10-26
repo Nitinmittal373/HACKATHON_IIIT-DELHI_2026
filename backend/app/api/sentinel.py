@@ -41,8 +41,9 @@ from app.sentinel.models import (
 from app.sentinel.monitors import MonitorError, MonitorGateway
 from app.sentinel.service import Sentinel
 from app.sentinel.store import SentinelStore
+from app.states.names import DEFAULT_STATE
+from app.states.registry import adapter_for
 from app.store import Store
-from app.uprera_links import details_url_for
 
 MAX_WEBHOOK_BYTES = 200_000
 logger = logging.getLogger(__name__)
@@ -72,10 +73,11 @@ async def create_watch(
             },
         )
     # The page search confirmed for this number; a number sent alone gets its stable page.
-    details_url = body.details_url or details_url_for(body.rera_id)
-    assert details_url is not None  # WatchCreate requires a link for new-format numbers
+    adapter = adapter_for(body.state or DEFAULT_STATE)
+    known = Project(rera_id=body.rera_id, state=adapter.code, details_url=body.details_url or "")
+    details_url = adapter.details_url(known)
     if store.get_project(body.rera_id) is None:
-        store.save_project(Project(rera_id=body.rera_id, details_url=details_url))
+        store.save_project(known.model_copy(update={"details_url": details_url}))
     latest = store.latest_completed_check(body.rera_id)
     watch = watches.add_watch(
         email=body.email,
@@ -86,8 +88,10 @@ async def create_watch(
     )
     if gateway:
         project = store.get_project(body.rera_id)
+        # A page monitor needs a page Fetch can read; Search-only portals get the topic monitor.
+        page_url = details_url if adapter.coverage != "search_only" else None
         await add_monitors(
-            gateway, watches, watch, details_url, project and project.promoter, settings
+            gateway, watches, watch, page_url, project and project.promoter, settings
         )
     return watch
 
@@ -96,7 +100,7 @@ async def add_monitors(
     gateway: MonitorGateway,
     watches: SentinelStore,
     watch: Watch,
-    details_url: str,
+    details_url: str | None,
     promoter: str | None,
     settings: Settings,
 ) -> None:
@@ -105,8 +109,9 @@ async def add_monitors(
     secret = settings.webhook_secret.get_secret_value()
     hook = f"{settings.public_base_url.rstrip('/')}/api/sentinel/webhook?secret={secret}"
     try:
-        created = [await gateway.create_page_monitor(details_url, hook)]
-        watches.add_monitor(watch.id, created[0].monitor_id, created[0].kind)
+        if details_url:
+            page = await gateway.create_page_monitor(details_url, hook)
+            watches.add_monitor(watch.id, page.monitor_id, page.kind)
         if promoter:
             topic = await gateway.create_topic_monitor(promoter, hook)
             watches.add_monitor(watch.id, topic.monitor_id, topic.kind)
