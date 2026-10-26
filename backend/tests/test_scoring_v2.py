@@ -22,6 +22,7 @@ def finding(
     total: int | None = None,
     scope: InsolvencyScope | None = None,
     reliability: Reliability = "primary",
+    occurred_on: date | None = None,
 ) -> Finding:
     return Finding(
         id=f"f{next(_ids)}",
@@ -36,6 +37,7 @@ def finding(
         months=months,
         total=total,
         scope=scope,
+        occurred_on=occurred_on,
     )
 
 
@@ -77,7 +79,7 @@ def test_nothing_found_scores_900_and_never_adds_points() -> None:
         ("land_dues", "P5", {}, 70),
         ("land_package_default", "P5", {}, 50),
         ("oc_cc_past_due", "P5", {}, 30),
-        ("news_story", "P6", {}, 10),
+        ("news_story", "P6", {"occurred_on": date(2026, 6, 1)}, 10),
     ],
 )
 def test_each_rule(kind: str, pillar: str, facts: dict[str, object], expected: int) -> None:
@@ -85,7 +87,7 @@ def test_each_rule(kind: str, pillar: str, facts: dict[str, object], expected: i
 
 
 def test_news_is_capped_at_60_and_a_pillar_at_100() -> None:
-    news = [finding("news_story") for _ in range(9)]
+    news = [finding("news_story", occurred_on=date(2026, 8, 1)) for _ in range(9)]
     rera = [finding("completion_extended", count=5), finding("qpr_missed", count=4)]
 
     result = score_v2([*news, *rera], ALL)
@@ -93,6 +95,15 @@ def test_news_is_capped_at_60_and_a_pillar_at_100() -> None:
     penalties = {p.id: p.penalty for p in result.pillars}
     assert penalties["P6"] == 60
     assert penalties["P1"] == 100
+
+
+def test_only_news_from_the_last_12_months_counts() -> None:
+    old = finding("news_story", occurred_on=date(2025, 10, 24))  # 366 days before the read
+    undated = finding("news_story")
+    edge = finding("news_story", occurred_on=date(2025, 10, 25))  # exactly 365 days
+
+    assert score_v2([old, undated], ALL).value == 900
+    assert score_v2([edge], ALL).pillars[5].penalty == 10
 
 
 def test_unknown_kinds_cost_nothing() -> None:
@@ -204,7 +215,10 @@ def test_unread_data_is_r12_with_no_penalty() -> None:
 
 
 def test_reason_codes_are_ordered_by_points_lost() -> None:
-    findings = [finding("news_story"), finding("completion_extended", count=3)]
+    findings = [
+        finding("news_story", occurred_on=date(2026, 8, 1)),
+        finding("completion_extended", count=3),
+    ]
 
     codes = [c.code for c in score_v2(findings, ALL).reason_codes]
 

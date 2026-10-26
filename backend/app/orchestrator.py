@@ -207,8 +207,7 @@ class Orchestrator:
             runs = check.sources if check else []
             completed = [run.source for run in runs if run.status == "completed"]
             unavailable = [
-                f"{UNAVAILABLE_LABELS[run.source]}"
-                + (f" ({run.message})" if run.message else "")
+                f"{UNAVAILABLE_LABELS[run.source]}" + (f" ({run.message})" if run.message else "")
                 for run in runs
                 if run.status != "completed" and run.source in UNAVAILABLE_LABELS
             ]
@@ -241,6 +240,7 @@ UNAVAILABLE_LABELS: dict[SourceName, str] = {
     "consumer": "Consumer cases (e-Jagriti)",
     "news": "News",
     "group": "Group companies",
+    "sarfaesi": "Lender auction notices",
 }
 SUMMARY = {"value", "band", "band_label", "confidence", "provisional", "hard_stop"}
 

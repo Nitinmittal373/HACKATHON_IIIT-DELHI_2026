@@ -43,6 +43,13 @@ def _group_delay_share(f: Finding) -> int:
     return min(100, round(100 * f.count / f.total))
 
 
+def _recent_news(f: Finding) -> int:
+    """Only an article known to be from the last 12 months counts; an undated one is not proved."""
+    if f.occurred_on is None or not 0 <= (f.read_on - f.occurred_on).days <= w.NEWS_WINDOW_DAYS:
+        return 0
+    return w.NEWS_PER_ARTICLE
+
+
 def _insolvency(f: Finding) -> int:
     if f.scope in ("company", "this_project") and f.reliability == "primary":
         return 100
@@ -71,7 +78,7 @@ RULES: dict[str, Rule] = {
     "land_dues": Rule("P5", "R08", _flat(w.LAND_DEFAULTER)),
     "land_package_default": Rule("P5", "R08", _flat(w.LAND_PACKAGE_DEPOSIT_FAILED)),
     "oc_cc_past_due": Rule("P5", "R08", _flat(w.OC_CC_PAST_DUE)),
-    "news_story": Rule("P6", "R11", _flat(w.NEWS_PER_ARTICLE)),
+    "news_story": Rule("P6", "R11", _recent_news),
 }
 
 

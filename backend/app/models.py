@@ -12,7 +12,9 @@ from urllib.parse import urlsplit
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-SourceName = Literal["uprera", "registry", "insolvency", "land", "consumer", "news", "group"]
+SourceName = Literal[
+    "uprera", "registry", "insolvency", "land", "consumer", "news", "group", "sarfaesi"
+]
 Area = Literal["rera", "execution", "legal", "financial", "builder_history", "news"]
 Reliability = Literal["primary", "secondary"]
 Verdict = Literal["ok", "fail", "red_flag", "review", "context", "not_found"]

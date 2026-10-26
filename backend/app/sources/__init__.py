@@ -5,6 +5,7 @@ from app.sources.insolvency import InsolvencySource
 from app.sources.land import LandSource
 from app.sources.news import NewsSource
 from app.sources.registry import RegistrySource
+from app.sources.sarfaesi import SarfaesiSource
 from app.sources.uprera import UpreraSource
 
 
@@ -19,5 +20,5 @@ def build_sources(v2: bool = False) -> list[Source]:
         NewsSource(),
     ]
     if v2:
-        sources.insert(2, GroupSource())
+        sources[2:2] = [GroupSource(), SarfaesiSource()]
     return sources
