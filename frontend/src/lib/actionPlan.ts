@@ -1,3 +1,4 @@
+import { unreadChecks } from "@/lib/reportView";
 import type { Report } from "@/lib/types";
 
 export type PlanKey =
@@ -32,7 +33,7 @@ export function actionPlan(report: Report): PlanKey[] {
     KINDS[key].some((kind) => kinds.has(kind)),
   );
   const fillers: PlanKey[] = [
-    ...(report.score.checks_unread.length > 0 ? (["unread"] as const) : []),
+    ...(unreadChecks(report).length > 0 ? (["unread"] as const) : []),
     "verify",
     "agreement",
   ];

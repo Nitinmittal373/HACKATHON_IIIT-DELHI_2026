@@ -3,17 +3,6 @@ import type { credit as English } from "@/lib/i18n/en/credit";
 /** The Hindi copy has exactly the same keys as the English. */
 export const credit: typeof English = {
   title: "नींवस्कोर",
-  dialLabel: (value, band) => `नींवस्कोर 900 में से ${value}, ${band}`,
-  outOf: "900 में से",
-  scaleLow: "300",
-  scaleHigh: "900",
-  bands: {
-    Low: "कम जोखिम",
-    Watch: "निगरानी रखें",
-    Elevated: "बढ़ा हुआ जोखिम",
-    High: "ज़्यादा जोखिम",
-    insufficient_evidence: "अभी पर्याप्त प्रमाण नहीं",
-  },
   provisional: "अनंतिम: जोखिम श्रेणी देने के लिए बहुत कम तरह के रिकॉर्ड पढ़े जा सके।",
   hardStopTitle: "हार्ड स्टॉप",
   hardStopBody: (reason) => `${reason}। इस कारण स्कोर ज़्यादा जोखिम की श्रेणी में रहता है।`,
@@ -23,7 +12,7 @@ export const credit: typeof English = {
   pillarsLead: "छह तरह के जोखिम, हर एक का तय वज़न। लंबी पट्टी का मतलब उस क्षेत्र में ज़्यादा जोखिम है।",
   weight: (percent) => `वज़न ${percent}%`,
   noPenalty: "कोई कटौती नहीं",
-  pillarCost: (penalty, points) => `${penalty}/100 · −${points} अंक`,
+  pillarCost: (penalty, points) => `−${points} अंक · इस स्तंभ का ${penalty}%`,
   pillars: {
     P1: "नियामक अनुपालन (RERA)",
     P2: "डिलीवरी का रिकॉर्ड",
@@ -53,12 +42,15 @@ export const credit: typeof English = {
     R14: "कंपनी रजिस्ट्री में देर से फ़ाइलिंग",
   },
   r12Note: "पढ़ा नहीं जा सका, इसलिए अंक नहीं कटे। इससे सिर्फ़ भरोसा घटता है।",
-  classicTitle: "क्लासिक स्कोर (0–100)",
-  classicNote: "मूल नींवस्कोर, ताकि कुछ खोए नहीं।",
-  narrative: (value, band, reasons, unreadCount) =>
-    `स्कोर 900 में से ${value} (${band})।` +
+  methodTitle: "यह स्कोर कैसे बनता है",
+  methodBody: (max) =>
+    `नींवस्कोर ${max} से शुरू होता है और सिर्फ़ उन रिकॉर्ड के लिए अंक कटते हैं जो हमें मिले, छह भारित स्तंभों में। जो रिकॉर्ड हम पढ़ नहीं पाए, उससे अंक कभी नहीं बढ़ते; सिर्फ़ भरोसा घटता है। पूरी विधि प्रोजेक्ट रिपॉज़िटरी की docs/scoring.md में है।`,
+  classicLine: (value) =>
+    `क्लासिक स्कोर (0–100): ${value}। स्कोर का पहला संस्करण, पारदर्शिता के लिए रखा गया; ऊपर का नींवस्कोर ही इस्तेमाल करें।`,
+  narrative: (value, max, band, reasons, unreadCount, total) =>
+    `स्कोर ${max} में से ${value} (${band})।` +
     (reasons.length > 0 ? ` सबसे बड़े कारण: ${reasons.join("; ")}।` : " हमारे पढ़े किसी रिकॉर्ड से अंक नहीं कटे।") +
-    (unreadCount > 0 ? ` 6 में से ${unreadCount} तरह के रिकॉर्ड नहीं पढ़े जा सके; इससे भरोसा घटता है, स्कोर नहीं।` : ""),
+    (unreadCount > 0 ? ` ${total} में से ${unreadCount} तरह के रिकॉर्ड नहीं पढ़े जा सके; इससे भरोसा घटता है, स्कोर नहीं।` : ""),
   ratingNotice: "सार्वजनिक रिकॉर्ड पर आधारित जोखिम संकेतक — क्रेडिट रेटिंग नहीं।",
   ledger: {
     open: "प्रमाण बही खोलें",

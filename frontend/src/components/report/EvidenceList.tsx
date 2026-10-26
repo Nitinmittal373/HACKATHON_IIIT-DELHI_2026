@@ -16,7 +16,7 @@ interface Props {
 }
 
 export function EvidenceList({ report, ids, t, lang }: Props) {
-  const points = new Map(report.score.drivers.map((driver) => [driver.finding_id, driver.points]));
+  const points = new Map(report.score_v2.drivers.map((driver) => [driver.finding_id, driver.points]));
   const unread = unreadEntries(report);
 
   return (

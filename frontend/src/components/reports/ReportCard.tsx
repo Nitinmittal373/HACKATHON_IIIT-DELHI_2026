@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 
-import { ScoreRing } from "@/components/ScoreRing";
+import { NeevScore } from "@/components/NeevScore";
 import { describeApiError } from "@/lib/apiMessages";
 import { dayOf } from "@/lib/format";
 import { startCheck } from "@/lib/history";
@@ -31,7 +31,7 @@ export function ReportCard({ check, picked, canPick, onTogglePicked, onRemove }:
 
   const name = check.project ?? check.rera_id;
   const done = check.status === "completed";
-  const scored = done && check.score !== null && check.band !== null;
+  const display = done ? check.display_score : null;
   const status = done ? "done" : check.status === "failed" ? "failed" : "running";
 
   async function recheck() {
@@ -48,8 +48,8 @@ export function ReportCard({ check, picked, canPick, onTogglePicked, onRemove }:
 
   return (
     <article className={`card ${styles.card}`} aria-labelledby={titleId}>
-      {scored ? (
-        <ScoreRing value={check.score ?? 0} band={check.band ?? "insufficient_evidence"} size={84} delay={0.1} />
+      {display ? (
+        <NeevScore value={display.value} band={display.band} size={84} delay={0.1} />
       ) : (
         <span className={styles.noRing} aria-hidden="true" />
       )}
@@ -60,17 +60,13 @@ export function ReportCard({ check, picked, canPick, onTogglePicked, onRemove }:
         </h2>
         <p className={`mono ${styles.id}`}>{check.rera_id}</p>
         <p className={styles.tags}>
-          {scored && (
-            <span className="bandTag" data-band={check.band}>
-              {t.report.bands[check.band ?? "insufficient_evidence"]}
-            </span>
-          )}
+          {display && <NeevScore value={display.value} band={display.band} variant="chip" showValue={false} />}
           <span className={styles.status} data-status={status}>
             {t.reports.status[check.status]}
           </span>
           <span className={styles.date}>{t.reports.checkedOn(dayOf(check.created_at, lang))}</span>
         </p>
-        {!scored && (
+        {!display && (
           <p className={styles.hint}>
             {check.status === "failed" ? t.reports.noScoreFailed : t.reports.noScoreRunning}
           </p>

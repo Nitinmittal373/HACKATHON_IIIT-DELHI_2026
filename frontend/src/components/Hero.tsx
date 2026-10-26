@@ -8,6 +8,7 @@ import { SearchBar } from "@/components/SearchBar";
 import { Skyline } from "@/components/Skyline";
 import { heroCard } from "@/lib/heroCard";
 import { useLang } from "@/lib/LangProvider";
+import { useMeta } from "@/lib/MetaProvider";
 import { useRecentChecks } from "@/lib/useRecentChecks";
 import styles from "./Hero.module.css";
 
@@ -17,10 +18,11 @@ const WORD_STEP_SECONDS = 0.06;
 /** Search-first hero: headline, search, quick examples and the latest real report. */
 export function Hero() {
   const { lang, t } = useLang();
+  const meta = useMeta();
   const words = t.hero.headline;
   const recent = useRecentChecks();
   const latest = recent.status === "ready" ? recent.checks[0] : undefined;
-  const card = latest ? heroCard(latest, t, lang) : null;
+  const card = latest ? heroCard(latest, t, lang, meta) : null;
 
   return (
     <section className={styles.hero}>

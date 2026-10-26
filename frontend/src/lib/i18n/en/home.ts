@@ -1,14 +1,13 @@
 export const home = {
   marqueeLabel: "Sources we read",
   report: {
-    ariaLabel: (name: string, score: number, band: string) =>
-      `Latest NeevCheck report: ${name}, NeevScore ${score} out of 100, ${band}`,
+    ariaLabel: (name: string, score: string) => `Latest NeevCheck report: ${name}, ${score}`,
     kicker: (date: string) => `LATEST REPORT · READ ${date}`,
     latestNote: (date: string) => `The most recent real check on NeevCheck, read live on ${date}.`,
     open: "Open this report",
     registered: (date: string) => `registered ${date}`,
     sources: (count: number) => `read ${count} ${count === 1 ? "source" : "sources"}`,
-    confidence: "of key checks read",
+    confidence: "of record types read",
     skeletonLabel: "Placeholder for your report",
     skeletonKicker: "NEEVCHECK REPORT",
     skeletonTitle: "Your report appears here",
@@ -51,19 +50,14 @@ export const home = {
   },
   scale: {
     eyebrow: "NeevScore",
-    title: "One honest number, 0 to 100",
-    lead: "Everyone starts at 100. Points come off only for records we find. A source we cannot read lowers confidence, never adds points.",
-    caption:
-      "Marker: the score of the example check above. With fewer than half the key checks read, the score is shown without a band.",
-    weights: [
-      "UP-RERA compliance 25%",
-      "Project execution 20%",
-      "Legal & courts 15%",
-      "Financial & insolvency 15%",
-      "Builder history 15%",
-      "News 10%",
-    ],
-    bands: { critical: "Critical", high: "High", moderate: "Moderate", low: "Low" },
+    title: (min: number, max: number) => `One honest number, ${min} to ${max}`,
+    lead: (max: number) =>
+      `Everyone starts at ${max}. Points come off only for records we find. A source we cannot read lowers confidence, never adds points.`,
+    caption: (name: string) =>
+      `Marker: ${name}, the latest real check on NeevCheck. With fewer than half the record types read, the score is shown without a band.`,
+    captionEmpty:
+      "No check has finished on NeevCheck yet, so there is no marker. With fewer than half the record types read, a score is shown without a band.",
+    weightsLabel: "How the six pillars are weighted",
   },
   sentinel: {
     eyebrow: "Neev Sentinel",
@@ -78,7 +72,7 @@ export const home = {
     date: "Monday, 26 October",
     now: "now",
     alert: (score: number) =>
-      `New record: a court order on this builder's projects. Score unchanged at ${score}.`,
+      `New record: a court order on this builder's projects. NeevScore unchanged at ${score}.`,
     caption: "Illustration of an alert, not a real one.",
   },
   faq: {

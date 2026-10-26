@@ -17,7 +17,7 @@ test.describe("home", () => {
     await page.goto("/");
     await expect(page.getByRole("link", { name: /Latest NeevCheck report: SUPERTECH ECO VILLAGE-I PHASE I-C/ })).toBeVisible();
     const strip = page.getByRole("region", { name: "Recently checked on NeevCheck" });
-    await expect(strip.getByRole("link", { name: /NeevScore 68, Moderate risk/ })).toHaveAttribute("href", `/report/${ECO}`);
+    await expect(strip.getByRole("link", { name: /NeevScore 621, Watch/ })).toHaveAttribute("href", `/report/${ECO}`);
   });
 
   test("before any check has finished: an empty card, no numbers, no strip", async ({ page }) => {
@@ -55,7 +55,7 @@ test.describe("My reports", () => {
     await page.goto("/reports");
     const eco = page.getByRole("article", { name: "SUPERTECH ECO VILLAGE-I PHASE I-C" });
     await expect(eco).toContainText("UPRERAPRJ8334");
-    await expect(eco).toContainText("Moderate risk");
+    await expect(eco).toContainText("Watch");
     await expect(eco.getByRole("link", { name: "Open" })).toHaveAttribute("href", `/report/${ECO}`);
 
     await eco.getByRole("button", { name: "Compare" }).click();
@@ -121,8 +121,8 @@ test.describe("report extras", () => {
 
     const popup = page.waitForEvent("popup");
     await page.getByRole("button", { name: "Share on WhatsApp" }).click();
-    const url = decodeURIComponent((await popup).url());
-    expect(url).toContain("NeevCheck: SUPERTECH ECO VILLAGE-I PHASE I-C scored 68/100 (Moderate risk)");
+    const url = decodeURIComponent((await popup).url().replace(/\+/g, " "));
+    expect(url).toContain("NeevCheck: SUPERTECH ECO VILLAGE-I PHASE I-C, NeevScore 621 out of 900, Watch, on public records.");
     expect(url).toContain(`/report/${ECO}`);
   });
 

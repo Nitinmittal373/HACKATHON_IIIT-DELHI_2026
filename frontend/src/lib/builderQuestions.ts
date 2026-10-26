@@ -1,3 +1,4 @@
+import { unreadChecks } from "@/lib/reportView";
 import type { Report } from "@/lib/types";
 
 export type QuestionKey =
@@ -31,7 +32,7 @@ export function builderQuestions(report: Report): QuestionKey[] {
   if (has(INSOLVENCY)) asked.push("insolvency");
   if (has(["land_dues"])) asked.push("land");
   // Cases first when e-Jagriti could not be read; otherwise they are only a general question.
-  if (report.score.checks_unread.includes("consumer_cases")) asked.push("cases");
+  if (unreadChecks(report).includes("consumer_cases")) asked.push("cases");
   for (const filler of ["progress", "approvals", "cases"] as const) {
     if (!asked.includes(filler)) asked.push(filler);
   }

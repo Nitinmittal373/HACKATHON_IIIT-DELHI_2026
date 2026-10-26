@@ -96,5 +96,5 @@ export function farBlocks(random: () => number): FarBlock[] {
 }
 
 export function round(value: number): number {
-  return Math.round(value * 100) / 100;
+  return Number(value.toFixed(2));
 }

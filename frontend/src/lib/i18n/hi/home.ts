@@ -3,14 +3,13 @@ import type { home as en } from "@/lib/i18n/en/home";
 export const home: typeof en = {
   marqueeLabel: "जिन स्रोतों को हम पढ़ते हैं",
   report: {
-    ariaLabel: (name: string, score: number, band: string) =>
-      `NeevCheck की ताज़ा रिपोर्ट: ${name}, NeevScore 100 में से ${score}, ${band}`,
+    ariaLabel: (name: string, score: string) => `NeevCheck की ताज़ा रिपोर्ट: ${name}, ${score}`,
     kicker: (date: string) => `ताज़ा रिपोर्ट · पढ़ी गई ${date}`,
     latestNote: (date: string) => `NeevCheck पर सबसे हाल की असली जाँच, ${date} को लाइव पढ़ी गई।`,
     open: "यह रिपोर्ट खोलें",
     registered: (date: string) => `पंजीकरण ${date}`,
     sources: (count: number) => `${count} स्रोत पढ़े`,
-    confidence: "मुख्य जाँचें पढ़ी गईं",
+    confidence: "रिकॉर्ड प्रकार पढ़े गए",
     skeletonLabel: "आपकी रिपोर्ट की जगह",
     skeletonKicker: "NEEVCHECK रिपोर्ट",
     skeletonTitle: "आपकी रिपोर्ट यहाँ दिखेगी",
@@ -53,19 +52,14 @@ export const home: typeof en = {
   },
   scale: {
     eyebrow: "NeevScore",
-    title: "एक ईमानदार संख्या, 0 से 100",
-    lead: "सब 100 से शुरू करते हैं। अंक सिर्फ़ उन रिकॉर्ड के लिए कटते हैं जो हमें मिलते हैं। जो स्रोत हम पढ़ नहीं पाते, उससे भरोसा घटता है, अंक कभी नहीं बढ़ते।",
-    caption:
-      "निशान: ऊपर की उदाहरण जाँच का स्कोर। आधे से कम मुख्य जाँचें पढ़ी जाएँ तो स्कोर बिना श्रेणी के दिखता है।",
-    weights: [
-      "UP-RERA अनुपालन 25%",
-      "प्रोजेक्ट का निर्माण 20%",
-      "कानूनी और अदालती 15%",
-      "वित्तीय और दिवाला 15%",
-      "बिल्डर का इतिहास 15%",
-      "खबरें 10%",
-    ],
-    bands: { critical: "गंभीर", high: "ऊँचा", moderate: "मध्यम", low: "कम" },
+    title: (min: number, max: number) => `एक ईमानदार संख्या, ${min} से ${max}`,
+    lead: (max: number) =>
+      `सब ${max} से शुरू करते हैं। अंक सिर्फ़ उन रिकॉर्ड के लिए कटते हैं जो हमें मिलते हैं। जो स्रोत हम पढ़ नहीं पाते, उससे भरोसा घटता है, अंक कभी नहीं बढ़ते।`,
+    caption: (name: string) =>
+      `निशान: ${name}, NeevCheck पर सबसे ताज़ा असली जाँच। आधे से कम रिकॉर्ड प्रकार पढ़े जाएँ तो स्कोर बिना श्रेणी के दिखता है।`,
+    captionEmpty:
+      "NeevCheck पर अभी कोई जाँच पूरी नहीं हुई, इसलिए निशान नहीं है। आधे से कम रिकॉर्ड प्रकार पढ़े जाएँ तो स्कोर बिना श्रेणी के दिखता है।",
+    weightsLabel: "छह स्तंभों का वज़न कैसे बँटा है",
   },
   sentinel: {
     eyebrow: "Neev Sentinel",
@@ -80,7 +74,7 @@ export const home: typeof en = {
     date: "सोमवार, 26 अक्टूबर",
     now: "अभी",
     alert: (score: number) =>
-      `नया रिकॉर्ड: इस बिल्डर के प्रोजेक्ट पर एक अदालती आदेश। स्कोर ${score} पर वही है।`,
+      `नया रिकॉर्ड: इस बिल्डर के प्रोजेक्ट पर एक अदालती आदेश। NeevScore ${score} पर वही है।`,
     caption: "अलर्ट का चित्र, असली अलर्ट नहीं।",
   },
   faq: {

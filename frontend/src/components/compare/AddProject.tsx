@@ -59,7 +59,7 @@ export function AddProject({ current, onAdd }: Props) {
             <option value="">{t.compare.addPlaceholder}</option>
             {offered.map((check) => (
               <option key={check.id} value={check.id}>
-                {check.project ?? check.rera_id} · {check.score}
+                {check.project ?? check.rera_id} · {check.display_score?.value}
               </option>
             ))}
           </select>

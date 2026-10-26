@@ -32,7 +32,6 @@
 
 .bands {
   display: grid;
-  grid-template-columns: 40fr 20fr 20fr 20fr;
   gap: 6px;
   margin: 0;
   padding: 0;

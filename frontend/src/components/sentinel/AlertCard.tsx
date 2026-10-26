@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { NeevScore } from "@/components/NeevScore";
 import { dayOf } from "@/lib/format";
 import type { Lang, Strings } from "@/lib/i18n";
 import type { Alert, AlertChange } from "@/lib/types";
@@ -13,6 +14,8 @@ interface Props {
 
 /** One change Sentinel found: the score before and after, and exactly what is different. */
 export function AlertCard({ alert, t, lang }: Props) {
+  const before = alert.old_display_score;
+  const after = alert.new_display_score;
   const groups: [string, AlertChange[], string][] = [
     [t.alerts.added, alert.added, "added"],
     [t.alerts.changed, alert.changed, "changed"],
@@ -29,8 +32,10 @@ export function AlertCard({ alert, t, lang }: Props) {
             {t.alerts.when} {dayOf(alert.created_at, lang)}
           </span>
         </div>
-        <span className={`num ${styles.score}`}>
-          {t.alerts.scoreChange(alert.old_score, alert.new_score)}
+        <span className={styles.score} aria-label={t.alerts.scoreChange(before?.value, after?.value)}>
+          {before ? <NeevScore value={before.value} band={before.band} variant="chip" /> : <span aria-hidden="true">–</span>}
+          <span aria-hidden="true">→</span>
+          {after ? <NeevScore value={after.value} band={after.band} variant="chip" /> : <span aria-hidden="true">–</span>}
         </span>
       </header>
       {groups.map(([label, changes, kind]) =>

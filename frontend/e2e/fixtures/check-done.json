@@ -56,5 +56,13 @@
       "message": null,
       "checks_read": []
     }
-  ]
+  ],
+  "reused": false,
+  "display_score": {
+    "value": 741,
+    "band": "Watch",
+    "hard_stop": false,
+    "confidence": 0.67,
+    "provisional": false
+  }
 }

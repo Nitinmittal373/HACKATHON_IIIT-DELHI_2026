@@ -34,12 +34,11 @@
 }
 
 .score {
-  padding: 5px 10px;
-  border-radius: 999px;
-  background: #fff1e6;
-  color: var(--o-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--mu);
   font-size: 13px;
-  font-weight: 600;
 }
 
 .group {

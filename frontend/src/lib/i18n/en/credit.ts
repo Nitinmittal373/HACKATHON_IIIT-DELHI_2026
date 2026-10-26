@@ -1,17 +1,6 @@
-/** Copy for the credit-style score (NeevScore 300–900), reason codes and the evidence ledger. */
+/** Copy for the credit-style header, reason codes, the method note and the evidence ledger. */
 export const credit = {
   title: "NeevScore",
-  dialLabel: (value: number, band: string) => `NeevScore ${value} out of 900, ${band}`,
-  outOf: "out of 900",
-  scaleLow: "300",
-  scaleHigh: "900",
-  bands: {
-    Low: "Low risk",
-    Watch: "Watch",
-    Elevated: "Elevated risk",
-    High: "High risk",
-    insufficient_evidence: "Not enough evidence yet",
-  },
   provisional: "Provisional: too few record types could be read to give a risk band.",
   hardStopTitle: "Hard stop",
   hardStopBody: (reason: string) => `${reason}. This keeps the score in the High risk band.`,
@@ -21,7 +10,7 @@ export const credit = {
   pillarsLead: "Six kinds of risk, each with a fixed weight. A longer bar means more risk in that area.",
   weight: (percent: number) => `Weight ${percent}%`,
   noPenalty: "No cost",
-  pillarCost: (penalty: number, points: number) => `${penalty}/100 · −${points} pts`,
+  pillarCost: (penalty: number, points: number) => `−${points} pts · ${penalty}% of this pillar`,
   pillars: {
     P1: "Regulatory compliance (RERA)",
     P2: "Delivery track record",
@@ -51,12 +40,15 @@ export const credit = {
     R14: "Late filings with the company registry",
   } as Record<string, string>,
   r12Note: "Not read, so not scored. It only lowers confidence.",
-  classicTitle: "Classic score (0–100)",
-  classicNote: "The original NeevScore, kept so nothing is lost.",
-  narrative: (value: number, band: string, reasons: string[], unreadCount: number) =>
-    `Scored ${value} out of 900 (${band}).` +
+  methodTitle: "How this score is made",
+  methodBody: (max: number) =>
+    `NeevScore starts at ${max} and loses points only for records we found, in six weighted pillars. A record we could not read never adds points; it only lowers confidence. The full method is in docs/scoring.md in the project repository.`,
+  classicLine: (value: number) =>
+    `Classic score (0–100): ${value}. The first version of the score, kept for transparency; NeevScore above is the score to use.`,
+  narrative: (value: number, max: number, band: string, reasons: string[], unreadCount: number, total: number) =>
+    `Scored ${value} out of ${max} (${band}).` +
     (reasons.length > 0 ? ` The biggest reasons: ${reasons.join("; ")}.` : " No record we read cost any points.") +
-    (unreadCount > 0 ? ` ${unreadCount} of 6 record types could not be read, which lowers confidence but not the score.` : ""),
+    (unreadCount > 0 ? ` ${unreadCount} of ${total} record types could not be read, which lowers confidence but not the score.` : ""),
   ratingNotice: "Risk indicator based on public records — not a credit rating.",
   ledger: {
     open: "Open evidence ledger",

@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { ScoreRing } from "@/components/ScoreRing";
+import { NeevScore } from "@/components/NeevScore";
 import type { HeroCard } from "@/lib/heroCard";
 import type { Strings } from "@/lib/i18n";
 import styles from "./ReportStage.module.css";
@@ -29,19 +29,18 @@ export function ReportStage({ card, t }: { card: HeroCard | null; t: Strings }) 
 }
 
 function RealCard({ card, t }: { card: HeroCard; t: Strings }) {
-  const band = t.report.bands[card.band];
   return (
     <Link
       href={`/report/${card.id}`}
       className={`${styles.card} ${styles.link}`}
-      aria-label={t.home.report.ariaLabel(card.name, card.score, band)}
+      aria-label={t.home.report.ariaLabel(card.name, card.scoreLabel)}
     >
       <div className={styles.top}>
         <span className={`mono ${styles.kicker}`}>{t.home.report.kicker(card.readOn.toUpperCase())}</span>
-        <span className={`${styles.band} ${styles[card.band]}`}>{band}</span>
+        <NeevScore value={card.display.value} band={card.display.band} variant="chip" showValue={false} />
       </div>
       <div className={styles.body}>
-        <ScoreRing value={card.score} band={card.band} />
+        <NeevScore value={card.display.value} band={card.display.band} />
         <div>
           <p className={styles.name}>{card.name}</p>
           <p className={`mono ${styles.id}`}>
@@ -74,7 +73,7 @@ function EmptyCard({ t }: { t: Strings }) {
     <article className={styles.card} aria-label={t.home.report.skeletonLabel}>
       <div className={styles.top}>
         <span className={`mono ${styles.kicker}`}>{t.home.report.skeletonKicker}</span>
-        <span className={`${styles.band} ${styles.placeholderTag}`} aria-hidden="true" />
+        <span className={styles.placeholderTag} aria-hidden="true" />
       </div>
       <div className={styles.body}>
         <div className={styles.placeholderRing} aria-hidden="true" />

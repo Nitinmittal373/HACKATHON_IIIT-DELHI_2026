@@ -1,11 +1,4 @@
 export const report = {
-  bands: {
-    Low: "Low risk",
-    Moderate: "Moderate risk",
-    High: "High risk",
-    Critical: "Critical risk",
-    insufficient_evidence: "Not enough evidence yet",
-  },
   areas: {
     rera: "UP-RERA compliance",
     execution: "Project execution",
@@ -44,8 +37,7 @@ export const report = {
     return `Checked ${Math.floor(hours / 24)} days ago`;
   },
   recheck: "Re-check now",
-  outOf: "out of 100",
-  scoreLabel: (value: number, band: string) => `NeevScore ${value} out of 100, ${band}`,
+  summaryLabel: "In plain words",
   provisional: "Provisional: not enough evidence yet",
   noHardStop: "No hard stop",
   hardStop: "Hard stop",
@@ -54,7 +46,7 @@ export const report = {
   records: (records: number, sources: number) =>
     `${records} ${records === 1 ? "record" : "records"} · ${sources} ${sources === 1 ? "source" : "sources"}`,
   why: (value: number) => `Why ${value}`,
-  whyLead: "Everyone starts at 100. Points come off only for records we found.",
+  whyLead: (max: number) => `Everyone starts at ${max}. Points come off only for records we found.`,
   noDrivers: "No record we read cost any points.",
   evidence: "Evidence",
   readOn: (date: string, time: string | null) => `read ${date}${time ? `, ${time}` : ""}`,

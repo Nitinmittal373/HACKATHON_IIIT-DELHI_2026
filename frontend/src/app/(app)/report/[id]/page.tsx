@@ -15,12 +15,14 @@ import { FamilyTree } from "@/components/report/FamilyTree";
 import { PrintQr } from "@/components/report/PrintQr";
 import { SentinelCard } from "@/components/report/SentinelCard";
 import { ReportHeader } from "@/components/report/ReportHeader";
+import { MethodNote } from "@/components/report/MethodNote";
 import { ScoreCard } from "@/components/report/ScoreCard";
 import { Timeline } from "@/components/report/Timeline";
 import { TrackRecord } from "@/components/report/TrackRecord";
 import { ApiError, getReport } from "@/lib/api";
 import { dayOf } from "@/lib/format";
 import { getStrings } from "@/lib/i18n/server";
+import { loadMeta } from "@/lib/meta";
 import { CHECK_ID_PATTERN } from "@/lib/ids";
 import { evidenceIds } from "@/lib/reportView";
 import type { Report } from "@/lib/types";
@@ -45,7 +47,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const report = CHECK_ID_PATTERN.test(id) ? await load(id) : null;
   if (!report || report instanceof ApiError) return { title: "NeevCheck report" };
   const name = report.project.name ?? report.project.rera_id;
-  return { title: `${name}: NeevScore ${report.score.value} · NeevCheck` };
+  return { title: `${name}: NeevScore ${report.display_score.value} · NeevCheck` };
 }
 
 export default async function ReportPage({ params }: Props) {
@@ -55,7 +57,7 @@ export default async function ReportPage({ params }: Props) {
   const result = await load(id);
   if (result instanceof ApiError) return failure(result, id);
 
-  const { t, lang } = await getStrings();
+  const [{ t, lang }, meta] = await Promise.all([getStrings(), loadMeta()]);
   const report = result;
   const ids = evidenceIds(report.findings);
   const readDate = dayOf(report.check.completed_at ?? report.check.started_at, lang);
@@ -65,9 +67,9 @@ export default async function ReportPage({ params }: Props) {
       <ReportHeader report={report} t={t} lang={lang} />
       <div className={styles.grid}>
         <div className={styles.column}>
-          <CreditHeader report={report} ids={ids} t={t} />
-          <ScoreCard report={report} t={t} compact={report.score_v2 != null} />
-          <DriversCard report={report} ids={ids} t={t} />
+          <CreditHeader report={report} ids={ids} meta={meta} t={t} />
+          <ScoreCard report={report} t={t} />
+          <DriversCard report={report} ids={ids} meta={meta} t={t} />
           <EvidenceList report={report} ids={ids} t={t} lang={lang} />
           {report.family && <FamilyTree tree={report.family} />}
         </div>
@@ -79,6 +81,7 @@ export default async function ReportPage({ params }: Props) {
             <TrackRecord promoter={report.project.promoter} reraId={report.project.rera_id} />
           )}
           <Timeline events={report.timeline} t={t} lang={lang} />
+          <MethodNote report={report} meta={meta} t={t} />
           <SentinelCard project={report.project} t={t} />
           <CorrectionForm reportId={report.check.id} findings={report.findings} />
           <p className={styles.disclaimer}>{t.report.disclaimer(readDate)}</p>

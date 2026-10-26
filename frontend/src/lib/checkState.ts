@@ -2,9 +2,9 @@ import { ALL_SOURCES, EXTRA_SOURCES, SOURCE_ORDER } from "@/lib/sources";
 import type {
   Check,
   CheckEvent,
+  DisplayScore,
   Finding,
   RunStatus,
-  ScoreSummary,
   SourceName,
   SourceRun,
 } from "@/lib/types";
@@ -24,7 +24,7 @@ export interface SourceView {
 }
 
 export type Outcome =
-  | { status: "completed"; score: ScoreSummary | null }
+  | { status: "completed"; score: DisplayScore | null }
   | { status: "failed"; message: string };
 
 export interface CamState {
@@ -99,7 +99,7 @@ export function applyEvent(state: CamState, event: CheckEvent): CamState {
     }
     case "check.completed": {
       if (event.data.status === "completed") {
-        return { ...state, outcome: { status: "completed", score: event.data.score } };
+        return { ...state, outcome: { status: "completed", score: event.data.display_score } };
       }
       const message = event.data.message ?? "The check could not be completed";
       return { ...state, outcome: { status: "failed", message } };
@@ -126,7 +126,7 @@ export function visibleSources(state: CamState): SourceName[] {
   ];
 }
 
-/** Overall progress, 0 to 100: a finished source counts fully, a running one partly. */
+/** Overall progress in percent: a finished source counts fully, a running one partly. */
 export function progressPercent(state: CamState): number {
   if (state.outcome) return 100;
   const views = visibleSources(state).map((name) => state.sources[name]);

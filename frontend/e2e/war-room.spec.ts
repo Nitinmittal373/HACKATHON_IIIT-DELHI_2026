@@ -13,7 +13,7 @@ async function startCheck(page: Page) {
   await page.goto("/check?q=Supertech%20Eco%20Village");
   await page.getByRole("button", { name: "Yes, check this project" }).click();
   await expect(page).toHaveURL(CHECK_URL);
-  await expect(page.getByText("NeevScore 68 · Moderate risk")).toBeVisible();
+  await expect(page.getByText("NeevScore 741 · Watch")).toBeVisible();
 }
 
 test("the War Room shows six lanes with an honest status each", async ({ page }) => {

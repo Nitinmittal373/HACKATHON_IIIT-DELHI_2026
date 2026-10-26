@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { ScoreRing } from "@/components/ScoreRing";
+import { NeevScore } from "@/components/NeevScore";
 import type { Outcome } from "@/lib/checkState";
 import type { Strings } from "@/lib/i18n";
 import styles from "./ResultCard.module.css";
@@ -31,15 +31,13 @@ export function ResultCard({ outcome, checkId, reraId, t }: Props) {
 
   const score = outcome.score;
   const provisional = !score || score.provisional || score.band === "insufficient_evidence";
-  const band = score ? t.report.bands[score.band] : "";
+  const band = score ? t.score.bands[score.band] : "";
   return (
     <section className={`card ${styles.card}`} aria-live="polite">
-      {score && (
-        <ScoreRing value={score.value} band={score.band} size={96} delay={0.1} />
-      )}
+      {score && <NeevScore value={score.value} band={score.band} size={96} delay={0.1} />}
       <div className={styles.text}>
         <h2 className={styles.title}>
-          {score && !provisional ? t.cam.resultScore(score.value, band) : t.cam.resultProvisional}
+          {score && !provisional ? t.score.short(score.value, band) : t.cam.resultProvisional}
         </h2>
         <p className={styles.note}>
           {provisional ? t.cam.resultProvisionalNote : t.cam.resultNote}

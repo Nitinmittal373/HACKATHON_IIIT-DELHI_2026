@@ -70,6 +70,7 @@
 .placeholderTag {
   width: 96px;
   height: 24px;
+  border-radius: 999px;
   background: #f3eee9;
 }
 
@@ -90,40 +91,6 @@
 .kicker {
   font-size: 11.5px;
   color: var(--fa);
-}
-
-.band {
-  flex: none;
-  padding: 5px 11px;
-  border-radius: 999px;
-  font-size: 12.5px;
-  font-weight: 600;
-}
-
-.Low {
-  background: var(--low-bg);
-  color: var(--low-text);
-}
-
-.Moderate {
-  background: var(--moderate-bg);
-  color: var(--moderate);
-}
-
-.High {
-  background: var(--high-bg);
-  color: var(--high);
-}
-
-.Critical {
-  background: var(--critical-bg);
-  color: var(--critical);
-}
-
-/* Too little read to rate the project: no risk colour, just a neutral tag. */
-.insufficient_evidence {
-  background: #f3eee9;
-  color: var(--ink2);
 }
 
 .body {

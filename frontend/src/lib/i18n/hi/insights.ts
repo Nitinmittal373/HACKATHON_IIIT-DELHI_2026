@@ -14,8 +14,8 @@ export const insights: typeof en = {
   },
   whatsapp: {
     button: "WhatsApp पर भेजें",
-    text: (project: string, score: number, band: string, link: string) =>
-      `NeevCheck: सार्वजनिक रिकॉर्ड पर ${project} का स्कोर ${score}/100 (${band}) है। ${link}`,
+    text: (project: string, score: string, link: string) =>
+      `NeevCheck: सार्वजनिक रिकॉर्ड पर ${project}, ${score}। ${link}`,
   },
   questions: {
     title: "बिल्डर से पूछने के सवाल",

@@ -118,7 +118,6 @@ export const check = {
     blockedOther: (reason: string) => `Agent stopped: ${reason}`,
     unreadReason: "Could not be read this time. This lowers confidence, never the score.",
     checkYourself: "Check it yourself",
-    resultScore: (value: number, band: string) => `NeevScore ${value} · ${band}`,
     resultProvisional: "Not enough evidence yet",
     resultProvisionalNote: "Too few key records could be read to give a risk band.",
     resultNote: "Every point links to the record it came from.",

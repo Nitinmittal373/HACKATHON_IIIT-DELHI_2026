@@ -6,7 +6,11 @@ the report. Run from backend/:  python -m scripts.export_e2e_fixtures
 
 `python -m scripts.export_e2e_fixtures extras` writes only the newer answers, keeping the check
 id the other fixtures use: the comparison of that check with the recorded UP-RERA page of
-UPRERAPRJ6742, and the promoter's other projects from the recorded up-rera.in searches.
+UPRERAPRJ6742, the promoter's other projects from the recorded up-rera.in searches and the
+Sentinel alert a changed record raises. `python -m scripts.export_e2e_fixtures v2` rewrites the
+report with the v2 sources on, which is the 300-900 score the report screens show.
+
+backend/tests/test_e2e_fixtures.py checks every file against the API's own models.
 """
 
 import json
@@ -22,9 +26,14 @@ from tests.fakes import FakeWebClient, load_recording, recorded_searches
 
 OUT = Path(__file__).resolve().parents[2] / "frontend" / "e2e" / "fixtures"
 SEARCH_QUERY = "Supertech Eco Village"
+# Check ids are random, but the browser tests name this one, so it is kept across exports.
+E2E_CHECK_ID = "4ad9752355f9455aa9d242c93950ea04"
+RENAMED: dict[str, str] = {}
 
 
 def save(name: str, content: str) -> None:
+    for generated, kept in RENAMED.items():
+        content = content.replace(generated, kept)
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / name).write_text(content, encoding="utf-8")
     print(f"saved {name}")
@@ -44,11 +53,13 @@ def main() -> None:
             save_json("search.json", search.json())
             created = client.post("/api/checks", json={"rera_id": "UPRERAPRJ8334"})
             check = created.json()
+            RENAMED[check["id"]] = E2E_CHECK_ID
             save_json("check-created.json", check)
             with client.stream("GET", f"/api/checks/{check['id']}/events") as response:
                 save("events.sse", "\n".join(response.iter_lines()) + "\n")
             save_json("check-done.json", client.get(f"/api/checks/{check['id']}").json())
             save_json("report.json", client.get(f"/api/checks/{check['id']}/report").json())
+            save_json("meta.json", client.get("/api/meta").json())
 
 
 def export_compare() -> None:
@@ -106,6 +117,32 @@ def export_v2_report() -> None:
     save("report.json", text + "\n")
 
 
+def export_alerts() -> None:
+    """alerts.json: the alert Sentinel raises when the insolvency page changes after a watch."""
+    from tests.test_sentinel import (  # the same flow the Sentinel tests run
+        INSOLVENCY_PAGE,
+        alerts,
+        build_client,
+        insolvency_answer,
+        recheck,
+        run_check,
+        watch,
+    )
+
+    e2e_id = json.loads((OUT / "check-created.json").read_text(encoding="utf-8"))["id"]
+    web = make_web().replay(load_recording("check_8334.json"))
+    with tempfile.TemporaryDirectory() as folder, build_client(Path(folder), web) as client:
+        run_check(client)
+        watch(client)
+        web.agent_runs[INSOLVENCY_PAGE] = insolvency_answer(admitted_on="April 1, 2022")
+        recheck(client)
+        found = alerts(client)
+    text = json.dumps(found, indent=2, ensure_ascii=False)
+    for alert in found:
+        text = text.replace(str(alert["check_id"]), e2e_id)
+    save("alerts.json", text + "\n")
+
+
 FLAGGED_ID = "f" * 32
 
 
@@ -132,5 +169,6 @@ if __name__ == "__main__":
     elif sys.argv[1:] == ["extras"]:
         export_compare()
         export_track_record()
+        export_alerts()
     else:
         main()

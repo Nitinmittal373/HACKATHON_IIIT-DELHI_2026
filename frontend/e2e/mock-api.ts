@@ -11,10 +11,18 @@ import { createServer, type ServerResponse } from "node:http";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import type { components } from "../src/lib/api-schema";
+
+// Everything this mock builds itself is typed from the generated contract, so a change to the
+// backend's models breaks the compile here instead of silently serving a stale shape.
+type Schemas = components["schemas"];
+
 const FIXTURES = resolve(dirname(fileURLToPath(import.meta.url)), "fixtures");
 const PORT = Number(process.env.MOCK_API_PORT ?? 8010);
 const EVENT_DELAY_MS = Number(process.env.MOCK_EVENT_DELAY_MS ?? 40);
 const ALLOWED_ORIGIN = process.env.MOCK_ALLOWED_ORIGIN ?? "http://localhost:3010";
+// The email whose watch raised the recorded alert.
+const ALERTS_EMAIL = "buyer@example.com";
 // The second search result stands in for a visitor over the rate limit.
 const RATE_LIMITED_RERA_ID = "UPRERAPRJ4878";
 
@@ -58,15 +66,11 @@ function readBody(req: import("node:http").IncomingMessage): Promise<string> {
   });
 }
 
-interface RecordedReport {
-  check: { id: string; rera_id: string; details_url: string; started_at: string; completed_at: string; sources: { status: string }[] };
-  project: { name: string; promoter: string; registered_on: string };
-  score: { value: number; band: string; confidence: number; drivers: unknown[] };
-}
+const recordedReport = (): Schemas["Report"] => json("report.json") as unknown as Schemas["Report"];
 
 /** The recorded check as "My reports" lists it (GET /api/checks?ids=). */
-function recordedSummary() {
-  const { check, project, score } = json("report.json") as unknown as RecordedReport;
+function recordedSummary(): Schemas["CheckSummary"] {
+  const { check, project, score, display_score } = recordedReport();
   return {
     id: check.id,
     rera_id: check.rera_id,
@@ -77,19 +81,21 @@ function recordedSummary() {
     score: score.value,
     band: score.band,
     confidence: score.confidence,
+    display_score,
     created_at: check.started_at,
     completed_at: check.completed_at,
   };
 }
 
 /** The recorded check as the home page shows it (GET /api/checks/recent). */
-function recordedRecent() {
-  const { check, project, score } = json("report.json") as unknown as RecordedReport;
+function recordedRecent(): Schemas["RecentCheck"] {
+  const { check, project, score, score_v2 } = recordedReport();
   return {
     ...recordedSummary(),
     registered_on: project.registered_on,
     sources_read: check.sources.filter((run) => run.status === "completed").length,
     drivers: score.drivers.slice(0, 3),
+    reasons: score_v2.reason_codes.filter((reason) => reason.code !== "R12").slice(0, 3),
   };
 }
 
@@ -103,6 +109,13 @@ createServer(async (req, res) => {
     const query = url.searchParams.get("q") ?? "";
     if (/nothing/i.test(query)) return send(res, 200, { query, candidates: [] });
     return send(res, 200, { ...json("search.json"), query });
+  }
+
+  if (path === "/api/meta") return send(res, 200, json("meta.json"));
+
+  if (path === "/api/sentinel/alerts") {
+    const email = url.searchParams.get("email") ?? "";
+    return send(res, 200, email === ALERTS_EMAIL ? JSON.parse(read("alerts.json")) : []);
   }
 
   if (path === "/api/checks" && req.method === "POST") {

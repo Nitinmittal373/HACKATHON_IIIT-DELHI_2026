@@ -9,6 +9,7 @@ import { family as familyEn } from "@/lib/i18n/en/family";
 import { compare as compareEn } from "@/lib/i18n/en/compare";
 import { report as reportEn } from "@/lib/i18n/en/report";
 import { reports as reportsEn } from "@/lib/i18n/en/reports";
+import { score as scoreEn } from "@/lib/i18n/en/score";
 import { alerts as alertsEn, sentinel as sentinelEn } from "@/lib/i18n/en/sentinel";
 import { app as appHi } from "@/lib/i18n/hi/app";
 import { home as homeHi } from "@/lib/i18n/hi/home";
@@ -21,6 +22,7 @@ import { family as familyHi } from "@/lib/i18n/hi/family";
 import { compare as compareHi } from "@/lib/i18n/hi/compare";
 import { report as reportHi } from "@/lib/i18n/hi/report";
 import { reports as reportsHi } from "@/lib/i18n/hi/reports";
+import { score as scoreHi } from "@/lib/i18n/hi/score";
 import { alerts as alertsHi, sentinel as sentinelHi } from "@/lib/i18n/hi/sentinel";
 
 export type Lang = "en" | "hi";
@@ -35,6 +37,7 @@ const en = {
   legal: legalEn,
   report: reportEn,
   reports: reportsEn,
+  score: scoreEn,
   compare: compareEn,
   insights: insightsEn,
   sentinel: sentinelEn,
@@ -54,6 +57,7 @@ const hi: Strings = {
   legal: legalHi,
   report: reportHi,
   reports: reportsHi,
+  score: scoreHi,
   compare: compareHi,
   insights: insightsHi,
   sentinel: sentinelHi,

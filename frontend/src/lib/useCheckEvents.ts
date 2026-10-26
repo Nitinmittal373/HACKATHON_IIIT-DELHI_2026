@@ -2,9 +2,9 @@
 
 import { useEffect, useReducer, useRef, useState } from "react";
 
-import { eventsUrl, getCheck, getReport } from "@/lib/api";
+import { eventsUrl, getCheck } from "@/lib/api";
 import { applyCheck, applyEvent, initialState, type CamState } from "@/lib/checkState";
-import type { CheckEvent, CheckStatus, EventType, ScoreSummary } from "@/lib/types";
+import type { CheckEvent, CheckStatus, DisplayScore, EventType } from "@/lib/types";
 
 export type Connection = "live" | "reconnecting" | "polling" | "closed";
 
@@ -98,7 +98,7 @@ export function useCheckEvents(checkId: string): { state: CamState; connection: 
         if (stopped) return;
         dispatch({ kind: "update", apply: (current) => applyCheck(current, check) });
         if (check.status === "completed" || check.status === "failed") {
-          const score = check.status === "completed" ? await scoreOf(checkId) : null;
+          const { display_score: score } = check;
           dispatch({ kind: "update", apply: (current) => finish(current, check.status, score) });
           stop();
           return;
@@ -116,15 +116,7 @@ export function useCheckEvents(checkId: string): { state: CamState; connection: 
   return { state, connection };
 }
 
-async function scoreOf(checkId: string): Promise<ScoreSummary | null> {
-  try {
-    return (await getReport(checkId)).score;
-  } catch {
-    return null;
-  }
-}
-
-function finish(current: CamState, status: CheckStatus, score: ScoreSummary | null): CamState {
+function finish(current: CamState, status: CheckStatus, score: DisplayScore | null): CamState {
   if (status === "completed") return { ...current, outcome: { status: "completed", score } };
   const message = "The check could not be completed";
   return { ...current, outcome: { status: "failed", message } };

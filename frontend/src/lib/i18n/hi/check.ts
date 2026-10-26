@@ -119,7 +119,6 @@ export const check: typeof en = {
     blockedOther: (reason: string) => `एजेंट रुक गया: ${reason}`,
     unreadReason: "इस बार पढ़ा नहीं जा सका। इससे भरोसा घटता है, स्कोर नहीं।",
     checkYourself: "खुद जाँचें",
-    resultScore: (value: number, band: string) => `NeevScore ${value} · ${band}`,
     resultProvisional: "अभी पर्याप्त सबूत नहीं",
     resultProvisionalNote: "जोखिम श्रेणी देने के लिए बहुत कम मुख्य रिकॉर्ड पढ़े जा सके।",
     resultNote: "हर अंक उस रिकॉर्ड से जुड़ा है जहाँ से वह आया।",

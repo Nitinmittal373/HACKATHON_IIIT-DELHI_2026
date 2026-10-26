@@ -18,6 +18,12 @@ export function evidenceIds(findings: Finding[]): Map<string, string> {
   return new Map(findings.map((finding, index) => [finding.id, `E${index + 1}`]));
 }
 
+/** The key checks that no source read, taken from the source runs themselves. */
+export function unreadChecks(report: Report): CheckKey[] {
+  const read = new Set(report.check.sources.flatMap((run) => run.checks_read));
+  return (Object.keys(CHECK_SOURCE) as CheckKey[]).filter((check) => !read.has(check));
+}
+
 export interface UnreadEntry {
   /** The key check that stayed unread, when it was one. */
   check: CheckKey | null;
@@ -29,7 +35,7 @@ export interface UnreadEntry {
 /** Everything we could not read, so the report can say so and point to the official site. */
 export function unreadEntries(report: Report): UnreadEntry[] {
   const runs = new Map(report.check.sources.map((run) => [run.source, run]));
-  const entries: UnreadEntry[] = report.score.checks_unread.map((check) => {
+  const entries: UnreadEntry[] = unreadChecks(report).map((check) => {
     const source = CHECK_SOURCE[check];
     return { check, source, reason: runs.get(source)?.message ?? null };
   });
@@ -48,5 +54,5 @@ export function readSourceCount(report: Report): number {
 }
 
 export function readCheckCount(report: Report): number {
-  return KEY_CHECK_COUNT - report.score.checks_unread.length;
+  return KEY_CHECK_COUNT - unreadChecks(report).length;
 }
