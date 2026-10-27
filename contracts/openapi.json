@@ -3020,6 +3020,22 @@
         "title": "TrackedProject",
         "type": "object"
       },
+      "Unsubscribe": {
+        "additionalProperties": false,
+        "properties": {
+          "token": {
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "title": "Unsubscribe",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -4251,6 +4267,41 @@
           }
         },
         "summary": "Run Sentinel",
+        "tags": [
+          "sentinel"
+        ]
+      }
+    },
+    "/api/sentinel/unsubscribe": {
+      "post": {
+        "description": "The link in an alert email. Stops that watch; answers the same for any token, so it\ncannot be used to find out which tokens exist.",
+        "operationId": "unsubscribe_api_sentinel_unsubscribe_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Unsubscribe"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Unsubscribe",
         "tags": [
           "sentinel"
         ]

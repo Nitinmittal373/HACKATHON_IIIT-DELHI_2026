@@ -11,7 +11,7 @@ from app.config import Settings
 from app.orchestrator import Orchestrator
 from app.sentinel.diff import diff_findings
 from app.sentinel.models import Watch
-from app.sentinel.notify import send_alert
+from app.sentinel.notify import send_alert, smtp_configured, stop_link
 from app.sentinel.store import SentinelStore
 from app.store import Store
 
@@ -136,5 +136,9 @@ class Sentinel:
         alert = next(
             (a for a in self._watches.alerts_for_email(watch.email) if a.id == alert_id), None
         )
-        if alert and await send_alert(self._settings, watch.email, watch.language, alert):
+        if alert is None or not smtp_configured(self._settings):
+            return
+        token = self._watches.new_unsubscribe_token(watch.id, self._clock())
+        stop_url = stop_link(self._settings, token)
+        if await send_alert(self._settings, watch.email, watch.language, alert, stop_url):
             self._watches.mark_emailed(alert_id)

@@ -22,6 +22,7 @@ python -c "import secrets; print(secrets.token_urlsafe(32))"
    - `FRONTEND_ORIGINS`: leave a placeholder such as `https://example.com` for now; you set the real value in step 3 below.
    - `WEBHOOK_SECRET`: paste the random string you made.
    - `PUBLIC_BASE_URL` (optional): this service's own address, for example `https://<your-service>.onrender.com`. With `WEBHOOK_SECRET` set, watching a project also creates TinyFish Monitors that call the webhook; leave it empty to keep the weekly Sentinel schedule only.
+   - `SITE_URL` (optional): the web app's address, for example `https://<your-app>.vercel.app`. Alert emails end with a link to its `/alerts/stop` page.
    - `DATABASE_URL`, `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`: leave empty (see "Keeping data" and "Email" below).
 5. Click **Apply** and wait for the first deploy (a few minutes). When the log says the service is live, open `https://<your-service>.onrender.com/api/health`. It must answer `{"status":"ok"}`.
 6. Copy the service address (`https://<your-service>.onrender.com`). You need it next.

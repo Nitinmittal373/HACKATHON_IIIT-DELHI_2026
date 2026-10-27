@@ -19,9 +19,11 @@ from fastapi import (
     Request,
     Response,
 )
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.api.checks import rate_limit
 from app.api.deps import (
+    client_ip,
     get_clock,
     get_monitors,
     get_sentinel,
@@ -31,6 +33,7 @@ from app.api.deps import (
 )
 from app.config import Settings
 from app.models import Project
+from app.ratelimit import RateLimiter
 from app.sentinel.models import (
     EMAIL_PATTERN,
     MAX_WATCHES_PER_EMAIL,
@@ -123,12 +126,51 @@ async def remove_watch(
     """Stop watching. The watch id is unguessable and is the only proof needed."""
     if watches.get_watch(watch_id) is None:
         raise HTTPException(status_code=404, detail="No watch with this id")
+    await stop_watch(watch_id, watches, gateway)
+    return Response(status_code=204)
+
+
+async def stop_watch(watch_id: str, watches: SentinelStore, gateway: MonitorGateway | None) -> None:
     for monitor_id in watches.remove_watch(watch_id):
         if gateway:
             try:
                 await gateway.cancel(monitor_id)
             except MonitorError as error:
                 logger.warning("A monitor was not cancelled: %s", error)
+
+
+class Unsubscribe(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    token: str = Field(min_length=1, max_length=200)
+
+
+def unsubscribe_rate_limit(
+    request: Request, settings: Annotated[Settings, Depends(get_settings)]
+) -> None:
+    limiter: RateLimiter = request.app.state.unsubscribe_limiter
+    wait = limiter.retry_after(client_ip(request, settings))
+    if wait is not None:
+        raise HTTPException(
+            status_code=429,
+            detail="Too many requests from this address, please wait a minute",
+            headers={"Retry-After": str(wait)},
+        )
+
+
+@router.post(
+    "/api/sentinel/unsubscribe", status_code=204, dependencies=[Depends(unsubscribe_rate_limit)]
+)
+async def unsubscribe(
+    body: Unsubscribe,
+    watches: Annotated[SentinelStore, Depends(get_sentinel_store)],
+    gateway: Annotated[MonitorGateway | None, Depends(get_monitors)],
+) -> Response:
+    """The link in an alert email. Stops that watch; answers the same for any token, so it
+    cannot be used to find out which tokens exist."""
+    watch_id = watches.watch_for_token(body.token)
+    if watch_id is not None:
+        await stop_watch(watch_id, watches, gateway)
     return Response(status_code=204)
 
 

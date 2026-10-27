@@ -52,3 +52,6 @@ services:
         sync: false
       - key: SMTP_FROM
         sync: false
+      # The web app's address, for the stop-alerts link at the end of every alert email.
+      - key: SITE_URL
+        sync: false

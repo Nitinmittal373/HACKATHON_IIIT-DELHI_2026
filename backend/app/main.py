@@ -46,6 +46,7 @@ SOURCE_TIMEOUT_GRACE_SECONDS = 30
 EXTRACT_PER_MINUTE = 10
 # Saved-report calls per minute from one address; each is a small database read or write.
 ACCOUNT_PER_MINUTE = 30
+UNSUBSCRIBE_PER_MINUTE = 10
 
 
 def create_app(
@@ -79,6 +80,7 @@ def create_app(
         app.state.limiter = RateLimiter(settings.rate_limit_per_minute)
         app.state.extract_limiter = RateLimiter(EXTRACT_PER_MINUTE)
         app.state.account_limiter = RateLimiter(ACCOUNT_PER_MINUTE)
+        app.state.unsubscribe_limiter = RateLimiter(UNSUBSCRIBE_PER_MINUTE)
         app.state.user_reports = UserReports(make_session_factory(engine))
         app.state.track_records = TrackRecords(app.state.web, clock)
         app.state.orchestrator = Orchestrator(

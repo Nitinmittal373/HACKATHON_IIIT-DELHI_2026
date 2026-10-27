@@ -27,6 +27,10 @@ SCORE_LINE: dict[Language, str] = {
     "hi": "NeevScore: {old} -> {new}",
 }
 NOT_RATED = "-"
+STOP_LINE: dict[Language, str] = {
+    "en": "Stop alerts for this project:",
+    "hi": "इस प्रोजेक्ट के अलर्ट बंद करें:",
+}
 FOOTER: dict[Language, str] = {
     "en": "Public records as read by NeevCheck. Not legal or financial advice.",
     "hi": "NeevCheck द्वारा पढ़े गए सार्वजनिक रिकॉर्ड। यह कानूनी या वित्तीय सलाह नहीं है।",
@@ -37,7 +41,16 @@ def smtp_configured(settings: Settings) -> bool:
     return bool(settings.smtp_host and settings.smtp_from)
 
 
-def build_message(settings: Settings, to: str, language: Language, alert: Alert) -> EmailMessage:
+def stop_link(settings: Settings, token: str) -> str | None:
+    """The page that stops a watch. None until the web app's address is configured."""
+    if not settings.site_url:
+        return None
+    return f"{settings.site_url.rstrip('/')}/alerts/stop?token={token}"
+
+
+def build_message(
+    settings: Settings, to: str, language: Language, alert: Alert, stop_url: str | None = None
+) -> EmailMessage:
     project = alert.project_name or alert.rera_id
     old, new = alert.old_display_score, alert.new_display_score
     scores = SCORE_LINE[language].format(
@@ -55,6 +68,8 @@ def build_message(settings: Settings, to: str, language: Language, alert: Alert)
             lines += [f"- {change.title}" for change in changes]
             lines.append("")
     lines.append(FOOTER[language])
+    if stop_url:
+        lines += ["", STOP_LINE[language], stop_url]
     message = EmailMessage()
     message["Subject"] = SUBJECTS[language].format(project=project)
     message["From"] = settings.smtp_from or ""
@@ -73,12 +88,15 @@ def _send(settings: Settings, message: EmailMessage) -> None:
         server.send_message(message)
 
 
-async def send_alert(settings: Settings, to: str, language: Language, alert: Alert) -> bool:
+async def send_alert(
+    settings: Settings, to: str, language: Language, alert: Alert, stop_url: str | None = None
+) -> bool:
     """True when the email went out; False when SMTP is not set up or sending failed."""
     if not smtp_configured(settings):
         return False
     try:
-        await asyncio.to_thread(_send, settings, build_message(settings, to, language, alert))
+        message = build_message(settings, to, language, alert, stop_url)
+        await asyncio.to_thread(_send, settings, message)
     except (OSError, smtplib.SMTPException):
         # The alert is already stored and shown in the app, so a mail failure loses nothing.
         logger.warning("Could not email the alert for %s", alert.rera_id)
