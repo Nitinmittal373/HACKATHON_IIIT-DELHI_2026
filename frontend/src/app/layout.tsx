@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono, Noto_Sans_Devanagari } from "next/font/google";
+import localFont from "next/font/local";
 import type { ReactNode } from "react";
 
 import { Footer } from "@/components/Footer";
@@ -13,17 +13,24 @@ import "@/styles/globals.css";
 import "@/styles/app.css";
 import "@/styles/print.css";
 
-const geist = Geist({ subsets: ["latin"], variable: "--font-geist", display: "optional" });
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
+// Self-hosted so a build never depends on fonts.googleapis.com. All three files are variable
+// fonts (licences next to them), so one file serves every weight listed here.
+const geist = localFont({
+  src: "../fonts/Geist-latin.woff2",
+  weight: "100 900",
+  variable: "--font-geist",
+  display: "optional",
+});
+const geistMono = localFont({
+  src: "../fonts/GeistMono-latin.woff2",
+  weight: "400 500",
   variable: "--font-geist-mono",
   display: "swap",
   preload: false,
 });
-const devanagari = Noto_Sans_Devanagari({
-  subsets: ["devanagari"],
-  weight: ["500", "600", "700"],
+const devanagari = localFont({
+  src: "../fonts/NotoSansDevanagari-devanagari.woff2",
+  weight: "500 700",
   variable: "--font-devanagari",
   display: "swap",
   preload: false,

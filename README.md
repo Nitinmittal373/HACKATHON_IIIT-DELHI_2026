@@ -249,7 +249,7 @@ More detail in [`docs/architecture.md`](docs/architecture.md).
 | Browser agents | **TinyFish** Search, Fetch, Agent and Monitors | Reads real government portals like a person, with a live view we can show buyers |
 | Frontend | **Next.js 15**, React 19, TypeScript (strict) | Server rendering for a fast first load, file-based routes |
 | Styling | Plain CSS with design tokens, CSS animations | Easy to read; no runtime animation library |
-| Fonts | Geist, Geist Mono, Noto Sans Devanagari | Clean UI type with proper Hindi support |
+| Fonts | Geist, Geist Mono, Noto Sans Devanagari (self-hosted) | Clean UI type with proper Hindi support, and builds that never fetch fonts |
 | Backend | **Python 3.12, FastAPI**, Pydantic v2 | Typed API, async streaming with Server-Sent Events |
 | Documents | pypdf (PDF text), jsQR (QR codes, in the browser) | Small, pinned, offline; no OCR service |
 | Storage | SQLite (local), Postgres (production) via SQLAlchemy 2 | Zero setup locally, one switch to deploy |
