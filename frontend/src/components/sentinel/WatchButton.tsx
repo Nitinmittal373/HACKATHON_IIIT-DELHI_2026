@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { WatchDialog } from "@/components/sentinel/WatchDialog";
+import { useAccount } from "@/lib/account";
 import { useLang } from "@/lib/LangProvider";
 import type { Project } from "@/lib/types";
 
@@ -14,7 +15,20 @@ interface Props {
 
 export function WatchButton({ project, look = "primary" }: Props) {
   const { t } = useLang();
+  const account = useAccount();
   const [open, setOpen] = useState(false);
+  const signedIn = account.status === "in";
+
+  useEffect(() => {
+    // WatchDialog sends a visitor to sign in with ?watch=1. Back on this report: open the dialog again, once, and tidy the address.
+    // Only the main button does it, so the second one on the page does not open a second dialog.
+    if (!signedIn || look !== "primary") return;
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("watch") !== "1") return;
+    url.searchParams.delete("watch");
+    window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+    setOpen(true);
+  }, [signedIn, look]);
 
   return (
     <>

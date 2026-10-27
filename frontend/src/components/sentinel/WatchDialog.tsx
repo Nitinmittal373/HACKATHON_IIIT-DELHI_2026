@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 
 import { SignInForAlerts } from "@/components/sentinel/SignInForAlerts";
@@ -23,6 +24,7 @@ type Phase = "form" | "saving" | "done";
 export function WatchDialog({ project, open, onClose }: Props) {
   const { lang, t } = useLang();
   const account = useAccount();
+  const pathname = usePathname();
   const dialog = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const languageId = useId();
@@ -101,7 +103,7 @@ export function WatchDialog({ project, open, onClose }: Props) {
           <h2 id={`${titleId}-title`} className={styles.title}>
             {t.sentinel.title}
           </h2>
-          <SignInForAlerts className={styles.signIn} />
+          <SignInForAlerts className={styles.signIn} next={`${pathname}?watch=1`} />
           <div className={styles.actions}>
             <button type="button" className="btn2" onClick={onClose}>
               {t.sentinel.cancel}

@@ -7,8 +7,8 @@ import { useAccount } from "@/lib/account";
 import { useLang } from "@/lib/LangProvider";
 import styles from "./LoginCard.module.css";
 
-/** Sign in with Google, a plain note that no account is needed to check, and what is kept. */
-export function LoginCard({ enabled }: { enabled: boolean }) {
+/** Sign in with Google (then on to `next`, a path on this site), a plain note that no account is needed to check, and what is kept. */
+export function LoginCard({ enabled, next }: { enabled: boolean; next: string }) {
   const { t } = useLang();
   const account = useAccount();
   const copy = t.account.login;
@@ -33,7 +33,7 @@ export function LoginCard({ enabled }: { enabled: boolean }) {
             type="button"
             className={`btn ${styles.google}`}
             disabled={!enabled}
-            onClick={() => void signIn("google", { callbackUrl: "/reports" })}
+            onClick={() => void signIn("google", { callbackUrl: next })}
           >
             <GoogleMark />
             {copy.google}
