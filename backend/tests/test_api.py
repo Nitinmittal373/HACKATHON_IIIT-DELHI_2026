@@ -157,6 +157,23 @@ def test_a_number_sent_alone_gets_its_stable_page(client: TestClient) -> None:
     assert response.json()["details_url"].endswith("Frm_View_Project_Details.aspx?id=6742")
 
 
+# The summary every list carries; the card facts (drivers, reasons) come on top.
+SUMMARY_FIELDS = (
+    "id",
+    "rera_id",
+    "details_url",
+    "project",
+    "promoter",
+    "status",
+    "score",
+    "band",
+    "confidence",
+    "display_score",
+    "created_at",
+    "completed_at",
+)
+
+
 def test_my_reports_lists_known_checks_in_the_order_asked(client: TestClient) -> None:
     first, second = start_check(client), start_check(client, "UPRERAPRJ6742")
     read_events(client, first)
@@ -167,7 +184,7 @@ def test_my_reports_lists_known_checks_in_the_order_asked(client: TestClient) ->
     assert response.status_code == 200
     listed = response.json()
     assert [c["id"] for c in listed] == [second, first]
-    assert listed[1] == {
+    assert {k: listed[1][k] for k in SUMMARY_FIELDS} == {
         "id": first,
         "rera_id": "UPRERAPRJ8334",
         "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
@@ -199,28 +216,25 @@ def test_my_reports_rejects_bad_ids(client: TestClient, ids: str) -> None:
     assert client.get("/api/checks", params={"ids": unique}).status_code == 422
 
 
-def test_recent_checks_show_each_project_once_with_no_personal_data(client: TestClient) -> None:
-    for rera_id in ("UPRERAPRJ8334", "UPRERAPRJ6742"):
-        read_events(client, start_check(client, rera_id))
-    again = client.post("/api/checks", json={"rera_id": "UPRERAPRJ8334", "fresh": True})
-    read_events(client, again.json()["id"])
+def test_there_is_no_public_feed_of_other_visitors_checks(client: TestClient) -> None:
+    read_events(client, start_check(client, "UPRERAPRJ8334"))
+    # "recent" is read as a malformed check id, never as a list of everyone's checks.
+    assert client.get("/api/checks/recent").status_code == 422
 
-    # The test clock is fixed, so every check finished at the same moment; order is not tested.
-    listed = client.get("/api/checks/recent").json()
-    assert sorted(r["rera_id"] for r in listed) == ["UPRERAPRJ6742", "UPRERAPRJ8334"]
-    eco = next(r for r in listed if r["rera_id"] == "UPRERAPRJ8334")
+
+def test_listing_by_id_carries_the_card_facts_and_no_personal_data(client: TestClient) -> None:
+    ids = [start_check(client, rera_id) for rera_id in ("UPRERAPRJ8334", "UPRERAPRJ6742")]
+    for check_id in ids:
+        read_events(client, check_id)
+
+    listed = client.get("/api/checks", params={"ids": ",".join(ids)}).json()
+    assert [r["id"] for r in listed] == ids
+    eco = listed[0]
     assert eco["drivers"][0]["points"] == -14.0
     assert len(eco["drivers"]) <= 3
     assert eco["sources_read"] >= 1
     assert eco["registered_on"] == "2017-08-09"
-    assert not {"email", "ip", "client"} & set(eco)
-
-
-def test_recent_checks_leave_out_unfinished_and_failed_ones(client: TestClient) -> None:
-    store = client.app.state.store  # type: ignore[attr-defined]
-    store.save_project(Project(rera_id="UPRERAPRJ1", details_url="https://www.up-rera.in/x?id=1"))
-    store.create_check("d" * 32, "UPRERAPRJ1", datetime(2026, 10, 25, tzinfo=UTC))
-    assert client.get("/api/checks/recent").json() == []
+    assert not {"email", "ip", "client", "user"} & set(eco)
 
 
 def test_checks_cut_off_by_a_restart_are_failed_on_startup(tmp_path: Path) -> None:

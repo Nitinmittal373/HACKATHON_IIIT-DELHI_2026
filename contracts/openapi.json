@@ -1973,7 +1973,7 @@
         "type": "object"
       },
       "RecentCheck": {
-        "description": "A finished check shown on the home page. Only public-record facts, never who asked.",
+        "description": "A check with the facts the home page card shows: public records, never who asked.",
         "properties": {
           "band": {
             "anyOf": [
@@ -3171,7 +3171,7 @@
   "paths": {
     "/api/checks": {
       "get": {
-        "description": "The checks a visitor started, for \"My reports\". Ids the server no longer has are left out.",
+        "description": "The checks a browser kept, by id. Ids the server no longer has are left out.",
         "operationId": "list_checks_api_checks_get",
         "parameters": [
           {
@@ -3193,7 +3193,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/CheckSummary"
+                    "$ref": "#/components/schemas/RecentCheck"
                   },
                   "title": "Response List Checks Api Checks Get",
                   "type": "array"
@@ -3212,7 +3212,26 @@
         ]
       },
       "post": {
+        "description": "Starts a check. With a sign-in token the check is also saved to that account.",
         "operationId": "create_check_api_checks_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -3293,32 +3312,6 @@
           }
         },
         "summary": "Compare Checks",
-        "tags": [
-          "checks"
-        ]
-      }
-    },
-    "/api/checks/recent": {
-      "get": {
-        "description": "The latest finished check of up to 12 projects, for the home page. No emails or IPs.",
-        "operationId": "recent_checks_api_checks_recent_get",
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/RecentCheck"
-                  },
-                  "title": "Response Recent Checks Api Checks Recent Get",
-                  "type": "array"
-                }
-              }
-            },
-            "description": "Successful Response"
-          }
-        },
-        "summary": "Recent Checks",
         "tags": [
           "checks"
         ]
@@ -3714,6 +3707,60 @@
           }
         },
         "summary": "Delete Account",
+        "tags": [
+          "account"
+        ]
+      }
+    },
+    "/api/me/recent": {
+      "get": {
+        "description": "The last few checks of this account only, for \"Your recent checks\" on the home page.",
+        "operationId": "list_recent_api_me_recent_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RecentCheck"
+                  },
+                  "title": "Response List Recent Api Me Recent Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Recent",
         "tags": [
           "account"
         ]

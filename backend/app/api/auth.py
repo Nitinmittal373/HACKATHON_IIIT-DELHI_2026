@@ -48,3 +48,20 @@ def current_user(
 
 
 User = Annotated[BridgeUser, Depends(current_user)]
+
+
+def optional_user(
+    settings: Annotated[Settings, Depends(get_settings)],
+    clock: Annotated[Callable[[], datetime], Depends(get_clock)],
+    authorization: Annotated[str | None, Header()] = None,
+) -> BridgeUser | None:
+    """The signed-in account if a token came with the request; None for a visitor without one.
+
+    A token that is present but bad is refused, so a check never silently misses its account.
+    """
+    if authorization is None:
+        return None
+    return current_user(settings, clock, authorization)
+
+
+MaybeUser = Annotated[BridgeUser | None, Depends(optional_user)]

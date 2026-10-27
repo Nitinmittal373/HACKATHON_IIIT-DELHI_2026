@@ -139,18 +139,14 @@ class Store:
         by_id = {row.CheckRow.id: self._summary(row) for row in rows}
         return [by_id[check_id] for check_id in check_ids if check_id in by_id]
 
-    def recent_completed(self, limit: int) -> list[RecentCheck]:
-        """The newest finished check of each project, newest first."""
-        query = _summary_query().where(CheckRow.status == "completed")
-        query = query.order_by(CheckRow.completed_at.desc()).limit(limit * 4)
+    def recents(self, check_ids: list[str]) -> list[RecentCheck]:
+        """The checks among these ids that exist, in the order asked, with their top reasons."""
         with self._sessions() as session:
-            picked: list[Row[tuple[CheckRow, ProjectRow, ScoreRow]]] = []
-            for row in session.execute(query):
-                seen = {p.CheckRow.rera_id for p in picked}
-                if row.CheckRow.rera_id not in seen and len(picked) < limit:
-                    picked.append(row)
-            read = self._sources_read(session, [row.CheckRow.id for row in picked])
-        return [self._recent(row, read.get(row.CheckRow.id, 0)) for row in picked]
+            rows = session.execute(_summary_query().where(CheckRow.id.in_(check_ids))).all()
+            by_id = {row.CheckRow.id: row for row in rows}
+            ordered = [by_id[check_id] for check_id in check_ids if check_id in by_id]
+            read = self._sources_read(session, [row.CheckRow.id for row in ordered])
+        return [self._recent(row, read.get(row.CheckRow.id, 0)) for row in ordered]
 
     def _sources_read(self, session: Session, check_ids: list[str]) -> dict[str, int]:
         counts = session.execute(

@@ -6,6 +6,7 @@ from typing import Annotated
 
 from fastapi import HTTPException, Path, Request
 
+from app.accounts import UserReports
 from app.config import Settings
 from app.corrections import CorrectionStore
 from app.events import EventHub
@@ -31,6 +32,10 @@ def get_web(request: Request) -> WebClient:
 
 def get_store(request: Request) -> Store:
     return request.app.state.store
+
+
+def get_user_reports(request: Request) -> UserReports:
+    return request.app.state.user_reports
 
 
 def get_hub(request: Request) -> EventHub:
