@@ -38,6 +38,8 @@ The free Render database expires after a period set by Render; use a paid plan f
 
 Alerts always show on the Alerts page. To also email them, set `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD` and `SMTP_FROM` under **Environment** (any SMTP provider works; the API uses port 587 with STARTTLS). Leave them empty to send nothing.
 
+> **Redeploying the API.** The Render service was created from the public repository URL, so Render does **not** deploy on its own when `main` changes (the `autoDeploy` line in `render.yaml` applies only to services made from the Blueprint). After each merge: **Render → `neevcheck-api` → Manual Deploy → Deploy latest commit**. Vercel does deploy on every push to `main`.
+
 ## 2. The web app on Vercel
 
 1. Sign in to Vercel and click **Add New…** → **Project**.
@@ -51,7 +53,7 @@ Alerts always show on the Alerts page. To also email them, set `SMTP_HOST`, `SMT
 ## 3. Tell the API which site may call it
 
 1. Go back to Render → `neevcheck-api` → **Environment**.
-2. Set `FRONTEND_ORIGINS` to the Vercel address, for example `https://neevcheck.vercel.app`. If you also use your own domain, list both, separated by a comma. No trailing slash.
+2. Set `FRONTEND_ORIGINS` to the Vercel address, for example `https://neevcheck-up.vercel.app`. If you also use your own domain, list both, separated by a comma. No trailing slash.
 3. Click **Save, rebuild and deploy**.
 
 Until this is set, the browser blocks every call to the API (CORS), so the live check cannot start.

@@ -8,8 +8,8 @@ Thanks for helping families check a builder before they book a home.
 | --- | --- | --- | --- |
 | Nitin Mittal (team leader) | [@Nitinmittal373](https://github.com/Nitinmittal373) | Backend | Backend services and integrations |
 | Rishi Bhaskar | [@rishibhaskar777](https://github.com/rishibhaskar777) | Full-stack | Frontend and backend |
-| Siddharth Varshney | github.com/[github-username] | UI/UX | Interface and experience design |
-| Shreyansh Gupta | github.com/[github-username] | Architecture and idea | System architecture, design and the original idea |
+| Siddharth Varshney | — | UI/UX | Interface and experience design |
+| Shreyansh Gupta | — | Architecture and idea | System architecture, design and the original idea |
 
 ## Run it locally
 
