@@ -91,11 +91,9 @@ def test_my_reports_and_the_home_page_carry_it(client: TestClient) -> None:
     check_id = finished_check(client)
 
     [listed] = client.get("/api/checks", params={"ids": check_id}).json()
-    [recent] = client.get("/api/checks/recent").json()
 
     assert_display(listed["display_score"])
-    assert listed["display_score"] == recent["display_score"]
-    reasons = recent["reasons"]
+    reasons = listed["reasons"]
     assert 0 < len(reasons) <= 3
     assert all(r["code"] != DATA_UNAVAILABLE and r["points"] < 0 for r in reasons)
 
@@ -160,7 +158,6 @@ def test_a_check_stored_before_v2_is_re_scored_from_its_findings(client: TestCli
         return {
             "report": client.get(f"/api/checks/{check_id}/report").json(),
             "listed": client.get("/api/checks", params={"ids": check_id}).json(),
-            "recent": client.get("/api/checks/recent").json(),
             "check": client.get(f"/api/checks/{check_id}").json(),
         }
 

@@ -131,8 +131,6 @@ def test_the_browser_may_send_the_token(tmp_path: Path) -> None:
     assert "authorization" in response.headers["access-control-allow-headers"].lower()
 
 
-
-
 def test_deleting_the_account_removes_its_reports_only(tmp_path: Path) -> None:
     with client(tmp_path) as http:
         check_id = finished_check(http)
@@ -158,3 +156,80 @@ def test_deleting_the_account_is_rate_limited(tmp_path: Path) -> None:
     with client(tmp_path) as http:
         answers = [http.delete("/api/me", headers=auth()).status_code for _ in range(32)]
     assert answers.count(429) == 2
+
+
+def start(
+    http: TestClient, headers: dict[str, str] | None = None, **body: object
+) -> dict[str, str]:
+    response = http.post(
+        "/api/checks", json={"rera_id": "UPRERAPRJ8334", **body}, headers=headers or {}
+    )
+    assert response.status_code in (200, 202)
+    read_events(http, response.json()["id"])
+    return response.json()
+
+
+def test_a_check_started_while_signed_in_is_saved_to_that_account(tmp_path: Path) -> None:
+    with client(tmp_path) as http:
+        check = start(http, auth(sub="one"))
+        assert [c["id"] for c in http.get("/api/me/reports", headers=auth(sub="one")).json()] == [
+            check["id"]
+        ]
+        # A reused check is saved to the account that asked again, too.
+        body = {"rera_id": "UPRERAPRJ8334"}
+        reused = http.post("/api/checks", json=body, headers=auth(sub="two"))
+        assert reused.status_code == 200
+        assert [c["id"] for c in http.get("/api/me/reports", headers=auth(sub="two")).json()] == [
+            check["id"]
+        ]
+
+
+def test_a_check_started_signed_out_is_saved_to_nobody(tmp_path: Path) -> None:
+    with client(tmp_path) as http:
+        start(http)
+        assert http.get("/api/me/reports", headers=auth(sub="one")).json() == []
+        assert http.get("/api/me/recent", headers=auth(sub="one")).json() == []
+
+
+def test_a_bad_token_on_a_new_check_is_refused_rather_than_ignored(tmp_path: Path) -> None:
+    with client(tmp_path) as http:
+        response = http.post(
+            "/api/checks", json={"rera_id": "UPRERAPRJ8334"}, headers=auth(secret="x")
+        )
+    assert response.status_code == 401
+
+
+def test_recent_checks_are_this_accounts_last_six_and_nobody_elses(tmp_path: Path) -> None:
+    with client(tmp_path) as http:
+        mine = start(http, auth(sub="one"))
+        other = http.post("/api/checks", json={"rera_id": "UPRERAPRJ6742"}, headers=auth(sub="two"))
+        read_events(http, other.json()["id"])
+
+        recent_one = http.get("/api/me/recent", headers=auth(sub="one")).json()
+        recent_two = http.get("/api/me/recent", headers=auth(sub="two")).json()
+        assert [c["id"] for c in recent_one] == [mine["id"]]
+        assert [c["id"] for c in recent_two] == [other.json()["id"]]
+        assert recent_one[0]["drivers"] and not {"user", "email"} & set(recent_one[0])
+
+        for _ in range(7):
+            start(http, auth(sub="one"), fresh=True)
+        assert len(http.get("/api/me/recent", headers=auth(sub="one")).json()) == 6
+        # Account two still sees only its own.
+        assert len(http.get("/api/me/recent", headers=auth(sub="two")).json()) == 1
+
+
+def test_account_routes_give_account_b_nothing_of_account_a(tmp_path: Path) -> None:
+    with client(tmp_path) as http:
+        check = start(http, auth(sub="a"))
+        http.post("/api/me/reports", json={"ids": [check["id"]]}, headers=auth(sub="a"))
+
+        for path in ("/api/me/reports", "/api/me/recent", "/api/sentinel/alerts"):
+            assert http.get(path, headers=auth(sub="b")).json() == [], path
+        assert http.get("/api/me/recent", headers=auth(sub="a")).json() != []
+
+
+def test_recent_checks_need_a_valid_token(tmp_path: Path) -> None:
+    with client(tmp_path) as http:
+        assert http.get("/api/me/recent").status_code == 401
+        assert http.get("/api/me/recent", headers=auth(secret="x")).status_code == 401
+        assert http.get("/api/checks/recent").status_code == 422

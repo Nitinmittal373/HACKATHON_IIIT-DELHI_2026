@@ -5,6 +5,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 
+from app.accounts import UserReports
+from app.api.auth import MaybeUser
 from app.api.deps import (
     CheckId,
     client_ip,
@@ -14,10 +16,12 @@ from app.api.deps import (
     get_orchestrator,
     get_settings,
     get_store,
+    get_user_reports,
 )
+from app.bridge_token import BridgeUser
 from app.budget import REUSE_WINDOW, seconds_until_cap_resets
 from app.config import Settings
-from app.models import Check, CheckCreate, CheckSummary, Project, RecentCheck
+from app.models import Check, CheckCreate, Project, RecentCheck
 from app.orchestrator import Orchestrator
 from app.ratelimit import RateLimiter
 from app.store import Store
@@ -27,7 +31,6 @@ router = APIRouter(tags=["checks"])
 
 # A visitor's history lives in their browser; it asks for at most this many checks at once.
 MAX_LISTED = 50
-RECENT_SHOWN = 12
 CHECK_ID = re.compile(r"^[0-9a-f]{32}$")
 
 
@@ -58,13 +61,17 @@ async def create_check(
     store: Annotated[Store, Depends(get_store)],
     settings: Annotated[Settings, Depends(get_settings)],
     clock: Annotated[Callable[[], datetime], Depends(get_clock)],
+    reports: Annotated[UserReports, Depends(get_user_reports)],
+    user: MaybeUser,
 ) -> Check:
+    """Starts a check. With a sign-in token the check is also saved to that account."""
     now = clock()
     if not body.fresh:
         recent = store.latest_completed_check(body.rera_id, since=now - REUSE_WINDOW)
         if recent:
             response.status_code = 200
             response.headers["Location"] = f"/api/checks/{recent.id}"
+            _save_for(user, recent.id, reports, now)
             return recent.model_copy(update={"reused": True})
 
     wait = seconds_until_cap_resets(store, settings.max_checks_per_day, now)
@@ -84,7 +91,13 @@ async def create_check(
     )
     check = orchestrator.start(asked, fresh=body.fresh)
     response.headers["Location"] = f"/api/checks/{check.id}"
+    _save_for(user, check.id, reports, now)
     return check
+
+
+def _save_for(user: BridgeUser | None, check_id: str, reports: UserReports, now: datetime) -> None:
+    if user is not None:
+        reports.add(user.sub, [check_id], now)
 
 
 @router.get("/api/checks", responses={422: {"description": "A malformed id, or more than 50"}})
@@ -92,19 +105,12 @@ def list_checks(
     # 50 ids of 32 characters and their commas.
     ids: Annotated[str, Query(max_length=MAX_LISTED * 33, description="Comma-separated ids")],
     store: Annotated[Store, Depends(get_store)],
-) -> list[CheckSummary]:
-    """The checks a visitor started, for "My reports". Ids the server no longer has are left out."""
+) -> list[RecentCheck]:
+    """The checks a browser kept, by id. Ids the server no longer has are left out."""
     wanted = list(dict.fromkeys(part.strip() for part in ids.split(",") if part.strip()))
     if len(wanted) > MAX_LISTED or not all(CHECK_ID.match(check_id) for check_id in wanted):
         raise HTTPException(status_code=422, detail=f"ids must be up to {MAX_LISTED} check ids")
-    return store.summaries(wanted)
-
-
-# Declared before /api/checks/{check_id}, which would otherwise reject "recent" as an id.
-@router.get("/api/checks/recent")
-def recent_checks(store: Annotated[Store, Depends(get_store)]) -> list[RecentCheck]:
-    """The latest finished check of up to 12 projects, for the home page. No emails or IPs."""
-    return store.recent_completed(RECENT_SHOWN)
+    return store.recents(wanted)
 
 
 @router.get("/api/checks/{check_id}")

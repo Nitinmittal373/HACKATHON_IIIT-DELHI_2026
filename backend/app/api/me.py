@@ -5,7 +5,7 @@ from collections.abc import Callable
 from datetime import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.accounts import MAX_SAVED, UserReports
@@ -16,15 +16,17 @@ from app.api.deps import (
     get_monitors,
     get_sentinel_store,
     get_store,
+    get_user_reports,
 )
 from app.api.sentinel import stop_watch
-from app.models import CheckSummary
+from app.models import CheckSummary, RecentCheck
 from app.sentinel.monitors import MonitorGateway
 from app.sentinel.store import SentinelStore
 from app.store import Store
 
 router = APIRouter(tags=["account"])
 
+RECENT_SHOWN = 6
 CHECK_ID = re.compile(r"^[0-9a-f]{32}$")
 
 
@@ -33,10 +35,6 @@ class SaveReports(BaseModel):
 
     # Newest first. Used for one check just started, and to move this browser's list in.
     ids: list[str] = Field(min_length=1, max_length=MAX_SAVED)
-
-
-def get_user_reports(request: Request) -> UserReports:
-    return request.app.state.user_reports
 
 
 Reports = Annotated[UserReports, Depends(get_user_reports)]
@@ -48,6 +46,12 @@ Now = Annotated[Callable[[], datetime], Depends(get_clock)]
 def list_saved(user: User, reports: Reports, store: Checks) -> list[CheckSummary]:
     """The checks saved to this account, newest first. Ids the server no longer has are left out."""
     return store.summaries(reports.ids(user.sub))
+
+
+@router.get("/api/me/recent", dependencies=[Depends(rate_limit)])
+def list_recent(user: User, reports: Reports, store: Checks) -> list[RecentCheck]:
+    """The last few checks of this account only, for "Your recent checks" on the home page."""
+    return store.recents(reports.ids(user.sub)[:RECENT_SHOWN])
 
 
 @router.post("/api/me/reports", dependencies=[Depends(rate_limit)])

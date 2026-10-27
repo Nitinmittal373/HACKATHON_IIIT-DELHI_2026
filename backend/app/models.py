@@ -349,7 +349,7 @@ class CheckSummary(ApiModel):
 
 
 class RecentCheck(CheckSummary):
-    """A finished check shown on the home page. Only public-record facts, never who asked."""
+    """A check with the facts the home page card shows: public records, never who asked."""
 
     registered_on: date | None = None
     sources_read: int = 0

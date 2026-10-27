@@ -13,11 +13,14 @@ export interface paths {
         };
         /**
          * List Checks
-         * @description The checks a visitor started, for "My reports". Ids the server no longer has are left out.
+         * @description The checks a browser kept, by id. Ids the server no longer has are left out.
          */
         get: operations["list_checks_api_checks_get"];
         put?: never;
-        /** Create Check */
+        /**
+         * Create Check
+         * @description Starts a check. With a sign-in token the check is also saved to that account.
+         */
         post: operations["create_check_api_checks_post"];
         delete?: never;
         options?: never;
@@ -34,26 +37,6 @@ export interface paths {
         };
         /** Compare Checks */
         get: operations["compare_checks_api_checks_compare_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/checks/recent": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Recent Checks
-         * @description The latest finished check of up to 12 projects, for the home page. No emails or IPs.
-         */
-        get: operations["recent_checks_api_checks_recent_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -189,6 +172,26 @@ export interface paths {
          * @description Deletes the account's saved reports, its watches and their alerts.
          */
         delete: operations["delete_account_api_me_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/recent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Recent
+         * @description The last few checks of this account only, for "Your recent checks" on the home page.
+         */
+        get: operations["list_recent_api_me_recent_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1095,7 +1098,7 @@ export interface components {
         };
         /**
          * RecentCheck
-         * @description A finished check shown on the home page. Only public-record facts, never who asked.
+         * @description A check with the facts the home page card shows: public records, never who asked.
          */
         RecentCheck: {
             /** Band */
@@ -1535,7 +1538,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CheckSummary"][];
+                    "application/json": components["schemas"]["RecentCheck"][];
                 };
             };
             /** @description A malformed id, or more than 50 */
@@ -1550,7 +1553,9 @@ export interface operations {
     create_check_api_checks_post: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -1628,26 +1633,6 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
-            };
-        };
-    };
-    recent_checks_api_checks_recent_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["RecentCheck"][];
-                };
             };
         };
     };
@@ -1907,6 +1892,37 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_recent_api_me_recent_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecentCheck"][];
+                };
             };
             /** @description Validation Error */
             422: {
