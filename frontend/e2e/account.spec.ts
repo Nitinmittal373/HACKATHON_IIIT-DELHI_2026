@@ -103,7 +103,7 @@ test.describe("signed in", () => {
     await expect.poll(() => page.evaluate(() => localStorage.getItem("neevcheck-reports"))).toBe("[]");
   });
 
-  test("My reports lists the account's reports and Alerts starts with the account email", async ({ page }) => {
+  test("My reports lists the account's reports and Alerts lists the account's alerts", async ({ page }) => {
     await signIn(page);
     const summary = {
       id: ECO,
@@ -140,6 +140,7 @@ test.describe("signed in", () => {
     await expect(page.getByText("Saved to your account.")).toBeVisible();
 
     await page.goto("/alerts");
-    await expect(page.locator("#alerts-email")).toHaveValue("asha@example.com");
+    await expect(page.getByRole("article")).toHaveCount(1);
+    await expect(page.locator("#alerts-email")).toHaveCount(0);
   });
 });

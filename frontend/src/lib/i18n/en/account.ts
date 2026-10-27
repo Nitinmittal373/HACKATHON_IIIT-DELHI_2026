@@ -3,7 +3,7 @@ export const account = {
   signOut: "Sign out",
   deleteData: "Delete my data",
   deleteConfirm:
-    "Delete your account and saved reports? This cannot be undone. Checks themselves are public records and stay.",
+    "Delete your account, saved reports, watches and alerts? This cannot be undone. Checks themselves are public records and stay.",
   deleteFailed: "We could not delete your data. Please try again, or email us.",
   menuLabel: "Your account",
   avatarAlt: (name: string) => `${name}, signed in`,
@@ -20,5 +20,4 @@ export const account = {
     toReports: "Open My reports",
   },
   reportsNote: "Saved to your account. Reports from this browser were moved here when you signed in.",
-  alertsHint: "Your account email is filled in.",
 };

@@ -1,5 +1,5 @@
 import type { NextAuthOptions } from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
+import GoogleProvider, { type GoogleProfile } from "next-auth/providers/google";
 
 /** Sign-in is offered only when the deployment has been given all three Google settings. */
 export function authConfigured(): boolean {
@@ -18,6 +18,11 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    // Alerts go to the account's email, so only a Google-verified address may sign in.
+    signIn({ account, profile }) {
+      if (account?.provider !== "google") return false;
+      return (profile as GoogleProfile | undefined)?.email_verified === true;
+    },
     session({ session, token }) {
       // The Google account id is the token's subject; the API names the account by it.
       if (session.user && token.sub) session.user.id = token.sub;

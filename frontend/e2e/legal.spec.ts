@@ -1,6 +1,8 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
+import { signInAsAsha } from "./signedIn";
+
 const API = "http://localhost:8010";
 const REPORT = "/report/4ad9752355f9455aa9d242c93950ea04";
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "Content-Type" };
@@ -40,6 +42,7 @@ test("the rating notice is on the report and the QR code appears only in print",
 });
 
 test("the watch dialog tells people what their email is used for", async ({ page }) => {
+  await signInAsAsha(page);
   await page.goto(REPORT);
   await page.getByRole("button", { name: "Watch with Sentinel" }).first().click();
   await expect(page.getByText("We use your email only to send alerts about this project.").first()).toBeVisible();

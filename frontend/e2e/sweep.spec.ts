@@ -4,6 +4,8 @@ import { resolve } from "node:path";
 
 import { expect, test, type Page } from "@playwright/test";
 
+import { signInAsAsha } from "./signedIn";
+
 /**
  * Every page, in English and Hindi, at desktop and phone width: no console error, no sideways
  * scroll, no failing link, and no leftover words from the days NeevCheck covered other states
@@ -27,7 +29,8 @@ const PAGES = [
   { name: "report", path: "/report/__ECO__" },
   { name: "report-unrated", path: `/report/${"a1".repeat(16)}` },
   { name: "compare", path: `/compare?ids=${ECO},${AVENUE}` },
-  { name: "alerts", path: "/alerts?email=buyer%40example.com" },
+  { name: "alerts", path: "/alerts", signedIn: true },
+  { name: "alerts-signed-out", path: "/alerts" },
   { name: "login", path: "/login" },
   { name: "my-reports", path: "/reports", saved: [ECO, AVENUE] },
 ];
@@ -51,7 +54,7 @@ async function visit(
   page: Page,
   lang: "en" | "hi",
   viewport: { name: string; width: number; height: number },
-  target: { name: string; path: string; settle?: boolean; saved?: string[] },
+  target: { name: string; path: string; settle?: boolean; saved?: string[]; signedIn?: boolean },
 ) {
   const problems: string[] = [];
   page.on("console", (message) => message.type() === "error" && problems.push(message.text()));
@@ -61,6 +64,7 @@ async function visit(
   );
   await page.setViewportSize({ width: viewport.width, height: viewport.height });
   await page.context().addCookies([{ name: "neevcheck-lang", value: lang, url: "http://localhost:3010" }]);
+  if (target.signedIn) await signInAsAsha(page);
   if (target.saved) {
     await page.addInitScript((ids) => localStorage.setItem("neevcheck-reports", JSON.stringify(ids)), target.saved);
   }

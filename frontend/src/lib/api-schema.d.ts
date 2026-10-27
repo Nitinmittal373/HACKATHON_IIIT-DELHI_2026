@@ -186,7 +186,7 @@ export interface paths {
         post?: never;
         /**
          * Delete Account
-         * @description Deletes the account's saved reports. Nothing else is stored about the account.
+         * @description Deletes the account's saved reports, its watches and their alerts.
          */
         delete: operations["delete_account_api_me_delete"];
         options?: never;
@@ -336,7 +336,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List Alerts */
+        /**
+         * List Alerts
+         * @description The signed-in account's alerts, newest first.
+         */
         get: operations["list_alerts_api_sentinel_alerts_get"];
         put?: never;
         post?: never;
@@ -420,7 +423,8 @@ export interface paths {
         post?: never;
         /**
          * Remove Watch
-         * @description Stop watching. The watch id is unguessable and is the only proof needed.
+         * @description Stop watching. Only the account that owns the watch can; for any other watch the answer
+         *     is the same 404 as for one that does not exist.
          */
         delete: operations["remove_watch_api_sentinel__watch_id__delete"];
         options?: never;
@@ -1495,8 +1499,6 @@ export interface components {
         WatchCreate: {
             /** Details Url */
             details_url?: string | null;
-            /** Email */
-            email: string;
             /**
              * Language
              * @default en
@@ -2175,7 +2177,9 @@ export interface operations {
     create_watch_api_sentinel_post: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2207,10 +2211,10 @@ export interface operations {
     };
     list_alerts_api_sentinel_alerts_get: {
         parameters: {
-            query: {
-                email: string;
+            query?: never;
+            header?: {
+                authorization?: string | null;
             };
-            header?: never;
             path?: never;
             cookie?: never;
         };
@@ -2338,7 +2342,9 @@ export interface operations {
     remove_watch_api_sentinel__watch_id__delete: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path: {
                 /** @description Watch id */
                 watch_id: string;

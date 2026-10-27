@@ -26,8 +26,9 @@ export const privacy = {
     {
       title: "Alerts",
       points: [
-        "If you watch a project, we keep the email you give us.",
+        "Watching a project needs you to be signed in. Alerts go to your Google account email, never to an address typed in by someone else.",
         "We use it only to send alerts about the projects you watch, and for nothing else.",
+        "Only your account can see and stop your watches and alerts.",
         "Every alert email has a link to stop it, and you can stop watching a project at any time.",
       ],
     },
@@ -42,7 +43,7 @@ export const privacy = {
   ],
   remove: {
     title: "Delete your data",
-    menu: 'Sign in, open your account menu and choose "Delete my data". Your account and saved reports are removed.',
+    menu: 'Sign in, open your account menu and choose "Delete my data". Your account, saved reports, watches and alerts are removed.',
     emailLead: "Or email us and we will do it for you:",
   },
   footerLink: "Privacy",

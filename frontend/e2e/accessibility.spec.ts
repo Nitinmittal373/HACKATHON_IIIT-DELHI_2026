@@ -4,6 +4,8 @@ import { resolve } from "node:path";
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
+import { signInAsAsha } from "./signedIn";
+
 const REPORT = "/report/4ad9752355f9455aa9d242c93950ea04";
 const AVENUE = (JSON.parse(readFileSync(resolve(__dirname, "fixtures", "summary-6742.json"), "utf-8")) as { id: string }).id;
 
@@ -17,10 +19,18 @@ const SCREENS: [string, string][] = [
   ["confirm", "/check?q=Supertech%20Eco%20Village"],
   ["no result", "/check?q=nothing"],
   ["report", REPORT],
-  ["alerts", "/alerts"],
+  ["alerts (signed out)", "/alerts"],
   ["my reports (empty)", "/reports"],
   ["compare", `/compare?ids=4ad9752355f9455aa9d242c93950ea04,${AVENUE}`],
 ];
+
+test("the signed-in alerts list has no accessibility violations", async ({ page }) => {
+  await signInAsAsha(page);
+  await page.goto("/alerts");
+  await expect(page.getByRole("article")).toHaveCount(1);
+  await page.waitForTimeout(4500);
+  expect(await violations(page)).toEqual([]);
+});
 
 test("my reports with saved checks has no accessibility violations", async ({ page }) => {
   await page.addInitScript((id) => localStorage.setItem("neevcheck-reports", JSON.stringify([id])), REPORT.slice(8));

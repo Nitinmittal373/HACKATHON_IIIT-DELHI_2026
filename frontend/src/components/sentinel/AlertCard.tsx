@@ -1,21 +1,24 @@
+"use client";
+
 import Link from "next/link";
 
 import { NeevScore } from "@/components/NeevScore";
 import { StopWatchingButton } from "@/components/sentinel/StopWatchingButton";
 import { UnratedNote } from "@/components/UnratedNote";
 import { dayOf } from "@/lib/format";
-import type { Lang, Strings } from "@/lib/i18n";
+import { useLang } from "@/lib/LangProvider";
 import type { Alert, AlertChange } from "@/lib/types";
 import styles from "./AlertCard.module.css";
 
 interface Props {
   alert: Alert;
-  t: Strings;
-  lang: Lang;
+  /** Called once the watch behind this alert is stopped, so the list can drop it. */
+  onStopped: () => void;
 }
 
 /** One change Sentinel found: the score before and after, and exactly what is different. */
-export function AlertCard({ alert, t, lang }: Props) {
+export function AlertCard({ alert, onStopped }: Props) {
+  const { t, lang } = useLang();
   const before = alert.old_display_score;
   const after = alert.new_display_score;
   const groups: [string, AlertChange[], string][] = [
@@ -68,7 +71,11 @@ export function AlertCard({ alert, t, lang }: Props) {
         <Link href={`/report/${alert.check_id}`} className={styles.report}>
           {t.alerts.openReport}
         </Link>
-        <StopWatchingButton watchId={alert.watch_id} project={alert.project_name ?? alert.rera_id} />
+        <StopWatchingButton
+          watchId={alert.watch_id}
+          project={alert.project_name ?? alert.rera_id}
+          onStopped={onStopped}
+        />
       </div>
     </article>
   );
