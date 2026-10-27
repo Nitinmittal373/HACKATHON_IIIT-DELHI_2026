@@ -131,3 +131,30 @@ def test_the_browser_may_send_the_token(tmp_path: Path) -> None:
     assert "authorization" in response.headers["access-control-allow-headers"].lower()
 
 
+
+
+def test_deleting_the_account_removes_its_reports_only(tmp_path: Path) -> None:
+    with client(tmp_path) as http:
+        check_id = finished_check(http)
+        http.post("/api/me/reports", json={"ids": [check_id]}, headers=auth(sub="one"))
+        http.post("/api/me/reports", json={"ids": [check_id]}, headers=auth(sub="two"))
+
+        assert http.delete("/api/me", headers=auth(sub="one")).status_code == 204
+
+        assert http.get("/api/me/reports", headers=auth(sub="one")).json() == []
+        assert len(http.get("/api/me/reports", headers=auth(sub="two")).json()) == 1
+        # The check is a public record and stays.
+        assert http.get(f"/api/checks/{check_id}").status_code == 200
+
+
+def test_deleting_the_account_needs_a_valid_token(tmp_path: Path) -> None:
+    with client(tmp_path) as http:
+        assert http.delete("/api/me").status_code == 401
+        assert http.delete("/api/me", headers=auth(secret="x")).status_code == 401
+        assert http.delete("/api/me", headers=auth(expires=FIXED_NOW)).status_code == 401
+
+
+def test_deleting_the_account_is_rate_limited(tmp_path: Path) -> None:
+    with client(tmp_path) as http:
+        answers = [http.delete("/api/me", headers=auth()).status_code for _ in range(32)]
+    assert answers.count(429) == 2

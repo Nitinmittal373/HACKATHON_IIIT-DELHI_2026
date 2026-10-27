@@ -95,3 +95,9 @@ def save_reports(
 @router.delete("/api/me/reports/{check_id}", status_code=204, dependencies=[Depends(rate_limit)])
 def forget_report(check_id: CheckId, user: User, reports: Reports) -> None:
     reports.remove(user.sub, check_id)
+
+
+@router.delete("/api/me", status_code=204, dependencies=[Depends(rate_limit)])
+def delete_account(user: User, reports: Reports) -> None:
+    """Deletes the account's saved reports. Nothing else is stored about the account."""
+    reports.delete_account(user.sub)
