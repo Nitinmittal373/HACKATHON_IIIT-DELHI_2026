@@ -13,9 +13,9 @@ test("the privacy page says what is kept, in English", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1, name: "Privacy" })).toBeVisible();
   await expect(page.getByText("Last updated 28 Oct 2026")).toBeVisible();
   await expect(page.getByText("your Google account id and the list of reports you saved")).toBeVisible();
-  await expect(page.getByRole("link", { name: "ryzenoccult@gmail.com" })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "neevcheck.help@gmail.com" })).toHaveAttribute(
     "href",
-    "mailto:ryzenoccult@gmail.com",
+    "mailto:neevcheck.help@gmail.com",
   );
   const result = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
   expect(result.violations.map((v) => v.id)).toEqual([]);

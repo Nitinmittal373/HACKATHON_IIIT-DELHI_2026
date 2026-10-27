@@ -366,6 +366,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/sentinel/unsubscribe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Unsubscribe
+         * @description The link in an alert email. Stops that watch; answers the same for any token, so it
+         *     cannot be used to find out which tokens exist.
+         */
+        post: operations["unsubscribe_api_sentinel_unsubscribe_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/sentinel/webhook": {
         parameters: {
             query?: never;
@@ -1431,6 +1452,11 @@ export interface components {
             /** Status */
             status: ("confirmed" | "listings_only" | "from_document" | "from_order") | null;
         };
+        /** Unsubscribe */
+        Unsubscribe: {
+            /** Token */
+            token: string;
+        };
         /** ValidationError */
         ValidationError: {
             /** Context */
@@ -2231,6 +2257,37 @@ export interface operations {
                         [key: string]: boolean;
                     };
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unsubscribe_api_sentinel_unsubscribe_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Unsubscribe"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

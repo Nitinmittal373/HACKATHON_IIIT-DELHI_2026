@@ -8,6 +8,8 @@
 
 - **Privacy page and Delete my data.** `/privacy` in English and Hindi, linked from the footer and the login page, says what is kept when you sign in, that checks need no account, how alert emails are used, and how to delete your data. The account menu has a **Delete my data** option backed by `DELETE /api/me` (same bridge token, rate limited), which removes the account's saved reports.
 
+- **Stop-alerts link in every alert email.** Each email ends with "Stop alerts for this project:" and a link to `/alerts/stop?token=...` (EN and HI), built from `SITE_URL` or `NEXT_PUBLIC_SITE_URL`. Tokens are 32 random bytes, stored hashed. The page only shows a **Stop alerts** button; the button sends `POST /api/sentinel/unsubscribe`, which is rate limited and answers the same for any token. Alert cards also have a **Stop watching** button. The privacy page now says every alert email has a link to stop it. The contact address is neevcheck.help@gmail.com.
+
 ### Changed
 
 - **Uttar Pradesh only.** NeevCheck now covers UP-RERA and nothing else, instead of thin, search-only coverage of 23 states. The other states' adapters, `GET /api/states`, the `state` fields on every model, the state picker, state badges, the coverage page and the pre-RERA notes are gone. A number of another state's RERA, or a project in a city outside Uttar Pradesh, is answered once, calmly: "NeevCheck covers Uttar Pradesh RERA projects for now. Check this project on its own state's RERA website." (`outside_up` on search results.) The search box takes "UP-RERA number, project or builder", and all copy, meta tags and the Hindi translation say UP-RERA. `docs/states.md` and `docs/find-any-project.md` are deleted.

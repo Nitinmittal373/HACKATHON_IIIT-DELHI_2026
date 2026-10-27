@@ -1,7 +1,7 @@
 /** The date the privacy page was last changed, as YYYY-MM-DD. Change it with the text. */
 export const PRIVACY_UPDATED = "2026-10-28";
 
-export const PRIVACY_EMAIL = "ryzenoccult@gmail.com";
+export const PRIVACY_EMAIL = "neevcheck.help@gmail.com";
 
 export const privacy = {
   metaTitle: "Privacy · NeevCheck",
@@ -28,7 +28,7 @@ export const privacy = {
       points: [
         "If you watch a project, we keep the email you give us.",
         "We use it only to send alerts about the projects you watch, and for nothing else.",
-        "You can stop watching a project at any time.",
+        "Every alert email has a link to stop it, and you can stop watching a project at any time.",
       ],
     },
     {

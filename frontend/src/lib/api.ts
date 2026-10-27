@@ -219,6 +219,15 @@ export function sendCorrection(body: CorrectionCreate): Promise<{ id: string }> 
   return request<{ id: string }>("/api/corrections", { method: "POST", body });
 }
 
+/** Stops the watch behind a link in an alert email. Answers the same for any token. */
+export function unsubscribe(token: string): Promise<void> {
+  return request<void>("/api/sentinel/unsubscribe", { method: "POST", body: { token } });
+}
+
+export function removeWatch(watchId: string): Promise<void> {
+  return request<void>(`/api/sentinel/${watchId}`, { method: "DELETE" });
+}
+
 export function getAlerts(email: string): Promise<Alert[]> {
   return request<Alert[]>(`/api/sentinel/alerts?email=${encodeURIComponent(email)}`);
 }

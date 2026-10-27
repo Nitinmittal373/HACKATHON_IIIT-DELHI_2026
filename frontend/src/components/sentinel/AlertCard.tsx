@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { NeevScore } from "@/components/NeevScore";
+import { StopWatchingButton } from "@/components/sentinel/StopWatchingButton";
 import { UnratedNote } from "@/components/UnratedNote";
 import { dayOf } from "@/lib/format";
 import type { Lang, Strings } from "@/lib/i18n";
@@ -63,9 +64,12 @@ export function AlertCard({ alert, t, lang }: Props) {
           </section>
         ),
       )}
-      <Link href={`/report/${alert.check_id}`} className={styles.report}>
-        {t.alerts.openReport}
-      </Link>
+      <div className={styles.actions}>
+        <Link href={`/report/${alert.check_id}`} className={styles.report}>
+          {t.alerts.openReport}
+        </Link>
+        <StopWatchingButton watchId={alert.watch_id} project={alert.project_name ?? alert.rera_id} />
+      </div>
     </article>
   );
 }
