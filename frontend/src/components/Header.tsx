@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { AccountMenu } from "@/components/AccountMenu";
 import { Logo } from "@/components/Logo";
 import { useLang } from "@/lib/LangProvider";
 import styles from "./Header.module.css";
@@ -29,7 +30,8 @@ export function Header() {
             हिं
           </button>
         </div>
-        {/* No accounts: a visitor's checks are kept in this browser and listed here. */}
+        <AccountMenu />
+        {/* Without an account a visitor's checks are kept in this browser and listed here. */}
         <Link href="/reports" className={`btn ${styles.cta}`}>
           {t.nav.reports}
         </Link>

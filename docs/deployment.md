@@ -66,6 +66,16 @@ Until this is set, the browser blocks every call to the API (CORS), so the live 
 2. Start the check. The Agent Cam should fill with findings. A live check runs paid browser agents, so do this on purpose.
 3. Open `https://<your-service>.onrender.com/api/health` again, and `https://<your-service>.onrender.com/docs` for the API documentation.
 
+## Sign in with Google (optional)
+
+Without these settings the site works as before and `/login` says sign-in is not set up. To turn it on:
+
+1. In Google Cloud, create an OAuth client (type **Web application**) with the authorised redirect URIs `https://neevcheck-up.vercel.app/api/auth/callback/google` and, for local work, `http://localhost:3000/api/auth/callback/google`.
+2. On **Vercel** (Project → Environment Variables) add `AUTH_SECRET` (a long random string), `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `AUTH_BRIDGE_SECRET` (another long random string) and `NEXTAUTH_URL` (the site's address). Redeploy.
+3. On **Render** add `AUTH_BRIDGE_SECRET` with the same value as on Vercel, then redeploy the API.
+
+Never put these in a `NEXT_PUBLIC_` variable.
+
 ## Weekly Sentinel re-checks
 
 The API re-checks watched projects every `SENTINEL_INTERVAL_HOURS` (168, one week) while it is running. On Render's free plan the service sleeps when idle, which also pauses that schedule. To re-check on time, call the webhook from an external cron (for example a free cron service, or a scheduled GitHub Action):

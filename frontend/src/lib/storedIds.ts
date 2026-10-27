@@ -10,6 +10,8 @@ export interface IdStore {
   remove: (ids: string[]) => void;
   /** The saved ids in order; null while rendering on the server, before storage is read. */
   useIds: () => string[] | null;
+  /** The saved ids right now, for code that is not a component. */
+  read: () => string[];
 }
 
 /**
@@ -48,6 +50,7 @@ export function idStore(key: string, limit: number): IdStore {
 
   return {
     add: (id) => save([id, ...parse(raw()).filter((known) => known !== id)]),
+    read: () => parse(raw()),
     remove: (ids) => save(parse(raw()).filter((known) => !ids.includes(known))),
     useIds: () => {
       const text = useSyncExternalStore(subscribe, raw, () => null);

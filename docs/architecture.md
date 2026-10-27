@@ -302,9 +302,23 @@ The API runs on Render's free plan, which sleeps after 15 idle minutes and takes
 2. The confirm page waits for that same ping. If it takes longer than 1.5 seconds it says "Waking up the server…", then "Searching UP-RERA…" once the server answers.
 3. Search may take up to 120 seconds in the browser. A dropped connection, or a `502`/`503`/`504` from Render's proxy (no `detail.code`), is retried once. Errors from the API itself carry a `detail.code` and are shown as they are, never retried.
 
-## My reports, without accounts
+## My reports, with or without an account
 
-NeevCheck has no sign-in. The app keeps the ids of the checks a visitor starts in `localStorage` (`neevcheck-reports`, newest first, at most 50) and asks `GET /api/checks?ids=` for their state, so the list is private to that browser. Ids the server no longer knows (for example after its database was reset) are dropped from the list with a note. The home page's report card and its "Recently checked" strip come from `GET /api/checks/recent`, fetched in the browser after the page loads; before any check has finished, the card is an empty frame that says "Your report appears here", never sample numbers.
+Signing in is optional: search, checks, reports and sharing never need it. Without an account the app keeps the ids of the checks a visitor starts in `localStorage` (`neevcheck-reports`, newest first, at most 50) and asks `GET /api/checks?ids=` for their state, so the list is private to that browser. Ids the server no longer knows (for example after its database was reset) are dropped from the list with a note. The home page's report card and its "Recently checked" strip come from `GET /api/checks/recent`, fetched in the browser after the page loads; before any check has finished, the card is an empty frame that says "Your report appears here", never sample numbers.
+
+### Signing in with Google (optional)
+
+The site uses Auth.js (`next-auth` 4, the current stable release that supports Next 15) with the Google provider, configured by `AUTH_SECRET`, `AUTH_GOOGLE_ID` and `AUTH_GOOGLE_SECRET`; without them `/login` says sign-in is not set up and nothing else changes. `/login` is a glass card over the skyline; the header shows Sign in, or the Google avatar with My reports and Sign out.
+
+The API never talks to Google. After sign-in the browser asks the site for a token (`GET /api/bridge-token`, a Next route handler): HS256, valid ten minutes, `sub` = the Google account id, plus the e-mail, signed with `AUTH_BRIDGE_SECRET`. The same secret is set on the API, which checks the signature (`app/bridge_token.py`, constant-time compare) and serves, with `Authorization: Bearer <token>`:
+
+| Route | What it does |
+| --- | --- |
+| `GET /api/me/reports` | The account's saved checks, newest first |
+| `POST /api/me/reports` `{ids}` | Saves check ids (first is newest) and returns the list; ids the server has no check for are ignored |
+| `DELETE /api/me/reports/{id}` | Forgets one |
+
+They are limited to 30 requests a minute per address and answer 503 when `AUTH_BRIDGE_SECRET` is not set. Saved reports are rows of (Google id, check id, time) in `user_reports`; the account itself is stored nowhere on our side beyond that. On the first sign-in, the checks kept in this browser are moved into the account and removed from the browser; while signed in, new checks are saved to the account, and Alerts starts with the account's e-mail.
 
 ## Compare
 

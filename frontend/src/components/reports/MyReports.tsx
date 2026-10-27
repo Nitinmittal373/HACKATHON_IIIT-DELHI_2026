@@ -8,6 +8,8 @@ import { Skeleton } from "@/components/Skeleton";
 import { CompareBar } from "@/components/reports/CompareBar";
 import { ReportCard } from "@/components/reports/ReportCard";
 import { listChecks } from "@/lib/api";
+import { AccountReports } from "@/components/reports/AccountReports";
+import { useAccount } from "@/lib/account";
 import { addToCompare, forgetChecks, removeFromCompare, useCompareTray, useHistory } from "@/lib/history";
 import { useLang } from "@/lib/LangProvider";
 import type { CheckSummary } from "@/lib/types";
@@ -19,7 +21,13 @@ type Loaded = { status: "loading" } | { status: "ready"; checks: CheckSummary[] 
 const REFRESH_WHILE_RUNNING_MS = 10_000;
 const MAX_COMPARED = 3;
 
+/** Signed in: the account's saved reports. Otherwise the checks kept in this browser. */
 export function MyReports() {
+  const account = useAccount();
+  return account.status === "in" ? <AccountReports /> : <BrowserReports />;
+}
+
+function BrowserReports() {
   const { t } = useLang();
   const ids = useHistory();
   const [loaded, setLoaded] = useState<Loaded>({ status: "loading" });

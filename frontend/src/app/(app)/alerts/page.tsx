@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { ApiProblem } from "@/components/ApiProblem";
 import { PageMessage } from "@/components/PageMessage";
+import { AlertsEmailField } from "@/components/AlertsEmailField";
 import { AlertCard } from "@/components/sentinel/AlertCard";
 import { ApiError, getAlerts } from "@/lib/api";
 import type { Lang, Strings } from "@/lib/i18n";
@@ -39,16 +40,7 @@ export default async function AlertsPage({ searchParams }: Props) {
         <label htmlFor="alerts-email" className="sr">
           {t.alerts.emailLabel}
         </label>
-        <input
-          id="alerts-email"
-          name="email"
-          type="email"
-          className={styles.input}
-          placeholder={t.sentinel.emailPlaceholder}
-          defaultValue={email}
-          maxLength={254}
-          required
-        />
+        <AlertsEmailField email={email} className={styles.input ?? ""} />
         <button type="submit" className="btn">
           {t.alerts.show}
         </button>

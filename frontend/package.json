@@ -17,6 +17,7 @@
   "dependencies": {
     "jsqr": "1.4.0",
     "next": "15.5.28",
+    "next-auth": "4.24.15",
     "qrcode-generator": "1.4.4",
     "react": "19.1.10",
     "react-dom": "19.1.10"

@@ -47,19 +47,26 @@ export const UNREACHABLE = 0;
 
 async function request<T>(
   path: string,
-  options: { method?: "GET" | "POST"; body?: unknown; file?: File; timeoutMs?: number } = {},
+  options: {
+    method?: "GET" | "POST" | "DELETE";
+    body?: unknown;
+    file?: File;
+    timeoutMs?: number;
+    /** The sign-in token from /api/bridge-token, for the account routes. */
+    token?: string;
+  } = {},
 ): Promise<T> {
-  const { method = "GET", body, file, timeoutMs = REQUEST_TIMEOUT_MS } = options;
+  const { method = "GET", body, file, timeoutMs = REQUEST_TIMEOUT_MS, token } = options;
   let response: Response;
   try {
     response = await fetch(`${API_URL}${path}`, {
       method,
       cache: "no-store",
-      headers: file
-        ? { "Content-Type": "application/pdf" }
-        : body === undefined
-          ? undefined
-          : { "Content-Type": "application/json" },
+      headers: {
+        ...(file ? { "Content-Type": "application/pdf" } : {}),
+        ...(!file && body !== undefined ? { "Content-Type": "application/json" } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       // A file goes as the raw request body, so the server needs no multipart parser.
       body: file ?? (body === undefined ? undefined : JSON.stringify(body)),
       signal: AbortSignal.timeout(timeoutMs),
@@ -75,6 +82,7 @@ async function request<T>(
     );
   }
   if (!response.ok) throw await toApiError(response);
+  if (response.status === 204) return undefined as T;
   return (await response.json()) as T;
 }
 
@@ -244,6 +252,20 @@ export function recentChecks(): Promise<RecentCheck[]> {
     checks.catch(() => (recent = null));
   }
   return recent.checks;
+}
+
+/** The checks saved to the signed-in account, newest first. */
+export function listAccountReports(token: string): Promise<CheckSummary[]> {
+  return request<CheckSummary[]>("/api/me/reports", { token, timeoutMs: WAKE_TIMEOUT_MS });
+}
+
+/** Saves check ids (newest first) to the account; answers with the account's whole list. */
+export function saveAccountReports(token: string, ids: string[]): Promise<CheckSummary[]> {
+  return request<CheckSummary[]>("/api/me/reports", { method: "POST", body: { ids }, token });
+}
+
+export function forgetAccountReport(token: string, id: string): Promise<void> {
+  return request<void>(`/api/me/reports/${id}`, { method: "DELETE", token });
 }
 
 export function getCheck(id: string): Promise<Check> {
