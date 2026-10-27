@@ -4,6 +4,7 @@
 
 <br>
 
+[![Live demo](https://img.shields.io/badge/live%20demo-neevcheck--up.vercel.app-F26B1D?style=flat-square)](https://neevcheck-up.vercel.app)
 [![HackIIITD 2026](https://img.shields.io/badge/HackIIITD-2026%20finalist-111111?style=flat-square)](#team)
 [![TinyFish](https://img.shields.io/badge/agents-TinyFish-F26B1D?style=flat-square)](https://tinyfish.ai)
 [![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=nextdotjs)](https://nextjs.org)
@@ -14,7 +15,7 @@
 
 **A risk check for under-construction homes in India.** Give NeevCheck a project, a builder, a brochure or a QR code. TinyFish browser agents read the public records, and the app turns them into one **NeevScore (300–900)** with a source link for every point.
 
-[Find a project](#find-any-project-in-india) · [How it works](#how-it-works) · [NeevScore](#neevscore-300900) · [Architecture](#architecture) · [Run it](#getting-started) · [Team](#team)
+[**Live demo**](https://neevcheck-up.vercel.app) · [Find a project](#find-any-project-in-india) · [How it works](#how-it-works) · [NeevScore](#neevscore-300900) · [Architecture](#architecture) · [Run it](#getting-started) · [Team](#team)
 
 <br>
 
@@ -26,7 +27,9 @@
 
 ## Live demo
 
-The deployed web app and API follow [`docs/deployment.md`](docs/deployment.md) (Vercel and Render). Every check is live: nothing is mocked, and there is no demo mode. To run it yourself, see [Getting started](#getting-started).
+**Web app: <https://neevcheck-up.vercel.app>** · API: <https://neevcheck-api.onrender.com> ([health](https://neevcheck-api.onrender.com/api/health), [docs](https://neevcheck-api.onrender.com/docs)).
+
+Every check is live: nothing is mocked, and there is no demo mode. The API runs on Render's free plan and sleeps when idle, so the first search can take up to a minute while it wakes. To run it yourself, see [Getting started](#getting-started); to deploy it, see [`docs/deployment.md`](docs/deployment.md).
 
 ## The problem
 
@@ -373,8 +376,8 @@ Built by **Team RYZEN** from KIET Group of Institutions for the HackIIITD 2026 f
 | --- | --- | --- |
 | <a href="https://github.com/Nitinmittal373"><img src="https://github.com/Nitinmittal373.png?size=96" width="48" alt="" align="left" hspace="8"></a>**Nitin Mittal** (team leader)<br>[github.com/Nitinmittal373](https://github.com/Nitinmittal373) | Backend | Backend services and integrations |
 | <a href="https://github.com/rishibhaskar777"><img src="https://github.com/rishibhaskar777.png?size=96" width="48" alt="" align="left" hspace="8"></a>**Rishi Bhaskar**<br>[github.com/rishibhaskar777](https://github.com/rishibhaskar777) | Full-stack | Frontend and backend |
-| **Siddharth Varshney**<br>github.com/[github-username] | UI/UX | Interface and experience design |
-| **Shreyansh Gupta**<br>github.com/[github-username] | Architecture and idea | System architecture, design and the original idea |
+| **Siddharth Varshney** | UI/UX | Interface and experience design |
+| **Shreyansh Gupta** | Architecture and idea | System architecture, design and the original idea |
 
 Want to help? Read [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
