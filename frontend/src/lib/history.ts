@@ -20,7 +20,7 @@ export const useCompareTray = tray.useIds;
 
 /** Starts a live check (or reuses one from the last day) and adds it to "My reports". */
 export async function startCheck(
-  project: Pick<Project, "rera_id" | "details_url" | "state">,
+  project: Pick<Project, "rera_id" | "details_url">,
   options: { fresh?: boolean } = {},
 ): Promise<Check> {
   const check = await createCheck(project, options);

@@ -11,11 +11,10 @@ import styles from "./ReasonChips.module.css";
 interface Props {
   reasons: ReasonCode[];
   rows: LedgerRow[];
-  rera: string;
 }
 
 /** The top reason codes as chips; each opens the evidence ledger on its own records. */
-export function ReasonChips({ reasons, rows, rera }: Props) {
+export function ReasonChips({ reasons, rows }: Props) {
   const { t, lang } = useLang();
   const [open, setOpen] = useState(false);
   const [code, setCode] = useState<string | null>(null);
@@ -60,7 +59,6 @@ export function ReasonChips({ reasons, rows, rera }: Props) {
       </button>
       <EvidenceLedger
         rows={rows}
-        rera={rera}
         open={open}
         code={code}
         codes={reasons.filter((reason) => reason.finding_ids.length).map((reason) => reason.code)}

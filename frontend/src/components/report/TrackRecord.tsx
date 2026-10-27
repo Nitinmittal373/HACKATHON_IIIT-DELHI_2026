@@ -7,39 +7,33 @@ import { NeevScore } from "@/components/NeevScore";
 import { Skeleton } from "@/components/Skeleton";
 import { promoterProjects } from "@/lib/api";
 import { formatDay } from "@/lib/format";
-import { relabel } from "@/lib/i18n/relabel";
 import { useLang } from "@/lib/LangProvider";
 import type { TrackedProject } from "@/lib/types";
 import styles from "./TrackRecord.module.css";
 
 type Loaded = { status: "loading" } | { status: "ready"; projects: TrackedProject[] } | { status: "failed" };
 
-/** The promoter's other projects in the same state, each one a click away from its own live check. */
+/** The promoter's other projects, each one a click away from its own live check. */
 export function TrackRecord({
   promoter,
   reraId,
-  state,
-  rera,
 }: {
   promoter: string;
   reraId: string;
-  state: string;
-  rera: string;
 }) {
-  const { lang, t: base } = useLang();
-  const t = relabel(base, rera);
+  const { lang, t } = useLang();
   const [loaded, setLoaded] = useState<Loaded>({ status: "loading" });
 
   useEffect(() => {
     let cancelled = false;
-    promoterProjects(promoter, reraId, state).then(
+    promoterProjects(promoter, reraId).then(
       (record) => !cancelled && setLoaded({ status: "ready", projects: record.projects }),
       () => !cancelled && setLoaded({ status: "failed" }),
     );
     return () => {
       cancelled = true;
     };
-  }, [promoter, reraId, state]);
+  }, [promoter, reraId]);
 
   return (
     <section className={`card ${styles.card} noPrint`} aria-labelledby="track-title" aria-busy={loaded.status === "loading"}>

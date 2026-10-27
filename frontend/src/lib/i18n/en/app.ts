@@ -7,12 +7,12 @@ export const app = {
     alerts: "Alerts",
   },
   hero: {
-    pill: "Built for homebuyers across India",
+    pill: "Built for homebuyers in Uttar Pradesh",
     headline: ["Know", "your", "builder", "before", "you", "book."],
     subtitle:
-      "Any RERA project in India. Deepest coverage in Uttar Pradesh. NeevCheck reads the state RERA portal, company records, insolvency orders and court news, and gives you a clear risk score with proof.",
-    searchLabel: "RERA number or project name, any state",
-    placeholder: "RERA number or project name, any state",
+      "NeevCheck reads UP-RERA, company records, insolvency orders and court news for under-construction homes in Uttar Pradesh, and gives you a clear risk score with proof.",
+    searchLabel: "UP-RERA number, project or builder",
+    placeholder: "UP-RERA number, project or builder",
     submit: "Check project",
     try: "Try",
   },

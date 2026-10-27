@@ -1,9 +1,11 @@
+import type { ReactNode } from "react";
+
 import { UpreraReplica } from "@/components/cam/UpreraReplica";
 import type { SourceView } from "@/lib/checkState";
 import type { Strings } from "@/lib/i18n";
 import { SOURCE_INFO } from "@/lib/sources";
 import { stopReason } from "@/lib/stopReason";
-import type { SourceName } from "@/lib/types";
+import type { Finding, SourceName } from "@/lib/types";
 import styles from "./BrowserWindow.module.css";
 
 interface Props {
@@ -13,6 +15,8 @@ interface Props {
   address: string;
   /** Where a buyer can check this source themselves, when it is not the default one. */
   officialUrl?: string;
+  /** What this source has reported so far; listed when it stopped part-way. */
+  findings: Finding[];
   percent: number;
   t: Strings;
 }
@@ -20,13 +24,14 @@ interface Props {
 const BADGE: Record<SourceView["status"], "live" | "stopped" | "finished" | "queued"> = {
   running: "live",
   blocked: "stopped",
+  partial: "stopped",
   unread: "stopped",
   done: "finished",
   waiting: "queued",
 };
 
 /** The agent's browser: address bar, the live view (or an illustration) and a progress bar. */
-export function BrowserWindow({ name, view, address, officialUrl, percent, t }: Props) {
+export function BrowserWindow({ name, view, address, officialUrl, findings, percent, t }: Props) {
   const label = t.cam.sourceLabels[name];
   const badge = BADGE[view.status];
   const stepText = view.status === "running" ? (view.note ?? t.cam.stepReading(label)) : t.cam.status[view.status];
@@ -49,7 +54,7 @@ export function BrowserWindow({ name, view, address, officialUrl, percent, t }: 
       </div>
 
       <div className={styles.screen}>
-        <Screen name={name} view={view} t={t} label={label} officialUrl={officialUrl} />
+        <Screen name={name} view={view} t={t} label={label} officialUrl={officialUrl} findings={findings} />
       </div>
 
       <div className={styles.progress}>
@@ -79,12 +84,14 @@ function Screen({
   t,
   label,
   officialUrl,
+  findings,
 }: {
   name: SourceName;
   view: SourceView;
   t: Strings;
   label: string;
   officialUrl?: string;
+  findings: Finding[];
 }) {
   if (view.status === "running" && view.liveUrl) {
     return (
@@ -99,10 +106,21 @@ function Screen({
     );
   }
   if (view.status === "running") return <UpreraReplica notes={view.notes} t={t} />;
+  if (findings.length > 0 && ["blocked", "partial", "unread"].includes(view.status)) {
+    return (
+      <Notice tone="stopped" text={t.cam.partialReason} name={name} href={officialUrl} t={t}>
+        <ul>
+          {findings.map((finding) => (
+            <li key={finding.id}>{finding.title}</li>
+          ))}
+        </ul>
+      </Notice>
+    );
+  }
   if (view.status === "blocked") {
     return <Notice tone="stopped" text={stopReason(view.reason, t)} name={name} href={officialUrl} t={t} />;
   }
-  if (view.status === "unread") {
+  if (view.status === "unread" || view.status === "partial") {
     return <Notice tone="stopped" text={t.cam.unreadReason} name={name} href={officialUrl} t={t} />;
   }
   return <Notice tone="quiet" text={t.cam.status[view.status]} name={name} href={officialUrl} t={t} />;
@@ -114,16 +132,19 @@ function Notice({
   name,
   href,
   t,
+  children,
 }: {
   tone: "stopped" | "quiet";
   text: string;
   name: SourceName;
   href?: string;
   t: Strings;
+  children?: ReactNode;
 }) {
   return (
     <div className={`${styles.notice} ${styles[tone === "stopped" ? "noticeStopped" : "noticeQuiet"]}`}>
       <p>{text}</p>
+      {children}
       {tone === "stopped" && (
         <a href={href ?? SOURCE_INFO[name].officialUrl} target="_blank" rel="noopener noreferrer">
           {t.cam.checkYourself}

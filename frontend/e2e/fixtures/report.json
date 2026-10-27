@@ -1,11 +1,5 @@
 {
-  "state": "UP",
-  "state_name": "Uttar Pradesh",
-  "rera_name": "UP-RERA",
   "check": {
-    "state": "UP",
-    "state_name": "Uttar Pradesh",
-    "rera_name": "UP-RERA",
     "id": "4ad9752355f9455aa9d242c93950ea04",
     "rera_id": "UPRERAPRJ8334",
     "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
@@ -80,9 +74,9 @@
     ],
     "reused": false,
     "display_score": {
-      "value": 621,
+      "value": 495,
       "provisional_value": null,
-      "band": "Watch",
+      "band": "Elevated",
       "hard_stop": false,
       "confidence": 0.83,
       "provisional": false,
@@ -91,15 +85,15 @@
     }
   },
   "project": {
-    "state": "UP",
-    "state_name": "Uttar Pradesh",
-    "rera_name": "UP-RERA",
     "rera_id": "UPRERAPRJ8334",
     "name": "SUPERTECH ECO VILLAGE-I PHASE I-C",
     "promoter": "SUPERTECH LIMITED",
     "registered_on": "2017-08-09",
     "district": "Gautam Buddha Nagar",
-    "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334"
+    "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
+    "status": null,
+    "sources": [],
+    "found_in": null
   },
   "score": {
     "value": 68,
@@ -111,42 +105,42 @@
     "hard_stop_reason": null,
     "drivers": [
       {
-        "finding_id": "dfb98ebf8d0847cb930e2a616ef0417a",
+        "finding_id": "d4ce6f81f576464b9eb972c3668b1983",
         "title": "Completion date on record (30 Dec 2017) passed 105 months ago; project still listed as Ongoing",
         "area": "execution",
         "penalty": 70,
         "points": -14.0
       },
       {
-        "finding_id": "8ec06703cdee4dea9bf44c0d5d74c78e",
+        "finding_id": "768e715a98954f11a410e6d205ebe403",
         "title": "2803 complaints on UP-RERA against the promoter, across all its projects",
         "area": "builder_history",
         "penalty": 60,
         "points": -9.0
       },
       {
-        "finding_id": "6f22859e39b14d25afba80e8ab1fabe1",
+        "finding_id": "6521d11eb0dd4abdb843be0a9340e4d2",
         "title": "15 complaints on UP-RERA about this project",
         "area": "legal",
         "penalty": 40,
         "points": -6.0
       },
       {
-        "finding_id": "718ffac559354bcdaf5ece9f8bc7e875",
+        "finding_id": "5a060c5c29414cdda95d1dd042764f3c",
         "title": "News on delays, about the promoter: 16 years, Rs 50 lakh lost: How Supertech delays are costing homebuyers lakhs (published about 1 month ago)",
         "area": "news",
         "penalty": 10,
         "points": -1.0
       },
       {
-        "finding_id": "7d4588e79d0c4e919c5f50f7dbad9beb",
+        "finding_id": "ca62e3003b75480da5ec522cc3065854",
         "title": "News on delays, about the promoter: NBCC to resume work on 16 stalled Supertech projects in Jan (published about 4 weeks ago)",
         "area": "news",
         "penalty": 10,
         "points": -1.0
       },
       {
-        "finding_id": "ea8868b5f2d94e9181c58c8a473b352c",
+        "finding_id": "e7f7820663b447bdb5920c0c8ae41759",
         "title": "News on delays, about the promoter: NBCC moves Supreme Court over RERA rules for 16 Supertech projects (published about 2 months ago)",
         "area": "news",
         "penalty": 10,
@@ -198,7 +192,7 @@
   },
   "findings": [
     {
-      "id": "dfb98ebf8d0847cb930e2a616ef0417a",
+      "id": "d4ce6f81f576464b9eb972c3668b1983",
       "source": "uprera",
       "kind": "past_end_date",
       "title": "Completion date on record (30 Dec 2017) passed 105 months ago; project still listed as Ongoing",
@@ -217,7 +211,7 @@
       "via": null
     },
     {
-      "id": "8ec06703cdee4dea9bf44c0d5d74c78e",
+      "id": "768e715a98954f11a410e6d205ebe403",
       "source": "uprera",
       "kind": "promoter_complaints",
       "title": "2803 complaints on UP-RERA against the promoter, across all its projects",
@@ -236,7 +230,7 @@
       "via": null
     },
     {
-      "id": "6f22859e39b14d25afba80e8ab1fabe1",
+      "id": "6521d11eb0dd4abdb843be0a9340e4d2",
       "source": "uprera",
       "kind": "project_complaints",
       "title": "15 complaints on UP-RERA about this project",
@@ -255,7 +249,7 @@
       "via": null
     },
     {
-      "id": "718ffac559354bcdaf5ece9f8bc7e875",
+      "id": "5a060c5c29414cdda95d1dd042764f3c",
       "source": "news",
       "kind": "news_story",
       "title": "News on delays, about the promoter: 16 years, Rs 50 lakh lost: How Supertech delays are costing homebuyers lakhs (published about 1 month ago)",
@@ -274,7 +268,7 @@
       "via": null
     },
     {
-      "id": "7d4588e79d0c4e919c5f50f7dbad9beb",
+      "id": "ca62e3003b75480da5ec522cc3065854",
       "source": "news",
       "kind": "news_story",
       "title": "News on delays, about the promoter: NBCC to resume work on 16 stalled Supertech projects in Jan (published about 4 weeks ago)",
@@ -293,7 +287,7 @@
       "via": null
     },
     {
-      "id": "ea8868b5f2d94e9181c58c8a473b352c",
+      "id": "e7f7820663b447bdb5920c0c8ae41759",
       "source": "news",
       "kind": "news_story",
       "title": "News on delays, about the promoter: NBCC moves Supreme Court over RERA rules for 16 Supertech projects (published about 2 months ago)",
@@ -312,7 +306,7 @@
       "via": null
     },
     {
-      "id": "38db8f85c3474fdd829e82f8f70ddc2c",
+      "id": "98853121b9ac463b815074ef55f08258",
       "source": "uprera",
       "kind": "registration",
       "title": "Registered on UP-RERA on 09 Aug 2017",
@@ -331,7 +325,7 @@
       "via": null
     },
     {
-      "id": "737f9af2f6c3409487df62512c356dc6",
+      "id": "de5d4ce0167344878c18ebf6ef5d442a",
       "source": "registry",
       "kind": "company_status",
       "title": "Company status: Active (CIN U74899DL1995PLC074422)",
@@ -350,7 +344,7 @@
       "via": null
     },
     {
-      "id": "22f53e1130b74278a1d23e98c9489909",
+      "id": "9cf9b0a6ae8d4258a2bc68abbb54f24d",
       "source": "group",
       "kind": "directors",
       "title": "6 directors on record for SUPERTECH LIMITED",
@@ -369,7 +363,7 @@
       "via": null
     },
     {
-      "id": "baf2bf74af4c44d6996afa4965ec3c5d",
+      "id": "4b556fea50aa4fabbdf9b72e4ef7c088",
       "source": "insolvency",
       "kind": "insolvency_admitted",
       "title": "Insolvency application against SUPERTECH LIMITED was admitted on 25 Mar 2022",
@@ -388,7 +382,7 @@
       "via": null
     },
     {
-      "id": "1c5846ae33c04985ba2baccf2ff75a0e",
+      "id": "615a1514e10a47f9a9c7bde83febb75f",
       "source": "insolvency",
       "kind": "insolvency_scope_unverified",
       "title": "A news report says the insolvency covers the whole company (page says: \"The NCLT order terming Supertech Limited insolvent will not affect operations of any other Supertech Group company, the realty firm stated.\"). No court order was read, so this is not scored; check the NCLT and NCLAT orders",
@@ -407,7 +401,7 @@
       "via": null
     },
     {
-      "id": "bf9e4d7b2d9e400f9a40e5237c0dbb2f",
+      "id": "50c6323198a54b5aa41711df6f3ad65a",
       "source": "news",
       "kind": "court_order",
       "title": "Supreme Court order of 05 Feb 2026 names this project among the stalled SUPERTECH LIMITED projects the NBCC is to complete",
@@ -426,7 +420,7 @@
       "via": null
     },
     {
-      "id": "d0379c2d6920401997bb0acf41d63f23",
+      "id": "7f4931a971a444f0b7ee135190e190f9",
       "source": "group",
       "kind": "group_project_delayed",
       "title": "Supertech Upcountry (Plotted) (UPRERAPRJ8267): completion date 30 Dec 2017 passed 105 months ago, not completed",
@@ -445,7 +439,7 @@
       "via": null
     },
     {
-      "id": "94423db35a6a44feaaf315d5b6843a6a",
+      "id": "0f121870ef9849f98003adb7b1c21a34",
       "source": "group",
       "kind": "group_project_delayed",
       "title": "SUPERTECH CAPETOWN (PHASE-I) (UPRERAPRJ5017): completion date 30 Dec 2019 passed 81 months ago, not completed",
@@ -464,7 +458,7 @@
       "via": null
     },
     {
-      "id": "81c0859faaa643a2bf3457be7c8e0f9e",
+      "id": "aebe11d87fd94832bbc7d9aa1230bdaa",
       "source": "group",
       "kind": "group_project_delayed",
       "title": "SPORTS VILLAGE (PHASE-I) (UPRERAPRJ408): completion date 30 Jun 2021 passed 63 months ago, not completed",
@@ -483,7 +477,7 @@
       "via": null
     },
     {
-      "id": "a4491143dfd04da4860b938ccaef1367",
+      "id": "2ae0700ac65e4467b00881b90ad4bd60",
       "source": "group",
       "kind": "group_project_delayed",
       "title": "SUPERTECH GOLF COUNTRY (PHASE-I) (UPRERAPRJ5848): completion date 29 Jun 2019 passed 87 months ago, not completed",
@@ -502,7 +496,7 @@
       "via": null
     },
     {
-      "id": "341deafd29d244eab3b6bcc5393c1061",
+      "id": "8d1fac700ce14cbcbab9a86025e0c2b7",
       "source": "group",
       "kind": "group_project_delayed",
       "title": "Project (UPRERAPRJ5854): completion date 31 Dec 2019 passed 81 months ago, not completed",
@@ -521,7 +515,7 @@
       "via": null
     },
     {
-      "id": "0468996846dc47d39138888aec40b658",
+      "id": "0925d276a8a54fc682fb93312fdafad2",
       "source": "group",
       "kind": "group_delay_share",
       "title": "5 of 5 group projects read on UP-RERA are more than 12 months past their completion date",
@@ -542,7 +536,7 @@
   ],
   "timeline": [
     {
-      "id": "38db8f85c3474fdd829e82f8f70ddc2c",
+      "id": "98853121b9ac463b815074ef55f08258",
       "source": "uprera",
       "kind": "registration",
       "title": "Registered on UP-RERA on 09 Aug 2017",
@@ -561,7 +555,7 @@
       "via": null
     },
     {
-      "id": "dfb98ebf8d0847cb930e2a616ef0417a",
+      "id": "d4ce6f81f576464b9eb972c3668b1983",
       "source": "uprera",
       "kind": "past_end_date",
       "title": "Completion date on record (30 Dec 2017) passed 105 months ago; project still listed as Ongoing",
@@ -580,7 +574,7 @@
       "via": null
     },
     {
-      "id": "d0379c2d6920401997bb0acf41d63f23",
+      "id": "7f4931a971a444f0b7ee135190e190f9",
       "source": "group",
       "kind": "group_project_delayed",
       "title": "Supertech Upcountry (Plotted) (UPRERAPRJ8267): completion date 30 Dec 2017 passed 105 months ago, not completed",
@@ -599,7 +593,7 @@
       "via": null
     },
     {
-      "id": "a4491143dfd04da4860b938ccaef1367",
+      "id": "2ae0700ac65e4467b00881b90ad4bd60",
       "source": "group",
       "kind": "group_project_delayed",
       "title": "SUPERTECH GOLF COUNTRY (PHASE-I) (UPRERAPRJ5848): completion date 29 Jun 2019 passed 87 months ago, not completed",
@@ -618,7 +612,7 @@
       "via": null
     },
     {
-      "id": "94423db35a6a44feaaf315d5b6843a6a",
+      "id": "0f121870ef9849f98003adb7b1c21a34",
       "source": "group",
       "kind": "group_project_delayed",
       "title": "SUPERTECH CAPETOWN (PHASE-I) (UPRERAPRJ5017): completion date 30 Dec 2019 passed 81 months ago, not completed",
@@ -637,7 +631,7 @@
       "via": null
     },
     {
-      "id": "341deafd29d244eab3b6bcc5393c1061",
+      "id": "8d1fac700ce14cbcbab9a86025e0c2b7",
       "source": "group",
       "kind": "group_project_delayed",
       "title": "Project (UPRERAPRJ5854): completion date 31 Dec 2019 passed 81 months ago, not completed",
@@ -656,7 +650,7 @@
       "via": null
     },
     {
-      "id": "81c0859faaa643a2bf3457be7c8e0f9e",
+      "id": "aebe11d87fd94832bbc7d9aa1230bdaa",
       "source": "group",
       "kind": "group_project_delayed",
       "title": "SPORTS VILLAGE (PHASE-I) (UPRERAPRJ408): completion date 30 Jun 2021 passed 63 months ago, not completed",
@@ -675,7 +669,7 @@
       "via": null
     },
     {
-      "id": "baf2bf74af4c44d6996afa4965ec3c5d",
+      "id": "4b556fea50aa4fabbdf9b72e4ef7c088",
       "source": "insolvency",
       "kind": "insolvency_admitted",
       "title": "Insolvency application against SUPERTECH LIMITED was admitted on 25 Mar 2022",
@@ -694,7 +688,7 @@
       "via": null
     },
     {
-      "id": "bf9e4d7b2d9e400f9a40e5237c0dbb2f",
+      "id": "50c6323198a54b5aa41711df6f3ad65a",
       "source": "news",
       "kind": "court_order",
       "title": "Supreme Court order of 05 Feb 2026 names this project among the stalled SUPERTECH LIMITED projects the NBCC is to complete",
@@ -713,7 +707,7 @@
       "via": null
     },
     {
-      "id": "ea8868b5f2d94e9181c58c8a473b352c",
+      "id": "e7f7820663b447bdb5920c0c8ae41759",
       "source": "news",
       "kind": "news_story",
       "title": "News on delays, about the promoter: NBCC moves Supreme Court over RERA rules for 16 Supertech projects (published about 2 months ago)",
@@ -732,7 +726,7 @@
       "via": null
     },
     {
-      "id": "718ffac559354bcdaf5ece9f8bc7e875",
+      "id": "5a060c5c29414cdda95d1dd042764f3c",
       "source": "news",
       "kind": "news_story",
       "title": "News on delays, about the promoter: 16 years, Rs 50 lakh lost: How Supertech delays are costing homebuyers lakhs (published about 1 month ago)",
@@ -751,7 +745,7 @@
       "via": null
     },
     {
-      "id": "7d4588e79d0c4e919c5f50f7dbad9beb",
+      "id": "ca62e3003b75480da5ec522cc3065854",
       "source": "news",
       "kind": "news_story",
       "title": "News on delays, about the promoter: NBCC to resume work on 16 stalled Supertech projects in Jan (published about 4 weeks ago)",
@@ -771,9 +765,9 @@
     }
   ],
   "display_score": {
-    "value": 621,
+    "value": 495,
     "provisional_value": null,
-    "band": "Watch",
+    "band": "Elevated",
     "hard_stop": false,
     "confidence": 0.83,
     "provisional": false,
@@ -781,9 +775,9 @@
     "records_total": 6
   },
   "score_v2": {
-    "value": 621,
-    "band": "Watch",
-    "band_label": "Watch",
+    "value": 495,
+    "band": "Elevated",
+    "band_label": "Elevated risk",
     "provisional": false,
     "hard_stop": false,
     "hard_stop_reason": null,
@@ -793,8 +787,8 @@
         "id": "P1",
         "name": "Regulatory compliance (RERA)",
         "weight": 0.3,
-        "penalty": 0,
-        "points": -0.0
+        "penalty": 70,
+        "points": -126.0
       },
       {
         "id": "P2",
@@ -837,15 +831,23 @@
         "code": "R05",
         "label": "15 RERA complaints",
         "finding_ids": [
-          "6f22859e39b14d25afba80e8ab1fabe1"
+          "6521d11eb0dd4abdb843be0a9340e4d2"
         ],
         "points": -150.0
+      },
+      {
+        "code": "R03",
+        "label": "Revised completion date 105 months after the promised one",
+        "finding_ids": [
+          "d4ce6f81f576464b9eb972c3668b1983"
+        ],
+        "points": -126.0
       },
       {
         "code": "R13",
         "label": "Other projects of the same group delayed or lapsed",
         "finding_ids": [
-          "0468996846dc47d39138888aec40b658"
+          "0925d276a8a54fc682fb93312fdafad2"
         ],
         "points": -120.0
       },
@@ -853,9 +855,9 @@
         "code": "R11",
         "label": "Adverse news or protests (3 articles)",
         "finding_ids": [
-          "718ffac559354bcdaf5ece9f8bc7e875",
-          "7d4588e79d0c4e919c5f50f7dbad9beb",
-          "ea8868b5f2d94e9181c58c8a473b352c"
+          "5a060c5c29414cdda95d1dd042764f3c",
+          "ca62e3003b75480da5ec522cc3065854",
+          "e7f7820663b447bdb5920c0c8ae41759"
         ],
         "points": -9.0
       },
@@ -868,35 +870,42 @@
     ],
     "drivers": [
       {
-        "finding_id": "6f22859e39b14d25afba80e8ab1fabe1",
+        "finding_id": "6521d11eb0dd4abdb843be0a9340e4d2",
         "pillar": "P3",
         "code": "R05",
         "penalty": 100,
         "points": -150.0
       },
       {
-        "finding_id": "0468996846dc47d39138888aec40b658",
+        "finding_id": "d4ce6f81f576464b9eb972c3668b1983",
+        "pillar": "P1",
+        "code": "R03",
+        "penalty": 70,
+        "points": -126.0
+      },
+      {
+        "finding_id": "0925d276a8a54fc682fb93312fdafad2",
         "pillar": "P2",
         "code": "R13",
         "penalty": 100,
         "points": -120.0
       },
       {
-        "finding_id": "718ffac559354bcdaf5ece9f8bc7e875",
+        "finding_id": "5a060c5c29414cdda95d1dd042764f3c",
         "pillar": "P6",
         "code": "R11",
         "penalty": 10,
         "points": -3.0
       },
       {
-        "finding_id": "7d4588e79d0c4e919c5f50f7dbad9beb",
+        "finding_id": "ca62e3003b75480da5ec522cc3065854",
         "pillar": "P6",
         "code": "R11",
         "penalty": 10,
         "points": -3.0
       },
       {
-        "finding_id": "ea8868b5f2d94e9181c58c8a473b352c",
+        "finding_id": "e7f7820663b447bdb5920c0c8ae41759",
         "pillar": "P6",
         "code": "R11",
         "penalty": 10,
@@ -1028,7 +1037,6 @@
       }
     ]
   },
-  "coverage": "full",
   "portal_url": "https://www.up-rera.in/",
   "complaint_url": "https://www.up-rera.in/ComplaintHome"
 }

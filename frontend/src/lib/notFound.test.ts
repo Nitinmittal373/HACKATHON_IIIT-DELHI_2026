@@ -20,7 +20,7 @@ const BANNED = [
 ];
 
 function words(card: typeof en.notFound): string {
-  return [card.title, card.note, card.stepsTitle, ...card.steps, card.reportTitle, card.reportLink("RERA"), card.reportOther, card.tryTitle, ...card.tryItems, card.tryButton].join(" ");
+  return [card.title, card.note, card.stepsTitle, ...card.steps, card.reportTitle, card.reportLink, card.tryTitle, ...card.tryItems, card.tryButton].join(" ");
 }
 
 test("the not-found card never accuses the project", () => {
@@ -38,6 +38,16 @@ test("the not-found card says only that no record was found, and what to do", ()
 });
 
 test("the other cards do not accuse the project either", () => {
-  const copy = [en.preRera.body("X"), en.orderLead.body("Y"), en.builderResults.noneBody("Z"), hi.preRera.body("X"), hi.orderLead.body("Y")].join(" ");
+  const copy = [en.orderLead.body("Y"), en.builderResults.noneBody("Z"), hi.orderLead.body("Y")].join(" ");
   for (const word of BANNED) assert.doesNotMatch(copy, word);
+});
+
+test("the outside-Uttar-Pradesh answer is calm and names no other state", () => {
+  assert.equal(
+    en.outsideUp,
+    "NeevCheck covers Uttar Pradesh RERA projects for now. Check this project on its own state's RERA website.",
+  );
+  for (const text of [en.outsideUp, hi.outsideUp]) {
+    for (const word of BANNED) assert.doesNotMatch(text, word);
+  }
 });

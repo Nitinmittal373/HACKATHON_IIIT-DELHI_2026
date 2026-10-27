@@ -3,7 +3,7 @@ export const check = {
     step: "Step 1 of 3 · Confirm",
     title: (count: number, query: string) =>
       `We found ${count} ${count === 1 ? "project" : "projects"} for “${query}”`,
-    lead: "From the state RERA portals. Each phase has its own registration, so pick the one on your agreement.",
+    lead: "From UP-RERA. Each phase has its own registration, so pick the one on your agreement.",
     tableLabel: "Matching projects",
     colProject: "Project",
     colNumber: "RERA no.",
@@ -17,13 +17,13 @@ export const check = {
     starting: "Starting the check…",
     pickOne: "Pick the project on your agreement to continue.",
     waking: "Waking up the server, this takes up to a minute on the free plan…",
-    searching: "Searching RERA portals…",
-    searchingNote: "Reading RERA portals live. A name search can take up to a minute.",
-    searchFailedTitle: "We could not search the RERA portals just now",
+    searching: "Searching UP-RERA…",
+    searchingNote: "Reading UP-RERA live. A name search can take up to a minute.",
+    searchFailedTitle: "We could not search UP-RERA just now",
     searchFailedBody:
       "The search did not finish. Nothing was charged and nothing was saved. Please try again in a minute.",
     searchTimeout:
-      "A RERA portal or the search service did not answer in time. Nothing was charged. Please try again.",
+      "UP-RERA or the search service did not answer in time. Nothing was charged. Please try again.",
     searchKey:
       "The search service did not accept NeevCheck's key, so nothing could be read. This is on our side; please try again later.",
     searchBusy: (seconds: number) =>
@@ -46,7 +46,8 @@ export const check = {
       sarfaesi: "Lender notices",
     },
     warRoom: "War Room",
-    warRoomHint: "Six lanes read in parallel. Open one to watch it in the browser below.",
+    warRoomHint: (lanes: number) =>
+      `${lanes} lanes read, two at a time. Open one to watch it in the browser below.`,
     lanes: {
       uprera: "UP-RERA",
       registry: "MCA and registry",
@@ -65,7 +66,9 @@ export const check = {
       partial: "Partly read",
     },
     laneWaitingNote: "Waiting to start",
-    laneSkippedNote: "This lane did not run in this check.",
+    laneSkippedFailed: "The check stopped before this lane started, so it was not read.",
+    laneSkippedOld:
+      "Not run: this check was made before this source was added. Run a new check to include it.",
     laneFindings: (count: number) => `${count} ${count === 1 ? "finding" : "findings"}`,
     laneExpand: "Open in the big view",
     laneOpen: "Shown in the big view",
@@ -75,6 +78,7 @@ export const check = {
       running: "Reading",
       done: "Done",
       blocked: "Stopped",
+      partial: "Partly read",
       unread: "Not read",
     },
     live: "LIVE",
@@ -106,6 +110,7 @@ export const check = {
     blockedTimeout: "Agent stopped: this page did not answer in time.",
     blockedOther: (reason: string) => `Agent stopped: ${reason}`,
     unreadReason: "Could not be read this time. This lowers confidence, never the score.",
+    partialReason: "Read in part before it stopped. What it found so far:",
     checkYourself: "Check it yourself",
     resultProvisional: "Not enough evidence yet",
     resultProvisionalNote: "Too few key records could be read to give a risk band.",

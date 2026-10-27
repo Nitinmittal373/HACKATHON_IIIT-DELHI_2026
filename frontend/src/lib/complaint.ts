@@ -1,6 +1,5 @@
 import { formatDay } from "@/lib/format";
 import type { Lang, Strings } from "@/lib/i18n";
-import { stateLabel } from "@/lib/states";
 import type { Finding, Report } from "@/lib/types";
 
 const COMPLAINT_KINDS = [
@@ -35,7 +34,7 @@ export function buildComplaintDraft(report: Report, t: Strings, lang: Lang): str
   const readOn = formatDay(report.check.completed_at?.slice(0, 10) ?? report.check.started_at.slice(0, 10), lang);
 
   const lines = [
-    c.to(stateLabel(report.state, report.state_name, lang), report.rera_name),
+    c.to,
     "",
     c.subject(project.name ?? project.rera_id, project.rera_id),
     "",

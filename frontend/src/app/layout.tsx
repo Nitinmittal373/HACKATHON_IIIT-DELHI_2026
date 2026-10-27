@@ -41,7 +41,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: "NeevCheck: know your builder before you book",
   description:
-    "A risk check for under-construction homes, for any RERA project in India with the deepest coverage in Uttar Pradesh. TinyFish agents read state RERA, company, insolvency and court records and give a NeevScore with proof for every point.",
+    "A risk check for under-construction homes in Uttar Pradesh. TinyFish agents read UP-RERA, company, insolvency and court records and give a NeevScore with proof for every point.",
 };
 
 export const viewport: Viewport = { themeColor: "#ffffff" };

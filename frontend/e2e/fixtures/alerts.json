@@ -1,10 +1,7 @@
 [
   {
-    "state": "UP",
-    "state_name": "Uttar Pradesh",
-    "rera_name": "UP-RERA",
-    "id": "4b9427e5ba34414a84b2968a2a65b762",
-    "watch_id": "3e16bbdff9744b0f9deb2987bc735707",
+    "id": "751ab9db318b4d35a85980833069d423",
+    "watch_id": "b5f2435da6804d768b4fe99e793cb0e8",
     "rera_id": "UPRERAPRJ8334",
     "project_name": "SUPERTECH ECO VILLAGE-I PHASE I-C",
     "check_id": "4ad9752355f9455aa9d242c93950ea04",
@@ -12,9 +9,9 @@
     "old_score": 68,
     "new_score": 68,
     "old_display_score": {
-      "value": 741,
+      "value": 567,
       "provisional_value": null,
-      "band": "Watch",
+      "band": "Elevated",
       "hard_stop": false,
       "confidence": 0.67,
       "provisional": false,
@@ -22,9 +19,9 @@
       "records_total": 6
     },
     "new_display_score": {
-      "value": 741,
+      "value": 567,
       "provisional_value": null,
-      "band": "Watch",
+      "band": "Elevated",
       "hard_stop": false,
       "confidence": 0.67,
       "provisional": false,

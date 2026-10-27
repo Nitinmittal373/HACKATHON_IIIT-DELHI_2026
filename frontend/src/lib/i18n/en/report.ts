@@ -1,4 +1,5 @@
 export const report = {
+  builderFromListings: "Builder identified from public listings; verify on UP-RERA.",
   areas: {
     rera: "UP-RERA compliance",
     execution: "Project execution",

@@ -8,7 +8,6 @@ import { ResultCard } from "@/components/cam/ResultCard";
 import { SourceTabs } from "@/components/cam/SourceTabs";
 import { WarRoom } from "@/components/cam/WarRoom";
 import { activeSource, progressPercent, visibleSources, type CamState } from "@/lib/checkState";
-import { relabel } from "@/lib/i18n/relabel";
 import { useLang } from "@/lib/LangProvider";
 import { SOURCE_INFO } from "@/lib/sources";
 import type { SourceName } from "@/lib/types";
@@ -20,16 +19,11 @@ interface Props {
   reraId: string;
   /** The UP-RERA page the check reads; shown in the address bar until a finding names a page. */
   detailsUrl: string;
-  /** The state's authority as its pages call it, such as MahaRERA. */
-  rera: string;
-  /** Where that authority's portal is; the RERA lane links to it. */
-  portalUrl?: string;
 }
 
 /** The live check: source tabs, the agent's browser, and the findings as they arrive. */
-export function AgentCam({ checkId, reraId, detailsUrl, rera, portalUrl }: Props) {
-  const { t: base } = useLang();
-  const t = relabel(base, rera);
+export function AgentCam({ checkId, reraId, detailsUrl }: Props) {
+  const { t } = useLang();
   const { state, connection } = useCheckEvents(checkId);
   // Until a tab is clicked the window follows whichever source is working.
   const [picked, setPicked] = useState<SourceName | null>(null);
@@ -67,7 +61,8 @@ export function AgentCam({ checkId, reraId, detailsUrl, rera, portalUrl }: Props
           name={shown}
           view={state.sources[shown]}
           address={addressFor(shown, state, detailsUrl)}
-          officialUrl={shown === "uprera" ? portalUrl : undefined}
+          officialUrl={shown === "uprera" ? SOURCE_INFO.uprera.officialUrl : undefined}
+          findings={state.findings.filter((finding) => finding.source === shown)}
           percent={percent}
           t={t}
         />

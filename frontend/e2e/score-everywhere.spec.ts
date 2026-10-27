@@ -168,7 +168,7 @@ test("alerts: the score before and after is on the scale", async ({ page }) => {
 test("in Hindi the band labels and the scale follow the same map", async ({ page }) => {
   await page.context().addCookies([{ name: "neevcheck-lang", value: "hi", url: "http://localhost:3010" }]);
   await page.goto(`/report/${ECO}`);
-  await expect(page.getByRole("img", { name: `नींवस्कोर ${max} में से ${SCORE.value}, निगरानी रखें` })).toBeVisible();
+  await expect(page.getByRole("img", { name: `नींवस्कोर ${max} में से ${SCORE.value}, बढ़ा हुआ जोखिम` })).toBeVisible();
   await page.goto("/");
   await expect(page.getByRole("heading", { name: `एक ईमानदार संख्या, ${min} से ${max}` })).toBeVisible();
 });

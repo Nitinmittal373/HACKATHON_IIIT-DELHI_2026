@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 
 import { NeevScore } from "@/components/NeevScore";
 import { UnratedNote } from "@/components/UnratedNote";
-import { StateBadge } from "@/components/StateBadge";
 import { ExternalLinkIcon } from "@/components/report/ExternalLinkIcon";
 import { bestColumn, companyRank, insolvencyRank, pillarLost, pillarsComparable } from "@/lib/compare";
 import { formatDay } from "@/lib/format";
@@ -37,10 +36,7 @@ export function compareRows(comparison: Comparison, t: Strings, lang: Lang): Com
   const comparePillars = pillarsComparable(projects);
 
   return [
-    { key: "rera", label: c.rows.rera, cells: projects.map((p) => <span key={p.check_id}>
-            <span className="mono">{p.project.rera_id}</span>{" "}
-            <StateBadge code={p.project.state} name={p.project.state_name} rera={p.project.rera_name} t={t} lang={lang} />
-          </span>), best: null },
+    { key: "rera", label: c.rows.rera, cells: projects.map((p) => <span key={p.check_id} className="mono">{p.project.rera_id}</span>), best: null },
     { key: "promoter", label: c.rows.promoter, cells: projects.map((p) => text(p.project.promoter)), best: null },
     { key: "district", label: c.rows.district, cells: projects.map((p) => text(p.project.district)), best: null },
     {

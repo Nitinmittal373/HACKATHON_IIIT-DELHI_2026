@@ -1,8 +1,5 @@
 {
-  "state": "UP",
-  "state_name": "Uttar Pradesh",
-  "rera_name": "UP-RERA",
-  "id": "0da04d7b616b405483f3263356e815bd",
+  "id": "a51464c429a54a30a03bc454d51061cf",
   "rera_id": "UPRERAPRJ6742",
   "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=6742",
   "project": "14th Avenue (Group Housing) - Gaur City",
@@ -13,7 +10,7 @@
   "confidence": 0.29,
   "display_score": {
     "value": null,
-    "provisional_value": 900,
+    "provisional_value": 774,
     "band": "insufficient_evidence",
     "hard_stop": false,
     "confidence": 0.33,

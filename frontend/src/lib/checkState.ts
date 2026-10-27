@@ -9,8 +9,11 @@ import type {
   SourceRun,
 } from "@/lib/types";
 
-/** What the Agent Cam shows for one source. "unread" means the source could not be read. */
-export type SourceStatus = "waiting" | "running" | "done" | "blocked" | "unread";
+/**
+ * What the Agent Cam shows for one source. "unread" means the source could not be read;
+ * "partial" means it was read in part before it stopped.
+ */
+export type SourceStatus = "waiting" | "running" | "done" | "partial" | "blocked" | "unread";
 
 export interface SourceView {
   status: SourceStatus;
@@ -62,8 +65,14 @@ function patch(state: CamState, name: SourceName, change: Partial<SourceView>): 
   return { ...state, sources: { ...state.sources, [name]: { ...state.sources[name], ...change } } };
 }
 
-function finishedStatus(status: RunStatus): SourceStatus {
-  if (status === "completed") return "done";
+/** These sources answer a key check; finishing without reading it is "not read", not "done". */
+const ANSWERS_A_CHECK: SourceName[] = ["uprera", "registry", "insolvency", "land", "consumer"];
+
+function finishedStatus(status: RunStatus, source: SourceName, checksRead: string[]): SourceStatus {
+  if (status === "completed") {
+    return ANSWERS_A_CHECK.includes(source) && checksRead.length === 0 ? "unread" : "done";
+  }
+  if (status === "partial") return "partial";
   if (status === "blocked") return "blocked";
   return "unread";
 }
@@ -93,7 +102,7 @@ export function applyEvent(state: CamState, event: CheckEvent): CamState {
     case "source.blocked":
       return patch(state, event.source, { status: "blocked", reason: event.data.reason || null });
     case "source.completed": {
-      const status = finishedStatus(event.data.status);
+      const status = finishedStatus(event.data.status, event.source, event.data.checks_read);
       const reason = event.data.message ?? state.sources[event.source].reason;
       return patch(state, event.source, { status, reason });
     }
@@ -113,7 +122,8 @@ export function applyCheck(state: CamState, check: Check): CamState {
 }
 
 function applyRun(state: CamState, run: SourceRun): CamState {
-  const status: SourceStatus = run.status === "running" ? "running" : finishedStatus(run.status);
+  const status: SourceStatus =
+    run.status === "running" ? "running" : finishedStatus(run.status, run.source, run.checks_read);
   const liveUrl = run.live_url && isHttps(run.live_url) ? run.live_url : null;
   return patch(state, run.source, { status, liveUrl, reason: run.message });
 }
