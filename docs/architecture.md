@@ -44,26 +44,13 @@ flowchart TB
 | 4. Report | `GET /api/checks/{id}/report` | Score, drivers, evidence and timeline (action plan in Phase 4) |
 | 5. Watch list | `POST /api/sentinel` | Adds the project to weekly re-checks; alerts are read with `GET /api/sentinel/alerts?email=` |
 
-## State adapters
+## Scope: Uttar Pradesh only
 
-`backend/app/states/` holds one small file per state. Each builds a `StateAdapter` from the facts in [states.md](states.md): code, name, authority, domains, number patterns, coverage level, examples and complaint page.
-
-```
-buyer's text ─► detect_state ─► registry ─► StateAdapter ─┬─ resolve(query)  Search on the state's domains
-   (any state)   (number format)                          ├─ read(project)   ProjectRecord (state-agnostic)
-                                                          └─ details_url / complaint_url / coverage
-UP:   UpAdapter wraps the original UP-RERA code (Fetch + parser), unchanged
-rest: SearchStateAdapter reads the portal's own pages through Search snippets (and the page or
-      list row when Fetch can open it: Goa, Bihar, Jharkhand)
-```
-
-`ProjectRecord` (state, number, name, promoter, district, registration date, promised and revised completion, extensions, status, complaints, `source_url`, `read_at`, the snippet text) is all the scoring needs. `StateReraSource` turns it into the same findings UP-RERA gives, so NeevScore v2 is unchanged for every state; a fact the portal did not show stays unread (R12) and never costs points. The findings of a search-only read carry `via: "search_snippet"`. The state is not stored: every number format belongs to exactly one state, so `state_of(rera_id)` gives it back, and records made before all-India support are UP.
-
-`GET /api/states` lists the adapters; `GET /api/projects/search?q=&state=` accepts an optional state. With no state, a number is routed by its format and a name is searched with one combined Search across every portal, then one focused Search for the three states that answered best, plus UP. `POST /api/checks` takes an optional `state`; the details link is accepted only on that state's own domains. The source cache is keyed by state for every state but UP.
+NeevCheck reads one register, UP-RERA, and the sources that follow its promoter. A registration number of another state's RERA, or a name that only a city outside Uttar Pradesh explains, is answered with `outside_up: true` on `GET /api/projects/search` and `GET /api/promoters/search`, and the app says: *"NeevCheck covers Uttar Pradesh RERA projects for now. Check this project on its own state's RERA website."* `POST /api/checks` refuses such a number with the same words. Nothing is searched for it.
 
 ## Finding a project
 
-For UP, `app/resolve.py` (behind `UpAdapter`) turns what the buyer typed into at most 8 candidates, each with its name, promoter, district and registration date, and the page a check will read.
+`app/resolve.py` turns what the buyer typed into at most 8 candidates, each with its name, promoter, district and registration date, and the page a check will read.
 
 | Typed | How it is found |
 | --- | --- |
@@ -76,24 +63,24 @@ A number counts only when its own up-rera.in page shows it with a name and a pro
 
 ### Finding a project on the open web
 
-A state portal Search cannot read still has its projects' numbers printed by the builder and by listing sites, so `app/states/openweb.py` also runs two Searches with no domain limit (`<q> RERA registration number`, `<q> RERA`, cached for 24 hours) beside the portal search. It looks for the number formats of every state (`id_patterns`) in the titles and snippets and votes:
+A project whose up-rera.in page Search does not return still has its number printed by the builder and by listing sites, so `app/states/openweb.py` also runs two Searches with no domain limit (`<q> RERA registration number`, `<q> RERA`, cached for 24 hours) beside the portal search. It looks for the number formats of every state (`id_patterns`) in the titles and snippets and votes:
 
 | Who prints the number | Points |
 | --- | --- |
-| A page on that state's RERA domain | +3 |
+| A page on up-rera.in | +3 |
 | The builder's own site (its domain holds the brand word of the query) | +2 |
 | Any other distinct domain | +1 each |
 
 A number is kept at 3 points, or when two domains print it, and only if one of them prints it next to the project's name (at least 75% of its distinctive words, city names ignored). A list of projects gives each number only the words up to its neighbours, so a number beside another project's name is not this project's. Plain formats such as `112 of 2021` need "RERA" beside them. Several numbers (phases, towers) are separate candidates.
 
-Each kept number is then searched exactly on its state's domain (`app/states/confirm.py`, at most four per query). A page that prints it makes the candidate `confirmed`; otherwise it stays `listings_only` and the app says so. Listing sites are used only to find the number; a finding still needs the portal. A listing sentence such as "does not apply to RERA and has already been delivered" (`app/states/prerera.py`) becomes a `pre_rera` note: the app quotes the sentence, links the page and offers a builder-only check, with no project score. A number typed alone that no portal page names gets its builder from `identify_builder`.
+Each kept number is then looked up exactly on up-rera.in (`app/states/confirm.py`, at most four per query). A page that prints it makes the candidate `confirmed`; otherwise it stays `listings_only` and the app says so. Listing sites are used only to find the number; a finding still needs the portal. A listing sentence such as "does not apply to RERA and has already been delivered" (`app/states/prerera.py`) becomes a `pre_rera` note: the app quotes the sentence, links the page and offers a builder-only check, with no project score. A number typed alone that no portal page names gets its builder from `identify_builder`.
 
 ### Builder and locality search
 
 For buyers whose project has no website to search:
 
-- `GET /api/promoters/search?q=&state=&city=` (`app/states/promoter_search.py`) takes a builder's name and runs three Searches: the state RERA domains (the named state, the state of the named city, or all of them), company-registry mirrors of MCA data (name and CIN only), and the open web, whose numbers are voted on like a project name's. It returns the registered projects found, each with its number, state, status and the sites that printed it, and the company pages found. Generic words such as "Limited" and "Developers" never decide a match, and different Lodha companies are listed apart, never merged.
-- `GET /api/projects/search?q=&locality=` adds a city or locality ("Sector 150 Noida"). `app/states/places.py` maps about 150 cities and areas to a state, so the portals searched narrow to it; the locality is added to the open-web search and never counts as part of the project's name.
+- `GET /api/promoters/search?q=&city=` (`app/states/promoter_search.py`) takes a builder's name and runs three Searches: up-rera.in, company-registry mirrors of MCA data (name and CIN only), and the open web, whose numbers are voted on like a project name's. It returns the registered projects found, each with its number, state, status and the sites that printed it, and the company pages found. Generic words such as "Limited" and "Developers" never decide a match, and different Lodha companies are listed apart, never merged.
+- `GET /api/projects/search?q=&locality=` adds a city or locality ("Sector 150 Noida"). `app/states/places.py` lists the cities homebuyers search, so a city outside Uttar Pradesh can be answered calmly when nothing is found; the locality is added to the open-web search and never counts as part of the project's name.
 
 ### Brochure, agreement and QR
 
@@ -305,7 +292,7 @@ flowchart LR
     A -->|page read| P
 ```
 
-A report costs at most three agent runs: the insolvency source and e-Jagriti each use one, and the registry source only when Fetch cannot read its page. UP-RERA, the builder's group, lender notices, land-authority lists and news are read with Search and Fetch alone. Results are cached per (source, entity, day) with `V2_SOURCES=true`.
+A report costs at most three agent runs: the insolvency source and e-Jagriti each use one, and the registry source only when Fetch cannot read its page. UP-RERA, the builder's group, lender notices, land-authority lists and news are read with Search and Fetch alone. Results are cached per (source, entity, day).
 
 ## Free-plan cold starts
 
@@ -335,4 +322,10 @@ NeevCheck has no sign-in. The app keeps the ids of the checks a visitor starts i
 
 ## Source cache (v2)
 
-With `V2_SOURCES=true` each source result is kept per (source, entity, day) in the `source_cache` table. Registry, insolvency, land, news and lender notices are reused for the same UTC day, the group source for 7 days. A reused read keeps the time it was really read, and "Re-check now" bypasses the cache. Blocked or failed reads are never kept. `python -m scripts.prewarm UPRERAPRJ8334 ...` runs real checks ahead of a demo.
+Each source result is kept per (source, entity, day) in the `source_cache` table. Registry, insolvency, land, news and lender notices are reused for the same UTC day, the group source for 7 days. A reused read keeps the time it was really read, and "Re-check now" bypasses the cache. Blocked or failed reads are never kept. `python -m scripts.prewarm UPRERAPRJ8334 ...` runs real checks ahead of a demo.
+
+## A check that is only partly read
+
+UP-RERA reports what it has read (`ChecksRead`: registration, completion date, and extensions when the summary page is the main record) as soon as the main page is parsed, before the slower complaint pages. A source that then times out or fails keeps its findings and checks and ends as **`partial`** (a run status next to `completed`, `blocked`, `failed` and `unavailable`); with nothing reported it ends as `blocked` (timeout, CAPTCHA) or `failed`. A check fails only when UP-RERA gave no project record and the builder is not known: with a builder name, the registry, group, insolvency, consumer and news sources still run. The War Room shows a lane that has findings as "Partly read", never "Not read".
+
+At startup the API scores every stored check again with the current rules (`Store.rescore_all`, idempotent), so old reports and `GET /api/checks/recent` follow the method section.

@@ -6,7 +6,7 @@ NeevScore is a number from 300 to 900, like a credit score: higher is safer. It 
 
 The backend owns the scale. Every response that shows a score carries a `display_score` (`value`, `band`, `hard_stop`, `confidence`, `provisional`): the report, the check and its events, My reports, the recent checks, compare, Sentinel alerts and a promoter's other projects. The full detail (pillars, reason codes, drivers) is the report's `score_v2`. `GET /api/meta` returns the scale (300 and 900), the band edges, the pillar weights and the reason codes, so the frontend never keeps its own copy.
 
-A check made before NeevScore existed has no stored v2 result. It is re-scored from its stored findings and source runs whenever it is read, with the same engine, so an old report reads exactly as a new one would. Nothing is written back.
+Every stored check is scored again with the current rules once when the API starts (idempotent: the same findings give the same score), so an old report and `GET /api/checks/recent` read exactly as a new check would. A check made before NeevScore existed is scored from its stored findings and source runs the same way.
 
 ## Formula
 
@@ -24,8 +24,8 @@ Credit ratings weigh business, financial, project and management risk separately
 
 | Pillar | Weight | Penalties |
 | --- | --: | --- |
-| P1 Regulatory compliance (RERA) | 30% | Registration lapsed or revoked 100 (**hard stop**); extended: 30 + 20 per extra; revised date more than 12 / 24 months after the promised one: 40 / 70; QPRs missed in the last 4 quarters: 15 each (max 60); penalty orders: 20 each |
-| P2 Delivery track record | 20% | Share of the group's RERA projects delayed over 12 months (0–100); any group project lapsed: 40 |
+| P1 Regulatory compliance (RERA) | 30% | Registration lapsed or revoked 100 (**hard stop**); extended: 30 + 20 per extra; revised date more than 12 / 24 months after the promised one: 40 / 70; completion date passed and the project not completed (`past_end_date`): the same 40 / 70 steps by months overdue, and when both lateness findings are present only the larger counts; QPRs missed in the last 4 quarters: 15 each (max 60); penalty orders: 20 each |
+| P2 Delivery track record | 20% | Share of the group's RERA projects delayed over 12 months (0–100); any group project lapsed: 40; UP-RERA complaints against the promoter across all its projects: 1 each (max 40) |
 | P3 Legal and insolvency | 25% | Promoter in CIRP 100 (**hard stop**, official NCLT/IBBI/MCA page only); sister company or other project in insolvency 50; RERA complaints about the project 10 each (max 100); pending cases 5 each (max 40) |
 | P4 Financial and corporate health | 15% | Company or director struck off or disqualified 40; recent charge 20; late MCA filings 20; SARFAESI auction notice 60 |
 | P5 Land authority and approvals | 5% | On a land authority defaulter list 70; failed package deposit 50; no OC/CC past due 30 |
@@ -42,7 +42,7 @@ Credit ratings weigh business, financial, project and management risk separately
 
 ## Confidence
 
-The share of the six pillars with at least one source read. Below 50% the band is "Not enough evidence yet": the score is still shown, marked provisional, unless a hard stop from an official page applies. Compare ranks only checks at or above 50%.
+The share of the six pillars with at least one source read. A band is shown only when the UP-RERA record (P1) was read **and** at least 4 of the 6 pillars were read. Otherwise the band is "Not enough evidence yet": the number is kept as a provisional value, never shown as a score. A hard stop from an official page always shows. Compare ranks only checks that have a band.
 
 ## Reason codes
 
@@ -62,16 +62,14 @@ The report shows the four codes that cost the most points, like a credit report.
 | R10 | Pending litigation (n cases) |
 | R11 | Adverse news or protests (n articles) |
 | R12 | Data unavailable (source down or CAPTCHA). **Never adds a penalty**; it only lowers confidence |
-| R13 | Other projects of the same group delayed or lapsed (added: P2 has no code in the first list) |
+| R13 | Builder record: complaints against the promoter across its UP-RERA projects ("Builder complaint record"), and other projects of the same group delayed or lapsed (added: P2 has no code in the first list) |
 | R14 | Late filings with the company registry (added for the same reason) |
 
 Findings that map to no v2 rule (a registration date, a court order, an unverified insolvency report) still appear in the evidence list with 0 v2 points. The v2 reason codes use only facts the code can read; a signal that cannot be read honestly stays unread and appears under R12.
 
-## Other states
+## No number without evidence
 
-The rules read only findings, never a state. A state adapter turns its portal into the same findings UP-RERA gives (registration, completion date, delay against the promised date, status, complaints), so the same rules apply. For a state whose portal can only be read through Search snippets, most of those facts are not shown: they stay unread, appear under R12 and lower confidence, and never cost points. The land-dues check exists for Uttar Pradesh only; for any other state it is unread. Such a read is usually *provisional* (too few pillars read), which the report says in plain words. 
-
-**No number without evidence.** When fewer than half of the six pillars were read (band `insufficient_evidence`), `display_score.value` is `null` and every screen shows a dash with "Not enough evidence yet · n of 6 record types read". The computed figure is kept as `provisional_value` and appears only in the method section, labelled as provisional. Compare and "best on records" ignore such projects. A Maharashtra, a Haryana and a Karnataka project checked live each read 2 of 6 record types (confidence 33%) and so show no score.
+When the band gate above is not met (band `insufficient_evidence`), `display_score.value` is `null` and every screen shows a dash with "Not enough evidence yet · n of 6 record types read". The computed figure is kept as `provisional_value` and appears only in the method section, labelled as provisional. Compare and "best on records" ignore such projects. A check that read only UP-RERA and one or two other sources therefore shows no score, however clean it looks: a missing record never adds points.
 
 ## Worked example
 
@@ -79,13 +77,13 @@ Supertech Eco Village-I Phase I-C (`UPRERAPRJ8334`), checked live with every sou
 
 | Pillar | Weight | Penalty | Points |
 | --- | --: | --: | --: |
-| P1 Regulatory compliance (RERA) | 30% | 0 | 0 |
-| P2 Delivery track record: 5 of 5 group projects read are more than 12 months past their completion date | 20% | 100 | −120 |
+| P1 Regulatory compliance (RERA): completion date 105 months overdue | 30% | 70 | −126 |
+| P2 Delivery track record: 5 of 5 group projects read are more than 12 months past their completion date (the 2,803 complaints against the promoter use the same pillar, whose cap is spent) | 20% | 100 | −120 |
 | P3 Legal and insolvency: 15 complaints on UP-RERA about this project | 25% | 100 | −150 |
 | P4 Financial and corporate health | 15% | 0 | 0 |
 | P5 Land authority and approvals (not read) | 5% | 0 | 0 |
 | P6 Sentiment and news: three recent stories on delays | 5% | 30 | −9 |
-| **NeevScore** | | | **621 · Watch** |
+| **NeevScore** | | | **495 · Elevated** |
 
 Five of six pillars were read (confidence 83%). Land authority lists could not be read and e-Jagriti stopped at its CAPTCHA, so they appear as reason code R12 and cost nothing.
 
