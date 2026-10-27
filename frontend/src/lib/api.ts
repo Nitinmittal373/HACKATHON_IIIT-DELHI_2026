@@ -201,18 +201,14 @@ export function createCheck(
   return request<Check>("/api/checks", { method: "POST", body });
 }
 
+/** Watches a project; the alert goes to the signed-in account's email, which the API knows. */
 export function createWatch(
+  token: string,
   project: Pick<Project, "rera_id" | "details_url">,
-  email: string,
   language: WatchCreate["language"],
 ): Promise<Watch> {
-  const body: WatchCreate = {
-    rera_id: project.rera_id,
-    details_url: project.details_url,
-    email,
-    language,
-  };
-  return request<Watch>("/api/sentinel", { method: "POST", body });
+  const body: WatchCreate = { rera_id: project.rera_id, details_url: project.details_url, language };
+  return request<Watch>("/api/sentinel", { method: "POST", body, token });
 }
 
 export function sendCorrection(body: CorrectionCreate): Promise<{ id: string }> {
@@ -224,12 +220,13 @@ export function unsubscribe(token: string): Promise<void> {
   return request<void>("/api/sentinel/unsubscribe", { method: "POST", body: { token } });
 }
 
-export function removeWatch(watchId: string): Promise<void> {
-  return request<void>(`/api/sentinel/${watchId}`, { method: "DELETE" });
+export function removeWatch(token: string, watchId: string): Promise<void> {
+  return request<void>(`/api/sentinel/${watchId}`, { method: "DELETE", token });
 }
 
-export function getAlerts(email: string): Promise<Alert[]> {
-  return request<Alert[]>(`/api/sentinel/alerts?email=${encodeURIComponent(email)}`);
+/** The signed-in account's alerts, newest first. */
+export function getAlerts(token: string): Promise<Alert[]> {
+  return request<Alert[]>("/api/sentinel/alerts", { token, timeoutMs: WAKE_TIMEOUT_MS });
 }
 
 /** The checks a visitor started, for "My reports". Ids the server no longer has are left out. */

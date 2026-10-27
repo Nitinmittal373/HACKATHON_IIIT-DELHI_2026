@@ -1,6 +1,11 @@
 "use client";
 
-import { deleteAccount, forgetAccountReport, listAccountReports, saveAccountReports } from "@/lib/api";
+import {
+  createWatch,
+  deleteAccount,
+  forgetAccountReport,
+  getAlerts,
+  removeWatch, listAccountReports, saveAccountReports } from "@/lib/api";
 import { forgetChecks, setAccountSaver, readLocalHistory } from "@/lib/history";
 
 const TOKEN_REFRESH_MS = 9 * 60_000;
@@ -26,6 +31,18 @@ export async function saveToAccount(ids: string[]) {
 
 export async function forgetFromAccount(id: string) {
   return forgetAccountReport(await bridgeToken(), id);
+}
+
+export async function myAlerts() {
+  return getAlerts(await bridgeToken());
+}
+
+export async function watchProject(project: Parameters<typeof createWatch>[1], language: "en" | "hi") {
+  return createWatch(await bridgeToken(), project, language);
+}
+
+export async function stopWatching(watchId: string) {
+  return removeWatch(await bridgeToken(), watchId);
 }
 
 export async function deleteMyData() {

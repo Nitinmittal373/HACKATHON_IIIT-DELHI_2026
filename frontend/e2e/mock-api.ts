@@ -21,8 +21,6 @@ const FIXTURES = resolve(dirname(fileURLToPath(import.meta.url)), "fixtures");
 const PORT = Number(process.env.MOCK_API_PORT ?? 8010);
 const EVENT_DELAY_MS = Number(process.env.MOCK_EVENT_DELAY_MS ?? 40);
 const ALLOWED_ORIGIN = process.env.MOCK_ALLOWED_ORIGIN ?? "http://localhost:3010";
-// The email whose watch raised the recorded alert.
-const ALERTS_EMAIL = "buyer@example.com";
 // The second search result stands in for a visitor over the rate limit.
 const RATE_LIMITED_RERA_ID = "UPRERAPRJ4878";
 
@@ -111,8 +109,8 @@ createServer(async (req, res) => {
     // The browser asks before any JSON POST made from another origin.
     res.writeHead(204, {
       "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type, Authorization",
     });
     return res.end();
   }
@@ -136,8 +134,9 @@ createServer(async (req, res) => {
   if (path === "/api/meta") return send(res, 200, json("meta.json"));
 
   if (path === "/api/sentinel/alerts") {
-    const email = url.searchParams.get("email") ?? "";
-    return send(res, 200, email === ALERTS_EMAIL ? JSON.parse(read("alerts.json")) : []);
+    // Alerts belong to the signed-in account; the real API answers 401 without its token.
+    if (!req.headers.authorization) return send(res, 401, { detail: "Sign in to use this" });
+    return send(res, 200, JSON.parse(read("alerts.json")));
   }
 
   if (path === "/api/checks" && req.method === "POST") {

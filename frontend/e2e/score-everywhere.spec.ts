@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 
 import type { components } from "../src/lib/api-schema";
+import { signInAsAsha } from "./signedIn";
 
 /**
  * Every screen that shows a score shows NeevScore on the scale the API's /api/meta gives. The
@@ -154,7 +155,8 @@ test("Compare: the score row and the pillar rows use the scale; only enough evid
 });
 
 test("alerts: the score before and after is on the scale", async ({ page }) => {
-  await page.goto(`/alerts?email=${encodeURIComponent("buyer@example.com")}`);
+  await signInAsAsha(page);
+  await page.goto("/alerts");
 
   const card = page.getByRole("article");
   const before = ALERT.old_display_score;

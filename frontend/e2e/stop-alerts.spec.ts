@@ -1,10 +1,12 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
+import { signInAsAsha } from "./signedIn";
+
 const API = "http://localhost:8010";
 const CORS = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
   "Access-Control-Allow-Methods": "GET, POST, DELETE",
 };
 const TOKEN = "t0ken-from-the-email";
@@ -58,11 +60,14 @@ test("a failed request says so and lets the reader try again", async ({ page }) 
 });
 
 test("each alert has a Stop watching button that removes that watch", async ({ page }) => {
+  await signInAsAsha(page);
   const sent = await recordStops(page);
-  await page.goto(`/alerts?email=${encodeURIComponent("buyer@example.com")}`);
+  await page.goto("/alerts");
   const button = page.getByRole("button", { name: /^Stop watching / }).first();
   await expect(button).toBeVisible();
   await button.click();
   await expect.poll(() => sent.length).toBe(1);
   expect(sent[0]).toMatch(/^DELETE \/api\/sentinel\/[0-9a-f]{32}$/);
+  // The card goes away with its watch.
+  await expect(page.getByRole("article")).toHaveCount(0);
 });

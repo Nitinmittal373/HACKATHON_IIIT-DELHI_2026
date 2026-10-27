@@ -39,7 +39,7 @@ The free Render database expires after a period set by Render; use a paid plan f
 
 ### Email (optional)
 
-Alerts always show on the Alerts page. To also email them, set `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD` and `SMTP_FROM` under **Environment** (any SMTP provider works; the API uses port 587 with STARTTLS). Leave them empty to send nothing.
+Alerts always show on the Alerts page for the signed-in account. To also email them, set `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD` and `SMTP_FROM` under **Environment** (any SMTP provider works; the API uses port 587 with STARTTLS). Leave them empty to send nothing.
 
 > **Redeploying the API.** The Render service was created from the public repository URL, so Render does **not** deploy on its own when `main` changes (the `autoDeploy` line in `render.yaml` applies only to services made from the Blueprint). After each merge: **Render → `neevcheck-api` → Manual Deploy → Deploy latest commit**. Vercel does deploy on every push to `main`.
 

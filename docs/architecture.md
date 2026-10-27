@@ -42,7 +42,7 @@ flowchart TB
 | 2. Confirm | `POST /api/checks` | Creates a check for one registration number and starts it; returns the check and its `id` (202) |
 | 3. Watch | `GET /api/checks/{id}/events` | Server-Sent Events: `source.started`, `source.live_url`, `source.progress`, `finding.added`, `source.blocked`, `source.completed`, `check.completed` |
 | 4. Report | `GET /api/checks/{id}/report` | Score, drivers, evidence and timeline (action plan in Phase 4) |
-| 5. Watch list | `POST /api/sentinel` | Adds the project to weekly re-checks; alerts are read with `GET /api/sentinel/alerts?email=` |
+| 5. Watch list | `POST /api/sentinel` | Adds the project to weekly re-checks; alerts are read with `GET /api/sentinel/alerts`; both need a sign-in |
 
 ## Scope: Uttar Pradesh only
 
@@ -145,12 +145,12 @@ Interactive docs are served at `/docs`.
 | `GET /api/checks/{id}` | `200` check with each source's status and, once it has one, its `display_score` | `404`, `422` malformed id |
 | `GET /api/checks/{id}/events` | `200 text/event-stream` | `404` |
 | `GET /api/checks/{id}/report` | `200` `display_score`, `score_v2` (pillars, reason codes, drivers), the classic `score`, findings, timeline | `404`, `409` still running or failed |
-| `POST /api/sentinel` `{rera_id, details_url?, email, language}` | `201` watch (`200` if the same email already watches it) | `422` bad input, `409` more than 3 watches for one email, `429` rate limit |
-| `GET /api/sentinel/alerts?email=` | `200` alerts, newest first, each with `old_display_score` and `new_display_score` | `422` bad email |
+| `POST /api/sentinel` `{rera_id, details_url?, language}` with `Authorization: Bearer <bridge token>` | `201` watch for the signed-in account (`200` if it already watches the project). The alert email is the account's verified Google email; an `email` in the body is ignored | `401` no or bad token, `422` bad input, `409` more than 3 watches for one account, `429` rate limit |
+| `GET /api/sentinel/alerts` with the bridge token | `200` the account's alerts only, newest first, each with `old_display_score` and `new_display_score` | `401` no or bad token |
 | `POST /api/sentinel/run` with header `X-Webhook-Secret` | `202` `{started}`; starts a re-check run for an external cron | `401` missing or wrong secret (always, when `WEBHOOK_SECRET` is not set) |
 | `POST /api/sentinel/webhook` with header `X-Webhook-Secret` or `?secret=` | `202` `{status}`: `accepted` (the project is re-checked in the background), `duplicate` (a delivery already handled) or `ignored` (a monitor we do not know). Called by TinyFish monitors | `401` missing or wrong secret, `413` payload over 200 kB |
 | `POST /api/sentinel/unsubscribe` `{token}` | `204` always, whether or not the token exists; a known token removes its watch and cancels its monitors. Limited to 10 requests a minute per address | `422` bad body, `429` rate limit |
-| `DELETE /api/sentinel/{watch_id}` | `204`; removes the watch and cancels its TinyFish monitors | `404` unknown watch |
+| `DELETE /api/sentinel/{watch_id}` with the bridge token | `204`; removes the account's own watch and cancels its TinyFish monitors | `401` no or bad token; `404` for a watch that does not exist **or belongs to another account**, so it never reveals that one exists |
 | `POST /api/corrections` `{report_id, finding_id?, message, contact?}` | `201` `{id}`; stored for the operator | `404` unknown report, `422` bad input, `429` rate limit |
 | `GET /api/corrections` with header `X-Webhook-Secret` | `200` the latest corrections, newest first (admin log) | `401` missing or wrong secret |
 
@@ -240,7 +240,7 @@ erDiagram
 
 ## Neev Sentinel
 
-A watch is an email, a project and a language (at most three watches per email). Every alert email ends with "Stop alerts for this project:" and a link to `<SITE_URL>/alerts/stop?token=...` (`SITE_URL`, or `NEXT_PUBLIC_SITE_URL`; the line is left out when neither is set). The token is 32 random bytes minted for that email and only its SHA-256 hash is stored (`unsubscribe_tokens`), so an older email's link keeps working until the watch is gone and no existing watch needs a backfill. Opening `/alerts/stop` only shows a page; its **Stop alerts** button sends `POST /api/sentinel/unsubscribe`. Alert cards in the app also have **Stop watching**. A re-check runs every `SENTINEL_INTERVAL_HOURS` (default 168, one week; `0` turns the built-in schedule off) from a loop in the app's lifespan, and `POST /api/sentinel/run` starts the same run for an external cron; the secret is compared in constant time.
+A watch is an account (the Google id), its verified email, a project and a language (at most three watches per account). Creating a watch, reading alerts and stopping a watch from the app all need the bridge token described under Accounts; the Alerts page and **Watch with Sentinel** ask the visitor to sign in first. Watches made before accounts existed have no owner: they keep emailing and their email links keep working, they are hidden from the app, and the first signed-in call from an account with the same verified email links them to it (`adopt_unowned`). Sign-in only accepts a Google-verified email. Every alert email ends with "Stop alerts for this project:" and a link to `<SITE_URL>/alerts/stop?token=...` (`SITE_URL`, or `NEXT_PUBLIC_SITE_URL`; the line is left out when neither is set). The token is 32 random bytes minted for that email and only its SHA-256 hash is stored (`unsubscribe_tokens`), so an older email's link keeps working until the watch is gone and no existing watch needs a backfill. Opening `/alerts/stop` only shows a page; its **Stop alerts** button sends `POST /api/sentinel/unsubscribe`. Alert cards in the app also have **Stop watching**. A re-check runs every `SENTINEL_INTERVAL_HOURS` (default 168, one week; `0` turns the built-in schedule off) from a loop in the app's lifespan, and `POST /api/sentinel/run` starts the same run for an external cron; the secret is compared in constant time.
 
 Each re-check is a normal check. It is compared with the check the watch last saw, and **only real changes create an alert**:
 
@@ -249,7 +249,7 @@ Each re-check is a normal check. It is compared with the check the watch last sa
 - Only sources that both checks read are compared. Unread to unread is never a change; a source that went unreadable does not make its records "removed", and a source read for the first time does not make them "added".
 - The first finished check of a project is a baseline, not a change.
 
-An alert stores the old and new NeevScore and the diff, and is shown at `/alerts?email=`. If `SMTP_HOST` and `SMTP_FROM` are set it is also emailed, to the watch's address only; without them it is stored and shown in the app.
+An alert stores the old and new NeevScore and the diff, and is shown on the account's Alerts page. If `SMTP_HOST` and `SMTP_FROM` are set it is also emailed, to the watch's address only; without them it is stored and shown in the app.
 
 ### Cost guards
 
@@ -267,7 +267,7 @@ sequenceDiagram
     participant U as Buyer
     participant API as NeevCheck API
     participant M as TinyFish Monitor
-    U->>API: POST /api/sentinel (email, project)
+    U->>API: POST /api/sentinel (project, bridge token)
     API->>M: create page + topic monitors (webhook_url)
     M-->>M: daily re-read of the page / topic
     M->>API: POST /api/sentinel/webhook (secret, monitor id, run id)
@@ -318,7 +318,7 @@ The API never talks to Google. After sign-in the browser asks the site for a tok
 | `GET /api/me/reports` | The account's saved checks, newest first |
 | `POST /api/me/reports` `{ids}` | Saves check ids (first is newest) and returns the list; ids the server has no check for are ignored |
 | `DELETE /api/me/reports/{id}` | Forgets one |
-| `DELETE /api/me` | Deletes the account: every saved report row for the Google id. The checks stay, since they are public records |
+| `DELETE /api/me` | Deletes the account: its saved reports, its watches (cancelling their monitors) and their alerts. The checks stay, since they are public records |
 
 They are limited to 30 requests a minute per address and answer 503 when `AUTH_BRIDGE_SECRET` is not set. Saved reports are rows of (Google id, check id, time) in `user_reports`; the account itself is stored nowhere on our side beyond that. The avatar menu's **Delete my data** calls `DELETE /api/me` and then signs out; `/privacy` (English and Hindi, linked from the footer and `/login`) says what is kept. On the first sign-in, the checks kept in this browser are moved into the account and removed from the browser; while signed in, new checks are saved to the account, and Alerts starts with the account's e-mail.
 

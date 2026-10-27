@@ -1,16 +1,20 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { removeWatch } from "@/lib/api";
+import { stopWatching } from "@/lib/accountReports";
 import { useLang } from "@/lib/LangProvider";
 import styles from "./AlertCard.module.css";
 
-/** Stops the watch an alert came from; its alerts go with it, so the list is reloaded. */
-export function StopWatchingButton({ watchId, project }: { watchId: string; project: string }) {
+interface Props {
+  watchId: string;
+  project: string;
+  onStopped: () => void;
+}
+
+/** Stops the watch an alert came from; its alerts go with it, so the list drops them. */
+export function StopWatchingButton({ watchId, project, onStopped }: Props) {
   const { t } = useLang();
-  const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
 
@@ -18,8 +22,8 @@ export function StopWatchingButton({ watchId, project }: { watchId: string; proj
     setBusy(true);
     setFailed(false);
     try {
-      await removeWatch(watchId);
-      router.refresh();
+      await stopWatching(watchId);
+      onStopped();
     } catch {
       setFailed(true);
       setBusy(false);
