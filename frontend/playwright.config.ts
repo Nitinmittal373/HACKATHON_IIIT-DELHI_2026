@@ -28,7 +28,7 @@ export default defineConfig({
       reuseExistingServer: !CI,
     },
     {
-      command: `node scripts/build-with-retry.ts && npx next start -p ${APP_PORT}`,
+      command: `npm run build && npx next start -p ${APP_PORT}`,
       url: `http://localhost:${APP_PORT}`,
       env: { NEXT_PUBLIC_API_URL: `http://localhost:${API_PORT}` },
       timeout: 240_000,
