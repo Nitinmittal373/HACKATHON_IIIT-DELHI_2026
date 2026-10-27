@@ -4,9 +4,9 @@ NeevScore is a number from 300 to 900, like a credit score: higher is safer. It 
 
 ## Where it is served
 
-The backend owns the scale. Every response that shows a score carries a `display_score` (`value`, `band`, `hard_stop`, `confidence`, `provisional`): the report, the check and its events, My reports, the recent checks, compare, Sentinel alerts and a promoter's other projects. The full detail (pillars, reason codes, drivers) is the report's `score_v2`. `GET /api/meta` returns the scale (300 and 900), the band edges, the pillar weights and the reason codes, so the frontend never keeps its own copy.
+The backend owns the scale. Every response that shows a score carries a `display_score` (`value`, `band`, `hard_stop`, `confidence`, `provisional`): the report, the check and its events, My reports, the home page card, compare, Sentinel alerts and a promoter's other projects. The full detail (pillars, reason codes, drivers) is the report's `score_v2`. `GET /api/meta` returns the scale (300 and 900), the band edges, the pillar weights and the reason codes, so the frontend never keeps its own copy.
 
-Every stored check is scored again with the current rules once when the API starts (idempotent: the same findings give the same score), so an old report and `GET /api/checks/recent` read exactly as a new check would. A check made before NeevScore existed is scored from its stored findings and source runs the same way.
+Every stored check is scored again with the current rules once when the API starts (idempotent: the same findings give the same score), so an old report and the home page card read exactly as a new check would. A check made before NeevScore existed is scored from its stored findings and source runs the same way.
 
 ## Formula
 
