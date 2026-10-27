@@ -26,7 +26,7 @@ test.describe("signed out", () => {
     await expect(page).toHaveURL(/\/check\/[0-9a-f]{32}$/);
     await expect(page.getByRole("link", { name: "Sign in", exact: true })).toBeVisible();
     const saved = await page.evaluate(() => localStorage.getItem("neevcheck-reports"));
-    expect(JSON.parse(saved ?? "[]")).toContain(ECO);
+    expect(JSON.parse(saved ?? "[]")).toContainEqual({ id: ECO, owner: "anon" });
   });
 
   test("the login page says what is kept and that no account is needed", async ({ page }) => {
@@ -74,18 +74,13 @@ test.describe("signed in", () => {
     );
   }
 
-  test("the avatar menu replaces Sign in, and this browser's reports move into the account", async ({ page }) => {
+  test("the avatar menu replaces Sign in", async ({ page }) => {
     await signIn(page);
-    await page.addInitScript((ids) => localStorage.setItem("neevcheck-reports", JSON.stringify(ids)), [ECO]);
-    const sent: { auth: string | undefined; ids: string[] }[] = [];
-    await page.route(`${API}/api/me/reports`, async (route) => {
-      const request = route.request();
-      if (request.method() === "OPTIONS") return route.fulfill({ status: 204, headers: CORS });
-      if (request.method() === "POST") {
-        sent.push({ auth: request.headers().authorization, ids: request.postDataJSON().ids });
-      }
-      return route.fulfill({ contentType: "application/json", headers: CORS, body: "[]" });
-    });
+    await page.route(`${API}/api/me/reports`, (route) =>
+      route.request().method() === "OPTIONS"
+        ? route.fulfill({ status: 204, headers: CORS })
+        : route.fulfill({ contentType: "application/json", headers: CORS, body: "[]" }),
+    );
 
     await page.goto("/");
     const nav = page.getByRole("navigation", { name: "Main" });
@@ -96,11 +91,6 @@ test.describe("signed in", () => {
     await nav.getByRole("button", { name: "Your account" }).click();
     await expect(page.getByRole("menuitem", { name: "My reports" })).toBeVisible();
     await expect(page.getByRole("menuitem", { name: "Sign out" })).toBeVisible();
-
-    await expect.poll(() => sent.length).toBe(1);
-    expect(sent[0]).toEqual({ auth: "Bearer test-token", ids: [ECO] });
-    // Once moved, the list leaves this browser.
-    await expect.poll(() => page.evaluate(() => localStorage.getItem("neevcheck-reports"))).toBe("[]");
   });
 
   test("My reports lists the account's reports and Alerts lists the account's alerts", async ({ page }) => {

@@ -3,7 +3,6 @@ import { resolve } from "node:path";
 
 import { expect, test, type Page } from "@playwright/test";
 
-const API = "http://localhost:8010";
 const FIXTURES = resolve(__dirname, "fixtures");
 const ECO = "4ad9752355f9455aa9d242c93950ea04";
 const AVENUE = (JSON.parse(readFileSync(resolve(FIXTURES, "summary-6742.json"), "utf-8")) as { id: string }).id;
@@ -13,20 +12,22 @@ async function remember(page: Page, ids: string[]) {
 }
 
 test.describe("home", () => {
-  test("the hero card and the strip show the latest real check", async ({ page }) => {
+  test("the hero card and the strip show this browser's own latest check", async ({ page }) => {
+    await remember(page, [ECO]);
     await page.goto("/");
     await expect(page.getByRole("link", { name: /Latest NeevCheck report: SUPERTECH ECO VILLAGE-I PHASE I-C/ })).toBeVisible();
-    const strip = page.getByRole("region", { name: "Recently checked on NeevCheck" });
+    const strip = page.getByRole("region", { name: "Checked in this browser" });
     await expect(strip.getByRole("link", { name: /NeevScore 495, Elevated/ })).toHaveAttribute("href", `/report/${ECO}`);
   });
 
-  test("before any check has finished: an empty card, no numbers, no strip", async ({ page }) => {
-    await page.route(`${API}/api/checks/recent`, (route) =>
-      route.fulfill({ contentType: "application/json", headers: { "Access-Control-Allow-Origin": "*" }, body: "[]" }),
-    );
+  test("with no check of your own: an empty card, no numbers, no strip, nobody else's checks", async ({ page }) => {
+    const asked: string[] = [];
+    page.on("request", (request) => asked.push(request.url()));
     await page.goto("/");
     await expect(page.getByLabel("Placeholder for your report")).toContainText("Your report appears here");
+    await expect(page.getByText("Checked in this browser")).toHaveCount(0);
     await expect(page.getByText("Recently checked on NeevCheck")).toHaveCount(0);
+    expect(asked.filter((url) => url.includes("/api/checks"))).toEqual([]);
   });
 
   test("the construction skyline is drawn behind the hero", async ({ page }) => {
@@ -75,7 +76,7 @@ test.describe("My reports", () => {
     await page.getByRole("button", { name: "Yes, check this project" }).click();
     await expect(page).toHaveURL(/\/check\/[0-9a-f]{32}$/);
     const saved = await page.evaluate(() => localStorage.getItem("neevcheck-reports"));
-    expect(JSON.parse(saved ?? "[]")).toContain(ECO);
+    expect(JSON.parse(saved ?? "[]")).toContainEqual({ id: ECO, owner: "anon" });
   });
 });
 
