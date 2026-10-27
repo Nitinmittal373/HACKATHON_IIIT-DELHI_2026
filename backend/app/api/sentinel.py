@@ -41,9 +41,8 @@ from app.sentinel.models import (
 from app.sentinel.monitors import MonitorError, MonitorGateway
 from app.sentinel.service import Sentinel
 from app.sentinel.store import SentinelStore
-from app.states.names import DEFAULT_STATE
-from app.states.registry import adapter_for
 from app.store import Store
+from app.uprera_links import project_details_url
 
 MAX_WEBHOOK_BYTES = 200_000
 logger = logging.getLogger(__name__)
@@ -73,11 +72,9 @@ async def create_watch(
             },
         )
     # The page search confirmed for this number; a number sent alone gets its stable page.
-    adapter = adapter_for(body.state or DEFAULT_STATE)
-    known = Project(rera_id=body.rera_id, state=adapter.code, details_url=body.details_url or "")
-    details_url = adapter.details_url(known)
+    details_url = project_details_url(body.rera_id, body.details_url or "")
     if store.get_project(body.rera_id) is None:
-        store.save_project(known.model_copy(update={"details_url": details_url}))
+        store.save_project(Project(rera_id=body.rera_id, details_url=details_url))
     latest = store.latest_completed_check(body.rera_id)
     watch = watches.add_watch(
         email=body.email,
@@ -88,10 +85,8 @@ async def create_watch(
     )
     if gateway:
         project = store.get_project(body.rera_id)
-        # A page monitor needs a page Fetch can read; Search-only portals get the topic monitor.
-        page_url = details_url if adapter.coverage != "search_only" else None
         await add_monitors(
-            gateway, watches, watch, page_url, project and project.promoter, settings
+            gateway, watches, watch, details_url, project and project.promoter, settings
         )
     return watch
 

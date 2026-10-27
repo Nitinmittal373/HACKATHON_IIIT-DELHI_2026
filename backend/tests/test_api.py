@@ -94,6 +94,8 @@ def test_check_shows_every_source_and_why_it_was_not_read(client: TestClient) ->
     assert statuses == {
         "uprera": "completed",
         "registry": "completed",
+        "group": "failed",  # nor does it name any company for the group lane to read
+        "sarfaesi": "completed",
         "insolvency": "completed",
         "land": "completed",
         "consumer": "failed",  # the fake web client gives the agent nothing to answer with
@@ -168,9 +170,6 @@ def test_my_reports_lists_known_checks_in_the_order_asked(client: TestClient) ->
     assert listed[1] == {
         "id": first,
         "rera_id": "UPRERAPRJ8334",
-        "state": "UP",
-        "state_name": "Uttar Pradesh",
-        "rera_name": "UP-RERA",
         "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
         "project": "SUPERTECH ECO VILLAGE-I PHASE I-C",
         "promoter": "SUPERTECH LIMITED",
@@ -181,7 +180,7 @@ def test_my_reports_lists_known_checks_in_the_order_asked(client: TestClient) ->
         "display_score": {
             # Too little was read to rate it: no number is shown, only kept as provisional.
             "value": None,
-            "provisional_value": 750,
+            "provisional_value": 576,
             "band": "insufficient_evidence",
             "hard_stop": False,
             "confidence": 0.33,

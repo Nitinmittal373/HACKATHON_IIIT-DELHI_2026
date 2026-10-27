@@ -67,10 +67,6 @@ class LandSource:
     checks: tuple[CheckKey, ...] = ("land_dues",)
 
     async def run(self, ctx: SourceContext) -> AsyncIterator[SourceEvent]:
-        if ctx.project.state != "UP":
-            # The lists are Noida, Greater Noida and Yamuna Expressway dues: UP only.
-            yield Progress("Land dues lists exist for Uttar Pradesh only; not read here")
-            return
         promoter, district = ctx.project.promoter, normalize(ctx.project.district)
         authorities = AUTHORITIES_BY_DISTRICT.get(district)
         if not promoter or not authorities:

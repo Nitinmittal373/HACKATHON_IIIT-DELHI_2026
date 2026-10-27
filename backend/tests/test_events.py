@@ -15,7 +15,7 @@ from app.store import Store
 from app.tinyfish import AgentDone, AgentLiveUrl
 from tests.conftest import FIXED_NOW, URL_8334, make_web, read_events
 
-SOURCES = {"uprera", "registry", "insolvency", "land", "consumer", "news"}
+SOURCES = {"uprera", "registry", "group", "sarfaesi", "insolvency", "land", "consumer", "news"}
 
 
 def test_stream_covers_every_source_and_ends_with_check_completed(client: TestClient) -> None:
@@ -23,7 +23,7 @@ def test_stream_covers_every_source_and_ends_with_check_completed(client: TestCl
     events = read_events(client, check_id)
 
     started = [e["source"] for e in events if e["type"] == "source.started"]
-    assert set(started) == SOURCES and len(started) == 6
+    assert set(started) == SOURCES and len(started) == 8
     assert started[0] == "uprera"
     assert sum(e["type"] == "finding.added" for e in events) == 4
     completed = {

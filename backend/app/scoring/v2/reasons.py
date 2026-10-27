@@ -1,8 +1,9 @@
 """Reason codes: the credit-report style explanation of why a score is what it is.
 
 R12 never costs points. It says which records could not be read, because a missing record
-must not look like a clean one. R13 and R14 are additions to the planned R01-R12 list, for
-the group track record and late registry filings, which have no other code.
+must not look like a clean one. R13 and R14 are additions to the planned R01-R12 list: R13 is
+the builder's own record (complaints across its projects, delays elsewhere in the group) and
+R14 late registry filings, which have no other code.
 """
 
 from collections.abc import Callable
@@ -41,6 +42,15 @@ def _complaints_or_orders(fs: list[Finding]) -> str:
     return text[:1].upper() + text[1:]
 
 
+def _builder_record(fs: list[Finding]) -> str:
+    parts = []
+    if any(f.kind == "promoter_complaints" for f in fs):
+        parts.append("Builder complaint record")
+    if any(f.kind.startswith("group_") for f in fs):
+        parts.append("Other projects of the same group delayed or lapsed")
+    return "; ".join(parts)
+
+
 LABELS: dict[str, Callable[[list[Finding]], str]] = {
     "R01": lambda fs: "UP-RERA registration lapsed or revoked",
     "R02": _extended,
@@ -53,7 +63,7 @@ LABELS: dict[str, Callable[[list[Finding]], str]] = {
     "R09": lambda fs: "Charges or SARFAESI action on the builder's assets",
     "R10": lambda fs: f"Pending litigation ({_plural(_count(fs), 'case', 'cases')})",
     "R11": lambda fs: f"Adverse news or protests ({_plural(len(fs), 'article', 'articles')})",
-    "R13": lambda fs: "Other projects of the same group delayed or lapsed",
+    "R13": _builder_record,
     "R14": lambda fs: "Late filings with the company registry",
 }
 

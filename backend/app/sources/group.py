@@ -24,7 +24,7 @@ from app.models import (
     Finding,
     Project,
 )
-from app.parsers.uprera_page import Extension, ParseError, UpreraRecord
+from app.parsers.uprera_page import ParseError, UpreraRecord
 from app.sources.base import (
     FoundFinding,
     GroupTree,
@@ -45,12 +45,12 @@ from app.sources.registry import (
     is_this_company as status_is_this_company,
 )
 from app.sources.uprera import months_between, read_record
-from app.states.base import ProjectRecord
 from app.tinyfish import SearchHit, WebError
 from app.track_record import TrackRecords
 
 MAX_COMPANIES = 10
 MAX_PROJECTS = 20
+RERA = "UP-RERA"
 RECENT_CHARGE_DAYS = 365
 DELAYED_AFTER_MONTHS = 12
 PARALLEL_READS = 4
@@ -86,7 +86,7 @@ class GroupSource:
         for finding in status_findings(statuses, ctx):
             yield FoundFinding(finding)
 
-        rera = _rera_name(ctx.project.state)
+        rera = RERA
         yield Progress(f"Listing the {rera} projects of the group")
         by_company = await self._group_projects(promoter, companies, ctx)
         projects = [project for group in by_company.values() for project in group]
@@ -136,7 +136,7 @@ class GroupSource:
         names = [promoter, *companies]
         try:
             found = await _gather_limited(
-                records.find(name, own, ctx.project.state) for name in names
+                records.find(name, own) for name in names
             )
         except WebError:
             return {}
@@ -152,53 +152,11 @@ class GroupSource:
     async def _read(
         self, project: Project, ctx: SourceContext
     ) -> tuple[Project, UpreraRecord] | None:
-        if project.state != "UP":
-            return await self._read_in_state(project, ctx)
         try:
             record = await read_record(project.details_url, ctx.web)
         except (WebError, ParseError):
             return None
         return (project, record) if record.rera_id == project.rera_id else None
-
-    async def _read_in_state(
-        self, project: Project, ctx: SourceContext
-    ) -> tuple[Project, UpreraRecord] | None:
-        """A project of another state, read by its adapter and shaped like a UP-RERA record."""
-        from app.states.registry import adapter_for  # imported here: it imports this package
-
-        try:
-            record = await adapter_for(project.state).read(project, ctx.web, ctx.now)
-        except WebError:
-            return None
-        return (project, as_uprera_record(record)) if record else None
-
-
-def as_uprera_record(record: ProjectRecord) -> UpreraRecord:
-    """The facts the group rules read (status and dates), whichever state they came from."""
-    return UpreraRecord(
-        rera_id=record.rera_id,
-        name=record.name,
-        promoter=record.promoter_name,
-        promoter_id=record.promoter_id,
-        registered_on=record.registration_date,
-        project_type=record.status,
-        district=record.district,
-        start_date=None,
-        end_date=record.promised_completion,
-        revised_end_date=record.revised_completion,
-        permits=(),
-        documents=(),
-        extensions=tuple(
-            Extension(extended_from=None, extended_to=e.extended_to, note=e.reason or "")
-            for e in record.extensions
-        ),
-    )
-
-
-def _rera_name(state: str) -> str:
-    from app.states.registry import adapter_for  # imported here: it imports this package
-
-    return adapter_for(state).rera_name
 
 
 def pages_named(hits: list[SearchHit], promoter: str) -> list[SearchHit]:
@@ -295,7 +253,7 @@ def project_findings(
             "group_project_lapsed",
             p,
             r,
-            f"{_rera_name(p.state)} lists {_name(p)} as '{r.project_type}'",
+            f"{RERA} lists {_name(p)} as '{r.project_type}'",
             ctx,
         )
         for p, r in lapsed
@@ -312,8 +270,7 @@ def project_findings(
         for p, r in delayed
     ]
     if reads and delayed:
-        first = delayed[0][0]
-        rera = _rera_name(first.state)
+        rera = RERA
         numbers = ", ".join(p.rera_id for p, _ in delayed)
         findings.append(
             build_finding(
@@ -324,7 +281,7 @@ def project_findings(
                 title=f"{len(delayed)} of {len(reads)} group projects read on {rera} are "
                 f"more than {DELAYED_AFTER_MONTHS} months past their completion date",
                 verdict="fail",
-                url=first.details_url,
+                url=delayed[0][0].details_url,
                 today=ctx.today,
                 now=ctx.now,
                 count=len(delayed),

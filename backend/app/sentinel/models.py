@@ -7,7 +7,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.api_model import ApiModel
-from app.models import DisplayScore, StateTagged, check_project_number
+from app.models import DisplayScore, check_project_number
 
 Language = Literal["en", "hi"]
 # Deliberately simple: one @, something on both sides, a dot in the domain.
@@ -19,7 +19,6 @@ class WatchCreate(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     rera_id: str = Field(max_length=60)
-    state: str | None = Field(default=None, max_length=2)
     details_url: str | None = Field(default=None, max_length=500)
     email: str = Field(max_length=254)
     language: Language = "en"
@@ -33,12 +32,12 @@ class WatchCreate(BaseModel):
         return email
 
     @model_validator(mode="after")
-    def valid_for_its_state(self) -> "WatchCreate":
-        self.state, self.rera_id = check_project_number(self.rera_id, self.state, self.details_url)
+    def valid_number(self) -> "WatchCreate":
+        self.rera_id = check_project_number(self.rera_id, self.details_url)
         return self
 
 
-class Watch(StateTagged):
+class Watch(ApiModel):
     id: str
     rera_id: str
     email: str
@@ -62,7 +61,7 @@ class Diff(ApiModel):
         return not (self.added or self.removed or self.changed)
 
 
-class Alert(StateTagged):
+class Alert(ApiModel):
     id: str
     watch_id: str
     rera_id: str

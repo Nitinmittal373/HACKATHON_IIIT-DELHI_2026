@@ -27,8 +27,8 @@ router = APIRouter(tags=["projects"])
 PDF_SECONDS = 20
 TOO_BIG = "This file is larger than 5 MB"
 NO_NUMBER = (
-    "We could not find a RERA registration number in this file. Ask the builder for the "
-    "number in writing, or search by the project's name."
+    "We could not find a UP-RERA registration number (UPRERAPRJ…) in this file. Ask the "
+    "builder for the number in writing, or search by the project's name."
 )
 
 

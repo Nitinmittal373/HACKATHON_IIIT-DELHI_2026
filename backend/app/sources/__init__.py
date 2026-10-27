@@ -9,16 +9,15 @@ from app.sources.sarfaesi import SarfaesiSource
 from app.sources.uprera import UpreraSource
 
 
-def build_sources(v2: bool = False) -> list[Source]:
+def build_sources() -> list[Source]:
     """UP-RERA first: it confirms the project and names the promoter for the others."""
-    sources: list[Source] = [
+    return [
         UpreraSource(),
         RegistrySource(),
+        GroupSource(),
+        SarfaesiSource(),
         InsolvencySource(),
         LandSource(),
         ConsumerSource(),
         NewsSource(),
     ]
-    if v2:
-        sources[2:2] = [GroupSource(), SarfaesiSource()]
-    return sources

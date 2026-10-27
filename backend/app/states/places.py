@@ -1,80 +1,42 @@
-"""Which state a city or district is in, so a buyer who types a place needs no state picker.
+"""Cities a buyer may type next to a project name.
 
-Only cities that homebuyers search for are listed, each in the state whose RERA registers its
-projects. A place that is not here simply gives no state, and every portal is searched.
+A city is not part of a project's name, so it is dropped before names are compared. A city
+outside Uttar Pradesh also tells us, without searching, that the project is not one UP-RERA
+registers. Only cities that homebuyers search for are listed; an unknown place changes nothing.
 """
 
 import re
 
-# fmt: off
-PLACES: dict[str, str] = {
-    # Uttar Pradesh (the Delhi-NCR towns on this side of the river register with UP-RERA)
-    "noida": "UP", "greater noida": "UP", "yamuna expressway": "UP", "ghaziabad": "UP",
-    "lucknow": "UP", "kanpur": "UP", "agra": "UP", "meerut": "UP", "varanasi": "UP",
-    "prayagraj": "UP", "allahabad": "UP", "bareilly": "UP", "gorakhpur": "UP",
-    "mathura": "UP", "vrindavan": "UP", "aligarh": "UP", "moradabad": "UP",
-    "greater noida west": "UP", "noida extension": "UP", "indirapuram": "UP",
-    # Maharashtra
-    "mumbai": "MH", "navi mumbai": "MH", "thane": "MH", "pune": "MH", "nagpur": "MH",
-    "nashik": "MH", "panvel": "MH", "kalyan": "MH", "palava": "MH", "dombivli": "MH",
-    "vasai": "MH", "virar": "MH", "mira road": "MH", "worli": "MH", "andheri": "MH",
-    "bandra": "MH", "powai": "MH", "chembur": "MH", "aurangabad": "MH", "kolhapur": "MH",
-    "hinjewadi": "MH", "wakad": "MH", "lower parel": "MH", "borivali": "MH",
-    # Haryana
-    "gurugram": "HR", "gurgaon": "HR", "faridabad": "HR", "panchkula": "HR", "sonipat": "HR",
-    "panipat": "HR", "ambala": "HR", "rohtak": "HR", "hisar": "HR", "karnal": "HR",
-    "manesar": "HR", "sohna": "HR", "bahadurgarh": "HR",
-    # Karnataka
-    "bengaluru": "KA", "bangalore": "KA", "mysuru": "KA", "mysore": "KA", "mangaluru": "KA",
-    "hubballi": "KA", "whitefield": "KA", "sarjapur": "KA", "yelahanka": "KA",
-    "hebbal": "KA", "electronic city": "KA", "devanahalli": "KA", "belagavi": "KA",
-    # Delhi
-    "delhi": "DL", "new delhi": "DL", "dwarka": "DL", "rohini": "DL", "saket": "DL",
-    # Telangana
-    "hyderabad": "TG", "secunderabad": "TG", "gachibowli": "TG", "kokapet": "TG",
-    "warangal": "TG", "kompally": "TG", "financial district": "TG",
-    # Gujarat
-    "ahmedabad": "GJ", "surat": "GJ", "vadodara": "GJ", "rajkot": "GJ", "gandhinagar": "GJ",
-    # Tamil Nadu
-    "chennai": "TN", "coimbatore": "TN", "madurai": "TN", "tiruchirappalli": "TN",
-    "omr": "TN", "tambaram": "TN", "porur": "TN",
-    # Rajasthan
-    "jaipur": "RJ", "jodhpur": "RJ", "udaipur": "RJ", "kota": "RJ", "ajmer": "RJ",
-    # Madhya Pradesh
-    "bhopal": "MP", "indore": "MP", "jabalpur": "MP", "gwalior": "MP",
-    # West Bengal
-    "kolkata": "WB", "howrah": "WB", "siliguri": "WB", "rajarhat": "WB", "new town": "WB",
-    # Punjab
-    "mohali": "PB", "ludhiana": "PB", "amritsar": "PB", "jalandhar": "PB", "zirakpur": "PB",
-    "patiala": "PB",
-    # Kerala
-    "kochi": "KL", "thiruvananthapuram": "KL", "trivandrum": "KL", "kozhikode": "KL",
-    "thrissur": "KL", "ernakulam": "KL",
-    # Andhra Pradesh
-    "visakhapatnam": "AP", "vizag": "AP", "vijayawada": "AP", "amaravati": "AP",
-    "guntur": "AP", "tirupati": "AP",
-    # Uttarakhand
-    "dehradun": "UK", "haridwar": "UK", "haldwani": "UK", "rishikesh": "UK",
-    # Bihar
-    "patna": "BR", "gaya": "BR", "muzaffarpur": "BR",
-    # Odisha
-    "bhubaneswar": "OD", "cuttack": "OD", "puri": "OD",
-    # Goa
-    "goa": "GA", "panaji": "GA", "margao": "GA", "mapusa": "GA", "north goa": "GA",
-    # Chhattisgarh
-    "raipur": "CG", "bhilai": "CG", "bilaspur": "CG",
-    # Himachal Pradesh
-    "shimla": "HP", "solan": "HP", "manali": "HP", "baddi": "HP",
-    # Jharkhand
-    "ranchi": "JH", "jamshedpur": "JH", "dhanbad": "JH",
-    # Assam
-    "guwahati": "AS", "dibrugarh": "AS", "silchar": "AS",
-    # Jammu and Kashmir
-    "srinagar": "JK", "jammu": "JK",
-}
-# fmt: on
+UP_PLACES = (
+    "noida", "greater noida", "greater noida west", "noida extension", "yamuna expressway",
+    "ghaziabad", "indirapuram", "lucknow", "kanpur", "agra", "meerut", "varanasi", "prayagraj",
+    "allahabad", "bareilly", "gorakhpur", "mathura", "vrindavan", "aligarh", "moradabad",
+)  # fmt: skip
 
-_LONGEST_FIRST = sorted(PLACES, key=len, reverse=True)
+# Cities whose projects other states' RERAs register.
+OTHER_PLACES = (
+    "mumbai", "navi mumbai", "thane", "pune", "nagpur", "nashik", "panvel", "kalyan", "palava",
+    "dombivli", "vasai", "virar", "mira road", "worli", "andheri", "bandra", "powai", "chembur",
+    "aurangabad", "kolhapur", "hinjewadi", "wakad", "lower parel", "borivali",
+    "gurugram", "gurgaon", "faridabad", "panchkula", "sonipat", "panipat", "ambala", "rohtak",
+    "hisar", "karnal", "manesar", "sohna", "bahadurgarh",
+    "bengaluru", "bangalore", "mysuru", "mysore", "mangaluru", "hubballi", "whitefield",
+    "sarjapur", "yelahanka", "hebbal", "electronic city", "devanahalli", "belagavi",
+    "delhi", "new delhi", "dwarka", "rohini", "saket",
+    "hyderabad", "secunderabad", "gachibowli", "kokapet", "warangal", "kompally",
+    "ahmedabad", "surat", "vadodara", "rajkot", "gandhinagar",
+    "chennai", "coimbatore", "madurai", "tiruchirappalli", "tambaram", "porur",
+    "jaipur", "jodhpur", "udaipur", "ajmer", "bhopal", "indore", "jabalpur", "gwalior",
+    "kolkata", "howrah", "siliguri", "rajarhat", "mohali", "ludhiana", "amritsar", "jalandhar",
+    "zirakpur", "patiala", "kochi", "thiruvananthapuram", "trivandrum", "kozhikode", "thrissur",
+    "ernakulam", "visakhapatnam", "vizag", "vijayawada", "amaravati", "guntur", "tirupati",
+    "dehradun", "haridwar", "haldwani", "rishikesh", "patna", "muzaffarpur",
+    "bhubaneswar", "cuttack", "goa", "panaji", "margao", "mapusa", "north goa",
+    "raipur", "bhilai", "bilaspur", "shimla", "solan", "manali", "baddi", "ranchi",
+    "jamshedpur", "dhanbad", "guwahati", "dibrugarh", "silchar", "srinagar", "jammu",
+)  # fmt: skip
+
+_LONGEST_FIRST = sorted((*UP_PLACES, *OTHER_PLACES), key=len, reverse=True)
 
 
 def place_in(text: str) -> str | None:
@@ -83,10 +45,10 @@ def place_in(text: str) -> str | None:
     return next((place for place in _LONGEST_FIRST if f" {place} " in lowered), None)
 
 
-def state_of_place(text: str) -> str | None:
-    """The state code of the first place the text names, or None when no known place is named."""
+def names_place_outside_up(text: str) -> bool:
+    """Whether the first place the text names is a city whose projects UP-RERA does not register."""
     place = place_in(text)
-    return PLACES[place] if place else None
+    return place is not None and place in OTHER_PLACES
 
 
 def without_places(text: str) -> str:

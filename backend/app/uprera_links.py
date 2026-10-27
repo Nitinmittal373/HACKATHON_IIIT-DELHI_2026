@@ -27,6 +27,11 @@ def details_url_for(rera_id: str) -> str | None:
     return DETAILS_URL.format(digits=rera_id.removeprefix("UPRERAPRJ"))
 
 
+def project_details_url(rera_id: str, known: str = "") -> str:
+    """The page a check should read: the one search found, else the stable one, else the home."""
+    return known or details_url_for(rera_id) or "https://www.up-rera.in/"
+
+
 def summary_url(url: str) -> str | None:
     """The link as https if it is a Projectsummary page on up-rera.in, else None."""
     url = https(url)

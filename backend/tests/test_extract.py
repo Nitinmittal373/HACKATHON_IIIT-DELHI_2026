@@ -7,14 +7,14 @@ from fastapi.testclient import TestClient
 
 from app.extract import MAX_BYTES, ExtractError, numbers_in_document, pdf_text
 from app.main import create_app
-from app.tinyfish import SearchHit
 from tests.conftest import make_settings
-from tests.fakes import FakeWebClient, search_key
+from tests.fakes import FakeWebClient
 from tests.pdfs import BROCHURE, make_pdf
 
-MH = "P51900008345"
-KA = "PRM/KA/RERA/1251/446/PR/170915/000176"
-PORTAL = "maharera.maharashtra.gov.in"
+UP = "UPRERAPRJ8334"
+UP_NEW = "UPRERAPRJ188811/08/2024"
+OTHER_STATE = "P51900008345"
+PORTAL = "www.up-rera.in"
 
 
 def client(tmp_path: Path, web: FakeWebClient | None = None, **overrides: object) -> TestClient:
@@ -32,8 +32,8 @@ def test_a_brochure_pdf_gives_its_numbers_and_the_words_around_them(tmp_path: Pa
     assert response.status_code == 200
     body = response.json()
     assert body["source"] == "your document"
-    assert [(n["state"], n["rera_id"]) for n in body["numbers"]] == [("MH", MH), ("KA", KA)]
-    assert "MahaRERA Reg. No." in body["numbers"][0]["line"]
+    assert [n["rera_id"] for n in body["numbers"]] == [UP]
+    assert "UP-RERA Reg. No." in body["numbers"][0]["line"]
     assert all(c["status"] == "from_document" for c in body["candidates"])
     assert all(c["sources"] == ["your document"] for c in body["candidates"])
 
@@ -46,18 +46,15 @@ def test_personal_details_never_come_back(tmp_path: Path) -> None:
 
 
 def test_a_number_the_portal_prints_is_confirmed(tmp_path: Path) -> None:
-    hit = SearchHit(
-        title="Projects search result",
-        url=f"https://{PORTAL}/projects-search-result?certificate_no={MH}",
-        snippet=f"{MH}. SUNRISE HEIGHTS. SUNRISE BUILDERS LIMITED. THANE.",
-    )
-    web = FakeWebClient(searches={search_key(f"{MH} MahaRERA project", PORTAL): [hit]})
-    with client(tmp_path, web) as http:
+    from tests.conftest import make_web
+
+    with client(tmp_path, make_web()) as http:
         body = post_pdf(http, make_pdf(BROCHURE)).json()
-    mh = next(c for c in body["candidates"] if c["rera_id"] == MH)
-    assert mh["status"] == "confirmed"
-    assert mh["sources"] == [PORTAL, "your document"]
-    assert mh["promoter"] == "SUNRISE BUILDERS LIMITED"
+    [found] = body["candidates"]
+    assert found["rera_id"] == UP
+    assert found["status"] == "confirmed"
+    assert found["sources"] == ["up-rera.in", "your document"]
+    assert found["promoter"] == "SUPERTECH LIMITED"
 
 
 def test_a_pdf_without_a_number_says_what_to_do(tmp_path: Path) -> None:
@@ -95,12 +92,12 @@ def test_a_damaged_pdf_is_refused_with_a_reason(tmp_path: Path) -> None:
 
 
 def test_qr_text_is_read_like_a_document(tmp_path: Path) -> None:
-    text = f"https://maharerait.example.test/view?certificate_no={MH}&x=1"
+    text = f"https://uprera.example.test/view?id={UP}&x=1"
     with client(tmp_path) as http:
         response = http.post("/api/extract", json={"text": text})
     body = response.json()
     assert body["source"] == "your QR code"
-    assert [n["rera_id"] for n in body["numbers"]] == [MH]
+    assert [n["rera_id"] for n in body["numbers"]] == [UP]
 
 
 def test_json_without_text_is_refused(tmp_path: Path) -> None:
@@ -130,5 +127,10 @@ def test_pdf_text_enforces_the_limit_itself() -> None:
 
 
 def test_numbers_in_a_url_are_found_after_decoding() -> None:
-    found = numbers_in_document("https://x.test/?no=PRM%2FKA%2FRERA%2F1251%2F446%2FPR%2F170915%2F000176")
-    assert [n.rera_id for n in found] == [KA]
+    found = numbers_in_document("https://x.test/?no=UPRERAPRJ188811%2F08%2F2024")
+    assert [n.rera_id for n in found] == [UP_NEW]
+
+
+def test_a_number_of_another_states_rera_is_not_taken_from_a_document() -> None:
+    text = f"Reg. No. {OTHER_STATE} and PRM/KA/RERA/1251/446/PR/170915/000176"
+    assert numbers_in_document(text) == []

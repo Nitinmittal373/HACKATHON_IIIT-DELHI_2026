@@ -1,12 +1,12 @@
-"""Name the builder of a project whose RERA portal page did not show one.
+"""Name the builder of a project whose UP-RERA page did not show one.
 
-Many portals can only be read through Search snippets, and a snippet often leaves out the
-promoter. Without a name the company registry, insolvency, group and news sources have nothing
-to look up. So one more free Search runs for the exact registration number, with no domain
-limit, and a name counts only when it stands next to that exact number in at least two
-different results. The name is used to identify the builder and is stored as a "secondary"
-identity; it is never a scored finding, and the report asks the buyer to verify it on the
-state's RERA portal.
+A Search snippet often leaves out the promoter. Without a name the company registry,
+insolvency, group and news sources have nothing to look up. So one more free Search runs
+for the exact registration number, with no domain limit, and a name counts only when it
+stands next to that exact number in at least two different results. The name is used to
+identify the builder and is stored as a "secondary"
+identity; it is never a scored finding, and the report asks the buyer to verify it on
+UP-RERA.
 """
 
 import re
@@ -33,7 +33,7 @@ BY = re.compile(rf"\bby\s+(?:M/s\.? )?(?P<name>{NAME_CHARS})")
 LEGAL = re.compile(rf"(?:M/s\.? )?(?P<name>{NAME_CHARS}\s{LEGAL_SUFFIX})")
 # Words that mean the text names an authority, a site or a sentence, not a builder.
 NOT_A_BUILDER = re.compile(
-    r"\b(rera|regulatory|authority|government|haryana real|maharashtra real|karnataka real|"
+    r"\b(rera|regulatory|authority|government|"
     r"terms|conditions|privacy|registration|read more|starting|possession|price|bhk|sq ft|"
     r"homebuyers?|allottees?|project|properties for|listing|sale|rent|yes|no)\b",
     re.IGNORECASE,

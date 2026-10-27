@@ -1,7 +1,7 @@
 """Registration numbers in a document the buyer has: a brochure, an agreement or a QR code.
 
-Nothing here is stored. A PDF is read from memory, its text is searched for numbers in every
-state's format, and only the numbers and the few words around each one go back to the buyer,
+Nothing here is stored. A PDF is read from memory, its text is searched for numbers in
+UP-RERA's format, and only the numbers and the few words around each one go back to the buyer,
 with phone numbers, e-mail addresses and identity numbers removed. The file is never written to
 disk, so there is nothing to delete afterwards; a photo is never uploaded at all, because its QR
 code is decoded in the browser and only the decoded text arrives here.
@@ -17,7 +17,7 @@ from pypdf.errors import PyPdfError
 from app.api_model import ApiModel
 from app.models import Project
 from app.states.openweb import numbers_in, prepare
-from app.states.registry import BY_CODE
+from app.uprera_links import project_details_url
 
 MAX_BYTES = 5 * 1024 * 1024
 MAX_PAGES = 40
@@ -42,7 +42,6 @@ class ExtractError(ValueError):
 
 class ExtractedNumber(ApiModel):
     rera_id: str
-    state: str
     # The words around the number in the buyer's own document, without personal data.
     line: str
 
@@ -80,11 +79,11 @@ def numbers_in_document(text: str) -> list[ExtractedNumber]:
     """Each distinct registration number in the text, with the words around its first use."""
     readable = prepare(unquote(text))
     seen: dict[str, ExtractedNumber] = {}
-    for state, rera_id, start, end in numbers_in(readable):
+    for rera_id, start, end in numbers_in(readable):
         key = re.sub(r"[^A-Z0-9]", "", rera_id.upper())
         if key not in seen:
             seen[key] = ExtractedNumber(
-                rera_id=rera_id, state=state, line=line_around(readable, start, end)
+                rera_id=rera_id, line=line_around(readable, start, end)
             )
     return list(seen.values())[:MAX_NUMBERS]
 
@@ -100,16 +99,12 @@ def line_around(text: str, start: int, end: int) -> str:
 
 def candidates_from_document(numbers: list[ExtractedNumber]) -> list[Project]:
     """The numbers as candidates; a portal page may still confirm them."""
-    projects = []
-    for number in numbers:
-        probe = Project(state=number.state, rera_id=number.rera_id, details_url="")
-        projects.append(
-            probe.model_copy(
-                update={
-                    "details_url": BY_CODE[number.state].details_url(probe),
-                    "status": "from_document",
-                    "sources": ["your document"],
-                }
-            )
+    return [
+        Project(
+            rera_id=number.rera_id,
+            details_url=project_details_url(number.rera_id),
+            status="from_document",
+            sources=["your document"],
         )
-    return projects
+        for number in numbers
+    ]

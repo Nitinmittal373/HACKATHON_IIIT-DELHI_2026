@@ -13,9 +13,7 @@ from urllib.parse import urlsplit
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.api_model import ApiModel
-from app.states.names import DEFAULT_STATE, state_name
 
-CoverageLevel = Literal["full", "partial", "search_only"]
 SourceName = Literal[
     "uprera", "registry", "insolvency", "land", "consumer", "news", "group", "sarfaesi"
 ]
@@ -25,7 +23,9 @@ Verdict = Literal["ok", "fail", "red_flag", "review", "context", "not_found"]
 Band = Literal["Low", "Moderate", "High", "Critical", "insufficient_evidence"]
 InsolvencyScope = Literal["company", "this_project", "other_project"]
 CheckStatus = Literal["queued", "running", "completed", "failed"]
-RunStatus = Literal["running", "completed", "blocked", "failed", "unavailable"]
+# "partial": the source gave some of what it was asked for before it ran out of time or failed;
+# what it reported is kept.
+RunStatus = Literal["running", "completed", "partial", "blocked", "failed", "unavailable"]
 # The facts a complete check must read. Confidence is the share of these that were read.
 CheckKey = Literal[
     "registration",
@@ -66,44 +66,19 @@ def is_uprera_url(url: str) -> bool:
     return parts.scheme == "https" and parts.hostname in UPRERA_HOSTS
 
 
-class StateTagged(ApiModel):
-    """A record that belongs to one state's RERA. Records made before all-India support are UP."""
-
-    state: str = DEFAULT_STATE
-    state_name: str = state_name(DEFAULT_STATE)
-    # The state's authority as its own pages call it, such as "MahaRERA".
-    rera_name: str = "UP-RERA"
-
-    @model_validator(mode="before")
-    @classmethod
-    def name_the_state(cls, data: Any) -> Any:
-        if not isinstance(data, dict):
-            return data
-        # Imported here: the state registry imports these models.
-        from app.states.registry import BY_CODE
-
-        code = data.get("state", DEFAULT_STATE)
-        adapter = BY_CODE.get(code)
-        filled = {
-            "state_name": state_name(code),
-            "rera_name": adapter.rera_name if adapter else "RERA",
-        }
-        return {**filled, **data}
-
-
-# "confirmed": a state portal page prints the number. "listings_only": builder and listing sites
+# "confirmed": an up-rera.in page prints the number. "listings_only": builder and listing sites
 # print it but no portal page was read. The last two come from an uploaded file or a public order.
 CandidateStatus = Literal["confirmed", "listings_only", "from_document", "from_order"]
 
 
-class Project(StateTagged):
+class Project(ApiModel):
     rera_id: str
     name: str | None = None
     promoter: str | None = None
     registered_on: date | None = None
     district: str | None = None
     details_url: str
-    # None for candidates a state adapter produced from its own portal pages.
+    # None for candidates produced from up-rera.in's own pages.
     status: CandidateStatus | None = None
     # Where the number was seen: site names, or "your document".
     sources: list[str] = []
@@ -119,96 +94,66 @@ class OrderLead(ApiModel):
     order_url: str
 
 
-class PreReraNote(ApiModel):
-    """A project that public pages say was finished before RERA, so it has no number to find."""
-
-    name: str
-    # The words of the page that say so, and the page.
-    statement: str
-    source_url: str
-
-
 class SearchResponse(ApiModel):
     query: str
     candidates: list[Project]
-    # The state the number's format pointed at; None for a name or a number of no known state.
-    detected_state: str | None = None
-    # The states whose portals were searched, so the page can say where it looked.
-    searched_states: list[str] = []
-    # Projects public pages say are older than RERA; they get a builder-only check.
-    pre_rera: list[PreReraNote] = []
+    # True when the text is a registration number of another state, or names a place outside
+    # Uttar Pradesh; the page then says calmly that NeevCheck does not cover it.
+    outside_up: bool = False
     # Builders that public orders name for the project, when nothing else found it.
     order_leads: list[OrderLead] = []
-
-
-class StateInfo(ApiModel):
-    """One state's RERA portal and how much of it NeevCheck reads."""
-
-    code: str
-    name: str
-    rera_name: str
-    coverage: CoverageLevel
-    # Real registration numbers read from the portal, for the search box's try-chips.
-    examples: list[str]
-    # What is read there, in a sentence.
-    note: str
-    portal_url: str
-    complaint_url: str
-    # Where to report a project that should be registered and is not.
-    unregistered_url: str
-    # Patterns the registration numbers of this state match, so a page can pick the state while
-    # a visitor types. Written for Python, and valid in JavaScript with the "i" flag.
-    id_patterns: list[str]
-    # False while no real number of this state has been read from its portal.
-    format_verified: bool
 
 
 class CheckCreate(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    rera_id: str = Field(max_length=60, examples=["UPRERAPRJ8334", "P51800000937"])
-    # Which state's RERA the number belongs to. Optional: the number's format tells, and
-    # UP numbers, the only ones before all-India support, default to "UP".
-    state: str | None = Field(default=None, max_length=2, examples=["UP", "MH"])
-    # The page search returned. Required for new-format UP numbers, whose pages have no stable
+    rera_id: str = Field(max_length=60, examples=["UPRERAPRJ8334"])
+    # The page search returned. Required for new-format numbers, whose pages have no stable
     # address; send it for every number, since many later numbers have no stable page either.
     details_url: str | None = Field(default=None, max_length=500)
     # Skip the 24-hour reuse of a recent check ("Re-check now"). The daily cap still applies.
     fresh: bool = False
 
     @model_validator(mode="after")
-    def valid_for_its_state(self) -> "CheckCreate":
-        self.state, self.rera_id = check_project_number(self.rera_id, self.state, self.details_url)
+    def valid_number(self) -> "CheckCreate":
+        self.rera_id = check_project_number(self.rera_id, self.details_url)
         return self
 
 
-def check_project_number(
-    rera_id: str, state: str | None, details_url: str | None
-) -> tuple[str, str]:
-    """(state, canonical number) of a number a visitor sent, or a ValueError saying what is wrong.
+OUTSIDE_UP_MESSAGE = (
+    "NeevCheck covers Uttar Pradesh RERA projects for now. "
+    "Check this project on its own state's RERA website."
+)
+# The shapes other states' registration numbers take ("P51800000937", "PRM/KA/RERA/1251/...",
+# "RC/REP/HARERA/..."). Used only to answer calmly; nothing is looked up for them.
+OTHER_STATE_NUMBER = re.compile(
+    r"^(?!UPRERA)(?:P\d{11}|[A-Z]{1,8}RERA[A-Z0-9/\-]*\d[A-Z0-9/\-]*"
+    r"|[A-Z]{2,5}/[A-Z0-9 /\-]*\d[A-Z0-9 /\-]*"
+    r"|[A-Z]{2,6}-[A-Z0-9\-]*\d{3,}[A-Z0-9\-]*|\d{1,5}\s?OF\s?\d{4})$"
+)
 
-    The state is the one named, else the one whose number format matches. A link is accepted
-    only on that state's own RERA site, so a check never reads a page we did not choose.
+
+def is_other_state_number(text: str) -> bool:
+    """Whether the text looks like a registration number of another state's RERA."""
+    candidate = re.sub(r"\s+", " ", text.strip().upper())
+    return normalize_rera_id(candidate) is None and bool(OTHER_STATE_NUMBER.match(candidate))
+
+
+def check_project_number(rera_id: str, details_url: str | None) -> str:
+    """The canonical number a visitor sent, or a ValueError saying what is wrong.
+
+    A link is accepted only on up-rera.in, so a check never reads a page we did not choose.
     """
-    # Imported here: the state registry imports these models.
-    from app.states.registry import BY_CODE, detect_state
-
-    found = detect_state(rera_id)
-    adapter = BY_CODE.get(state or (found[0].code if found else ""))
-    canonical = adapter.canonical_id(rera_id) if adapter else None
-    if adapter is None or canonical is None:
-        raise ValueError("must be a RERA project number of a supported state, e.g. UPRERAPRJ8334")
-    if details_url is not None and not _on_portal(details_url, adapter.domains):
-        raise ValueError(f"must be an https link on {adapter.rera_name}'s own site")
-    if adapter.code == DEFAULT_STATE and is_new_format(canonical) and not details_url:
+    canonical = normalize_rera_id(rera_id)
+    if canonical is None:
+        if is_other_state_number(rera_id):
+            raise ValueError(OUTSIDE_UP_MESSAGE)
+        raise ValueError("must be a UP-RERA project number, e.g. UPRERAPRJ8334")
+    if details_url is not None and not is_uprera_url(details_url):
+        raise ValueError("must be an https link on up-rera.in")
+    if is_new_format(canonical) and not details_url:
         raise ValueError("new-format numbers need the details_url returned by search")
-    return adapter.code, canonical
-
-
-def _on_portal(url: str, domains: tuple[str, ...]) -> bool:
-    parts = urlsplit(url)
-    host = parts.hostname or ""
-    return parts.scheme == "https" and any(host == d or host.endswith("." + d) for d in domains)
+    return canonical
 
 
 class SourceRun(ApiModel):
@@ -316,7 +261,7 @@ class DisplayScore(ApiModel):
         )
 
 
-class Check(StateTagged):
+class Check(ApiModel):
     id: str
     rera_id: str
     details_url: str
@@ -384,7 +329,7 @@ class Score(ApiModel):
     checks_unread: list[CheckKey]
 
 
-class CheckSummary(StateTagged):
+class CheckSummary(ApiModel):
     """One line of a visitor's history: enough to list a check without loading its report."""
 
     id: str
@@ -450,7 +395,7 @@ class FamilyTree(ApiModel):
     companies: list[FamilyCompany] = []
 
 
-class Report(StateTagged):
+class Report(ApiModel):
     check: Check
     project: Project
     # The classic 0-100 score, shown only as a transparency line in the method section.
@@ -462,8 +407,7 @@ class Report(StateTagged):
     score_v2: ScoreV2
     # Directors, related companies and their projects; None unless the group source ran.
     family: FamilyTree | None = None
-    # Where this state's portal is, how much of it is read, and where a complaint is filed.
-    coverage: CoverageLevel = "full"
+    # Where the UP-RERA portal is, and where a complaint is filed.
     portal_url: str = "https://www.up-rera.in/"
     complaint_url: str = "https://www.up-rera.in/ComplaintHome"
 

@@ -3,8 +3,9 @@
 UP-RERA runs first because it confirms the project exists and names the
 promoter the other sources search for. The rest run in parallel, at most
 AGENT_CONCURRENCY at a time. A source that fails or is blocked only leaves
-its checks unread; the check itself fails only when UP-RERA cannot be read,
-because without it there is nothing to score.
+its checks unread, and one that ran out of time keeps what it had already
+reported (status "partial"). The check itself fails only when there is no
+project record and no promoter at all, because then nothing can be looked up.
 """
 
 import asyncio
@@ -26,6 +27,7 @@ from app.models import (
     FamilyTree,
     Finding,
     Project,
+    RunStatus,
     SourceName,
     SourceRun,
 )
@@ -46,9 +48,6 @@ from app.sources.base import (
     SourceEvent,
     SourceUnavailable,
 )
-from app.sources.state_rera import StateReraSource
-from app.states.names import DEFAULT_STATE
-from app.states.registry import adapter_for
 from app.store import Store
 from app.tinyfish import WebClient, WebError
 
@@ -119,12 +118,9 @@ class Orchestrator:
         self._store.set_check_status(check_id, "running")
         try:
             primary, *others = self._sources()
-            adapter = adapter_for(project.state)
-            if project.state != DEFAULT_STATE:
-                primary = StateReraSource(adapter)
             now = self._clock()
             ctx = SourceContext(
-                project=project,
+                project=_merge(self._store.get_project(project.rera_id), project),
                 web=self._web,
                 today=now.astimezone(IST).date(),
                 now=now,
@@ -132,8 +128,8 @@ class Orchestrator:
                 cache_dir=self._cache_dir,
             )
             ctx, primary_read = await self._run_source(check_id, primary, ctx, fresh)
-            if "registration" not in primary_read:
-                message = f"{adapter.rera_name} could not be read, so no score"
+            if "registration" not in primary_read and not ctx.project.promoter:
+                message = "UP-RERA could not be read and no builder is known, so there is no score"
                 self._finish(check_id, "failed", message=message)
                 return
             others_read = await asyncio.gather(
@@ -210,17 +206,18 @@ class Orchestrator:
             except SourceUnavailable as error:
                 run = run.model_copy(update={"status": "unavailable", "message": str(error)})
             except (SourceError, WebError) as error:
-                run = run.model_copy(update={"status": "failed", "message": str(error)})
+                run = _stopped(run, "failed", str(error), bool(read or collected))
             except TimeoutError:
                 message = f"No answer within {self._source_timeout:.0f} seconds"
-                run = run.model_copy(update={"status": "blocked", "message": message})
-                self._emit(check_id, "source.blocked", source.name, reason="timeout")
+                run = _stopped(run, "blocked", message, bool(read or collected))
+                if run.status == "blocked":
+                    self._emit(check_id, "source.blocked", source.name, reason="timeout")
             except Exception:
                 logger.exception("source %s failed in check %s", source.name, check_id)
                 message = "Unexpected error while reading this source"
-                run = run.model_copy(update={"status": "failed", "message": message})
+                run = _stopped(run, "failed", message, bool(read or collected))
 
-            if run.status != "completed":
+            if run.status not in ("completed", "partial"):
                 read = ()
             run = run.model_copy(update={"checks_read": list(read)})
             self._store.save_source_run(check_id, run)
@@ -289,6 +286,13 @@ async def replay(cached: CachedRead) -> AsyncIterator[SourceEvent]:
 
 
 SUMMARY = {"value", "band", "band_label", "confidence", "provisional", "hard_stop"}
+
+
+def _stopped(run: SourceRun, status: RunStatus, message: str, kept_something: bool) -> SourceRun:
+    """A source that stopped early keeps what it had already reported: it is then "partial"."""
+    return run.model_copy(
+        update={"status": "partial" if kept_something else status, "message": message}
+    )
 
 
 def _merge(known: Project | None, new: Project) -> Project:

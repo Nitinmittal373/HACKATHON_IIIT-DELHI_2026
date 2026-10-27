@@ -213,6 +213,8 @@ def test_e_the_endpoint_answers_an_empty_list_not_an_error(client: TestClient) -
     response = client.get("/api/projects/search", params={"q": "Lodha Palava Mumbai"})
     assert response.status_code == 200
     assert response.json()["candidates"] == []
+    # Mumbai is not in Uttar Pradesh, so the page can say so calmly.
+    assert response.json()["outside_up"] is True
 
 
 def test_search_engine_link_text_is_not_part_of_a_promoter() -> None:

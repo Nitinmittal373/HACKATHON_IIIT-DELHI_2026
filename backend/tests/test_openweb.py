@@ -20,8 +20,9 @@ from app.states.openweb import (
 from app.tinyfish import SearchHit
 from tests.fakes import FakeWebClient, load_recording
 
-MH_A = "P51900008345"
-MH_B = "P51900008962"
+A = "UPRERAPRJ1001"
+B = "UPRERAPRJ1002"
+PORTAL = "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=1001"
 
 
 @pytest.fixture(autouse=True)
@@ -38,82 +39,74 @@ def famous(query: str) -> list:
     return asyncio.run(search_open_web(query, web))
 
 
-def test_lodha_world_towers_gives_its_two_maharera_numbers() -> None:
-    found = famous("Lodha World Towers")
-    assert {p.rera_id for p in found} == {MH_A, MH_B}
-    assert {p.state for p in found} == {"MH"}
-    assert all(p.status == "listings_only" for p in found)
-    assert all("lodhagroup.com" in p.sources for p in found)
+def test_mahagun_mywoods_is_confirmed_by_its_up_rera_page() -> None:
+    [found] = famous("Mahagun Mywoods")
+    assert found.rera_id == "UPRERAPRJ3330"
+    assert found.status == "confirmed"
+    assert found.sources[0] == "up-rera.in"
+    assert found.name == "Mahagun Mywoods"
 
 
-def test_prestige_is_confirmed_by_the_karnataka_portal() -> None:
-    found = famous("Prestige Lakeside Habitat")
-    assert [p.rera_id for p in found] == ["PRM/KA/RERA/1251/446/PR/170915/000176"]
-    assert found[0].status == "confirmed"
-    assert found[0].sources[0] == "rera.karnataka.gov.in"
-    assert found[0].name == "Prestige Lakeside Habitat"
+def test_a_number_printed_by_a_listing_alone_is_kept_only_when_two_domains_print_it() -> None:
+    found = {p.rera_id: p for p in famous("ATS Pristine")}
+    assert found["UPRERAPRJ2875"].status == "listings_only"
+    assert found["UPRERAPRJ2875"].sources[:2] == ["ats-greens.co.in", "atsgreens.com"]
 
 
-def test_a_number_printed_by_one_other_site_is_not_kept() -> None:
-    # The Quora answer prints a Prestige number of a different project.
-    ids = [p.rera_id for p in famous("Prestige Lakeside Habitat")]
-    assert "PRM/KA/RERA/1251/310/PR/170913/000114" not in ids
-
-
-def test_a_phrase_that_only_looks_like_a_number_is_rejected() -> None:
-    # "112 of 2021" is on a Gurgaon sales page and fits Andhra Pradesh's plain format.
-    assert famous("M3M Golf Estate") == []
+def test_a_number_beside_another_project_is_not_this_projects_in_a_listing_of_many() -> None:
+    ids = [p.rera_id for p in famous("Godrej Woods Noida")]
+    assert "UPRERAPRJ704730" in ids and "UPRERAPRJ773536" in ids
 
 
 def test_a_number_beside_another_project_is_not_this_projects() -> None:
     hits = [
-        hit("https://a.example/1", f"Sunrise Heights RERA {MH_A}. Moon Park RERA {MH_B}."),
-        hit("https://b.example/2", f"Sunrise Heights RERA {MH_A}."),
-        hit("https://c.example/3", f"Moon Park RERA {MH_B}."),
+        hit("https://a.example/1", f"Sunrise Heights RERA {A}. Moon Park RERA {B}."),
+        hit("https://b.example/2", f"Sunrise Heights RERA {A}."),
+        hit("https://c.example/3", f"Moon Park RERA {B}."),
     ]
-    assert [p.rera_id for p in candidates_from(hits, "Sunrise Heights")] == [MH_A]
+    assert [p.rera_id for p in candidates_from(hits, "Sunrise Heights")] == [A]
 
 
 def test_one_listing_alone_is_not_enough() -> None:
-    hits = [hit("https://listing.example/x", f"Sunrise Heights RERA {MH_A}")]
+    hits = [hit("https://listing.example/x", f"Sunrise Heights RERA {A}")]
     assert candidates_from(hits, "Sunrise Heights") == []
 
 
 def test_two_domains_that_name_the_project_are_enough() -> None:
     hits = [
-        hit("https://a.example/x", f"Sunrise Heights RERA {MH_A}"),
-        hit("https://b.example/y", f"Sunrise Heights RERA {MH_A}"),
+        hit("https://a.example/x", f"Sunrise Heights RERA {A}"),
+        hit("https://b.example/y", f"Sunrise Heights RERA {A}"),
     ]
     [found] = candidates_from(hits, "Sunrise Heights")
-    assert found.rera_id == MH_A
+    assert found.rera_id == A
     assert found.status == "listings_only"
 
 
 def test_the_builders_own_site_and_one_listing_score_enough() -> None:
-    hits = [hit("https://www.sunrisebuilders.com/x", f"Sunrise Heights {MH_A}")]
+    hits = [hit("https://www.sunrisebuilders.com/x", f"Sunrise Heights {A}")]
     assert candidates_from(hits, "Sunrise Heights") == []  # builder alone: 2 points, one domain
-    hits.append(hit("https://listing.example/y", f"Sunrise Heights {MH_A}"))
-    assert [p.rera_id for p in candidates_from(hits, "Sunrise Heights")] == [MH_A]
+    hits.append(hit("https://listing.example/y", f"Sunrise Heights {A}"))
+    assert [p.rera_id for p in candidates_from(hits, "Sunrise Heights")] == [A]
 
 
 def test_a_portal_page_alone_keeps_a_number_that_names_the_project() -> None:
-    hits = [hit("https://maharera.maharashtra.gov.in/p", f"Sunrise Heights {MH_A}")]
+    hits = [hit(PORTAL, f"Sunrise Heights {A}")]
     [found] = candidates_from(hits, "Sunrise Heights")
     assert found.status == "confirmed"
 
 
 def test_a_portal_page_that_does_not_name_the_project_is_not_kept() -> None:
-    hits = [hit("https://maharera.maharashtra.gov.in/p", f"Moon Park {MH_A}")]
+    hits = [hit(PORTAL, f"Moon Park {A}")]
     assert candidates_from(hits, "Sunrise Heights") == []
 
 
-def test_spaces_and_ack_noise_do_not_hide_a_number() -> None:
-    text = prepare("Sunrise Heights RERA ACK No P 51900 008345 and RERA ACK123")
-    assert [n[1] for n in numbers_in(text)] == [MH_A]
+def test_ack_noise_does_not_hide_a_number_and_other_states_numbers_are_ignored() -> None:
+    text = prepare("Sunrise Heights RERA ACK No UPRERAPRJ1001 and P51900008345 RERA ACK123")
+    assert [n[0] for n in numbers_in(text)] == [A]
 
 
 def test_brand_tokens_are_the_first_words() -> None:
-    assert brand_tokens("Lodha World Towers") == {"lodha", "lodhaworld"}
+    assert brand_tokens("Godrej Woods Noida") == {"godrej", "godrejwoods"}
     assert brand_tokens("My Home Bhooja") == {"myhome"}
 
 
@@ -133,9 +126,8 @@ def test_resolve_any_adds_open_web_numbers_to_the_portal_ones() -> None:
     from app.states.resolver import resolve_any
 
     web = FakeWebClient().replay(load_recording("openweb_famous.json"))
-    resolved = asyncio.run(resolve_any("Lodha World Towers", web))
-    assert {p.rera_id for p in resolved.candidates} >= {MH_A, MH_B}
-    assert all(p.status for p in resolved.candidates if p.rera_id in {MH_A, MH_B})
+    resolved = asyncio.run(resolve_any("Mahagun Mywoods", web))
+    assert "UPRERAPRJ3330" in {p.rera_id for p in resolved.candidates}
 
 
 def test_a_typed_number_keeps_only_that_number() -> None:
@@ -143,14 +135,14 @@ def test_a_typed_number_keeps_only_that_number() -> None:
 
     web = FakeWebClient(
         searches={
-            f"{MH_A} RERA": [
-                hit("https://a.example/1", f"Lodha World Towers {MH_A} {MH_B}"),
-                hit("https://b.example/2", f"Lodha World Towers {MH_A}"),
+            f"{A} RERA": [
+                hit("https://a.example/1", f"Sunrise Heights {A} {B}"),
+                hit("https://b.example/2", f"Sunrise Heights {A}"),
             ]
         }
     )
-    resolved = asyncio.run(resolve_any(MH_A, web))
-    assert [p.rera_id for p in resolved.candidates] == [MH_A]
+    resolved = asyncio.run(resolve_any(A, web))
+    assert [p.rera_id for p in resolved.candidates] == [A]
 
 
 def test_a_word_counts_whole_not_as_the_start_of_another_project() -> None:
@@ -166,19 +158,21 @@ def test_names_spelled_apart_or_together_match() -> None:
 
     assert share_of({"mahagun", "mywoods"}, "mahagun my wood, noida") == 1.0
     assert share_of({"m3m", "golf", "estate"}, "the rera number for m3m golfestate") == 1.0
-    assert share_of({"lodha", "world", "towers"}, "lodha world one, worli") < 0.75
+    assert share_of({"godrej", "woods", "noida"}, "godrej woods, bengaluru") < 0.75
 
 
-def test_a_city_in_the_query_puts_that_states_projects_first() -> None:
+def test_confirmed_numbers_come_before_listing_only_ones() -> None:
     from app.models import Project
     from app.states.resolver import ordered
 
-    def godrej(state: str, rera_id: str, status: str) -> Project:
+    def godrej(rera_id: str, status: str) -> Project:
         return Project(
-            state=state, rera_id=rera_id, name="Godrej Woods", details_url="x", status=status
+            rera_id=rera_id, name="Godrej Woods", details_url="x", status=status
         )  # type: ignore[arg-type]
 
-    bengaluru = godrej("KA", "PRM/KA/RERA/1251/472/PR/121125/008248", "confirmed")
-    noida = godrej("UP", "UPRERAPRJ773536", "listings_only")
-    assert [p.state for p in ordered([bengaluru, noida], "Godrej Woods Noida")] == ["UP", "KA"]
-    assert [p.state for p in ordered([bengaluru, noida], "Godrej Woods")] == ["KA", "UP"]
+    listed = godrej("UPRERAPRJ145318", "listings_only")
+    confirmed = godrej("UPRERAPRJ773536", "confirmed")
+    assert [p.rera_id for p in ordered([listed, confirmed], "Godrej Woods Noida")] == [
+        "UPRERAPRJ773536",
+        "UPRERAPRJ145318",
+    ]

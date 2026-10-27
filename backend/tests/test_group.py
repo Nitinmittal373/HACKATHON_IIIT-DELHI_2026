@@ -119,7 +119,7 @@ def test_the_company_table_parser_still_reads_the_registry_page() -> None:
     assert parse_company_table(text)["status"]
 
 
-def test_with_v2_sources_the_group_pillar_is_scored(tmp_path: Path) -> None:
+def test_the_group_pillar_is_scored(tmp_path: Path) -> None:
     from fastapi.testclient import TestClient
 
     from app.main import create_app
@@ -129,7 +129,7 @@ def test_with_v2_sources_the_group_pillar_is_scored(tmp_path: Path) -> None:
 
     web = make_web().replay(CHECK).replay(RECORDING)
     app = create_app(
-        make_settings(tmp_path, v2_sources=True), web=web, clock=lambda: CAPTURED_AT, cache_dir=None
+        make_settings(tmp_path), web=web, clock=lambda: CAPTURED_AT, cache_dir=None
     )
     with TestClient(app) as client:
         check_id = client.post("/api/checks", json={"rera_id": "UPRERAPRJ8334"}).json()["id"]
@@ -186,7 +186,7 @@ def test_the_report_carries_the_family_tree(tmp_path: Path) -> None:
 
     web = make_web().replay(CHECK).replay(RECORDING)
     app = create_app(
-        make_settings(tmp_path, v2_sources=True), web=web, clock=lambda: CAPTURED_AT, cache_dir=None
+        make_settings(tmp_path), web=web, clock=lambda: CAPTURED_AT, cache_dir=None
     )
     with TestClient(app) as client:
         check_id = client.post("/api/checks", json={"rera_id": "UPRERAPRJ8334"}).json()["id"]

@@ -21,7 +21,6 @@ from app.api import (
     promoters,
     reports,
     sentinel,
-    states,
 )
 from app.cache import SourceCache
 from app.config import BACKEND_DIR, Settings, load_settings
@@ -65,11 +64,13 @@ def create_app(
         )
         engine = make_engine(settings.database_url)
         app.state.store = Store(make_session_factory(engine))
-        # Cached reads belong to the v2 sources: one flag turns both on.
-        source_cache = SourceCache(make_session_factory(engine)) if settings.v2_sources else None
+        source_cache = SourceCache(make_session_factory(engine))
         # A check's agents run inside this process; any it was running before a restart or a
         # redeploy are gone, so those checks can never finish and are failed honestly.
         app.state.store.fail_unfinished_checks(clock())
+        # Old reports follow the current rules too, so the home page and My reports never
+        # show a number the method section no longer explains.
+        app.state.store.rescore_all()
         app.state.hub = EventHub()
         app.state.limiter = RateLimiter(settings.rate_limit_per_minute)
         app.state.extract_limiter = RateLimiter(EXTRACT_PER_MINUTE)
@@ -82,7 +83,7 @@ def create_app(
             # The agent stops itself at agent_timeout_seconds; this is only the backstop.
             source_timeout=settings.agent_timeout_seconds + SOURCE_TIMEOUT_GRACE_SECONDS,
             clock=clock,
-            sources=lambda: build_sources(settings.v2_sources),
+            sources=build_sources,
             cache_dir=cache_dir,
             source_cache=source_cache,
         )
@@ -133,7 +134,6 @@ def create_app(
     for module in (
         health,
         meta,
-        states,
         projects,
         extract,
         promoters,

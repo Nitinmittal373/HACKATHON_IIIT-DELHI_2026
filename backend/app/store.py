@@ -27,7 +27,6 @@ from app.models import (
 )
 from app.scoring.v2.from_runs import score_from_runs
 from app.scoring.v2.reasons import DATA_UNAVAILABLE
-from app.states.registry import state_of
 
 logger = logging.getLogger(__name__)
 
@@ -38,8 +37,6 @@ EXTRA_DETAIL = ("v2", "family")
 EXTRA_FIELDS = ("snippet", "total", "via")
 
 # The home page card shows the three biggest reasons behind a score.
-# The state is not stored: every number format belongs to exactly one state's RERA.
-STATE_FIELDS = {"state", "state_name", "rera_name"}
 # What search learned about a candidate; the stored project is the portal-confirmed record.
 CANDIDATE_FIELDS = {"status", "sources", "found_in"}
 RECENT_DRIVERS = 3
@@ -52,7 +49,7 @@ class Store:
 
     def save_project(self, project: Project) -> None:
         with self._sessions.begin() as session:
-            session.merge(ProjectRow(**project.model_dump(exclude=STATE_FIELDS | CANDIDATE_FIELDS)))
+            session.merge(ProjectRow(**project.model_dump(exclude=CANDIDATE_FIELDS)))
 
     def get_project(self, rera_id: str) -> Project | None:
         with self._sessions() as session:
@@ -107,7 +104,6 @@ class Store:
             return Check(
                 id=row.id,
                 rera_id=row.rera_id,
-                state=state_of(row.rera_id),
                 details_url=project.details_url,
                 status=row.status,  # type: ignore[arg-type]  # written only from CheckStatus
                 started_at=row.started_at,
@@ -239,6 +235,28 @@ class Store:
             row = session.get_one(ScoreRow, check_id)
             row.detail = {**row.detail, "v2": score.model_dump(mode="json")}
 
+    def rescore_all(self) -> int:
+        """Score every stored check again with today's rules; returns how many were scored.
+
+        Scoring is deterministic, so running this on every start is harmless: a check whose
+        rules did not change gets the number it already had.
+        """
+        with self._sessions() as session:
+            check_ids = list(session.scalars(select(ScoreRow.check_id)))
+        done = 0
+        for check_id in check_ids:
+            check = self._load_check(check_id)
+            if check is None:
+                continue
+            try:
+                score = score_from_runs(self.list_findings(check_id), check.sources)
+            except Exception:
+                logger.exception("v2 re-score failed for check %s", check_id)
+                continue
+            self.save_score_v2(check_id, score)
+            done += 1
+        return done
+
     def save_family(self, check_id: str, tree: FamilyTree) -> None:
         with self._sessions.begin() as session:
             row = session.get_one(ScoreRow, check_id)
@@ -292,7 +310,6 @@ class Store:
             {
                 "id": check.id,
                 "rera_id": check.rera_id,
-                "state": state_of(check.rera_id),
                 "details_url": project.details_url,
                 "project": project.name,
                 "promoter": project.promoter,
@@ -341,7 +358,6 @@ def _summary_query() -> Select[tuple[CheckRow, ProjectRow, ScoreRow]]:
 def _project(row: ProjectRow) -> Project:
     return Project(
         rera_id=row.rera_id,
-        state=state_of(row.rera_id),
         name=row.name,
         promoter=row.promoter,
         registered_on=row.registered_on,

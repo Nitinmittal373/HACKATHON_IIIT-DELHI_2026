@@ -27,9 +27,9 @@ from app.states.openweb import (
     prepare,
     share_of,
 )
-from app.states.registry import BY_CODE
 from app.states.text import squash
 from app.tinyfish import SearchHit, WebClient, WebError
+from app.uprera_links import project_details_url
 
 ORDER_SEARCHES: tuple[tuple[str, str | None], ...] = (
     ("{q} RERA order", None),
@@ -76,9 +76,9 @@ async def numbers_in_orders(hits: list[SearchHit], query: str, web: WebClient) -
     for hit, text in zip(hits, texts, strict=True):
         readable = prepare(text)
         numbers = numbers_in(readable)
-        for index, (state, rera_id, _, _) in enumerate(numbers):
+        for index, (rera_id, _, _) in enumerate(numbers):
             if names_project(readable, numbers, index, words, hit):
-                found.setdefault(rera_id, project_from_order(state, rera_id, hit))
+                found.setdefault(rera_id, project_from_order(rera_id, hit))
     return list(found.values())
 
 
@@ -126,13 +126,11 @@ def builder_leads(hits: list[SearchHit]) -> list[OrderLead]:
     return list(leads.values())[:MAX_LEADS]
 
 
-def project_from_order(state: str, rera_id: str, hit: SearchHit) -> Project:
-    probe = Project(state=state, rera_id=rera_id, details_url="")
-    return probe.model_copy(
-        update={
-            "details_url": BY_CODE[state].details_url(probe),
-            "status": "from_order",
-            "found_in": hit.url,
-            "sources": [domain_of(hit.url)],
-        }
+def project_from_order(rera_id: str, hit: SearchHit) -> Project:
+    return Project(
+        rera_id=rera_id,
+        details_url=project_details_url(rera_id),
+        status="from_order",
+        found_in=hit.url,
+        sources=[domain_of(hit.url)],
     )

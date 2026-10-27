@@ -198,8 +198,76 @@ def test_too_few_pillars_gives_no_band() -> None:
     assert result.band_label == "Not enough evidence yet"
 
 
-def test_half_the_pillars_is_enough_for_a_band() -> None:
-    assert not score_v2([], ["P1", "P2", "P3"]).provisional
+def test_four_pillars_with_the_rera_record_are_enough_for_a_band() -> None:
+    assert not score_v2([], ["P1", "P2", "P3", "P4"]).provisional
+
+
+def test_three_of_six_pillars_have_no_band_however_clean() -> None:
+    result = score_v2([], ["P1", "P2", "P3"])
+
+    assert result.provisional and result.band == "insufficient_evidence"
+    assert result.value == 900  # kept as the provisional value, never shown as a band
+
+
+def test_without_the_rera_record_there_is_no_band_even_with_five_pillars() -> None:
+    assert score_v2([], ["P2", "P3", "P4", "P5", "P6"]).band == "insufficient_evidence"
+
+
+def test_a_hard_stop_shows_even_when_little_was_read() -> None:
+    result = score_v2([finding("registration_revoked")], ["P1"])
+
+    assert result.hard_stop and result.band == "High"
+
+
+def test_an_overdue_project_costs_points_like_a_slipped_date() -> None:
+    overdue = score_v2([finding("past_end_date", months=39)], ALL)
+    slipped = score_v2([finding("delay_vs_promised", months=39)], ALL)
+
+    assert overdue.value == slipped.value == 774
+    assert [r.code for r in overdue.reason_codes] == ["R03"]
+
+
+def test_when_both_delay_kinds_are_present_only_the_larger_counts() -> None:
+    both = score_v2(
+        [finding("past_end_date", months=39), finding("delay_vs_promised", months=14)], ALL
+    )
+
+    assert both.value == score_v2([finding("past_end_date", months=39)], ALL).value
+    assert len(both.drivers) == 1
+
+
+def test_promoter_complaints_cost_a_capped_amount_under_r13() -> None:
+    few = score_v2([finding("promoter_complaints", count=10)], ALL)
+    many = score_v2([finding("promoter_complaints", count=2803)], ALL)
+
+    assert few.value == 900 - 12 and many.value == 900 - 48
+    assert [c.label for c in many.reason_codes] == ["Builder complaint record"]
+    assert many.reason_codes[0].code == "R13"
+    assert next(p for p in many.pillars if p.id == "P2").penalty == 40
+
+
+def test_9966_overdue_with_many_complaints_is_not_low() -> None:
+    # UPRERAPRJ9966 as read on UP-RERA: 39 months overdue and 52 complaints about the project.
+    result = score_v2(
+        [finding("past_end_date", months=39), finding("project_complaints", count=52)], ALL
+    )
+
+    assert result.band != "Low"
+
+
+def test_8334_is_elevated_or_worse() -> None:
+    # UPRERAPRJ8334 as read on UP-RERA: 105 months overdue, 2803 complaints against the
+    # promoter and 15 about the project.
+    result = score_v2(
+        [
+            finding("past_end_date", months=105),
+            finding("promoter_complaints", count=2803),
+            finding("project_complaints", count=15),
+        ],
+        ALL,
+    )
+
+    assert result.band in ("Elevated", "High")
 
 
 def test_unread_data_is_r12_with_no_penalty() -> None:
@@ -240,11 +308,11 @@ def test_recorded_8334_check_has_a_v2_score(tmp_path: Path) -> None:
 
     v2 = report["score_v2"]
     assert report["score"]["value"] == 68  # v1 is untouched
-    assert (v2["value"], v2["band"], v2["confidence"]) == (741, "Watch", 0.67)
+    assert (v2["value"], v2["band"], v2["confidence"]) == (567, "Elevated", 0.67)
     assert v2["pillars_unread"] == ["P2", "P5"]
     assert [p["id"] for p in v2["pillars"]] == ALL
     codes = [c["code"] for c in v2["reason_codes"]]
-    assert codes == ["R05", "R11", "R12"]
+    assert codes == ["R05", "R03", "R13", "R11", "R12"]
     assert v2["reason_codes"][0]["label"] == "15 RERA complaints"
     assert all(c["finding_ids"] or c["code"] == "R12" for c in v2["reason_codes"])
     finding_ids = {f["id"] for f in report["findings"]}

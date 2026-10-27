@@ -8,7 +8,6 @@ page:
     python -m scripts.capture_fixtures                          # pages and searches
     python -m scripts.capture_fixtures uprera_summary_8334.html  # named files only
     python -m scripts.capture_fixtures check_8334.json          # one full live check
-    python -m scripts.capture_fixtures check_mh.json            # the same for another state
 
 The full check runs every source of UPRERAPRJ8334 for real, so it uses paid
 agent runs. It is never part of the default run: ask for it by name.
@@ -36,12 +35,9 @@ from scripts.recorder import RecordingWebClient, scrub
 FIXTURES = Path(__file__).resolve().parents[1] / "tests" / "fixtures"
 PURPOSE = "Record a UP-RERA response as a parser test fixture"
 CHECK_FIXTURE = "check_8334.json"
-# One full live check per fixture; the number is the one to check (see docs/states.md).
+# One full live check per fixture; the number is the one to check .
 LIVE_CHECKS = {
     CHECK_FIXTURE: "UPRERAPRJ8334",
-    "check_mh.json": "P99000055716",
-    "check_hr.json": "RC/REP/HARERA/GGM/1059/791/2026/31",
-    "check_ka.json": "PRM/KA/RERA/1251/446/PR/190723/006078",
 }
 
 SEARCHES = {
@@ -127,7 +123,6 @@ def capture_check(settings: Settings, fixture: str) -> None:
             "score": report["score"]["value"],
             "band": report["score"]["band"],
             "confidence": report["score"]["confidence"],
-            "state": report["state"],
             "display_score": report["display_score"],
             "reasons": [r["label"] for r in report["score_v2"]["reason_codes"]][:5],
             "sources": {run["source"]: run["status"] for run in report["check"]["sources"]},

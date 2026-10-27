@@ -60,7 +60,7 @@ def main() -> None:
     if not numbers:
         sys.exit("Give at least one UP-RERA number or --file")
 
-    settings = load_settings().model_copy(update={"v2_sources": True, "rate_limit_per_minute": 100})
+    settings = load_settings().model_copy(update={"rate_limit_per_minute": 100})
     web = LiveWebClient(
         settings.tinyfish_api_key,
         fetch_timeout=settings.fetch_timeout_seconds,

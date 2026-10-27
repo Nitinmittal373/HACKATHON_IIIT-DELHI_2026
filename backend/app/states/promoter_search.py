@@ -3,7 +3,7 @@
 For buyers whose project has no website to search: they know the builder (from a hoarding, an
 agent or a brochure) and want to see what that builder has registered. Three Searches run:
 
-1. the state RERA domains (the named state, the state of the named city, or all of them),
+1. up-rera.in,
 2. company-registry pages that mirror MCA data (name and CIN only),
 3. the open web, whose numbers are voted on like any project name's.
 
@@ -17,7 +17,7 @@ from collections.abc import Iterable
 
 from app.api_model import ApiModel
 from app.models import Project
-from app.states.names import DEFAULT_STATE
+from app.resolve import candidates_from_hits
 from app.states.openweb import (
     CACHE,
     NAME_SHARE,
@@ -25,15 +25,13 @@ from app.states.openweb import (
     cached_search,
     candidates_from,
     domain_of,
-    hits_by_state,
     name_words,
     share_of,
 )
-from app.states.places import state_of_place
-from app.states.registry import ADAPTERS, BY_CODE
-from app.states.search_adapter import SearchStateAdapter
+from app.states.places import names_place_outside_up
 from app.states.text import clean, squash
 from app.tinyfish import SearchHit, WebClient
+from app.uprera_links import UPRERA_DOMAIN
 
 REGISTRY_DOMAINS = "zaubacorp.com,tofler.in,thecompanycheck.com,economictimes.indiatimes.com"
 CIN = re.compile(r"\b[LU]\d{5}[A-Z]{2}\d{4}[A-Z]{3}\d{6}\b")
@@ -61,39 +59,35 @@ class CompanyHit(ApiModel):
 
 class PromoterSearchResponse(ApiModel):
     query: str
-    # The state the search was limited to, from the request or from the named city.
-    state: str | None = None
     companies: list[CompanyHit]
     projects: list[Project]
-    searched_states: list[str]
+    # True when nothing was found and the city points outside Uttar Pradesh.
+    outside_up: bool = False
 
 
 async def search_promoter(
     builder: str,
     web: WebClient,
-    state: str | None = None,
     city: str | None = None,
     cache: SearchCache = CACHE,
 ) -> PromoterSearchResponse:
-    chosen = state if state in BY_CODE else state_of_place(city or "") or state_of_place(builder)
-    adapters = [BY_CODE[chosen]] if chosen in BY_CODE else list(ADAPTERS)
-    domains = ",".join(domain for adapter in adapters for domain in adapter.domains)
     places = f" {city}" if city else ""
     portal, registry, open_web = await asyncio.gather(
-        cached_search(f"{builder}{places} promoter RERA registered projects", web, cache, domains),
+        cached_search(
+            f"{builder}{places} promoter RERA registered projects", web, cache, UPRERA_DOMAIN
+        ),
         cached_search(f"{builder} company CIN", web, cache, REGISTRY_DOMAINS),
         cached_search(f"{builder}{places} RERA registered projects", web, cache),
     )
     words = builder_words(builder)
     named = [hit for hit in portal if share_of(words, hit_text(hit).lower()) >= NAME_SHARE]
     voted = candidates_from(open_web, " ".join(sorted(words)) or builder)
-    projects = [*portal_projects(named), *voted]
+    projects = one_each([*portal_projects(named), *voted])[:MAX_PROJECTS]
     return PromoterSearchResponse(
         query=builder,
-        state=chosen if chosen in BY_CODE else None,
         companies=companies_in(registry, words),
-        projects=one_each(projects)[:MAX_PROJECTS],
-        searched_states=[adapter.code for adapter in adapters],
+        projects=projects,
+        outside_up=not projects and names_place_outside_up(f"{builder}{places}"),
     )
 
 
@@ -107,24 +101,10 @@ def hit_text(hit: SearchHit) -> str:
 
 
 def portal_projects(hits: list[SearchHit]) -> list[Project]:
-    # Imported here: app.resolve and app.sources import each other, so it must come second.
-    from app.resolve import candidates_from_hits as up_candidates_from_hits
-
-    found: list[Project] = []
-    for code, state_hits in hits_by_state(hits).items():
-        adapter = BY_CODE[code]
-        projects = (
-            up_candidates_from_hits(state_hits)
-            if code == DEFAULT_STATE
-            else adapter.candidates_from_hits(state_hits)
-            if isinstance(adapter, SearchStateAdapter)
-            else []
-        )
-        found += [
-            p.model_copy(update={"status": "confirmed", "sources": [domain_of(p.details_url)]})
-            for p in projects
-        ]
-    return found
+    return [
+        p.model_copy(update={"status": "confirmed", "sources": [domain_of(p.details_url)]})
+        for p in candidates_from_hits([hit for hit in hits if domain_of(hit.url) == UPRERA_DOMAIN])
+    ]
 
 
 def companies_in(hits: Iterable[SearchHit], words: set[str]) -> list[CompanyHit]:
