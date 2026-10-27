@@ -2208,6 +2208,25 @@
         "title": "Report",
         "type": "object"
       },
+      "SaveReports": {
+        "additionalProperties": false,
+        "properties": {
+          "ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 50,
+            "minItems": 1,
+            "title": "Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "ids"
+        ],
+        "title": "SaveReports",
+        "type": "object"
+      },
       "Scale": {
         "properties": {
           "max": {
@@ -3645,6 +3664,176 @@
         "summary": "Health",
         "tags": [
           "health"
+        ]
+      }
+    },
+    "/api/me/reports": {
+      "get": {
+        "description": "The checks saved to this account, newest first. Ids the server no longer has are left out.",
+        "operationId": "list_saved_api_me_reports_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CheckSummary"
+                  },
+                  "title": "Response List Saved Api Me Reports Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Saved",
+        "tags": [
+          "account"
+        ]
+      },
+      "post": {
+        "description": "Saves check ids (the first is the newest) and answers with the account's whole list.",
+        "operationId": "save_reports_api_me_reports_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveReports"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CheckSummary"
+                  },
+                  "title": "Response Save Reports Api Me Reports Post",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Save Reports",
+        "tags": [
+          "account"
+        ]
+      }
+    },
+    "/api/me/reports/{check_id}": {
+      "delete": {
+        "operationId": "forget_report_api_me_reports__check_id__delete",
+        "parameters": [
+          {
+            "description": "Check id",
+            "in": "path",
+            "name": "check_id",
+            "required": true,
+            "schema": {
+              "description": "Check id",
+              "pattern": "^[0-9a-f]{32}$",
+              "title": "Check Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Forget Report",
+        "tags": [
+          "account"
         ]
       }
     },

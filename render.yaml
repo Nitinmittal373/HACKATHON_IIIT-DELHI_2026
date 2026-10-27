@@ -23,6 +23,9 @@ services:
         sync: false
       - key: WEBHOOK_SECRET
         sync: false
+      # Optional. Same value as the web app's AUTH_BRIDGE_SECRET; without it saved reports are off.
+      - key: AUTH_BRIDGE_SECRET
+        sync: false
       # Optional. Without it the API uses SQLite on the service's own disk, which Render clears
       # on every deploy. Paste the Internal Database URL of a Render Postgres to keep data.
       - key: DATABASE_URL

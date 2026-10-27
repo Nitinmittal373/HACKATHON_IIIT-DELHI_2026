@@ -9,6 +9,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.accounts import UserReports
 from app.api import (
     checks,
     compare,
@@ -16,6 +17,7 @@ from app.api import (
     events,
     extract,
     health,
+    me,
     meta,
     projects,
     promoters,
@@ -42,6 +44,8 @@ DEFAULT_CACHE_DIR = BACKEND_DIR / "data" / "cache"
 SOURCE_TIMEOUT_GRACE_SECONDS = 30
 # Files read per minute from one address; each may be 5 MB and 40 pages.
 EXTRACT_PER_MINUTE = 10
+# Saved-report calls per minute from one address; each is a small database read or write.
+ACCOUNT_PER_MINUTE = 30
 
 
 def create_app(
@@ -74,6 +78,8 @@ def create_app(
         app.state.hub = EventHub()
         app.state.limiter = RateLimiter(settings.rate_limit_per_minute)
         app.state.extract_limiter = RateLimiter(EXTRACT_PER_MINUTE)
+        app.state.account_limiter = RateLimiter(ACCOUNT_PER_MINUTE)
+        app.state.user_reports = UserReports(make_session_factory(engine))
         app.state.track_records = TrackRecords(app.state.web, clock)
         app.state.orchestrator = Orchestrator(
             app.state.store,
@@ -126,7 +132,7 @@ def create_app(
         CORSMiddleware,
         allow_origins=settings.cors_origins,
         allow_methods=["GET", "POST", "DELETE"],
-        allow_headers=["Content-Type"],
+        allow_headers=["Content-Type", "Authorization"],
         # Without this the browser hides Retry-After and cannot tell a visitor how long to wait.
         expose_headers=["Retry-After"],
     )
@@ -143,6 +149,7 @@ def create_app(
         reports,
         sentinel,
         corrections,
+        me,
     ):
         app.include_router(module.router)
     return app

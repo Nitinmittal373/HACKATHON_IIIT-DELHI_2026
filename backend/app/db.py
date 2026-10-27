@@ -178,6 +178,16 @@ class CorrectionRow(Base):
     contact: Mapped[str | None] = mapped_column(String(254))
 
 
+class UserReportRow(Base):
+    """A check saved to a signed-in account (the account is the Google id, nothing else)."""
+
+    __tablename__ = "user_reports"
+
+    user_id: Mapped[str] = mapped_column(String(64), primary_key=True)
+    check_id: Mapped[str] = mapped_column(String(32), primary_key=True)
+    saved_at: Mapped[datetime] = mapped_column(UTCDateTime)
+
+
 class AlertRow(Base):
     __tablename__ = "alerts"
 
