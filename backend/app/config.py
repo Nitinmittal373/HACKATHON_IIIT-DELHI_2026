@@ -3,7 +3,7 @@
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import Field, SecretStr, ValidationError, field_validator
+from pydantic import AliasChoices, Field, SecretStr, ValidationError, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BACKEND_DIR = Path(__file__).resolve().parents[1]
@@ -39,6 +39,10 @@ class Settings(BaseSettings):
     # This API's public address. With it and WEBHOOK_SECRET, watching a project also creates
     # TinyFish monitors that call back here; without it Sentinel keeps its own schedule.
     public_base_url: str | None = None
+    # The web app's public address, used for the stop-alerts link in every alert email.
+    site_url: str | None = Field(
+        default=None, validation_alias=AliasChoices("SITE_URL", "NEXT_PUBLIC_SITE_URL")
+    )
     # Optional email delivery of alerts; without smtp_host alerts are only stored.
     smtp_host: str | None = None
     smtp_port: int = 587
@@ -50,6 +54,7 @@ class Settings(BaseSettings):
         "webhook_secret",
         "auth_bridge_secret",
         "public_base_url",
+        "site_url",
         "smtp_host",
         "smtp_user",
         "smtp_password",

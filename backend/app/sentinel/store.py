@@ -1,14 +1,29 @@
 """Reads and writes for watches and alerts."""
 
+import hashlib
+import secrets
 import uuid
 from datetime import datetime
 
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session, sessionmaker
 
-from app.db import AlertRow, MonitorRow, ProjectRow, WatchRow, WebhookReceiptRow
+from app.db import (
+    AlertRow,
+    MonitorRow,
+    ProjectRow,
+    UnsubscribeTokenRow,
+    WatchRow,
+    WebhookReceiptRow,
+)
 from app.models import DisplayScore
 from app.sentinel.models import Alert, Diff, FindingChange, Language, Watch
+
+TOKEN_BYTES = 32
+
+
+def hash_token(token: str) -> str:
+    return hashlib.sha256(token.encode()).hexdigest()
 
 
 class SentinelStore:
@@ -62,9 +77,32 @@ class SentinelStore:
                 )
             )
             session.execute(delete(MonitorRow).where(MonitorRow.watch_id == watch_id))
+            session.execute(
+                delete(UnsubscribeTokenRow).where(UnsubscribeTokenRow.watch_id == watch_id)
+            )
             session.execute(delete(AlertRow).where(AlertRow.watch_id == watch_id))
             session.execute(delete(WatchRow).where(WatchRow.id == watch_id))
             return monitor_ids
+
+    def new_unsubscribe_token(self, watch_id: str, created_at: datetime) -> str:
+        """A fresh 32-byte token for one alert email. Only its hash is stored, so each email
+        gets its own and links in older emails keep working until the watch is gone."""
+        token = secrets.token_urlsafe(TOKEN_BYTES)
+        with self._sessions.begin() as session:
+            session.add(
+                UnsubscribeTokenRow(
+                    token_hash=hash_token(token), watch_id=watch_id, created_at=created_at
+                )
+            )
+        return token
+
+    def watch_for_token(self, token: str) -> str | None:
+        with self._sessions() as session:
+            return session.scalar(
+                select(UnsubscribeTokenRow.watch_id).where(
+                    UnsubscribeTokenRow.token_hash == hash_token(token)
+                )
+            )
 
     def add_monitor(self, watch_id: str, monitor_id: str, kind: str) -> None:
         with self._sessions.begin() as session:

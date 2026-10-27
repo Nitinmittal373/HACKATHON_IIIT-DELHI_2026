@@ -146,6 +146,16 @@ class WatchRow(Base):
     baseline_check_id: Mapped[str | None] = mapped_column(String(32))
 
 
+class UnsubscribeTokenRow(Base):
+    """A link in an alert email that stops one watch. Only the hash is kept, never the token."""
+
+    __tablename__ = "unsubscribe_tokens"
+
+    token_hash: Mapped[str] = mapped_column(String(64), primary_key=True)
+    watch_id: Mapped[str] = mapped_column(ForeignKey("watches.id"), index=True)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime)
+
+
 class MonitorRow(Base):
     """A TinyFish monitor created for a watch; cancelled when the watch is removed."""
 

@@ -1,14 +1,20 @@
 """Neev Sentinel: watches, change detection, alerts, the webhook and the cost guards."""
 
+import asyncio
 from datetime import date, timedelta
 from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import select
 
+from app.db import UnsubscribeTokenRow
 from app.main import create_app
 from app.models import Check, Finding, SourceRun
 from app.sentinel.diff import diff_findings
+from app.sentinel.models import Alert, Diff, FindingChange
+from app.sentinel.notify import STOP_LINE, build_message, stop_link
+from app.sentinel.store import hash_token
 from app.tinyfish import AgentDone
 from tests.conftest import FIXED_NOW, make_settings, make_web, read_events
 from tests.fakes import FakeWebClient, load_recording
@@ -265,3 +271,140 @@ def test_a_check_older_than_a_day_is_not_reused(tmp_path: Path) -> None:
 
         assert later.status_code == 202
         assert later.json()["id"] != first
+
+
+SITE = "https://neevcheck.example"
+
+
+def watch_project(client: TestClient) -> str:
+    body = {"rera_id": "UPRERAPRJ8334", "email": EMAIL}
+    return client.post("/api/sentinel", json=body).json()["id"]
+
+
+def stop_url_in(message: object, language: str) -> str:
+    """The last line of the email, after checking it follows the "stop alerts" sentence."""
+    lines = message.get_content().strip().splitlines()  # type: ignore[attr-defined]
+    assert lines[-2] == STOP_LINE[language]
+    return lines[-1]
+
+
+def alert_for(watch_id: str) -> Alert:
+    return Alert(
+        id="b" * 32,
+        watch_id=watch_id,
+        rera_id="UPRERAPRJ8334",
+        check_id="a" * 32,
+        created_at=FIXED_NOW,
+        old_score=None,
+        new_score=None,
+        added=[FindingChange(title="New complaint")],
+        removed=[],
+        changed=[],
+    )
+
+
+def test_every_alert_email_ends_with_a_stop_link_built_from_the_site_address(
+    tmp_path: Path,
+) -> None:
+    settings = make_settings(tmp_path, site_url=f"{SITE}/", smtp_host="h", smtp_from="a@b.c")
+    link = stop_link(settings, "tok123")
+    assert link == f"{SITE}/alerts/stop?token=tok123"
+    for language in ("en", "hi"):
+        message = build_message(settings, EMAIL, language, alert_for("w" * 32), link)  # type: ignore[arg-type]
+        assert stop_url_in(message, language) == link
+
+
+def test_without_a_site_address_the_email_has_no_link(tmp_path: Path) -> None:
+    settings = make_settings(tmp_path)
+    assert stop_link(settings, "tok") is None
+    message = build_message(settings, EMAIL, "en", alert_for("w" * 32))
+    assert "alerts/stop" not in message.get_content()
+
+
+def test_the_site_address_can_come_from_next_public_site_url(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("NEXT_PUBLIC_SITE_URL", SITE)
+    assert make_settings(tmp_path).site_url == SITE
+
+
+def test_a_token_is_long_random_and_stored_only_as_a_hash(tmp_path: Path) -> None:
+    with build_client(tmp_path) as client:
+        watch_id = watch_project(client)
+        store = client.app.state.sentinel_store  # type: ignore[attr-defined]
+        first = store.new_unsubscribe_token(watch_id, FIXED_NOW)
+        second = store.new_unsubscribe_token(watch_id, FIXED_NOW)
+        assert first != second
+        assert len(first) >= 43  # 32 random bytes, url-safe
+        assert store.watch_for_token(first) == watch_id
+        with client.app.state.sentinel_store._sessions() as session:  # type: ignore[attr-defined]
+            stored = list(session.scalars(select(UnsubscribeTokenRow.token_hash)))
+        assert first not in stored
+        assert hash_token(first) in stored
+
+
+def test_delivering_an_alert_puts_a_working_stop_link_in_the_email(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    sent: list[str | None] = []
+
+    async def fake_send(settings: object, to: str, language: str, alert: object, url: str | None):
+        sent.append(url)
+        return True
+
+    monkeypatch.setattr("app.sentinel.service.send_alert", fake_send)
+    with build_client(tmp_path, site_url=SITE, smtp_host="h", smtp_from="a@b.c") as client:
+        watch_id = watch_project(client)
+        watches = client.app.state.sentinel_store  # type: ignore[attr-defined]
+        watches.add_alert(
+            watch=watches.get_watch(watch_id),
+            check_id="a" * 32,
+            created_at=FIXED_NOW,
+            old_score=None,
+            new_score=None,
+            old_display=None,
+            new_display=None,
+            diff=Diff(added=[FindingChange(title="x")]),
+        )
+        alert_id = watches.alerts_for_email(EMAIL)[0].id
+        asyncio.run(client.app.state.sentinel._deliver(watches.get_watch(watch_id), alert_id))
+
+        assert len(sent) == 1 and sent[0] and sent[0].startswith(f"{SITE}/alerts/stop?token=")
+        token = sent[0].split("token=")[1]
+        assert client.post("/api/sentinel/unsubscribe", json={"token": token}).status_code == 204
+        assert watches.get_watch(watch_id) is None
+
+
+def test_unsubscribing_deletes_that_watch_only(tmp_path: Path) -> None:
+    with build_client(tmp_path) as client:
+        mine = watch_project(client)
+        other = client.post(
+            "/api/sentinel", json={"rera_id": "UPRERAPRJ8334", "email": "other@example.com"}
+        ).json()["id"]
+        watches = client.app.state.sentinel_store  # type: ignore[attr-defined]
+        token = watches.new_unsubscribe_token(mine, FIXED_NOW)
+
+        assert client.post("/api/sentinel/unsubscribe", json={"token": token}).status_code == 204
+
+        assert watches.get_watch(mine) is None
+        assert watches.get_watch(other) is not None
+        assert watches.watch_for_token(token) is None
+
+
+def test_unsubscribing_answers_the_same_for_an_unknown_token(tmp_path: Path) -> None:
+    with build_client(tmp_path) as client:
+        watch_id = watch_project(client)
+        token = client.app.state.sentinel_store.new_unsubscribe_token(watch_id, FIXED_NOW)  # type: ignore[attr-defined]
+        real = client.post("/api/sentinel/unsubscribe", json={"token": token})
+        unknown = client.post("/api/sentinel/unsubscribe", json={"token": "nope" * 12})
+        assert (real.status_code, real.content) == (unknown.status_code, unknown.content)
+        assert (unknown.status_code, unknown.content) == (204, b"")
+
+
+def test_unsubscribing_is_rate_limited(tmp_path: Path) -> None:
+    with build_client(tmp_path) as client:
+        answers = [
+            client.post("/api/sentinel/unsubscribe", json={"token": "x"}).status_code
+            for _ in range(12)
+        ]
+    assert answers.count(429) == 2
