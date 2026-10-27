@@ -81,8 +81,26 @@
 
 .report {
   display: inline-block;
-  margin-top: 16px;
   color: var(--o-text);
   font-size: 14px;
   font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-top: 16px;
+}
+
+.stop {
+  padding: 8px 14px;
+  font-size: 13.5px;
+}
+
+.stopFailed {
+  margin: 0;
+  color: var(--ink2);
+  font-size: 13px;
 }

@@ -149,6 +149,7 @@ Interactive docs are served at `/docs`.
 | `GET /api/sentinel/alerts?email=` | `200` alerts, newest first, each with `old_display_score` and `new_display_score` | `422` bad email |
 | `POST /api/sentinel/run` with header `X-Webhook-Secret` | `202` `{started}`; starts a re-check run for an external cron | `401` missing or wrong secret (always, when `WEBHOOK_SECRET` is not set) |
 | `POST /api/sentinel/webhook` with header `X-Webhook-Secret` or `?secret=` | `202` `{status}`: `accepted` (the project is re-checked in the background), `duplicate` (a delivery already handled) or `ignored` (a monitor we do not know). Called by TinyFish monitors | `401` missing or wrong secret, `413` payload over 200 kB |
+| `POST /api/sentinel/unsubscribe` `{token}` | `204` always, whether or not the token exists; a known token removes its watch and cancels its monitors. Limited to 10 requests a minute per address | `422` bad body, `429` rate limit |
 | `DELETE /api/sentinel/{watch_id}` | `204`; removes the watch and cancels its TinyFish monitors | `404` unknown watch |
 | `POST /api/corrections` `{report_id, finding_id?, message, contact?}` | `201` `{id}`; stored for the operator | `404` unknown report, `422` bad input, `429` rate limit |
 | `GET /api/corrections` with header `X-Webhook-Secret` | `200` the latest corrections, newest first (admin log) | `401` missing or wrong secret |
@@ -239,7 +240,7 @@ erDiagram
 
 ## Neev Sentinel
 
-A watch is an email, a project and a language (at most three watches per email). A re-check runs every `SENTINEL_INTERVAL_HOURS` (default 168, one week; `0` turns the built-in schedule off) from a loop in the app's lifespan, and `POST /api/sentinel/run` starts the same run for an external cron; the secret is compared in constant time.
+A watch is an email, a project and a language (at most three watches per email). Every alert email ends with "Stop alerts for this project:" and a link to `<SITE_URL>/alerts/stop?token=...` (`SITE_URL`, or `NEXT_PUBLIC_SITE_URL`; the line is left out when neither is set). The token is 32 random bytes minted for that email and only its SHA-256 hash is stored (`unsubscribe_tokens`), so an older email's link keeps working until the watch is gone and no existing watch needs a backfill. Opening `/alerts/stop` only shows a page; its **Stop alerts** button sends `POST /api/sentinel/unsubscribe`. Alert cards in the app also have **Stop watching**. A re-check runs every `SENTINEL_INTERVAL_HOURS` (default 168, one week; `0` turns the built-in schedule off) from a loop in the app's lifespan, and `POST /api/sentinel/run` starts the same run for an external cron; the secret is compared in constant time.
 
 Each re-check is a normal check. It is compared with the check the watch last saw, and **only real changes create an alert**:
 
