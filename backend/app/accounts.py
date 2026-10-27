@@ -44,3 +44,8 @@ class UserReports:
                     UserReportRow.user_id == user_id, UserReportRow.check_id == check_id
                 )
             )
+
+    def delete_account(self, user_id: str) -> None:
+        """Forgets everything kept for this account. The checks themselves are public records."""
+        with self._sessions.begin() as session:
+            session.execute(delete(UserReportRow).where(UserReportRow.user_id == user_id))

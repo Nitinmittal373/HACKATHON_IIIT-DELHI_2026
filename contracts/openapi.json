@@ -3667,6 +3667,49 @@
         ]
       }
     },
+    "/api/me": {
+      "delete": {
+        "description": "Deletes the account's saved reports. Nothing else is stored about the account.",
+        "operationId": "delete_account_api_me_delete",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Account",
+        "tags": [
+          "account"
+        ]
+      }
+    },
     "/api/me/reports": {
       "get": {
         "description": "The checks saved to this account, newest first. Ids the server no longer has are left out.",
