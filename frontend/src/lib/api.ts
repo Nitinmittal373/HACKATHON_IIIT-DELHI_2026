@@ -191,6 +191,8 @@ export function extractFromText(text: string): Promise<ExtractResponse> {
 export function createCheck(
   project: Pick<Project, "rera_id" | "details_url">,
   options: { fresh?: boolean } = {},
+  /** A sign-in token: the API then saves the check to that account. */
+  token?: string,
 ): Promise<Check> {
   // The page search confirmed: many numbers registered after 2018 have no stable address.
   const body: CheckCreate = {
@@ -198,7 +200,7 @@ export function createCheck(
     details_url: project.details_url,
     ...(options.fresh ? { fresh: true } : {}),
   };
-  return request<Check>("/api/checks", { method: "POST", body });
+  return request<Check>("/api/checks", { method: "POST", body, token });
 }
 
 /** Watches a project; the alert goes to the signed-in account's email, which the API knows. */
@@ -229,9 +231,9 @@ export function getAlerts(token: string): Promise<Alert[]> {
   return request<Alert[]>("/api/sentinel/alerts", { token, timeoutMs: WAKE_TIMEOUT_MS });
 }
 
-/** The checks a visitor started, for "My reports". Ids the server no longer has are left out. */
-export function listChecks(ids: string[]): Promise<CheckSummary[]> {
-  return request<CheckSummary[]>(`/api/checks?ids=${ids.join(",")}`, { timeoutMs: WAKE_TIMEOUT_MS });
+/** The checks a browser kept, by id. Ids the server no longer has are left out. */
+export function listChecks(ids: string[]): Promise<RecentCheck[]> {
+  return request<RecentCheck[]>(`/api/checks?ids=${ids.join(",")}`, { timeoutMs: WAKE_TIMEOUT_MS });
 }
 
 /** Two or three finished checks side by side. */
@@ -247,17 +249,9 @@ export function promoterProjects(promoter: string, exclude: string): Promise<Tra
   return request<TrackRecord>(`/api/promoters/projects?${query}`, { timeoutMs: WAKE_TIMEOUT_MS });
 }
 
-const RECENT_FRESH_FOR_MS = 60_000;
-let recent: { at: number; checks: Promise<RecentCheck[]> } | null = null;
-
-/** The latest finished checks site-wide. The hero card and the strip below it share one request. */
-export function recentChecks(): Promise<RecentCheck[]> {
-  if (!recent || Date.now() - recent.at > RECENT_FRESH_FOR_MS) {
-    const checks = request<RecentCheck[]>("/api/checks/recent", { timeoutMs: WAKE_TIMEOUT_MS });
-    recent = { at: Date.now(), checks };
-    checks.catch(() => (recent = null));
-  }
-  return recent.checks;
+/** The signed-in account's last few checks, with what the home page card shows. */
+export function listAccountRecent(token: string): Promise<RecentCheck[]> {
+  return request<RecentCheck[]>("/api/me/recent", { token, timeoutMs: WAKE_TIMEOUT_MS });
 }
 
 /** The checks saved to the signed-in account, newest first. */

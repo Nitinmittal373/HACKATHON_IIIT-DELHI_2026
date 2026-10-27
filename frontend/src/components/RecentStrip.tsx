@@ -9,11 +9,15 @@ import { useLang } from "@/lib/LangProvider";
 import { useRecentChecks } from "@/lib/useRecentChecks";
 import styles from "./RecentStrip.module.css";
 
-/** Real checks other visitors finished, newest first. Hidden until there is at least one. */
+/**
+ * The visitor's own checks, newest first: the account's when signed in, this browser's when not.
+ * Never anyone else's. Hidden until there is at least one finished check.
+ */
 export function RecentStrip() {
   const { lang, t } = useLang();
   const recent = useRecentChecks();
   if (recent.status !== "ready") return null;
+  const account = recent.scope === "account";
   const rated = recent.checks.flatMap((check) =>
     check.display_score ? [{ check, display: check.display_score }] : [],
   );
@@ -22,9 +26,9 @@ export function RecentStrip() {
   return (
     <section className={`wrap ${styles.strip}`} aria-labelledby="recent-title">
       <h2 id="recent-title" className={styles.title}>
-        {t.home.recent.title}
+        {account ? t.home.recent.accountTitle : t.home.recent.browserTitle}
       </h2>
-      <p className={styles.lead}>{t.home.recent.lead}</p>
+      <p className={styles.lead}>{account ? t.home.recent.accountLead : t.home.recent.browserLead}</p>
       <ul className={styles.list}>
         {rated.map(({ check, display }) => {
           const name = check.project ?? check.rera_id;

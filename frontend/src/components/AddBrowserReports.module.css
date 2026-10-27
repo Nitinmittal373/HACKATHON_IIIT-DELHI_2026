@@ -1,0 +1,44 @@
+.dialog {
+  width: min(480px, calc(100% - 32px));
+  padding: 0;
+  border: 1px solid var(--ln);
+  border-radius: var(--r-lg);
+  background: #fff;
+  color: var(--ink);
+  box-shadow: var(--shadow-card);
+}
+
+.dialog::backdrop {
+  background: rgba(17, 17, 17, 0.45);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  padding: 28px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.lead {
+  margin-top: 8px;
+  color: var(--mu);
+  line-height: 1.55;
+}
+
+.problem {
+  margin-top: 14px;
+  color: var(--critical);
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}

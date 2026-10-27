@@ -3,10 +3,15 @@
 import { SessionProvider, useSession } from "next-auth/react";
 import { createContext, useContext, useEffect, useMemo, type ReactNode } from "react";
 
-import { listChecksOfAccount } from "@/lib/accountReports";
-import { setAccountSaver } from "@/lib/history";
+import { AddBrowserReports } from "@/components/AddBrowserReports";
+import { forgetBridgeToken } from "@/lib/bridgeSession";
+import { setSignedInAs } from "@/lib/history";
+import { dropReportsOfOthers } from "@/lib/localReports";
+import { forgetRecentChecks } from "@/lib/recentChecks";
 
 export interface AccountUser {
+  /** The Google account id; the API names the account by it. */
+  id: string;
   name: string | null;
   email: string | null;
   image: string | null;
@@ -36,21 +41,27 @@ function SessionAccount({ children }: { children: ReactNode }) {
   const user = data?.user;
   const account = useMemo<Account>(() => {
     if (status === "loading") return { status: "loading" };
-    if (status === "authenticated" && user) {
-      return { status: "in", user: { name: user.name ?? null, email: user.email ?? null, image: user.image ?? null } };
+    if (status === "authenticated" && user?.id) {
+      return { status: "in", user: { id: user.id, name: user.name ?? null, email: user.email ?? null, image: user.image ?? null } };
     }
     return { status: "out" };
   }, [status, user]);
 
-  const signedIn = account.status === "in";
+  const accountId = account.status === "in" ? account.user.id : null;
   useEffect(() => {
-    // While signed in, new checks are saved to the account; this browser's list moves over once.
-    if (!signedIn) {
-      setAccountSaver(null);
-      return;
-    }
-    return listChecksOfAccount();
-  }, [signedIn]);
+    // What was cached for one account must never be shown to the next.
+    forgetBridgeToken();
+    forgetRecentChecks();
+    setSignedInAs(accountId);
+    // Reports another account made in this browser are not this account's to move or see.
+    if (accountId) dropReportsOfOthers(accountId);
+    return () => setSignedInAs(null);
+  }, [accountId]);
 
-  return <AccountContext.Provider value={account}>{children}</AccountContext.Provider>;
+  return (
+    <AccountContext.Provider value={account}>
+      {children}
+      {accountId && <AddBrowserReports key={accountId} />}
+    </AccountContext.Provider>
+  );
 }

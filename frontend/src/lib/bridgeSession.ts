@@ -1,0 +1,19 @@
+"use client";
+
+const TOKEN_REFRESH_MS = 9 * 60_000;
+let cached: { token: string; at: number } | null = null;
+
+/** A ten-minute sign-in token for the API, asked from this site and reused for nine minutes. */
+export async function bridgeToken(): Promise<string> {
+  if (cached && Date.now() - cached.at < TOKEN_REFRESH_MS) return cached.token;
+  const response = await fetch("/api/bridge-token", { cache: "no-store" });
+  if (!response.ok) throw new Error("Could not get a sign-in token");
+  const { token } = (await response.json()) as { token: string };
+  cached = { token, at: Date.now() };
+  return token;
+}
+
+/** Must run whenever the signed-in account changes, or the next account would reuse this token. */
+export function forgetBridgeToken() {
+  cached = null;
+}

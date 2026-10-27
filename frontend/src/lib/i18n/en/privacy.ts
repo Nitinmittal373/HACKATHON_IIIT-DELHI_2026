@@ -24,6 +24,15 @@ export const privacy = {
       ],
     },
     {
+      title: "Who sees what you checked",
+      points: [
+        "There is no public list of what people check. Nobody sees another person's checks, reports, alerts or recent checks.",
+        "Signed in, your reports and recent checks come only from your account. Signed out, they are kept in your own browser and never sent to anyone.",
+        "A report opens for anyone who has its link, so you can share one. Sharing is your choice.",
+        "Signing out clears your account's reports and alerts from the browser.",
+      ],
+    },
+    {
       title: "Alerts",
       points: [
         "Watching a project needs you to be signed in. Alerts go to your Google account email, never to an address typed in by someone else.",
