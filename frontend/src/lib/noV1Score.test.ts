@@ -43,7 +43,9 @@ test("no 0-100 score copy is left", () => {
 });
 
 test("the scale and the band edges are never written into the interface", () => {
-  assert.deepEqual(offences(/\b(300|900|449|599|749|750)\b/), []);
+  // A font-weight range such as "100 900" in the font setup is CSS, not the score scale.
+  const fontWeight = (line: string) => /^weight:/.test(line.trim());
+  assert.deepEqual(offences(/\b(300|900|449|599|749|750)\b/, fontWeight), []);
 });
 
 test("no screen reads the classic score fields", () => {
