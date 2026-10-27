@@ -18,3 +18,11 @@ updates:
     groups:
       frontend:
         patterns: ["*"]
+    # Next and React are upgraded by hand, together with the code that depends on them.
+    ignore:
+      - dependency-name: next
+        update-types: ["version-update:semver-major"]
+      - dependency-name: react
+        update-types: ["version-update:semver-major"]
+      - dependency-name: react-dom
+        update-types: ["version-update:semver-major"]
