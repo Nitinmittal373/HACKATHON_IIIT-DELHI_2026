@@ -5,8 +5,9 @@ import secrets
 import uuid
 from datetime import datetime
 
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, func, select, update
 from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.sql.elements import ColumnElement
 
 from app.db import (
     AlertRow,
@@ -30,21 +31,45 @@ class SentinelStore:
     def __init__(self, sessions: sessionmaker[Session]) -> None:
         self._sessions = sessions
 
-    def count_watches(self, email: str) -> int:
+    def count_watches(self, user_id: str) -> int:
         with self._sessions() as session:
-            query = select(func.count()).select_from(WatchRow).where(WatchRow.email == email)
+            query = select(func.count()).select_from(WatchRow).where(WatchRow.user_id == user_id)
             return session.scalar(query) or 0
 
-    def find_watch(self, email: str, rera_id: str) -> Watch | None:
+    def find_watch(self, user_id: str, rera_id: str) -> Watch | None:
         with self._sessions() as session:
             row = session.scalar(
-                select(WatchRow).where(WatchRow.email == email, WatchRow.rera_id == rera_id)
+                select(WatchRow).where(WatchRow.user_id == user_id, WatchRow.rera_id == rera_id)
+            )
+            return _watch(row) if row else None
+
+    def adopt_unowned(self, user_id: str, email: str) -> None:
+        """Links watches made before accounts existed to the account with the same email.
+
+        The email comes from a Google-verified sign-in, so only its owner can claim them."""
+        with self._sessions.begin() as session:
+            session.execute(
+                update(WatchRow)
+                .where(WatchRow.user_id.is_(None), WatchRow.email == email)
+                .values(user_id=user_id)
+            )
+
+    def watch_ids_of(self, user_id: str) -> list[str]:
+        with self._sessions() as session:
+            return list(session.scalars(select(WatchRow.id).where(WatchRow.user_id == user_id)))
+
+    def get_owned_watch(self, user_id: str, watch_id: str) -> Watch | None:
+        """The watch, only if this account owns it."""
+        with self._sessions() as session:
+            row = session.scalar(
+                select(WatchRow).where(WatchRow.id == watch_id, WatchRow.user_id == user_id)
             )
             return _watch(row) if row else None
 
     def add_watch(
         self,
         *,
+        user_id: str,
         email: str,
         rera_id: str,
         language: Language,
@@ -54,6 +79,7 @@ class SentinelStore:
         row = WatchRow(
             id=uuid.uuid4().hex,
             rera_id=rera_id,
+            user_id=user_id,
             email=email,
             language=language,
             created_at=created_at,
@@ -176,13 +202,20 @@ class SentinelStore:
         with self._sessions.begin() as session:
             session.get_one(AlertRow, alert_id).emailed = True
 
-    def alerts_for_email(self, email: str, limit: int = 50) -> list[Alert]:
+    def alerts_for_user(self, user_id: str, limit: int = 50) -> list[Alert]:
+        return self._alerts(WatchRow.user_id == user_id, limit)
+
+    def get_alert(self, alert_id: str) -> Alert | None:
+        found = self._alerts(AlertRow.id == alert_id, 1)
+        return found[0] if found else None
+
+    def _alerts(self, condition: ColumnElement[bool], limit: int) -> list[Alert]:
         with self._sessions() as session:
             rows = session.execute(
                 select(AlertRow, WatchRow, ProjectRow)
                 .join(WatchRow, AlertRow.watch_id == WatchRow.id)
                 .join(ProjectRow, WatchRow.rera_id == ProjectRow.rera_id)
-                .where(WatchRow.email == email)
+                .where(condition)
                 .order_by(AlertRow.created_at.desc())
                 .limit(limit)
             )

@@ -17,6 +17,8 @@ from sqlalchemy import (
     String,
     TypeDecorator,
     create_engine,
+    inspect,
+    text,
 )
 from sqlalchemy.engine import Engine, make_url
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
@@ -140,6 +142,9 @@ class WatchRow(Base):
     id: Mapped[str] = mapped_column(String(32), primary_key=True)
     rera_id: Mapped[str] = mapped_column(ForeignKey("projects.rera_id"), index=True)
     email: Mapped[str] = mapped_column(String(254), index=True)
+    # The Google account that owns the watch. None for watches made before accounts existed;
+    # those keep emailing, and are linked to an account that signs in with the same email.
+    user_id: Mapped[str | None] = mapped_column(String(255), index=True)
     language: Mapped[str] = mapped_column(String(2))
     created_at: Mapped[datetime] = mapped_column(UTCDateTime)
     # The check later re-checks are compared against; None until the project has a finished one.
@@ -220,6 +225,15 @@ def normalize_database_url(database_url: str) -> str:
     return database_url
 
 
+def add_missing_columns(engine: Engine) -> None:
+    """create_all never alters a table; a database from before accounts gets user_id here."""
+    if "user_id" in {column["name"] for column in inspect(engine).get_columns("watches")}:
+        return
+    with engine.begin() as connection:
+        connection.execute(text("ALTER TABLE watches ADD COLUMN user_id VARCHAR(255)"))
+        connection.execute(text("CREATE INDEX ix_watches_user_id ON watches (user_id)"))
+
+
 def make_engine(database_url: str) -> Engine:
     url = make_url(normalize_database_url(database_url))
     if url.get_backend_name() == "sqlite":
@@ -230,6 +244,7 @@ def make_engine(database_url: str) -> Engine:
     else:
         engine = create_engine(url, pool_pre_ping=True)
     Base.metadata.create_all(engine)
+    add_missing_columns(engine)
     return engine
 
 

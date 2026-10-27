@@ -133,9 +133,7 @@ class Sentinel:
         return 1
 
     async def _deliver(self, watch: Watch, alert_id: str) -> None:
-        alert = next(
-            (a for a in self._watches.alerts_for_email(watch.email) if a.id == alert_id), None
-        )
+        alert = self._watches.get_alert(alert_id)
         if alert is None or not smtp_configured(self._settings):
             return
         token = self._watches.new_unsubscribe_token(watch.id, self._clock())

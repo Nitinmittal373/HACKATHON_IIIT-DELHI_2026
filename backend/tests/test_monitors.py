@@ -7,6 +7,8 @@ from fastapi.testclient import TestClient
 from app.main import create_app
 from app.sentinel.monitors import CreatedMonitor, MonitorError
 from tests.conftest import FIXED_NOW, make_settings, make_web
+from tests.test_accounts import SECRET as BRIDGE_SECRET
+from tests.test_accounts import auth
 from tests.test_sentinel import (
     EMAIL,
     RECORDING,
@@ -50,6 +52,7 @@ def build(tmp_path: Path, monitors: FakeMonitors, **settings: object) -> TestCli
         "webhook_secret": SECRET,
         "public_base_url": BASE,
         "sentinel_interval_hours": 0,
+        "auth_bridge_secret": BRIDGE_SECRET,
         **settings,
     }
     app = create_app(
@@ -59,7 +62,7 @@ def build(tmp_path: Path, monitors: FakeMonitors, **settings: object) -> TestCli
         cache_dir=None,
         monitors=monitors,
     )
-    return TestClient(app)
+    return TestClient(app, headers=auth())
 
 
 def hook(client: TestClient, body: dict[str, object], secret: str | None = SECRET):
@@ -81,12 +84,17 @@ def test_watching_creates_a_page_and_a_topic_monitor_that_call_back(tmp_path: Pa
 
 def test_without_a_public_address_no_monitor_is_made(tmp_path: Path) -> None:
     app = create_app(
-        make_settings(tmp_path, webhook_secret=SECRET, sentinel_interval_hours=0),
+        make_settings(
+            tmp_path,
+            webhook_secret=SECRET,
+            sentinel_interval_hours=0,
+            auth_bridge_secret=BRIDGE_SECRET,
+        ),
         web=make_web().replay(RECORDING),
         clock=lambda: FIXED_NOW,
         cache_dir=None,
     )
-    with TestClient(app) as client:
+    with TestClient(app, headers=auth()) as client:
         run_check(client)
         assert watch(client).status_code == 201
         assert client.app.state.monitors is None  # type: ignore[attr-defined]
@@ -126,14 +134,18 @@ def test_a_delivery_rechecks_the_project_once_and_alerts_with_the_diff(tmp_path:
     web = make_web().replay(RECORDING)
     app = create_app(
         make_settings(
-            tmp_path, webhook_secret=SECRET, public_base_url=BASE, sentinel_interval_hours=0
+            tmp_path,
+            webhook_secret=SECRET,
+            public_base_url=BASE,
+            sentinel_interval_hours=0,
+            auth_bridge_secret=BRIDGE_SECRET,
         ),
         web=web,
         clock=lambda: FIXED_NOW,
         cache_dir=None,
         monitors=monitors,
     )
-    with TestClient(app) as client:
+    with TestClient(app, headers=auth()) as client:
         run_check(client)
         watch(client)
         page = next(a["url"] for a in RECORDING["agents"] if "fortuneindia" in a["url"])
