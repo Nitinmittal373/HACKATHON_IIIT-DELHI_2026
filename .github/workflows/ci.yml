@@ -92,6 +92,16 @@ jobs:
         working-directory: frontend
         # Replays the recorded check against a mock API; no backend or key is needed.
         run: npm run e2e
+      - if: failure() && steps.present.outputs.yes == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          # The HTML report holds the traces of tests that needed a retry.
+          path: |
+            frontend/playwright-report/
+            frontend/test-results/
+          retention-days: 14
+          if-no-files-found: ignore
 
   secrets:
     name: Secret scan
