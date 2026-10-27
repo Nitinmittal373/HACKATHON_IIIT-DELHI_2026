@@ -4,6 +4,7 @@
 
 ### Changed
 
+- **Self-hosted fonts.** Geist, Geist Mono and Noto Sans Devanagari are served from `frontend/src/fonts` (SIL Open Font License texts included) instead of Google Fonts, so a build never needs the network for type.
 - **One score.** NeevScore 300–900 is the only score the interface shows: the home scale and report card, the live check result, the report, My reports, Compare, Sentinel alerts, the shared preview image and the WhatsApp text. The first 0–100 score is kept as one line in each report's method section, and in the API for older clients.
 - **One contract.** The API's shape is exported from the backend to `contracts/openapi.json`, and the frontend's types are generated from it. `make contract` does both; CI fails when either is out of date.
 
