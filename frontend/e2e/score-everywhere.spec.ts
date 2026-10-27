@@ -67,7 +67,8 @@ test("the fixtures really are on the 300-900 scale the API reports", () => {
   expect(META.bands.map((band) => band.key)).toEqual(["Low", "Watch", "Elevated", "High"]);
 });
 
-test("home: the scale is drawn from the meta and the marker is the latest real check", async ({ page }) => {
+test("home: the scale is drawn from the meta and the marker is your latest check", async ({ page }) => {
+  await remember(page, [ECO]);
   await page.goto("/");
 
   const scale = page.getByRole("heading", { name: `One honest number, ${min} to ${max}` });

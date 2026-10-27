@@ -89,7 +89,7 @@ function recordedSummary(): Schemas["CheckSummary"] {
   };
 }
 
-/** The recorded check as the home page shows it (GET /api/checks/recent). */
+/** The recorded check with the facts the home page card shows (GET /api/checks?ids=). */
 function recordedRecent(): Schemas["RecentCheck"] {
   const { check, project, score, score_v2 } = recordedReport();
   return {
@@ -151,7 +151,11 @@ createServer(async (req, res) => {
 
   if (path === "/api/checks" && req.method === "GET") {
     const ids = (url.searchParams.get("ids") ?? "").split(",");
-    const known = [recordedSummary(), json("summary-6742.json")];
+    const avenue = json("summary-6742.json") as unknown as Schemas["CheckSummary"];
+    const known: Schemas["RecentCheck"][] = [
+      recordedRecent(),
+      { ...avenue, registered_on: null, sources_read: 0, drivers: [], reasons: [] },
+    ];
     return send(res, 200, ids.flatMap((id) => known.filter((check) => check.id === id)));
   }
 
@@ -163,8 +167,6 @@ createServer(async (req, res) => {
     if (projects.length < 2) return send(res, 404, { detail: "No check with this id" });
     return send(res, 200, { ...comparison, projects });
   }
-
-  if (path === "/api/checks/recent") return send(res, 200, [recordedRecent()]);
 
   if (path === "/api/promoters/projects") return send(res, 200, json("track-record.json"));
 
