@@ -3127,7 +3127,6 @@
         "type": "object"
       },
       "WatchCreate": {
-        "additionalProperties": false,
         "properties": {
           "details_url": {
             "anyOf": [
@@ -3140,11 +3139,6 @@
               }
             ],
             "title": "Details Url"
-          },
-          "email": {
-            "maxLength": 254,
-            "title": "Email",
-            "type": "string"
           },
           "language": {
             "default": "en",
@@ -3162,8 +3156,7 @@
           }
         },
         "required": [
-          "rera_id",
-          "email"
+          "rera_id"
         ],
         "title": "WatchCreate",
         "type": "object"
@@ -3685,7 +3678,7 @@
     },
     "/api/me": {
       "delete": {
-        "description": "Deletes the account's saved reports. Nothing else is stored about the account.",
+        "description": "Deletes the account's saved reports, its watches and their alerts.",
         "operationId": "delete_account_api_me_delete",
         "parameters": [
           {
@@ -4133,6 +4126,24 @@
     "/api/sentinel": {
       "post": {
         "operationId": "create_watch_api_sentinel_post",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -4173,16 +4184,23 @@
     },
     "/api/sentinel/alerts": {
       "get": {
+        "description": "The signed-in account's alerts, newest first.",
         "operationId": "list_alerts_api_sentinel_alerts_get",
         "parameters": [
           {
-            "in": "query",
-            "name": "email",
-            "required": true,
+            "in": "header",
+            "name": "authorization",
+            "required": false,
             "schema": {
-              "maxLength": 254,
-              "title": "Email",
-              "type": "string"
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
             }
           }
         ],
@@ -4380,7 +4398,7 @@
     },
     "/api/sentinel/{watch_id}": {
       "delete": {
-        "description": "Stop watching. The watch id is unguessable and is the only proof needed.",
+        "description": "Stop watching. Only the account that owns the watch can; for any other watch the answer\nis the same 404 as for one that does not exist.",
         "operationId": "remove_watch_api_sentinel__watch_id__delete",
         "parameters": [
           {
@@ -4393,6 +4411,22 @@
               "pattern": "^[0-9a-f]{32}$",
               "title": "Watch Id",
               "type": "string"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
             }
           }
         ],

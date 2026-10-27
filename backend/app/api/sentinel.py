@@ -21,6 +21,8 @@ from fastapi import (
 )
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.api.auth import User
+from app.api.auth import rate_limit as account_rate_limit
 from app.api.checks import rate_limit
 from app.api.deps import (
     client_ip,
@@ -35,8 +37,7 @@ from app.config import Settings
 from app.models import Project
 from app.ratelimit import RateLimiter
 from app.sentinel.models import (
-    EMAIL_PATTERN,
-    MAX_WATCHES_PER_EMAIL,
+    MAX_WATCHES_PER_ACCOUNT,
     Alert,
     Watch,
     WatchCreate,
@@ -52,9 +53,13 @@ logger = logging.getLogger(__name__)
 router = APIRouter(tags=["sentinel"])
 
 
-@router.post("/api/sentinel", status_code=201, dependencies=[Depends(rate_limit)])
+WATCH_LIMITS = [Depends(account_rate_limit), Depends(rate_limit)]
+
+
+@router.post("/api/sentinel", status_code=201, dependencies=WATCH_LIMITS)
 async def create_watch(
     body: WatchCreate,
+    user: User,
     response: Response,
     store: Annotated[Store, Depends(get_store)],
     watches: Annotated[SentinelStore, Depends(get_sentinel_store)],
@@ -62,16 +67,18 @@ async def create_watch(
     settings: Annotated[Settings, Depends(get_settings)],
     gateway: Annotated[MonitorGateway | None, Depends(get_monitors)],
 ) -> Watch:
-    existing = watches.find_watch(body.email, body.rera_id)
+    email = user.email.lower()
+    watches.adopt_unowned(user.sub, email)
+    existing = watches.find_watch(user.sub, body.rera_id)
     if existing:
         response.status_code = 200  # watching twice is not an error
         return existing
-    if watches.count_watches(body.email) >= MAX_WATCHES_PER_EMAIL:
+    if watches.count_watches(user.sub) >= MAX_WATCHES_PER_ACCOUNT:
         raise HTTPException(
             status_code=409,
             detail={
                 "code": "watch_limit",
-                "message": f"One email can watch up to {MAX_WATCHES_PER_EMAIL} projects",
+                "message": f"One account can watch up to {MAX_WATCHES_PER_ACCOUNT} projects",
             },
         )
     # The page search confirmed for this number; a number sent alone gets its stable page.
@@ -80,7 +87,8 @@ async def create_watch(
         store.save_project(Project(rera_id=body.rera_id, details_url=details_url))
     latest = store.latest_completed_check(body.rera_id)
     watch = watches.add_watch(
-        email=body.email,
+        user_id=user.sub,
+        email=email,
         rera_id=body.rera_id,
         language=body.language,
         created_at=clock(),
@@ -117,14 +125,18 @@ async def add_monitors(
         logger.warning("Monitors for a watch were not fully created: %s", error)
 
 
-@router.delete("/api/sentinel/{watch_id}", status_code=204)
+@router.delete(
+    "/api/sentinel/{watch_id}", status_code=204, dependencies=[Depends(account_rate_limit)]
+)
 async def remove_watch(
     watch_id: Annotated[str, Path(pattern=r"^[0-9a-f]{32}$", description="Watch id")],
+    user: User,
     watches: Annotated[SentinelStore, Depends(get_sentinel_store)],
     gateway: Annotated[MonitorGateway | None, Depends(get_monitors)],
 ) -> Response:
-    """Stop watching. The watch id is unguessable and is the only proof needed."""
-    if watches.get_watch(watch_id) is None:
+    """Stop watching. Only the account that owns the watch can; for any other watch the answer
+    is the same 404 as for one that does not exist."""
+    if watches.get_owned_watch(user.sub, watch_id) is None:
         raise HTTPException(status_code=404, detail="No watch with this id")
     await stop_watch(watch_id, watches, gateway)
     return Response(status_code=204)
@@ -174,16 +186,15 @@ async def unsubscribe(
     return Response(status_code=204)
 
 
-@router.get("/api/sentinel/alerts")
+@router.get("/api/sentinel/alerts", dependencies=[Depends(account_rate_limit)])
 def list_alerts(
-    email: Annotated[str, Query(max_length=254)],
+    user: User,
     watches: Annotated[SentinelStore, Depends(get_sentinel_store)],
     store: Annotated[Store, Depends(get_store)],
 ) -> list[Alert]:
-    address = email.strip().lower()
-    if not EMAIL_PATTERN.match(address):
-        raise HTTPException(status_code=422, detail="Enter a valid email address")
-    return [with_new_score(alert, store) for alert in watches.alerts_for_email(address)]
+    """The signed-in account's alerts, newest first."""
+    watches.adopt_unowned(user.sub, user.email.lower())
+    return [with_new_score(alert, store) for alert in watches.alerts_for_user(user.sub)]
 
 
 def with_new_score(alert: Alert, store: Store) -> Alert:

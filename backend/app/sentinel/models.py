@@ -1,35 +1,24 @@
 """Shapes for Neev Sentinel: a watch on a project and the alerts its re-checks produce."""
 
-import re
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.api_model import ApiModel
 from app.models import DisplayScore, check_project_number
 
 Language = Literal["en", "hi"]
-# Deliberately simple: one @, something on both sides, a dot in the domain.
-EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
-MAX_WATCHES_PER_EMAIL = 3
+MAX_WATCHES_PER_ACCOUNT = 3
 
 
+# The alert goes to the signed-in account's verified email, so an email sent here is ignored.
 class WatchCreate(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="ignore")
 
     rera_id: str = Field(max_length=60)
     details_url: str | None = Field(default=None, max_length=500)
-    email: str = Field(max_length=254)
     language: Language = "en"
-
-    @field_validator("email")
-    @classmethod
-    def valid_email(cls, value: str) -> str:
-        email = value.strip().lower()
-        if not EMAIL_PATTERN.match(email):
-            raise ValueError("must be a valid email address")
-        return email
 
     @model_validator(mode="after")
     def valid_number(self) -> "WatchCreate":
