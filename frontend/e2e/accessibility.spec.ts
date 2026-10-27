@@ -45,7 +45,7 @@ test("the live check has no accessibility violations once it has finished", asyn
   );
   await page.goto("/check?q=Supertech%20Eco%20Village");
   await page.getByRole("button", { name: "Yes, check this project" }).click();
-  await expect(page.getByText("NeevScore 741 · Watch")).toBeVisible();
+  await expect(page.getByText("NeevScore 495 · Elevated")).toBeVisible();
   await page.waitForTimeout(1500);
   expect(await violations(page)).toEqual([]);
 });

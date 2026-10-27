@@ -11,7 +11,7 @@ async function violations(page: Page) {
 test("the report leads with the 300-900 score, its reasons and the classic score below", async ({ page }) => {
   await page.goto(REPORT);
 
-  await expect(page.getByRole("img", { name: "NeevScore 621 out of 900, Watch" })).toBeVisible();
+  await expect(page.getByRole("img", { name: "NeevScore 495 out of 900, Elevated" })).toBeVisible();
   await expect(page.getByText("5 of 6 record types read")).toBeVisible();
   await expect(page.getByText("Risk indicator based on public records — not a credit rating.")).toBeVisible();
   // The classic score is kept as one line in the method section, and says so.
@@ -19,11 +19,11 @@ test("the report leads with the 300-900 score, its reasons and the classic score
   await expect(page.getByRole("alert").filter({ hasText: "Hard stop" })).toHaveCount(0);
 
   const chips = page.getByRole("button", { name: /^R\d\d:/ });
-  await expect(chips).toHaveCount(4);
+  await expect(chips).toHaveCount(5);
   await expect(chips.nth(0)).toContainText("R05");
   // Data that could not be read is listed last, and costs nothing.
-  await expect(chips.nth(3)).toContainText("R12");
-  await expect(chips.nth(3)).toContainText("Not read");
+  await expect(chips.nth(4)).toContainText("R12");
+  await expect(chips.nth(4)).toContainText("Not read");
 });
 
 test("each pillar shows its weight and cost", async ({ page }) => {
@@ -77,7 +77,7 @@ test("the credit header is in Hindi", async ({ page }) => {
   await page.context().addCookies([{ name: "neevcheck-lang", value: "hi", url: "http://localhost:3010" }]);
   await page.goto(REPORT);
 
-  await expect(page.getByRole("img", { name: "नींवस्कोर 900 में से 621, निगरानी रखें" })).toBeVisible();
+  await expect(page.getByRole("img", { name: "नींवस्कोर 900 में से 495, बढ़ा हुआ जोखिम" })).toBeVisible();
   await expect(page.getByText(/^क्लासिक स्कोर \(0–100\): 68/)).toBeVisible();
   await expect(page.getByRole("button", { name: /^R13:/ })).toContainText("उसी समूह के अन्य प्रोजेक्ट देरी में");
   await page.getByRole("button", { name: "प्रमाण बही खोलें" }).click();
@@ -90,7 +90,7 @@ test.describe("on a phone", () => {
 
   test("the credit header and the ledger fit the screen", async ({ page }) => {
     await page.goto(REPORT);
-    await expect(page.getByRole("img", { name: /NeevScore 621/ })).toBeVisible();
+    await expect(page.getByRole("img", { name: /NeevScore 495/ })).toBeVisible();
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );

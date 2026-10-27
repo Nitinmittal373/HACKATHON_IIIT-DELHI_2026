@@ -2,9 +2,6 @@
   "query": "Supertech Eco Village",
   "candidates": [
     {
-      "state": "UP",
-      "state_name": "Uttar Pradesh",
-      "rera_name": "UP-RERA",
       "rera_id": "UPRERAPRJ8334",
       "name": "SUPERTECH ECO VILLAGE-I PHASE I-C",
       "promoter": "SUPERTECH LIMITED",
@@ -18,9 +15,6 @@
       "found_in": null
     },
     {
-      "state": "UP",
-      "state_name": "Uttar Pradesh",
-      "rera_name": "UP-RERA",
       "rera_id": "UPRERAPRJ4878",
       "name": "SUPERTECH ECO VILLAGE-I (PHASE-III)",
       "promoter": null,
@@ -34,10 +28,6 @@
       "found_in": null
     }
   ],
-  "detected_state": null,
-  "searched_states": [
-    "UP"
-  ],
-  "pre_rera": [],
+  "outside_up": false,
   "order_leads": []
 }

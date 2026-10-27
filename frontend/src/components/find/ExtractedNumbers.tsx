@@ -37,7 +37,7 @@ export function ExtractedNumbers({ result }: { result: ExtractResponse }) {
             <button
               type="button"
               className="btn"
-              onClick={() => router.push(`/check?q=${encodeURIComponent(found.rera_id)}&state=${found.state}`)}
+              onClick={() => router.push(`/check?q=${encodeURIComponent(found.rera_id)}`)}
             >
               {copy.use}
             </button>

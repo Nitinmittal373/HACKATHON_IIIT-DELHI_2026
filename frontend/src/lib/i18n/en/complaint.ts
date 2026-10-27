@@ -11,8 +11,7 @@ export const complaint = {
   print: "Print or save as PDF",
   file: "Open the UP-RERA site to file",
   fileNote: "On the UP-RERA site, choose the complaint option and attach the annexures.",
-  to: (state: string, rera: string) =>
-    `To,\nThe Hon'ble ${state} Real Estate Regulatory Authority (${rera})`,
+  to: "To,\nThe Hon'ble Uttar Pradesh Real Estate Regulatory Authority (UP-RERA)",
   subject: (project: string, reraId: string) => `Subject: Complaint about ${project} (${reraId})`,
   promoterUnknown: "the promoter",
   intro: (promoter: string, reraId: string, date: string) =>

@@ -33,9 +33,10 @@ const json = (name: string): Record<string, unknown> => JSON.parse(read(name));
 const FLAGGED_ID = "f".repeat(32);
 
 let finished = false;
-// The Maharashtra check (search_only) has its own recorded answers and id.
-const MH_NUMBER = "P99000055716";
-const mhId = (): string => json("check-created-mh.json").id as string;
+// A real replay with too few record types read to give a band; served under its own id.
+const UNRATED_ID = "a1".repeat(16);
+// A number of another state's RERA: NeevCheck answers calmly that it covers Uttar Pradesh only.
+const OTHER_STATE_NUMBER = "P51800000937";
 
 function send(res: ServerResponse, status: number, body: unknown, headers: Record<string, string> = {}) {
   res.writeHead(status, {
@@ -77,9 +78,6 @@ function recordedSummary(): Schemas["CheckSummary"] {
   return {
     id: check.id,
     rera_id: check.rera_id,
-    state: check.state,
-    state_name: check.state_name,
-    rera_name: check.rera_name,
     details_url: check.details_url,
     project: project.name,
     promoter: project.promoter,
@@ -123,23 +121,17 @@ createServer(async (req, res) => {
 
   if (path === "/api/projects/search") {
     const query = url.searchParams.get("q") ?? "";
-    if (/nothing/i.test(query)) {
+    if (/nothing/i.test(query) || query === OTHER_STATE_NUMBER) {
       const none: Schemas["SearchResponse"] = {
         query,
         candidates: [],
-        detected_state: null,
-        searched_states: ["UP"],
-        pre_rera: [],
+        outside_up: query === OTHER_STATE_NUMBER,
         order_leads: [],
       };
       return send(res, 200, none);
     }
-    if (query === MH_NUMBER) return send(res, 200, json("search-mh.json"));
-    if (/prestige/i.test(query)) return send(res, 200, json("search-grouped.json"));
     return send(res, 200, { ...json("search.json"), query });
   }
-
-  if (path === "/api/states") return send(res, 200, JSON.parse(read("states.json")));
 
   if (path === "/api/meta") return send(res, 200, json("meta.json"));
 
@@ -155,7 +147,6 @@ createServer(async (req, res) => {
       return send(res, 429, { detail }, { "Retry-After": "30" });
     }
     finished = false;
-    if (body.rera_id === MH_NUMBER) return send(res, 202, json("check-created-mh.json"));
     return send(res, 202, json("check-created.json"));
   }
 
@@ -181,10 +172,7 @@ createServer(async (req, res) => {
   const check = path.match(/^\/api\/checks\/([0-9a-f]{32})(\/events|\/report)?$/);
   if (check) {
     const [, id, tail] = check;
-    if (id === mhId()) {
-      if (tail === "/events") return streamEvents(res, "events-mh.sse");
-      return send(res, 200, json(tail === "/report" ? "report-mh.json" : "check-done-mh.json"));
-    }
+    if (id === UNRATED_ID && tail === "/report") return send(res, 200, json("report-unrated.json"));
     const known = json("check-created.json").id;
     if (id === FLAGGED_ID && tail === "/report") return send(res, 200, json("report-flagged.json"));
     if (id !== known) return send(res, 404, { detail: "No check with this id" });

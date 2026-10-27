@@ -1,27 +1,37 @@
 import Link from "next/link";
 
 import type { Strings } from "@/lib/i18n";
-import type { StateInfo } from "@/lib/types";
 import styles from "./ResultCards.module.css";
 
+const UNREGISTERED_URL = "https://www.up-rera.in/NonRegistration";
+
 interface Props {
-  /** The states whose portals were searched; their report links are offered. */
-  searched: string[];
-  states: StateInfo[];
+  /** True when the text was another state's number or a place outside Uttar Pradesh. */
+  outsideUp: boolean;
   t: Strings;
 }
-
-// More than this and "the states searched" is every state; a link to each would be a wall.
-const MAX_REPORT_LINKS = 3;
 
 /**
  * When every path found nothing. It says what is true (no record was found in public pages, which
  * is not a finding about the project) and what a buyer can do. It never calls the project illegal
- * or unregistered: a search can miss a project.
+ * or unregistered: a search can miss a project. A project of another state gets one calm line.
  */
-export function NotFoundGuidance({ searched, states, t }: Props) {
+export function NotFoundGuidance({ outsideUp, t }: Props) {
   const copy = t.find.notFound;
-  const chosen = searched.length <= MAX_REPORT_LINKS ? states.filter((s) => searched.includes(s.code)) : [];
+  if (outsideUp) {
+    return (
+      <section className={`card ${styles.card}`} aria-labelledby="outside-up-title">
+        <h2 id="outside-up-title" className={styles.title}>
+          {t.find.outsideUp}
+        </h2>
+        <div className={styles.actions}>
+          <Link href="/#search" className="btn">
+            {copy.tryButton}
+          </Link>
+        </div>
+      </section>
+    );
+  }
   return (
     <section className={`card ${styles.card}`} aria-labelledby="not-found-title">
       <h2 id="not-found-title" className={styles.title}>
@@ -38,17 +48,9 @@ export function NotFoundGuidance({ searched, states, t }: Props) {
 
       <h3 className={styles.sub}>{copy.reportTitle}</h3>
       <p className={styles.body}>
-        {chosen.map((state) => (
-          <span key={state.code}>
-            <a className={styles.link} href={state.unregistered_url} target="_blank" rel="noopener noreferrer">
-              {copy.reportLink(state.rera_name)}
-            </a>
-            {" · "}
-          </span>
-        ))}
-        <Link className={styles.link} href="/coverage">
-          {copy.reportOther}
-        </Link>
+        <a className={styles.link} href={UNREGISTERED_URL} target="_blank" rel="noopener noreferrer">
+          {copy.reportLink}
+        </a>
       </p>
 
       <h3 className={styles.sub}>{copy.tryTitle}</h3>

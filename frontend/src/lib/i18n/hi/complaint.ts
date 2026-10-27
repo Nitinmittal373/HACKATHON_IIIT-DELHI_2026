@@ -13,8 +13,7 @@ export const complaint: typeof English = {
   print: "प्रिंट करें या PDF सहेजें",
   file: "दाखिल करने के लिए UP-RERA साइट खोलें",
   fileNote: "UP-RERA साइट पर शिकायत का विकल्प चुनें और अनुलग्नक जोड़ें।",
-  to: (state: string, rera: string) =>
-    `सेवा में,\nमाननीय ${state} रियल एस्टेट रेगुलेटरी अथॉरिटी (${rera})`,
+  to: "सेवा में,\nमाननीय उत्तर प्रदेश रियल एस्टेट रेगुलेटरी अथॉरिटी (UP-RERA)",
   subject: (project: string, reraId: string) => `विषय: ${project} (${reraId}) के संबंध में शिकायत`,
   promoterUnknown: "प्रमोटर",
   intro: (promoter: string, reraId: string, date: string) =>

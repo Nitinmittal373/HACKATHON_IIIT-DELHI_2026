@@ -6,7 +6,6 @@ import { useId, useState } from "react";
 
 import { NeevScore } from "@/components/NeevScore";
 import { UnratedNote } from "@/components/UnratedNote";
-import { StateBadge } from "@/components/StateBadge";
 import { describeApiError } from "@/lib/apiMessages";
 import { dayOf } from "@/lib/format";
 import { startCheck } from "@/lib/history";
@@ -23,7 +22,7 @@ interface Props {
   onRemove: () => void;
 }
 
-/** One saved check: its score, its state, and what the visitor can do with it. */
+/** One saved check: its score, its status, and what the visitor can do with it. */
 export function ReportCard({ check, picked, canPick, onTogglePicked, onRemove }: Props) {
   const router = useRouter();
   const { lang, t } = useLang();
@@ -61,7 +60,7 @@ export function ReportCard({ check, picked, canPick, onTogglePicked, onRemove }:
           {name}
         </h2>
         <p className={`mono ${styles.id}`}>
-          {check.rera_id} <StateBadge code={check.state} name={check.state_name} rera={check.rera_name} t={t} lang={lang} />
+          {check.rera_id}
         </p>
         <p className={styles.tags}>
           {display && <NeevScore score={display} variant="chip" showValue={false} />}

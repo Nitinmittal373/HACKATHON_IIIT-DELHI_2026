@@ -10,7 +10,6 @@ import { Skeleton } from "@/components/Skeleton";
 import { ApiError, getCheck, wakeServer } from "@/lib/api";
 import { describeApiError } from "@/lib/apiMessages";
 import { useLang } from "@/lib/LangProvider";
-import { useStates } from "@/lib/useStates";
 import type { Check } from "@/lib/types";
 
 type Loaded = { status: "loading" } | { status: "ready"; check: Check } | { status: "missing" } | { status: "failed"; error: unknown };
@@ -25,7 +24,6 @@ export function ResumeCheck({ checkId }: { checkId: string }) {
   const { t } = useLang();
   const [loaded, setLoaded] = useState<Loaded>({ status: "loading" });
   const [attempt, setAttempt] = useState(0);
-  const states = useStates();
 
   useEffect(() => {
     let cancelled = false;
@@ -80,16 +78,11 @@ export function ResumeCheck({ checkId }: { checkId: string }) {
     );
   }
   const { check } = loaded;
-  // The RERA lane links to the portal of this project's own state.
-  const portalUrl =
-    states.status === "ready" ? states.states.find((s) => s.code === check.state)?.portal_url : undefined;
   return (
     <AgentCam
       checkId={check.id}
       reraId={check.rera_id}
       detailsUrl={check.details_url}
-      rera={check.rera_name}
-      portalUrl={portalUrl}
     />
   );
 }

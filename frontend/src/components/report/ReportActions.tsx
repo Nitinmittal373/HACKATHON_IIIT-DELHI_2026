@@ -11,7 +11,7 @@ import styles from "./ReportActions.module.css";
 
 interface Props {
   reportId: string;
-  project: Pick<Project, "rera_id" | "details_url" | "name" | "state">;
+  project: Pick<Project, "rera_id" | "details_url" | "name">;
   score: DisplayScore;
 }
 

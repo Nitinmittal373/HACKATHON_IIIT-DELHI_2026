@@ -42,11 +42,15 @@ export function laneView(state: CamState, lane: LaneDef): LaneView {
   const running = views.find(({ view }) => view.status === "running");
   const noted = [...views].reverse().find(({ view }) => view.note);
   const started = views.filter(({ view }) => view.status !== "waiting");
+  const findings = state.findings.filter((finding) => lane.sources.includes(finding.source)).length;
   return {
     id: lane.id,
-    status: combine(views.map(({ view }) => view.status), state.outcome !== null),
+    status: withFindings(
+      combine(views.map(({ view }) => view.status), state.outcome !== null),
+      findings,
+    ),
     ticker: (running ?? noted)?.view.note ?? null,
-    findings: state.findings.filter((finding) => lane.sources.includes(finding.source)).length,
+    findings,
     liveUrl: running?.view.liveUrl ?? null,
     focus: (running ?? started[0])?.name ?? lane.sources[0] ?? "uprera",
   };
@@ -57,7 +61,13 @@ function combine(statuses: SourceStatus[], checkEnded: boolean): LaneStatus {
   if (statuses.every((status) => status === "waiting")) return checkEnded ? "skipped" : "waiting";
   // Some source has finished, but another may still be about to start.
   if (!checkEnded && statuses.includes("waiting")) return "running";
-  const stopped = statuses.includes("blocked") || statuses.includes("unread");
+  const stopped = statuses.some((status) => ["blocked", "unread", "partial"].includes(status));
   if (statuses.includes("done")) return stopped ? "partial" : "done";
+  if (statuses.includes("partial")) return "partial";
   return statuses.includes("blocked") ? "blocked" : "unread";
+}
+
+/** A lane that left findings was read in part, whatever else stopped it: never "not read". */
+function withFindings(status: LaneStatus, findings: number): LaneStatus {
+  return findings > 0 && (status === "unread" || status === "blocked") ? "partial" : status;
 }

@@ -6,7 +6,7 @@ import { useId, type FormEvent } from "react";
 import { useLang } from "@/lib/LangProvider";
 import styles from "./MoreWays.module.css";
 
-/** A project name plus the city or locality it is in, which also picks the state's portal. */
+/** A project name plus the city or locality it is in, which narrows the UP-RERA search. */
 export function LocalityForm() {
   const router = useRouter();
   const { t } = useLang();

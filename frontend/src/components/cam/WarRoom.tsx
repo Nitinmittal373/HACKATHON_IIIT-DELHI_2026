@@ -13,27 +13,29 @@ interface Props {
   t: Strings;
 }
 
-/** Six lanes reading in parallel. Opening a lane puts its source in the big browser view. */
+/** The lanes of this check, reading two at a time. Opening one puts its source in the big view. */
 export function WarRoom({ state, shown, onOpen, t }: Props) {
+  const views = LANES.map((lane) => ({ lane, view: laneView(state, lane) }));
+  const ran = views.filter(({ view }) => view.status !== "skipped").length;
+  // A lane that never started says why: the check stopped early, or it predates that source.
+  const skippedWhy = state.outcome?.status === "failed" ? t.cam.laneSkippedFailed : t.cam.laneSkippedOld;
   return (
     <section className={styles.room} aria-label={t.cam.warRoom}>
       <div className={styles.head}>
         <h2 className={`h3 ${styles.title}`}>{t.cam.warRoom}</h2>
-        <p className={styles.hint}>{t.cam.warRoomHint}</p>
+        <p className={styles.hint}>{t.cam.warRoomHint(ran)}</p>
       </div>
       <ul className={styles.grid}>
-        {LANES.map((lane) => {
-          const view = laneView(state, lane);
-          return (
-            <Lane
-              key={lane.id}
-              lane={view}
-              open={lane.sources.includes(shown)}
-              onOpen={() => onOpen(view.focus)}
-              t={t}
-            />
-          );
-        })}
+        {views.map(({ lane, view }) => (
+          <Lane
+            key={lane.id}
+            lane={view}
+            open={lane.sources.includes(shown)}
+            onOpen={() => onOpen(view.focus)}
+            skippedWhy={skippedWhy}
+            t={t}
+          />
+        ))}
       </ul>
     </section>
   );

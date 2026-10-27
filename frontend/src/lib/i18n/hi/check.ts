@@ -4,7 +4,7 @@ export const check: typeof en = {
   confirm: {
     step: "चरण 1 / 3 · पुष्टि",
     title: (count: number, query: string) => `“${query}” के लिए ${count} प्रोजेक्ट मिले`,
-    lead: "राज्यों के RERA पोर्टल से। हर फेज़ का अपना रजिस्ट्रेशन होता है, इसलिए वही चुनें जो आपके एग्रीमेंट में है।",
+    lead: "UP-RERA से। हर फेज़ का अपना रजिस्ट्रेशन होता है, इसलिए वही चुनें जो आपके एग्रीमेंट में है।",
     tableLabel: "मिलते-जुलते प्रोजेक्ट",
     colProject: "प्रोजेक्ट",
     colNumber: "RERA नं.",
@@ -18,13 +18,13 @@ export const check: typeof en = {
     starting: "जाँच शुरू हो रही है…",
     pickOne: "आगे बढ़ने के लिए अपने एग्रीमेंट वाला प्रोजेक्ट चुनें।",
     waking: "सर्वर जाग रहा है, फ्री प्लान पर इसमें एक मिनट तक लग सकता है…",
-    searching: "RERA पोर्टलों पर खोज हो रही है…",
-    searchingNote: "RERA पोर्टल लाइव पढ़े जा रहे हैं। नाम से खोज में एक मिनट तक लग सकता है।",
-    searchFailedTitle: "अभी RERA पोर्टलों पर खोज नहीं हो सकी",
+    searching: "UP-RERA पर खोज हो रही है…",
+    searchingNote: "UP-RERA लाइव पढ़ा जा रहा है। नाम से खोज में एक मिनट तक लग सकता है।",
+    searchFailedTitle: "अभी UP-RERA पर खोज नहीं हो सकी",
     searchFailedBody:
       "खोज पूरी नहीं हुई। कोई शुल्क नहीं लगा और कुछ सहेजा नहीं गया। कृपया एक मिनट बाद फिर कोशिश करें।",
     searchTimeout:
-      "किसी RERA पोर्टल या खोज सेवा ने समय पर जवाब नहीं दिया। कोई शुल्क नहीं लगा। कृपया फिर कोशिश करें।",
+      "UP-RERA या खोज सेवा ने समय पर जवाब नहीं दिया। कोई शुल्क नहीं लगा। कृपया फिर कोशिश करें।",
     searchKey:
       "खोज सेवा ने NeevCheck की कुंजी स्वीकार नहीं की, इसलिए कुछ पढ़ा नहीं जा सका। यह हमारी ओर की समस्या है; कृपया बाद में कोशिश करें।",
     searchBusy: (seconds: number) =>
@@ -47,7 +47,8 @@ export const check: typeof en = {
       sarfaesi: "ऋणदाता नोटिस",
     },
     warRoom: "वॉर रूम",
-    warRoomHint: "छह लेन एक साथ पढ़ती हैं। नीचे ब्राउज़र में देखने के लिए किसी लेन को खोलें।",
+    warRoomHint: (lanes: number) =>
+      `${lanes} लेन पढ़ी जा रही हैं, एक बार में दो। नीचे ब्राउज़र में देखने के लिए किसी लेन को खोलें।`,
     lanes: {
       uprera: "UP-RERA",
       registry: "MCA और रजिस्ट्री",
@@ -66,7 +67,9 @@ export const check: typeof en = {
       partial: "आंशिक रूप से पढ़ा",
     },
     laneWaitingNote: "शुरू होने की प्रतीक्षा",
-    laneSkippedNote: "यह लेन इस जाँच में नहीं चली।",
+    laneSkippedFailed: "इस लेन के शुरू होने से पहले जाँच रुक गई, इसलिए यह पढ़ी नहीं गई।",
+    laneSkippedOld:
+      "चली नहीं: यह जाँच इस स्रोत के जुड़ने से पहले की है। इसे शामिल करने के लिए नई जाँच चलाएँ।",
     laneFindings: (count: number) => `${count} निष्कर्ष`,
     laneExpand: "बड़े दृश्य में खोलें",
     laneOpen: "बड़े दृश्य में दिख रहा है",
@@ -76,6 +79,7 @@ export const check: typeof en = {
       running: "पढ़ रहा है",
       done: "पूरा",
       blocked: "रुका",
+      partial: "आंशिक रूप से पढ़ा",
       unread: "पढ़ा नहीं गया",
     },
     live: "लाइव",
@@ -107,6 +111,7 @@ export const check: typeof en = {
     blockedTimeout: "एजेंट रुक गया: इस पेज ने समय पर जवाब नहीं दिया।",
     blockedOther: (reason: string) => `एजेंट रुक गया: ${reason}`,
     unreadReason: "इस बार पढ़ा नहीं जा सका। इससे भरोसा घटता है, स्कोर नहीं।",
+    partialReason: "रुकने से पहले कुछ हिस्सा पढ़ा गया। अब तक जो मिला:",
     checkYourself: "खुद जाँचें",
     resultProvisional: "अभी पर्याप्त सबूत नहीं",
     resultProvisionalNote: "जोखिम श्रेणी देने के लिए बहुत कम मुख्य रिकॉर्ड पढ़े जा सके।",

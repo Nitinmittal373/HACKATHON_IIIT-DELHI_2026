@@ -64,7 +64,7 @@ export const home = {
   sentinel: {
     eyebrow: "Neev Sentinel",
     title: "We keep watching after you book",
-    lead: "Every week we re-read the records for your project and tell you only when something changes, in English or हिंदी.",
+    lead: "Every week we re-read the UP-RERA and other public records for your project and tell you only when something changes, in English or हिंदी.",
     stats: [
       ["re-checks", "Weekly"],
       ["spam alerts", "0"],
@@ -109,7 +109,8 @@ export const home = {
     button: "Check a project now",
   },
   footer: {
-    left: "NeevCheck · Team RYZEN, KIET · HackIIITD 2026",
+    left: "NeevCheck · Public records, read live",
+    note: "Not a credit rating",
     right: "Built on public records, read by TinyFish agents",
   },
 };

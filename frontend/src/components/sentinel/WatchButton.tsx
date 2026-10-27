@@ -7,7 +7,7 @@ import { useLang } from "@/lib/LangProvider";
 import type { Project } from "@/lib/types";
 
 interface Props {
-  project: Pick<Project, "rera_id" | "details_url" | "state">;
+  project: Pick<Project, "rera_id" | "details_url">;
   /** "primary" is the orange header button; "card" is the white button on the orange card. */
   look?: "primary" | "card";
 }

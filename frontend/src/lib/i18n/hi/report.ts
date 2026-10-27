@@ -1,6 +1,7 @@
 import type { report as en } from "@/lib/i18n/en/report";
 
 export const report: typeof en = {
+  builderFromListings: "बिल्डर की पहचान सार्वजनिक लिस्टिंग से हुई; UP-RERA पर सत्यापित करें।",
   areas: {
     rera: "UP-RERA अनुपालन",
     execution: "प्रोजेक्ट का निर्माण",

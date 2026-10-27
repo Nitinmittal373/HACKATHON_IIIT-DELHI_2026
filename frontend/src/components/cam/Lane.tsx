@@ -7,14 +7,16 @@ interface Props {
   /** True while this lane's source is the one in the big browser view. */
   open: boolean;
   onOpen: () => void;
+  /** Why a lane that never started did not run; shown instead of a bare "not in this check". */
+  skippedWhy: string;
   t: Strings;
 }
 
 /** One lane of the War Room: a source group reading in parallel with the others. */
-export function Lane({ lane, open, onOpen, t }: Props) {
+export function Lane({ lane, open, onOpen, skippedWhy, t }: Props) {
   const label = t.cam.lanes[lane.id];
   const status = t.cam.laneStatus[lane.status];
-  const ticker = lane.status === "skipped" ? t.cam.laneSkippedNote : (lane.ticker ?? t.cam.laneWaitingNote);
+  const ticker = lane.status === "skipped" ? skippedWhy : (lane.ticker ?? t.cam.laneWaitingNote);
   const showLive = lane.status === "running" && lane.liveUrl !== null && !open;
 
   return (

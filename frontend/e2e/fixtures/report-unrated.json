@@ -1,0 +1,415 @@
+{
+  "check": {
+    "id": "a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+    "rera_id": "UPRERAPRJ8334",
+    "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
+    "status": "completed",
+    "started_at": "2026-10-25T04:00:00Z",
+    "completed_at": "2026-10-25T04:00:00Z",
+    "sources": [
+      {
+        "source": "uprera",
+        "status": "completed",
+        "live_url": null,
+        "message": null,
+        "checks_read": [
+          "registration",
+          "completion_date",
+          "extensions"
+        ]
+      },
+      {
+        "source": "registry",
+        "status": "completed",
+        "live_url": null,
+        "message": null,
+        "checks_read": []
+      },
+      {
+        "source": "group",
+        "status": "failed",
+        "live_url": null,
+        "message": "No public company profile with the promoter's exact name was read",
+        "checks_read": []
+      },
+      {
+        "source": "sarfaesi",
+        "status": "completed",
+        "live_url": null,
+        "message": null,
+        "checks_read": []
+      },
+      {
+        "source": "insolvency",
+        "status": "completed",
+        "live_url": null,
+        "message": null,
+        "checks_read": []
+      },
+      {
+        "source": "land",
+        "status": "completed",
+        "live_url": null,
+        "message": null,
+        "checks_read": []
+      },
+      {
+        "source": "consumer",
+        "status": "failed",
+        "live_url": null,
+        "message": "The agent stopped without an answer",
+        "checks_read": []
+      },
+      {
+        "source": "news",
+        "status": "completed",
+        "live_url": null,
+        "message": null,
+        "checks_read": []
+      }
+    ],
+    "reused": false,
+    "display_score": {
+      "value": null,
+      "provisional_value": 576,
+      "band": "insufficient_evidence",
+      "hard_stop": false,
+      "confidence": 0.33,
+      "provisional": true,
+      "records_read": 2,
+      "records_total": 6
+    }
+  },
+  "project": {
+    "rera_id": "UPRERAPRJ8334",
+    "name": "SUPERTECH ECO VILLAGE-I PHASE I-C",
+    "promoter": "SUPERTECH LIMITED",
+    "registered_on": "2017-08-09",
+    "district": "Gautam Buddha Nagar",
+    "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
+    "status": null,
+    "sources": [],
+    "found_in": null
+  },
+  "score": {
+    "value": 71,
+    "band": "insufficient_evidence",
+    "band_label": "Not enough evidence yet",
+    "confidence": 0.43,
+    "provisional": true,
+    "hard_stop": false,
+    "hard_stop_reason": null,
+    "drivers": [
+      {
+        "finding_id": "c7d7c1026d734aedb12168c4869ff6a7",
+        "title": "Completion date on record (30 Dec 2017) passed 105 months ago; project still listed as Ongoing",
+        "area": "execution",
+        "penalty": 70,
+        "points": -14.0
+      },
+      {
+        "finding_id": "f4452cfde4bf429f8bd5a8a35841255b",
+        "title": "2803 complaints on UP-RERA against the promoter, across all its projects",
+        "area": "builder_history",
+        "penalty": 60,
+        "points": -9.0
+      },
+      {
+        "finding_id": "fb61dab30db94babab86dc5ce86bf88e",
+        "title": "15 complaints on UP-RERA about this project",
+        "area": "legal",
+        "penalty": 40,
+        "points": -6.0
+      }
+    ],
+    "areas": [
+      {
+        "area": "rera",
+        "label": "UP-RERA compliance",
+        "weight": 0.25,
+        "penalty": 0
+      },
+      {
+        "area": "execution",
+        "label": "Project execution",
+        "weight": 0.2,
+        "penalty": 70
+      },
+      {
+        "area": "legal",
+        "label": "Legal and courts",
+        "weight": 0.15,
+        "penalty": 40
+      },
+      {
+        "area": "financial",
+        "label": "Financial and insolvency",
+        "weight": 0.15,
+        "penalty": 0
+      },
+      {
+        "area": "builder_history",
+        "label": "Builder history",
+        "weight": 0.15,
+        "penalty": 60
+      },
+      {
+        "area": "news",
+        "label": "News",
+        "weight": 0.1,
+        "penalty": 0
+      }
+    ],
+    "checks_unread": [
+      "company_status",
+      "insolvency",
+      "land_dues",
+      "consumer_cases"
+    ]
+  },
+  "findings": [
+    {
+      "id": "c7d7c1026d734aedb12168c4869ff6a7",
+      "source": "uprera",
+      "kind": "past_end_date",
+      "title": "Completion date on record (30 Dec 2017) passed 105 months ago; project still listed as Ongoing",
+      "area": "execution",
+      "verdict": "fail",
+      "reliability": "primary",
+      "source_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": "2017-12-30",
+      "count": null,
+      "months": 105,
+      "scope": null,
+      "total": null,
+      "snippet": null,
+      "via": null
+    },
+    {
+      "id": "f4452cfde4bf429f8bd5a8a35841255b",
+      "source": "uprera",
+      "kind": "promoter_complaints",
+      "title": "2803 complaints on UP-RERA against the promoter, across all its projects",
+      "area": "builder_history",
+      "verdict": "review",
+      "reliability": "primary",
+      "source_url": "https://up-rera.in/Projectsummary?UI0aPA1ISD=fwOn88bfRpA=&hfFlag=9emr4VdBw22M7BGjKtJWMPDI4s5cHQZP&NPJ6RAme=gUoAr6nOB9CeG4WCZ3sI8xdst3G+GkrZUR6kve89n8F2pfuywUDJcw==&PaURJEMAN4=ZL9MNERkNdZ1OH5DIB2u4Q==&IRSAHEB=D6PY3lyims8=",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": null,
+      "count": 2803,
+      "months": null,
+      "scope": null,
+      "total": null,
+      "snippet": null,
+      "via": null
+    },
+    {
+      "id": "fb61dab30db94babab86dc5ce86bf88e",
+      "source": "uprera",
+      "kind": "project_complaints",
+      "title": "15 complaints on UP-RERA about this project",
+      "area": "legal",
+      "verdict": "review",
+      "reliability": "primary",
+      "source_url": "https://up-rera.in/Projectsummary?UI0aPA1ISD=fwOn88bfRpA=&hfFlag=9emr4VdBw22M7BGjKtJWMPDI4s5cHQZP&NPJ6RAme=gUoAr6nOB9CeG4WCZ3sI8xdst3G+GkrZUR6kve89n8F2pfuywUDJcw==&PaURJEMAN4=ZL9MNERkNdZ1OH5DIB2u4Q==&IRSAHEB=D6PY3lyims8=",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": null,
+      "count": 15,
+      "months": null,
+      "scope": null,
+      "total": null,
+      "snippet": null,
+      "via": null
+    },
+    {
+      "id": "1b7879c29dd647eaacf1ec4f018894a7",
+      "source": "uprera",
+      "kind": "registration",
+      "title": "Registered on UP-RERA on 09 Aug 2017",
+      "area": "rera",
+      "verdict": "ok",
+      "reliability": "primary",
+      "source_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": "2017-08-09",
+      "count": null,
+      "months": null,
+      "scope": null,
+      "total": null,
+      "snippet": null,
+      "via": null
+    }
+  ],
+  "timeline": [
+    {
+      "id": "1b7879c29dd647eaacf1ec4f018894a7",
+      "source": "uprera",
+      "kind": "registration",
+      "title": "Registered on UP-RERA on 09 Aug 2017",
+      "area": "rera",
+      "verdict": "ok",
+      "reliability": "primary",
+      "source_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": "2017-08-09",
+      "count": null,
+      "months": null,
+      "scope": null,
+      "total": null,
+      "snippet": null,
+      "via": null
+    },
+    {
+      "id": "c7d7c1026d734aedb12168c4869ff6a7",
+      "source": "uprera",
+      "kind": "past_end_date",
+      "title": "Completion date on record (30 Dec 2017) passed 105 months ago; project still listed as Ongoing",
+      "area": "execution",
+      "verdict": "fail",
+      "reliability": "primary",
+      "source_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
+      "read_on": "2026-10-25",
+      "read_at": "2026-10-25T04:00:00Z",
+      "occurred_on": "2017-12-30",
+      "count": null,
+      "months": 105,
+      "scope": null,
+      "total": null,
+      "snippet": null,
+      "via": null
+    }
+  ],
+  "display_score": {
+    "value": null,
+    "provisional_value": 576,
+    "band": "insufficient_evidence",
+    "hard_stop": false,
+    "confidence": 0.33,
+    "provisional": true,
+    "records_read": 2,
+    "records_total": 6
+  },
+  "score_v2": {
+    "value": 576,
+    "band": "insufficient_evidence",
+    "band_label": "Not enough evidence yet",
+    "provisional": true,
+    "hard_stop": false,
+    "hard_stop_reason": null,
+    "confidence": 0.33,
+    "pillars": [
+      {
+        "id": "P1",
+        "name": "Regulatory compliance (RERA)",
+        "weight": 0.3,
+        "penalty": 70,
+        "points": -126.0
+      },
+      {
+        "id": "P2",
+        "name": "Delivery track record",
+        "weight": 0.2,
+        "penalty": 40,
+        "points": -48.0
+      },
+      {
+        "id": "P3",
+        "name": "Legal and insolvency",
+        "weight": 0.25,
+        "penalty": 100,
+        "points": -150.0
+      },
+      {
+        "id": "P4",
+        "name": "Financial and corporate health",
+        "weight": 0.15,
+        "penalty": 0,
+        "points": -0.0
+      },
+      {
+        "id": "P5",
+        "name": "Land authority and approvals",
+        "weight": 0.05,
+        "penalty": 0,
+        "points": -0.0
+      },
+      {
+        "id": "P6",
+        "name": "Sentiment and news",
+        "weight": 0.05,
+        "penalty": 0,
+        "points": -0.0
+      }
+    ],
+    "reason_codes": [
+      {
+        "code": "R05",
+        "label": "15 RERA complaints",
+        "finding_ids": [
+          "fb61dab30db94babab86dc5ce86bf88e"
+        ],
+        "points": -150.0
+      },
+      {
+        "code": "R03",
+        "label": "Revised completion date 105 months after the promised one",
+        "finding_ids": [
+          "c7d7c1026d734aedb12168c4869ff6a7"
+        ],
+        "points": -126.0
+      },
+      {
+        "code": "R13",
+        "label": "Builder complaint record",
+        "finding_ids": [
+          "f4452cfde4bf429f8bd5a8a35841255b"
+        ],
+        "points": -48.0
+      },
+      {
+        "code": "R12",
+        "label": "Data unavailable: Group companies (No public company profile with the promoter's exact name was read); Consumer cases (e-Jagriti) (The agent stopped without an answer); Delivery track record; Legal and insolvency; Financial and corporate health; Land authority and approvals",
+        "finding_ids": [],
+        "points": 0.0
+      }
+    ],
+    "drivers": [
+      {
+        "finding_id": "fb61dab30db94babab86dc5ce86bf88e",
+        "pillar": "P3",
+        "code": "R05",
+        "penalty": 100,
+        "points": -150.0
+      },
+      {
+        "finding_id": "c7d7c1026d734aedb12168c4869ff6a7",
+        "pillar": "P1",
+        "code": "R03",
+        "penalty": 70,
+        "points": -126.0
+      },
+      {
+        "finding_id": "f4452cfde4bf429f8bd5a8a35841255b",
+        "pillar": "P2",
+        "code": "R13",
+        "penalty": 40,
+        "points": -48.0
+      }
+    ],
+    "pillars_unread": [
+      "P2",
+      "P3",
+      "P4",
+      "P5"
+    ]
+  },
+  "family": null,
+  "portal_url": "https://www.up-rera.in/",
+  "complaint_url": "https://www.up-rera.in/ComplaintHome"
+}

@@ -47,7 +47,7 @@ export function ProjectRow({ project, selected, best, groupName, onSelect, t, la
       </span>
       <span className={`mono ${styles.cell} ${styles.number}`}>{project.rera_id}</span>
       <span className={styles.cell}>
-        {project.registered_on ? formatDay(project.registered_on, lang) : ""}
+        {project.registered_on ? formatDay(project.registered_on, lang) : "—"}
       </span>
       <span className={styles.cell}>
         {best && <i className={styles.badge}>{t.confirm.bestMatch}</i>}

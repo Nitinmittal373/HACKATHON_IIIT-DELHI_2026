@@ -11,7 +11,6 @@ import type {
   RecentCheck,
   Report,
   SearchResponse,
-  StateInfo,
   TrackRecord,
   Watch,
   WatchCreate,
@@ -139,15 +138,10 @@ export function isTransient(error: unknown): boolean {
 }
 
 /** Runs in the browser, straight to the API, and tries once more after a transient failure. */
-export async function searchProjects(
-  query: string,
-  state?: string,
-  locality?: string,
-): Promise<SearchResponse> {
-  const scope = state ? `&state=${encodeURIComponent(state)}` : "";
+export async function searchProjects(query: string, locality?: string): Promise<SearchResponse> {
   const place = locality ? `&locality=${encodeURIComponent(locality)}` : "";
   const search = () =>
-    request<SearchResponse>(`/api/projects/search?q=${encodeURIComponent(query)}${scope}${place}`, {
+    request<SearchResponse>(`/api/projects/search?q=${encodeURIComponent(query)}${place}`, {
       timeoutMs: SEARCH_TIMEOUT_MS,
     });
   try {
@@ -158,13 +152,9 @@ export async function searchProjects(
   }
 }
 
-/** A builder's registered projects and company pages, from the portals and the open web. */
-export function searchBuilder(
-  builder: string,
-  city?: string,
-  state?: string,
-): Promise<PromoterSearchResponse> {
-  const extra = (city ? `&city=${encodeURIComponent(city)}` : "") + (state ? `&state=${state}` : "");
+/** A builder's registered projects and company pages, from up-rera.in and the open web. */
+export function searchBuilder(builder: string, city?: string): Promise<PromoterSearchResponse> {
+  const extra = city ? `&city=${encodeURIComponent(city)}` : "";
   return request<PromoterSearchResponse>(
     `/api/promoters/search?q=${encodeURIComponent(builder)}${extra}`,
     { timeoutMs: SEARCH_TIMEOUT_MS },
@@ -191,13 +181,12 @@ export function extractFromText(text: string): Promise<ExtractResponse> {
 
 /** `fresh` skips the reuse of a check from the last 24 hours ("Re-check now"). */
 export function createCheck(
-  project: Pick<Project, "rera_id" | "details_url" | "state">,
+  project: Pick<Project, "rera_id" | "details_url">,
   options: { fresh?: boolean } = {},
 ): Promise<Check> {
   // The page search confirmed: many numbers registered after 2018 have no stable address.
   const body: CheckCreate = {
     rera_id: project.rera_id,
-    state: project.state,
     details_url: project.details_url,
     ...(options.fresh ? { fresh: true } : {}),
   };
@@ -205,13 +194,12 @@ export function createCheck(
 }
 
 export function createWatch(
-  project: Pick<Project, "rera_id" | "details_url" | "state">,
+  project: Pick<Project, "rera_id" | "details_url">,
   email: string,
   language: WatchCreate["language"],
 ): Promise<Watch> {
   const body: WatchCreate = {
     rera_id: project.rera_id,
-    state: project.state,
     details_url: project.details_url,
     email,
     language,
@@ -239,25 +227,10 @@ export function compareChecks(ids: string[]): Promise<Comparison> {
   });
 }
 
-/** A promoter's other projects in one state, found with Search on that state's portal. */
-export function promoterProjects(
-  promoter: string,
-  exclude: string,
-  state: string,
-): Promise<TrackRecord> {
-  const query =
-    `name=${encodeURIComponent(promoter)}&exclude=${encodeURIComponent(exclude)}` +
-    `&state=${encodeURIComponent(state)}`;
+/** A promoter's other projects, found with Search on up-rera.in. */
+export function promoterProjects(promoter: string, exclude: string): Promise<TrackRecord> {
+  const query = `name=${encodeURIComponent(promoter)}&exclude=${encodeURIComponent(exclude)}`;
   return request<TrackRecord>(`/api/promoters/projects?${query}`, { timeoutMs: WAKE_TIMEOUT_MS });
-}
-
-let statesList: Promise<StateInfo[]> | null = null;
-
-/** Every state NeevCheck can search, with its coverage level and examples (one request per page load). */
-export function getStates(): Promise<StateInfo[]> {
-  statesList ??= request<StateInfo[]>("/api/states", { timeoutMs: WAKE_TIMEOUT_MS });
-  statesList.catch(() => (statesList = null));
-  return statesList;
 }
 
 const RECENT_FRESH_FOR_MS = 60_000;

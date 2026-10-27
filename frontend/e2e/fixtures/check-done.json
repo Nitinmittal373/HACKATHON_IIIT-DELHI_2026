@@ -1,7 +1,4 @@
 {
-  "state": "UP",
-  "state_name": "Uttar Pradesh",
-  "rera_name": "UP-RERA",
   "id": "4ad9752355f9455aa9d242c93950ea04",
   "rera_id": "UPRERAPRJ8334",
   "details_url": "https://www.up-rera.in/Frm_View_Project_Details.aspx?id=8334",
@@ -28,6 +25,20 @@
       "checks_read": [
         "company_status"
       ]
+    },
+    {
+      "source": "group",
+      "status": "completed",
+      "live_url": null,
+      "message": null,
+      "checks_read": []
+    },
+    {
+      "source": "sarfaesi",
+      "status": "completed",
+      "live_url": null,
+      "message": null,
+      "checks_read": []
     },
     {
       "source": "insolvency",
@@ -62,13 +73,13 @@
   ],
   "reused": false,
   "display_score": {
-    "value": 741,
+    "value": 495,
     "provisional_value": null,
-    "band": "Watch",
+    "band": "Elevated",
     "hard_stop": false,
-    "confidence": 0.67,
+    "confidence": 0.83,
     "provisional": false,
-    "records_read": 4,
+    "records_read": 5,
     "records_total": 6
   }
 }
