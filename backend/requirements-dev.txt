@@ -1,4 +1,4 @@
 -r requirements.txt
-httpx2==2.13.1  # starlette 1.10 TestClient imports httpx2 (falls back to httpx with a warning)
+httpx2==2.16.0  # starlette 1.10 TestClient imports httpx2 (falls back to httpx with a warning)
 pytest==9.1.1
 ruff==0.17.2
