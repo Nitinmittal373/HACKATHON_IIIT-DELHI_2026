@@ -1,11 +1,10 @@
-"""Find a project's RERA number anywhere on the public web, then vote on what was found.
+"""Find a project's UP-RERA number anywhere on the public web, then vote on what was found.
 
-A state portal that Search cannot read still has its project's number printed by the builder,
-by listing sites and sometimes by the authority's own certificate pages. So Search runs with no
-domain limit, every state's number format is looked for in the results, and each number is
-scored by who prints it:
+The builder, listing sites and sometimes the authority's own pages print a project's number.
+So Search runs with no domain limit, UPRERAPRJ numbers are looked for in the results, and each
+number is scored by who prints it:
 
-- +3 when a page of that state's RERA domain prints it,
+- +3 when a page of up-rera.in prints it,
 - +2 when the builder's own site does (its domain holds the brand word of the query),
 - +1 for every other distinct domain.
 
@@ -24,9 +23,9 @@ from urllib.parse import urlsplit
 
 from app.models import Project
 from app.states.places import without_places
-from app.states.registry import ADAPTERS
 from app.states.text import clean, distinctive_words, squash
 from app.tinyfish import SearchHit, WebClient
+from app.uprera_links import RERA_IN_TEXT, UPRERA_DOMAIN, project_details_url
 
 # Four wordings, because Search answers each with different pages: a builder's page prints the
 # number under "registration number", a listing's FAQ under "What is the RERA number of ...".
@@ -43,13 +42,11 @@ WINDOW = 160
 # The share of a query's distinctive words that must stand near a number.
 NAME_SHARE = 0.75
 SCORE_TO_KEEP = 3
-STATE_POINTS, BUILDER_POINTS, OTHER_POINTS = 3, 2, 1
+PORTAL_POINTS, BUILDER_POINTS, OTHER_POINTS = 3, 2, 1
 MAX_CANDIDATES = 8
 
 # Words of the page, not of the project: "Real Estate" must not make "Golf Estate" match.
 NOISE = re.compile(r"RERA\s*ACK\w*|Real Estate Regulatory Authority", re.IGNORECASE)
-# MahaRERA numbers are copied with spaces ("P 51900 008345") by some listings.
-SPACED_MAHARERA = re.compile(r"\bP[\s-]?[1-9](?:[\s-]?\d){10}\b")
 TITLE_SPLIT = re.compile(r"\s+[-|–—]\s+|\s*,\s+|\s+in\s+", re.IGNORECASE)
 
 
@@ -80,7 +77,6 @@ CACHE = SearchCache()
 class Votes:
     """Everything the search results say about one number."""
 
-    state: str
     rera_id: str
     # domain -> points it earned; a domain counts once, at its best role.
     domains: dict[str, int] = field(default_factory=dict)
@@ -138,9 +134,9 @@ def tally(hits: Iterable[SearchHit], query: str) -> dict[str, Votes]:
         domain = domain_of(hit.url)
         text = prepare(f"{hit.title}. {hit.snippet}")
         found = numbers_in(text)
-        for index, (state, rera_id, _, _) in enumerate(found):
-            vote = votes.setdefault(squash(rera_id), Votes(state=state, rera_id=rera_id))
-            on_portal = on_state_domain(state, domain)
+        for index, (rera_id, _, _) in enumerate(found):
+            vote = votes.setdefault(squash(rera_id), Votes(rera_id=rera_id))
+            on_portal = on_portal_domain(domain)
             vote.domains[domain] = max(
                 vote.domains.get(domain, 0), points_for(on_portal, domain, brands)
             )
@@ -153,43 +149,27 @@ def tally(hits: Iterable[SearchHit], query: str) -> dict[str, Votes]:
 
 def points_for(on_portal: bool, domain: str, brands: set[str]) -> int:
     if on_portal:
-        return STATE_POINTS
+        return PORTAL_POINTS
     if any(brand in domain for brand in brands):
         return BUILDER_POINTS
     return OTHER_POINTS
 
 
 def prepare(text: str) -> str:
-    text = NOISE.sub(" ", clean(text))
-    return SPACED_MAHARERA.sub(lambda m: re.sub(r"[\s-]", "", m.group(0)), text)
+    return NOISE.sub(" ", clean(text))
 
 
-def numbers_in(text: str) -> list[tuple[str, str, int, int]]:
-    """(state, number, start, end) of every registration number in the text."""
-    found: dict[tuple[int, int], tuple[str, str]] = {}
-    for adapter in ADAPTERS:
-        for pattern in adapter.id_patterns:
-            for match in re.finditer(pattern, text, re.IGNORECASE):
-                if plausible(match.group(0), text, match.start()):
-                    found.setdefault(match.span(), (adapter.code, match.group(0).upper()))
-    # Of two numbers that overlap, the longer one is the real number.
-    kept: list[tuple[int, int]] = []
-    for span in sorted(found, key=lambda s: s[0] - s[1]):
-        if not any(span[0] < other[1] and other[0] < span[1] for other in kept):
-            kept.append(span)
-    return [(*found[span], *span) for span in sorted(kept)]
-
-
-def plausible(number: str, text: str, start: int) -> bool:
-    """Plain digit formats ("112 of 2021") also fit phrases, so they need 'RERA' beside them."""
-    if not number[0].isdigit():
-        return True
-    return "RERA" in text[max(0, start - 40) : start + 60].upper()
+def numbers_in(text: str) -> list[tuple[str, int, int]]:
+    """(number, start, end) of every UP-RERA registration number in the text."""
+    return [
+        (match.group(0).upper(), match.start(), match.end())
+        for match in RERA_IN_TEXT.finditer(text)
+    ]
 
 
 def names_project(
     text: str,
-    found: list[tuple[str, str, int, int]],
+    found: list[tuple[str, int, int]],
     index: int,
     words: set[str],
     hit: SearchHit,
@@ -201,9 +181,9 @@ def names_project(
     """
     if not words:
         return True
-    _, _, start, end = found[index]
-    before = found[index - 1][3] if index > 0 else 0
-    after = found[index + 1][2] if index + 1 < len(found) else len(text)
+    _, start, end = found[index]
+    before = found[index - 1][2] if index > 0 else 0
+    after = found[index + 1][1] if index + 1 < len(found) else len(text)
     near = text[max(before, start - WINDOW) : min(after, end + WINDOW)].lower()
     if share_of(words, near) >= NAME_SHARE:
         return True
@@ -269,19 +249,15 @@ def domain_of(url: str) -> str:
     return (urlsplit(url).hostname or "").lower().removeprefix("www.")
 
 
-def on_state_domain(state: str, domain: str) -> bool:
-    adapter = next(a for a in ADAPTERS if a.code == state)
-    return any(domain == d or domain.endswith("." + d) for d in adapter.domains)
+def on_portal_domain(domain: str) -> bool:
+    return domain == UPRERA_DOMAIN or domain.endswith("." + UPRERA_DOMAIN)
 
 
 def project_of(vote: Votes, query: str) -> Project:
-    adapter = next(a for a in ADAPTERS if a.code == vote.state)
-    probe = Project(state=vote.state, rera_id=vote.rera_id, details_url="")
     return Project(
-        state=vote.state,
         rera_id=vote.rera_id,
         name=name_from(vote.titles, query),
-        details_url=adapter.details_url(probe),
+        details_url=project_details_url(vote.rera_id),
         status="confirmed" if vote.on_portal else "listings_only",
         sources=sorted(vote.domains, key=lambda d: (-vote.domains[d], d)),
     )
@@ -299,14 +275,3 @@ def name_from(titles: list[str], query: str) -> str | None:
     scored = [(-len(words & distinctive_words(part)), len(part), part) for part in parts]
     scored = [item for item in scored if item[0] < 0]
     return min(scored)[2] if scored else None
-
-
-def hits_by_state(hits: list[SearchHit]) -> dict[str, list[SearchHit]]:
-    grouped: dict[str, list[SearchHit]] = {}
-    for hit in hits:
-        host = domain_of(hit.url)
-        for adapter in ADAPTERS:
-            if any(host == d or host.endswith("." + d) for d in adapter.domains):
-                grouped.setdefault(adapter.code, []).append(hit)
-                break
-    return grouped

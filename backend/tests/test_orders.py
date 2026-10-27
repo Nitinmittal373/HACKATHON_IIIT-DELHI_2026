@@ -12,14 +12,14 @@ from app.states.resolver import resolve_any
 from app.tinyfish import SearchHit
 from tests.fakes import FIXTURES, FakeWebClient, load_recording
 
-ORDER_URL = "https://maharera.maharashtra.gov.in/sites/default/files/order_list/12345-Order.pdf"
+ORDER_URL = "https://www.up-rera.in/orders/12345-Order.pdf"
 
 
 def sample_order_web() -> FakeWebClient:
     hit = SearchHit(
         title="Order - Sunrise Heights",
         url=ORDER_URL,
-        snippet="Complaint against Sunrise Builders Pvt. Ltd. for Sunrise Heights, Thane.",
+        snippet="Complaint against Sunrise Builders Pvt. Ltd. for Sunrise Heights, Noida.",
     )
     text = (FIXTURES / "order_sample.txt").read_text(encoding="utf-8")
     return FakeWebClient(searches={"Sunrise Heights RERA order": [hit]}, texts={ORDER_URL: text})
@@ -28,10 +28,10 @@ def sample_order_web() -> FakeWebClient:
 def test_an_order_pdf_gives_the_projects_number_and_its_link() -> None:
     found = asyncio.run(find_in_orders("Sunrise Heights", sample_order_web(), SearchCache()))
     [project] = found.projects
-    assert project.rera_id == "P51900099999"
+    assert project.rera_id == "UPRERAPRJ99999"
     assert project.status == "from_order"
     assert project.found_in == ORDER_URL
-    assert project.sources == ["maharera.maharashtra.gov.in"]
+    assert project.sources == ["up-rera.in"]
 
 
 def test_an_unreadable_order_falls_back_to_its_snippet() -> None:
@@ -59,8 +59,8 @@ def test_listing_pages_are_not_orders() -> None:
 def test_orders_are_only_searched_when_nothing_else_found_the_project() -> None:
     web = sample_order_web()
     resolved = asyncio.run(resolve_any("Sunrise Heights", web))
-    assert [p.rera_id for p in resolved.candidates] == ["P51900099999"]
+    assert [p.rera_id for p in resolved.candidates] == ["UPRERAPRJ99999"]
     assert resolved.candidates[0].status == "from_order"
     web = FakeWebClient().replay(load_recording("openweb_famous.json"))
-    asyncio.run(resolve_any("Prestige Lakeside Habitat", web))
+    asyncio.run(resolve_any("Mahagun Mywoods", web))
     assert not any("order" in query for _, query in web.calls)

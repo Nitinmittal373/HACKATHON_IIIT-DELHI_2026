@@ -57,12 +57,19 @@ def _insolvency(f: Finding) -> int:
     return w.SISTER_COMPANY_INSOLVENT
 
 
+# Two readings of one lateness; only the larger is counted.
+DELAY_KINDS = ("delay_vs_promised", "past_end_date")
+
 RULES: dict[str, Rule] = {
     "registration_revoked": Rule("P1", "R01", _flat(100)),
     "completion_extended": Rule("P1", "R02", _extensions),
     "delay_vs_promised": Rule("P1", "R03", _delay),
+    "past_end_date": Rule("P1", "R03", _delay),
     "qpr_missed": Rule("P1", "R04", _per(w.QPR_MISSED_EACH, w.QPR_MISSED_CAP)),
     "rera_penalty_order": Rule("P1", "R05", _per(w.PENALTY_ORDER_EACH)),
+    "promoter_complaints": Rule(
+        "P2", "R13", _per(w.PROMOTER_COMPLAINT_EACH, w.PROMOTER_COMPLAINT_CAP)
+    ),
     "group_delay_share": Rule("P2", "R13", _group_delay_share),
     "group_project_lapsed": Rule("P2", "R13", _flat(w.GROUP_PROJECT_LAPSED)),
     "insolvency_scope": Rule("P3", "R06", _insolvency),

@@ -27,10 +27,6 @@ class Settings(BaseSettings):
     # by agent_timeout_seconds. Turn this on once the account is enabled.
     agent_send_max_steps: bool = False
 
-    # The v2 score's extra sources (group companies, lender notices). Off by default so a
-    # deployment opts in; they use free Search and Fetch only.
-    v2_sources: bool = False
-
     # Every live check costs money, Sentinel's included; past this many a day none may start.
     max_checks_per_day: int = Field(default=30, ge=1)
     # How often Sentinel re-checks watched projects; 0 turns the built-in schedule off (an

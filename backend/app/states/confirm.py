@@ -1,6 +1,6 @@
-"""Check a number the open web found against the state's own portal.
+"""Check a number the open web found against up-rera.in.
 
-The exact number is searched on the state's RERA domain (the adapter's own resolve). A page that
+The exact number is looked up on UP-RERA's own site (app.resolve). A page that
 prints it makes the candidate "confirmed" and brings the portal's page and facts; when nothing
 there prints it, the candidate stays "listings_only" and says so.
 """
@@ -8,8 +8,8 @@ there prints it, the candidate stays "listings_only" and says so.
 import asyncio
 
 from app.models import Project
+from app.resolve import resolve
 from app.states.openweb import domain_of
-from app.states.registry import BY_CODE
 from app.states.text import squash
 from app.tinyfish import WebClient, WebError
 
@@ -30,7 +30,7 @@ async def confirm_on_portals(candidates: list[Project], web: WebClient) -> list[
 
 async def confirmed(project: Project, web: WebClient) -> Project | None:
     try:
-        found = await BY_CODE[project.state].resolve(project.rera_id, web)
+        found = await resolve(project.rera_id, web)
     except WebError:
         return None  # An unreachable portal leaves the number as listings-only, not removed.
     portal = next((p for p in found if squash(p.rera_id) == squash(project.rera_id)), None)

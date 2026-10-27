@@ -14,7 +14,7 @@ from app.models import Finding
 from app.scoring.v2 import weights as w
 from app.scoring.v2.models import BandV2, DriverV2, Pillar, PillarId, ReasonCode, ScoreV2
 from app.scoring.v2.reasons import DATA_UNAVAILABLE, label_for
-from app.scoring.v2.rules import RULES, hard_stop_reason
+from app.scoring.v2.rules import DELAY_KINDS, RULES, Rule, hard_stop_reason
 
 
 def score_v2(
@@ -34,7 +34,7 @@ def score_v2(
     read = set(pillars_read)
     unread = [p for p in w.PILLAR_WEIGHTS if p not in read]
     confidence = round(len(read) / len(w.PILLAR_WEIGHTS), 2)
-    provisional = confidence < w.MIN_CONFIDENCE_FOR_BAND and stop is None
+    provisional = not _enough_to_band(read) and stop is None
     band: BandV2 = "insufficient_evidence" if provisional else band_for(value)
     return ScoreV2(
         value=value,
@@ -60,6 +60,11 @@ def score_v2(
     )
 
 
+def _enough_to_band(read: set[PillarId]) -> bool:
+    """The RERA record was read and so were most of the other records."""
+    return "P1" in read and len(read) >= w.MIN_PILLARS_FOR_BAND
+
+
 def clip(raw: float) -> int:
     return min(w.SCALE_TOP, max(w.SCALE_FLOOR, math.floor(raw + 0.5)))
 
@@ -76,6 +81,7 @@ def _apply_pillar_caps(findings: list[Finding]) -> tuple[list[DriverV2], dict[Pi
     used: dict[PillarId, int] = dict.fromkeys(w.PILLAR_WEIGHTS, 0)
     scored = [(f, RULES[f.kind]) for f in findings if f.kind in RULES]
     costs = {f.id: rule.penalty(f) for f, rule in scored}
+    scored = _one_delay(scored, costs)
     drivers: list[DriverV2] = []
     for finding, rule in sorted(scored, key=lambda pair: costs[pair[0].id], reverse=True):
         applied = min(costs[finding.id], w.PILLAR_CAPS[rule.pillar] - used[rule.pillar])
@@ -92,6 +98,17 @@ def _apply_pillar_caps(findings: list[Finding]) -> tuple[list[DriverV2], dict[Pi
             )
         )
     return drivers, used
+
+
+def _one_delay(
+    scored: list[tuple[Finding, Rule]], costs: dict[str, int]
+) -> list[tuple[Finding, Rule]]:
+    """One lateness read two ways (revised vs promised, overdue today): count the larger."""
+    delays = [f for f, _ in scored if f.kind in DELAY_KINDS]
+    if len(delays) < 2:
+        return scored
+    largest = max(delays, key=lambda f: costs[f.id])
+    return [(f, rule) for f, rule in scored if f.kind not in DELAY_KINDS or f is largest]
 
 
 def _reason_codes(

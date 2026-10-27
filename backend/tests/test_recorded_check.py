@@ -55,8 +55,10 @@ def test_e_jagriti_stops_at_its_captcha_and_the_other_sources_are_read(tmp_path:
 
     statuses = {run["source"]: run["status"] for run in result["report"]["check"]["sources"]}
     assert statuses.pop("consumer") == "blocked"
+    # The recording holds no company page, so the group lane has nobody to look up.
+    assert statuses.pop("group") == "failed"
     assert set(statuses.values()) == {"completed"}
-    assert len(statuses) == 5
+    assert len(statuses) == 6
     assert result["events"][-1]["type"] == "check.completed"
 
 

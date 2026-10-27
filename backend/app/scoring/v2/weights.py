@@ -12,7 +12,9 @@ SCALE_FLOOR = 300
 POINTS_PER_PENALTY = 6
 # A hard stop can never leave a project looking better than the top of the High band.
 HARD_STOP_CAP = 449
-MIN_CONFIDENCE_FOR_BAND = 0.5
+# A band is shown only when the RERA record (P1) was read and at least this many of the six
+# pillars were read; otherwise the number is provisional and no band is given.
+MIN_PILLARS_FOR_BAND = 4
 
 PILLAR_WEIGHTS: dict[PillarId, float] = {
     "P1": 0.30,
@@ -51,6 +53,9 @@ QPR_MISSED_EACH = 15
 QPR_MISSED_CAP = 60
 PENALTY_ORDER_EACH = 20
 COMPLAINT_EACH = 10
+# Complaints across all of the promoter's projects. Large builders have many, so each costs little.
+PROMOTER_COMPLAINT_EACH = 1
+PROMOTER_COMPLAINT_CAP = 40
 GROUP_PROJECT_LAPSED = 40
 SISTER_COMPANY_INSOLVENT = 50
 CASE_EACH = 5

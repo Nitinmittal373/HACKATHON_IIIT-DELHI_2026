@@ -90,7 +90,8 @@ class Sentinel:
         project = self._store.get_project(rera_id)
         if project is None:
             return 0
-        started = self._orchestrator.start(project)
+        # A re-check exists to see what changed, so it must not reuse a read made earlier today.
+        started = self._orchestrator.start(project, fresh=True)
         check = await self._orchestrator.finished(started.id)
         if check.status != "completed":
             return 0

@@ -9,7 +9,6 @@ from sqlalchemy.orm import Session, sessionmaker
 from app.db import AlertRow, MonitorRow, ProjectRow, WatchRow, WebhookReceiptRow
 from app.models import DisplayScore
 from app.sentinel.models import Alert, Diff, FindingChange, Language, Watch
-from app.states.registry import state_of
 
 
 class SentinelStore:
@@ -157,7 +156,6 @@ def _watch(row: WatchRow) -> Watch:
         {
             "id": row.id,
             "rera_id": row.rera_id,
-            "state": state_of(row.rera_id),
             "email": row.email,
             "language": row.language,
             "created_at": row.created_at,
@@ -180,7 +178,6 @@ def _alert(alert: AlertRow, watch: WatchRow, project: ProjectRow) -> Alert:
         id=alert.id,
         watch_id=alert.watch_id,
         rera_id=watch.rera_id,
-        state=state_of(watch.rera_id),
         project_name=project.name,
         check_id=alert.check_id,
         created_at=alert.created_at,

@@ -111,27 +111,29 @@ class UpreraSource:
         yield ProjectDetails(with_record(project, record))
         for finding in findings_from_record(record, project.details_url, ctx.today, ctx.now):
             yield FoundFinding(finding)
+        # Reported now, before the slower summary pages, so a timeout there keeps these reads.
+        # A summary page that is itself the main record also holds the extensions.
+        read: list[CheckKey] = ["registration"]
+        if record.latest_end_date:
+            read.append("completion_date")
+        if summary_url(project.details_url):
+            read.append("extensions")
+        yield ChecksRead(tuple(read))
 
         yield Progress("Reading complaint counts on the UP-RERA summary page")
         summary, url = await self._summary(project, record, ctx.web)
         records = [record] if summary is None else [record, summary]
         for finding in delay_vs_promised_findings(records, project.details_url, ctx.today, ctx.now):
             yield FoundFinding(finding)
-        extensions_read = False
         if summary and url:
             for finding in extension_findings(summary, url, ctx.today, ctx.now):
                 yield FoundFinding(finding)
             for finding in complaint_findings(summary, url, ctx.today, ctx.now):
                 yield FoundFinding(finding)
-            extensions_read = True
+            if "extensions" not in read:
+                read.append("extensions")
         else:
             yield Progress("The UP-RERA summary page was not found, so complaints were not read")
-
-        read: list[CheckKey] = ["registration"]
-        if record.latest_end_date:
-            read.append("completion_date")
-        if extensions_read:
-            read.append("extensions")
         yield ChecksRead(tuple(read))
 
     async def _summary(

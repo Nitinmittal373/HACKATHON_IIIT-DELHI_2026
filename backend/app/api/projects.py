@@ -5,7 +5,6 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.api.deps import get_web
 from app.models import SearchResponse
-from app.states.registry import known_state
 from app.states.resolver import resolve_any
 from app.tinyfish import WebClient, WebError
 
@@ -25,22 +24,18 @@ ERROR_STATUS = {"timeout": 504, "rate_limited": 429}
     },
 )
 async def search_projects(
-    q: Annotated[str, Query(min_length=2, max_length=120, description="RERA number or name")],
+    q: Annotated[
+        str, Query(min_length=2, max_length=120, description="UP-RERA number, project or builder")
+    ],
     web: Annotated[WebClient, Depends(get_web)],
-    state: Annotated[
-        str | None,
-        Query(max_length=2, description="State code such as MH; omit to search every state"),
-    ] = None,
     locality: Annotated[
         str | None,
         Query(max_length=80, description="City or locality such as 'Sector 43 Noida'"),
     ] = None,
 ) -> SearchResponse:
-    if state is not None and not known_state(state.upper()):
-        raise HTTPException(status_code=422, detail=f"{state} is not a supported state code")
     try:
         found = await asyncio.wait_for(
-            resolve_any(q, web, state.upper() if state else None, locality), SEARCH_BUDGET_SECONDS
+            resolve_any(q, web, locality), SEARCH_BUDGET_SECONDS
         )
     except TimeoutError:
         raise search_error(WebError("The RERA portals did not answer in time", "timeout")) from None
@@ -49,9 +44,7 @@ async def search_projects(
     return SearchResponse(
         query=q,
         candidates=found.candidates,
-        detected_state=found.detected_state,
-        searched_states=found.searched_states,
-        pre_rera=found.pre_rera,
+        outside_up=found.outside_up,
         order_leads=found.order_leads,
     )
 

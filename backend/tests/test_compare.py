@@ -47,12 +47,13 @@ def test_rows_come_from_the_records_and_unread_stays_unknown(client: TestClient)
     assert first["insolvency"] == "unverified"
     assert first["company_status"] == "Active"
     assert first["unread"] == ["land_dues", "consumer_cases"]
-    # Points are on the 300-900 scale: 15 project complaints take the whole legal pillar.
-    assert [f["points"] for f in first["top_findings"]] == [-150.0, -3.0, -3.0]
+    # Points are on the 300-900 scale: 15 project complaints take the whole legal pillar,
+    # 105 months overdue costs 126 and the promoter's complaints 48.
+    assert [f["points"] for f in first["top_findings"]] == [-150.0, -126.0, -48.0]
     assert all(f["source_url"].startswith("https://") for f in first["top_findings"])
     execution = next(a for a in first["areas"] if a["area"] == "execution")
     assert (execution["lost"], execution["max"]) == (14.0, 20.0)
-    assert first["display_score"]["band"] == "Watch"
+    assert first["display_score"]["band"] == "Elevated"
     legal = next(p for p in first["pillars"] if p["id"] == "P3")
     assert (legal["lost"], legal["max"]) == (150.0, 150.0)
 

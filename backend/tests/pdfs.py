@@ -33,12 +33,12 @@ def escape(text: str) -> str:
     return text.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
 
 
-# A made-up brochure page: a MahaRERA number, a Karnataka number and the sort of personal
-# details that must never come back out of the API.
+# A made-up brochure page: a UP-RERA number, a number of another state's RERA (ignored) and
+# the sort of personal details that must never come back out of the API.
 BROCHURE = [
-    "Sunrise Heights Phase 2 - Thane West",
-    "MahaRERA Reg. No. P51900008345 | www.example.test",
+    "Sunrise Heights Phase 2 - Noida",
+    "UP-RERA Reg. No. UPRERAPRJ8334 | www.example.test",
     "Sales: Mr. Test Person 9876543210, test.person@example.test",
-    "Karnataka RERA PRM/KA/RERA/1251/446/PR/170915/000176 (sister project)",
+    "Another state's RERA P51900008345 (sister project)",
     "Buyer PAN ABCDE1234F Aadhaar 1234 5678 9012",
 ]

@@ -22,6 +22,7 @@ FIXTURES = Path(__file__).resolve().parents[2] / "frontend" / "e2e" / "fixtures"
 JSON_FIXTURES: list[tuple[str, type | TypeAdapter]] = [
     ("report.json", Report),
     ("report-flagged.json", Report),
+    ("report-unrated.json", Report),
     ("check-created.json", Check),
     ("check-done.json", Check),
     ("summary-6742.json", CheckSummary),
