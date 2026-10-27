@@ -28,6 +28,7 @@ const PAGES = [
   { name: "report-unrated", path: `/report/${"a1".repeat(16)}` },
   { name: "compare", path: `/compare?ids=${ECO},${AVENUE}` },
   { name: "alerts", path: "/alerts?email=buyer%40example.com" },
+  { name: "login", path: "/login" },
   { name: "my-reports", path: "/reports", saved: [ECO, AVENUE] },
 ];
 

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added (sign-in)
+
+- **Sign in with Google (optional).** Auth.js with the Google provider, a `/login` page in English and Hindi, a Sign in button next to My reports (the Google avatar with My reports and Sign out once signed in) and a small link under the landing page's search box. Reports are saved per account: the site mints a ten-minute HS256 token with `AUTH_BRIDGE_SECRET`, and the API adds `GET`, `POST` and `DELETE /api/me/reports` (rate limited, stored in Postgres or SQLite as `user_reports`). The checks kept in this browser move into the account on first sign-in, and Alerts starts with the account's e-mail. Search, checks, reports and sharing never need an account. New dependency: `next-auth` 4.24.15.
+
 ### Changed
 
 - **Uttar Pradesh only.** NeevCheck now covers UP-RERA and nothing else, instead of thin, search-only coverage of 23 states. The other states' adapters, `GET /api/states`, the `state` fields on every model, the state picker, state badges, the coverage page and the pre-RERA notes are gone. A number of another state's RERA, or a project in a city outside Uttar Pradesh, is answered once, calmly: "NeevCheck covers Uttar Pradesh RERA projects for now. Check this project on its own state's RERA website." (`outside_up` on search results.) The search box takes "UP-RERA number, project or builder", and all copy, meta tags and the Hindi translation say UP-RERA. `docs/states.md` and `docs/find-any-project.md` are deleted.

@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import type { ReactNode } from "react";
 
+import { AccountProvider } from "@/lib/account";
+import { authConfigured } from "@/lib/authOptions";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { getLang } from "@/lib/i18n/server";
@@ -53,8 +55,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       <body>
         <LangProvider initial={lang}>
           <MetaProvider meta={meta}>
-            <Header />
-            {children}
+            <AccountProvider enabled={authConfigured()}>
+              <Header />
+              {children}
+            </AccountProvider>
             <Footer />
           </MetaProvider>
         </LangProvider>

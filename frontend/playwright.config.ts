@@ -30,7 +30,15 @@ export default defineConfig({
     {
       command: `npm run build && npx next start -p ${APP_PORT}`,
       url: `http://localhost:${APP_PORT}`,
-      env: { NEXT_PUBLIC_API_URL: `http://localhost:${API_PORT}` },
+      env: {
+        NEXT_PUBLIC_API_URL: `http://localhost:${API_PORT}`,
+        // Dummy Google settings turn the sign-in path on; nothing here ever reaches Google.
+        AUTH_SECRET: "e2e-only-secret-not-used-anywhere-else",
+        AUTH_GOOGLE_ID: "e2e-client-id",
+        AUTH_GOOGLE_SECRET: "e2e-client-secret",
+        AUTH_BRIDGE_SECRET: "e2e-bridge-secret",
+        NEXTAUTH_URL: `http://localhost:${APP_PORT}`,
+      },
       timeout: 240_000,
       reuseExistingServer: !CI,
     },

@@ -11,12 +11,20 @@ const history = idStore("neevcheck-reports", 50);
 const tray = idStore("neevcheck-compare", 3);
 
 export const rememberCheck = history.add;
+export const readLocalHistory = history.read;
 export const forgetChecks = history.remove;
 export const useHistory = history.useIds;
 
 export const addToCompare = tray.add;
 export const removeFromCompare = tray.remove;
 export const useCompareTray = tray.useIds;
+
+// Set while someone is signed in: a new check is then saved to their account too.
+let accountSaver: ((id: string) => Promise<void>) | null = null;
+
+export function setAccountSaver(saver: ((id: string) => Promise<void>) | null) {
+  accountSaver = saver;
+}
 
 /** Starts a live check (or reuses one from the last day) and adds it to "My reports". */
 export async function startCheck(
@@ -25,5 +33,7 @@ export async function startCheck(
 ): Promise<Check> {
   const check = await createCheck(project, options);
   rememberCheck(check.id);
+  // A failure here only means the report stays in this browser until the next sign-in sync.
+  void accountSaver?.(check.id).catch(() => undefined);
   return check;
 }

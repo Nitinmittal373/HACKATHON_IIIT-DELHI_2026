@@ -10,3 +10,10 @@
   font-size: 19px;
   letter-spacing: -0.03em;
 }
+
+/* On a phone the mark alone is the home link, so the header fits Sign in and My reports. */
+@media (max-width: 520px) {
+  .name {
+    display: none;
+  }
+}

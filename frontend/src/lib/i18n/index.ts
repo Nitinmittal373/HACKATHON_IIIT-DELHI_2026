@@ -1,3 +1,4 @@
+import { account as accountEn } from "@/lib/i18n/en/account";
 import { app as appEn } from "@/lib/i18n/en/app";
 import { home as homeEn } from "@/lib/i18n/en/home";
 import { insights as insightsEn } from "@/lib/i18n/en/insights";
@@ -12,6 +13,7 @@ import { report as reportEn } from "@/lib/i18n/en/report";
 import { reports as reportsEn } from "@/lib/i18n/en/reports";
 import { score as scoreEn } from "@/lib/i18n/en/score";
 import { alerts as alertsEn, sentinel as sentinelEn } from "@/lib/i18n/en/sentinel";
+import { account as accountHi } from "@/lib/i18n/hi/account";
 import { app as appHi } from "@/lib/i18n/hi/app";
 import { home as homeHi } from "@/lib/i18n/hi/home";
 import { insights as insightsHi } from "@/lib/i18n/hi/insights";
@@ -32,6 +34,7 @@ export type Lang = "en" | "hi";
 const en = {
   ...appEn,
   ...checkEn,
+  account: accountEn,
   home: homeEn,
   credit: creditEn,
   complaint: complaintEn,
@@ -53,6 +56,7 @@ export type Strings = typeof en;
 const hi: Strings = {
   ...appHi,
   ...checkHi,
+  account: accountHi,
   home: homeHi,
   credit: creditHi,
   complaint: complaintHi,

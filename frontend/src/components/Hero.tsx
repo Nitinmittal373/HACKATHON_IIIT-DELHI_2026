@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { SignInHint } from "@/components/SignInHint";
 import { Glow } from "@/components/Glow";
 import { MoreWays } from "@/components/find/MoreWays";
 import { ReportStage } from "@/components/ReportStage";
@@ -58,6 +59,8 @@ export function Hero() {
             submitLabel={t.hero.submit}
           />
         </div>
+
+        <SignInHint className={styles.fadeUp} />
 
         <div className={styles.fadeUp} style={{ animationDelay: "0.55s" }}>
           <MoreWays />
