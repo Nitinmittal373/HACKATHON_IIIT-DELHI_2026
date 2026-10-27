@@ -19,3 +19,13 @@
 .note {
   font-size: 12px;
 }
+
+.link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.link:hover {
+  color: var(--oD);
+}

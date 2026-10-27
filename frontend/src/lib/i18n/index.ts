@@ -9,6 +9,7 @@ import { legal as legalEn } from "@/lib/i18n/en/legal";
 import { family as familyEn } from "@/lib/i18n/en/family";
 import { find as findEn } from "@/lib/i18n/en/find";
 import { compare as compareEn } from "@/lib/i18n/en/compare";
+import { privacy as privacyEn } from "@/lib/i18n/en/privacy";
 import { report as reportEn } from "@/lib/i18n/en/report";
 import { reports as reportsEn } from "@/lib/i18n/en/reports";
 import { score as scoreEn } from "@/lib/i18n/en/score";
@@ -24,6 +25,7 @@ import { legal as legalHi } from "@/lib/i18n/hi/legal";
 import { family as familyHi } from "@/lib/i18n/hi/family";
 import { find as findHi } from "@/lib/i18n/hi/find";
 import { compare as compareHi } from "@/lib/i18n/hi/compare";
+import { privacy as privacyHi } from "@/lib/i18n/hi/privacy";
 import { report as reportHi } from "@/lib/i18n/hi/report";
 import { reports as reportsHi } from "@/lib/i18n/hi/reports";
 import { score as scoreHi } from "@/lib/i18n/hi/score";
@@ -41,6 +43,7 @@ const en = {
   family: familyEn,
   find: findEn,
   legal: legalEn,
+  privacy: privacyEn,
   report: reportEn,
   reports: reportsEn,
   score: scoreEn,
@@ -63,6 +66,7 @@ const hi: Strings = {
   family: familyHi,
   find: findHi,
   legal: legalHi,
+  privacy: privacyHi,
   report: reportHi,
   reports: reportsHi,
   score: scoreHi,

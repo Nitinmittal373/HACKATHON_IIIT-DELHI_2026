@@ -1,0 +1,39 @@
+.page {
+  max-width: 720px;
+}
+
+.updated {
+  margin: 8px 0 0;
+  color: var(--fa);
+  font-size: 13px;
+}
+
+.section {
+  margin-top: 28px;
+  padding: 22px 24px;
+  border: 1px solid var(--ln);
+  border-radius: var(--r-md, 16px);
+  background: #fff;
+}
+
+.heading {
+  margin: 0 0 10px;
+  font: 600 20px/1.25 var(--font-sans);
+  letter-spacing: -0.035em;
+}
+
+.section ul {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+  color: var(--ink2);
+  line-height: 1.55;
+}
+
+.section a {
+  color: var(--ink);
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}

@@ -264,6 +264,11 @@ export function saveAccountReports(token: string, ids: string[]): Promise<CheckS
   return request<CheckSummary[]>("/api/me/reports", { method: "POST", body: { ids }, token });
 }
 
+/** Deletes the account and its saved reports. */
+export function deleteAccount(token: string): Promise<void> {
+  return request<void>("/api/me", { method: "DELETE", token });
+}
+
 export function forgetAccountReport(token: string, id: string): Promise<void> {
   return request<void>(`/api/me/reports/${id}`, { method: "DELETE", token });
 }
