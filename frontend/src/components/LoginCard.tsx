@@ -43,7 +43,10 @@ export function LoginCard({ enabled }: { enabled: boolean }) {
       )}
 
       <p className={styles.note}>{copy.notNeeded}</p>
-      <p className={styles.privacy}>{copy.privacy}</p>
+      <p className={styles.privacy}>
+        {copy.privacy}{" "}
+        <Link href="/privacy">{t.privacy.loginLink}</Link>
+      </p>
     </section>
   );
 }

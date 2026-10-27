@@ -3,6 +3,10 @@ import type { account as en } from "@/lib/i18n/en/account";
 export const account: typeof en = {
   signIn: "साइन इन",
   signOut: "साइन आउट",
+  deleteData: "मेरा डेटा हटाएँ",
+  deleteConfirm:
+    "अपना खाता और सहेजी हुई रिपोर्टें हटाएँ? यह वापस नहीं हो सकता। जाँचें सार्वजनिक रिकॉर्ड हैं, वे बनी रहेंगी।",
+  deleteFailed: "हम आपका डेटा नहीं हटा सके। फिर कोशिश करें, या हमें ईमेल करें।",
   menuLabel: "आपका खाता",
   avatarAlt: (name: string) => `${name}, साइन इन`,
   heroLink: "रिपोर्ट सहेजने और अलर्ट पाने के लिए साइन इन करें",

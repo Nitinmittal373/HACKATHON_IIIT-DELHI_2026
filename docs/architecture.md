@@ -317,8 +317,9 @@ The API never talks to Google. After sign-in the browser asks the site for a tok
 | `GET /api/me/reports` | The account's saved checks, newest first |
 | `POST /api/me/reports` `{ids}` | Saves check ids (first is newest) and returns the list; ids the server has no check for are ignored |
 | `DELETE /api/me/reports/{id}` | Forgets one |
+| `DELETE /api/me` | Deletes the account: every saved report row for the Google id. The checks stay, since they are public records |
 
-They are limited to 30 requests a minute per address and answer 503 when `AUTH_BRIDGE_SECRET` is not set. Saved reports are rows of (Google id, check id, time) in `user_reports`; the account itself is stored nowhere on our side beyond that. On the first sign-in, the checks kept in this browser are moved into the account and removed from the browser; while signed in, new checks are saved to the account, and Alerts starts with the account's e-mail.
+They are limited to 30 requests a minute per address and answer 503 when `AUTH_BRIDGE_SECRET` is not set. Saved reports are rows of (Google id, check id, time) in `user_reports`; the account itself is stored nowhere on our side beyond that. The avatar menu's **Delete my data** calls `DELETE /api/me` and then signs out; `/privacy` (English and Hindi, linked from the footer and `/login`) says what is kept. On the first sign-in, the checks kept in this browser are moved into the account and removed from the browser; while signed in, new checks are saved to the account, and Alerts starts with the account's e-mail.
 
 ## Compare
 

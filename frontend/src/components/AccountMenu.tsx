@@ -4,6 +4,7 @@ import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
+import { deleteMyData } from "@/lib/accountReports";
 import { useAccount } from "@/lib/account";
 import { useLang } from "@/lib/LangProvider";
 import styles from "./AccountMenu.module.css";
@@ -13,6 +14,7 @@ export function AccountMenu() {
   const account = useAccount();
   const { t } = useLang();
   const [open, setOpen] = useState(false);
+  const [failed, setFailed] = useState(false);
   const box = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,6 +30,18 @@ export function AccountMenu() {
       document.removeEventListener("keydown", escape);
     };
   }, [open]);
+
+  async function deleteData() {
+    if (!window.confirm(t.account.deleteConfirm)) return;
+    setFailed(false);
+    try {
+      await deleteMyData();
+    } catch {
+      setFailed(true);
+      return;
+    }
+    await signOut({ callbackUrl: "/" });
+  }
 
   if (account.status !== "in") {
     return (
@@ -65,6 +79,14 @@ export function AccountMenu() {
           <button type="button" role="menuitem" onClick={() => void signOut({ callbackUrl: "/" })}>
             {t.account.signOut}
           </button>
+          <button type="button" role="menuitem" onClick={() => void deleteData()}>
+            {t.account.deleteData}
+          </button>
+          {failed && (
+            <p className={styles.who} role="alert">
+              {t.account.deleteFailed}
+            </p>
+          )}
         </div>
       )}
     </div>

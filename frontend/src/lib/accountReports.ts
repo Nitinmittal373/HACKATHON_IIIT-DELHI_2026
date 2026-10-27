@@ -1,6 +1,6 @@
 "use client";
 
-import { forgetAccountReport, listAccountReports, saveAccountReports } from "@/lib/api";
+import { deleteAccount, forgetAccountReport, listAccountReports, saveAccountReports } from "@/lib/api";
 import { forgetChecks, setAccountSaver, readLocalHistory } from "@/lib/history";
 
 const TOKEN_REFRESH_MS = 9 * 60_000;
@@ -26,6 +26,11 @@ export async function saveToAccount(ids: string[]) {
 
 export async function forgetFromAccount(id: string) {
   return forgetAccountReport(await bridgeToken(), id);
+}
+
+export async function deleteMyData() {
+  await deleteAccount(await bridgeToken());
+  cached = null;
 }
 
 /**
