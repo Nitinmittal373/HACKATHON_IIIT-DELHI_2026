@@ -4,6 +4,8 @@ NeevCheck is two services: the **API** (FastAPI) on Render and the **web app** (
 
 You need: a GitHub account with this repository, a [Render](https://render.com) account, a [Vercel](https://vercel.com) account and your TinyFish API key (<https://agent.tinyfish.ai/api-keys>). Keep the key to yourself: it only ever goes into the Render dashboard.
 
+NeevCheck covers Uttar Pradesh RERA projects. Nothing here selects a state or a set of sources: every deployment reads UP-RERA, the company registry, group companies, lender notices, insolvency, land dues, consumer cases and news.
+
 Make one long random string for the webhook secret first, for example:
 
 ```bash
