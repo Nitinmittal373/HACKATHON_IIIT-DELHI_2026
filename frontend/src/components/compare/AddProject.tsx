@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useId, useState } from "react";
 
+import { useAccount } from "@/lib/account";
+import { accountReports } from "@/lib/accountReports";
 import { listChecks } from "@/lib/api";
 import { useHistory } from "@/lib/history";
 import { useLang } from "@/lib/LangProvider";
@@ -15,26 +17,33 @@ interface Props {
   onAdd: (checkId: string) => void;
 }
 
-/** Adds a finished check from My reports, or points to a new search. */
+/**
+ * Adds a finished check from My reports, or points to a new search. Signed in, the choices are
+ * the account's reports; signed out, the ones kept in this browser. Never both.
+ */
 export function AddProject({ current, onAdd }: Props) {
   const { t } = useLang();
+  const account = useAccount();
   const selectId = useId();
   const history = useHistory();
   const [finished, setFinished] = useState<CheckSummary[]>([]);
   const [choice, setChoice] = useState("");
+  const accountId = account.status === "in" ? account.user.id : null;
   const key = history?.join(",") ?? "";
+  const waiting = account.status === "loading";
 
   useEffect(() => {
-    if (!key) return;
+    if (waiting || (!accountId && !key)) return;
     let cancelled = false;
-    listChecks(key.split(",")).then(
+    const reports = accountId ? accountReports() : listChecks(key.split(","));
+    reports.then(
       (checks) => !cancelled && setFinished(checks.filter((check) => check.status === "completed")),
       () => undefined,
     );
     return () => {
       cancelled = true;
     };
-  }, [key]);
+  }, [key, accountId, waiting]);
 
   const offered = finished.filter((check) => !current.includes(check.id));
 

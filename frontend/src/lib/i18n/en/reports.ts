@@ -1,6 +1,6 @@
 export const reports = {
   title: "My reports",
-  lead: "Checks you started on this device. They are kept in this browser only: there are no accounts.",
+  lead: "Checks you started in this browser without signing in. They stay here. Sign in to keep your reports with your account.",
   loading: "Loading your reports…",
   emptyTitle: "No reports yet",
   emptyBody: "Search a project to run your first live check. Every check you start is listed here.",

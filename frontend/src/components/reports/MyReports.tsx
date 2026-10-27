@@ -24,6 +24,8 @@ const MAX_COMPARED = 3;
 /** Signed in: the account's saved reports. Otherwise the checks kept in this browser. */
 export function MyReports() {
   const account = useAccount();
+  // Until the session is known, show nothing from this browser: it may belong to no one signed in.
+  if (account.status === "loading") return <Skeleton height={128} style={{ marginTop: 28 }} />;
   return account.status === "in" ? <AccountReports /> : <BrowserReports />;
 }
 

@@ -3,7 +3,7 @@ export const home = {
   report: {
     ariaLabel: (name: string, score: string) => `Latest NeevCheck report: ${name}, ${score}`,
     kicker: (date: string) => `LATEST REPORT · READ ${date}`,
-    latestNote: (date: string) => `The most recent real check on NeevCheck, read live on ${date}.`,
+    latestNote: (date: string) => `Your most recent check, read live on ${date}.`,
     open: "Open this report",
     registered: (date: string) => `registered ${date}`,
     sources: (count: number) => `read ${count} ${count === 1 ? "source" : "sources"}`,
@@ -12,11 +12,14 @@ export const home = {
     skeletonKicker: "NEEVCHECK REPORT",
     skeletonTitle: "Your report appears here",
     skeletonBody: "Search a project above. Every point on your report links to the record it came from.",
-    skeletonNote: "No check has finished on NeevCheck yet. Yours can be the first.",
+    skeletonNote: "You have no finished check yet. Search a project above to run your first.",
   },
   recent: {
-    title: "Recently checked on NeevCheck",
-    lead: "Real checks run by other buyers. Each one opens its full report, with every source.",
+    // Only the visitor's own checks are ever listed: nobody sees another person's.
+    accountTitle: "Your recent checks",
+    accountLead: "The last checks saved to your account. Only you see this list. Each one opens its full report, with every source.",
+    browserTitle: "Checked in this browser",
+    browserLead: "Checks you started here without signing in. They stay in this browser. Sign in to keep them with your account.",
     item: (name: string, score: number | null, band: string, date: string) =>
       score === null
         ? `${name}: not enough evidence yet, checked ${date}`
@@ -56,9 +59,9 @@ export const home = {
     lead: (max: number) =>
       `Everyone starts at ${max}. Points come off only for records we find. A source we cannot read lowers confidence, never adds points.`,
     caption: (name: string) =>
-      `Marker: ${name}, the latest real check on NeevCheck. With fewer than half the record types read, the score is shown without a band.`,
+      `Marker: ${name}, your latest check. With fewer than half the record types read, the score is shown without a band.`,
     captionEmpty:
-      "No check has finished on NeevCheck yet, so there is no marker. With fewer than half the record types read, a score is shown without a band.",
+      "You have no finished check yet, so there is no marker. With fewer than half the record types read, a score is shown without a band.",
     weightsLabel: "How the six pillars are weighted",
   },
   sentinel: {

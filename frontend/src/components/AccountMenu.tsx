@@ -4,6 +4,7 @@ import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
+import { clearAccountData } from "@/lib/accountData";
 import { deleteMyData } from "@/lib/accountReports";
 import { useAccount } from "@/lib/account";
 import { useLang } from "@/lib/LangProvider";
@@ -40,6 +41,12 @@ export function AccountMenu() {
       setFailed(true);
       return;
     }
+    await leave();
+  }
+
+  /** Clears this browser of the account, then signs out; the redirect reloads the whole page. */
+  async function leave() {
+    clearAccountData();
     await signOut({ callbackUrl: "/" });
   }
 
@@ -76,7 +83,7 @@ export function AccountMenu() {
           <Link href="/reports" role="menuitem" onClick={() => setOpen(false)}>
             {t.nav.reports}
           </Link>
-          <button type="button" role="menuitem" onClick={() => void signOut({ callbackUrl: "/" })}>
+          <button type="button" role="menuitem" onClick={() => void leave()}>
             {t.account.signOut}
           </button>
           <button type="button" role="menuitem" onClick={() => void deleteData()}>
