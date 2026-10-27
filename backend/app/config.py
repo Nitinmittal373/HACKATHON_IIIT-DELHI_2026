@@ -33,6 +33,9 @@ class Settings(BaseSettings):
     # external cron can still call POST /api/sentinel/run).
     sentinel_interval_hours: float = Field(default=168, ge=0)
     webhook_secret: SecretStr | None = None
+    # Shared with the web app, which signs the short-lived sign-in token; without it the
+    # account routes answer 503 and everything else works as before.
+    auth_bridge_secret: SecretStr | None = None
     # This API's public address. With it and WEBHOOK_SECRET, watching a project also creates
     # TinyFish monitors that call back here; without it Sentinel keeps its own schedule.
     public_base_url: str | None = None
@@ -45,6 +48,7 @@ class Settings(BaseSettings):
 
     @field_validator(
         "webhook_secret",
+        "auth_bridge_secret",
         "public_base_url",
         "smtp_host",
         "smtp_user",
