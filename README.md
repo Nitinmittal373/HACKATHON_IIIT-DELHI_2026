@@ -106,7 +106,7 @@ NeevCheck covers **Uttar Pradesh RERA projects** (numbers like `UPRERAPRJ8334`).
 | ✅ | **Buyer action plan and questions** | Four things to check before paying more, and five questions for the builder, ready to copy |
 | ✉️ | **Complaint draft** | An editable complaint built from facts only, with numbered annexures, in English or Hindi. *Draft for you to review. Not legal advice.* |
 | 🔔 | **Neev Sentinel** | Weekly re-checks and TinyFish Monitors on the project's page; an alert only when a record changes |
-| 🗃️ | **My reports** | Every check is kept in your browser, with no account |
+| 🗃️ | **My reports** | Every check is kept in your browser, or in your account if you sign in. Nobody sees anyone else's checks |
 | 🌐 | **English and हिंदी** | Plain-language reports for every family member |
 
 <div align="center">
