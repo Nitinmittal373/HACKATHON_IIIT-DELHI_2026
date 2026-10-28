@@ -246,6 +246,11 @@ export function removeWatch(token: string, watchId: string): Promise<void> {
   return request<void>(`/api/sentinel/${watchId}`, { method: "DELETE", token });
 }
 
+/** The projects the signed-in account watches. */
+export function getWatches(token: string): Promise<Watch[]> {
+  return request<Watch[]>("/api/sentinel/watches", { token, timeoutMs: WAKE_TIMEOUT_MS });
+}
+
 /** The signed-in account's alerts, newest first. */
 export function getAlerts(token: string): Promise<Alert[]> {
   return request<Alert[]>("/api/sentinel/alerts", { token, timeoutMs: WAKE_TIMEOUT_MS });

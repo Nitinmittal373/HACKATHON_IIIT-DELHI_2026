@@ -8,7 +8,8 @@ export const privacy = {
   title: "Privacy",
   updated: (date: string) => `Last updated ${date}`,
   lead: "NeevCheck reads public records. We keep very little about you, and this page says exactly what.",
-  sections: [
+  // `email` is whether this service emails alerts; when it does not, the page must not say so.
+  sections: (email: boolean): { title: string; points: string[] }[] => [
     {
       title: "If you sign in with Google",
       points: [
@@ -34,12 +35,18 @@ export const privacy = {
     },
     {
       title: "Alerts",
-      points: [
-        "Watching a project needs you to be signed in. Alerts go to your Google account email, never to an address typed in by someone else.",
-        "We use it only to send alerts about the projects you watch, and for nothing else.",
-        "Only your account can see and stop your watches and alerts.",
-        "Every alert email has a link to stop it, and you can stop watching a project at any time.",
-      ],
+      points: email
+        ? [
+            "Watching a project needs you to be signed in. Alerts appear on your Alerts page, and we also email them to your Google account email, never to an address typed in by someone else.",
+            "We use it only to send alerts about the projects you watch, and for nothing else.",
+            "Only your account can see and stop your watches and alerts.",
+            "Every alert email has a link to stop it, and you can stop watching a project at any time.",
+          ]
+        : [
+            "Watching a project needs you to be signed in. Alerts appear on your Alerts page. We do not send email.",
+            "Only your account can see and stop your watches and alerts.",
+            "You can stop watching a project at any time, from the Alerts page.",
+          ],
     },
     {
       title: "Search limits",

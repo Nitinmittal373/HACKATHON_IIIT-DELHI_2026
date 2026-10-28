@@ -5,6 +5,7 @@ import {
   deleteAccount,
   forgetAccountReport,
   getAlerts,
+  getWatches,
   listAccountReports,
   removeWatch,
   saveAccountReports,
@@ -26,6 +27,10 @@ export async function forgetFromAccount(id: string) {
 
 export async function myAlerts() {
   return getAlerts(await bridgeToken());
+}
+
+export async function myWatches() {
+  return getWatches(await bridgeToken());
 }
 
 export async function watchProject(project: Parameters<typeof createWatch>[1], language: "en" | "hi") {

@@ -9,6 +9,7 @@ import { useAccount } from "@/lib/account";
 import { watchProject } from "@/lib/accountReports";
 import { ApiError } from "@/lib/api";
 import { useLang } from "@/lib/LangProvider";
+import { useMeta } from "@/lib/MetaProvider";
 import type { Project } from "@/lib/types";
 import styles from "./WatchDialog.module.css";
 
@@ -16,13 +17,16 @@ interface Props {
   project: Pick<Project, "rera_id" | "details_url">;
   open: boolean;
   onClose: () => void;
+  /** Called once the watch is saved, so the page can say it is being watched. */
+  onWatched?: () => void;
 }
 
 type Phase = "form" | "saving" | "done";
 
 /** Language, then "Watching this project". Needs a signed-in account: the alert goes to its email. */
-export function WatchDialog({ project, open, onClose }: Props) {
+export function WatchDialog({ project, open, onClose, onWatched }: Props) {
   const { lang, t } = useLang();
+  const emailAlerts = useMeta().email_alerts;
   const account = useAccount();
   const pathname = usePathname();
   const dialog = useRef<HTMLDialogElement>(null);
@@ -46,6 +50,7 @@ export function WatchDialog({ project, open, onClose }: Props) {
     try {
       await watchProject(project, language);
       setPhase("done");
+      onWatched?.();
     } catch (error) {
       setProblem(messageFor(error, t.sentinel));
       setPhase("form");
@@ -59,7 +64,7 @@ export function WatchDialog({ project, open, onClose }: Props) {
           <h2 id={`${titleId}-title`} className={styles.title}>
             {t.sentinel.doneTitle}
           </h2>
-          <p className={styles.lead}>{t.sentinel.doneBody}</p>
+          <p className={styles.lead}>{emailAlerts ? t.sentinel.doneBodyEmail : t.sentinel.doneBody}</p>
           <div className={styles.actions}>
             <Link href="/alerts" className="btn">
               {t.sentinel.seeAlerts}
@@ -74,8 +79,8 @@ export function WatchDialog({ project, open, onClose }: Props) {
           <h2 id={`${titleId}-title`} className={styles.title}>
             {t.sentinel.title}
           </h2>
-          <p className={styles.lead}>{t.sentinel.lead}</p>
-          <p className={styles.lead}>{t.sentinel.sentTo(account.user.email ?? "")}</p>
+          <p className={styles.lead}>{emailAlerts ? t.sentinel.lead : t.sentinel.leadInApp}</p>
+          {emailAlerts && <p className={styles.lead}>{t.sentinel.sentTo(account.user.email ?? "")}</p>}
           <label htmlFor={languageId} className={styles.label}>
             {t.sentinel.language}
           </label>
@@ -83,7 +88,7 @@ export function WatchDialog({ project, open, onClose }: Props) {
             <option value="en">{t.sentinel.english}</option>
             <option value="hi">{t.sentinel.hindi}</option>
           </select>
-          <p className={styles.consent}>{t.legal.consent}</p>
+          <p className={styles.consent}>{emailAlerts ? t.legal.consent : t.legal.consentInApp}</p>
           {problem && (
             <p className={styles.problem} role="alert">
               {problem}

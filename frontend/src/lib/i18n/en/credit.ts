@@ -44,7 +44,8 @@ export const credit = {
   r12Note: "Not read, so not scored. It only lowers confidence.",
   methodTitle: "How this score is made",
   methodBody: (max: number) =>
-    `NeevScore starts at ${max} and loses points only for records we found, in six weighted pillars. A record we could not read never adds points; it only lowers confidence. The full method is in docs/scoring.md in the project repository.`,
+    `NeevScore starts at ${max} and loses points only for records we found, in six weighted pillars. A record we could not read never adds points; it only lowers confidence.`,
+  methodDoc: { before: "The full method is in ", link: "docs/scoring.md", after: " in the project repository." },
   classicLine: (value: number) =>
     `Classic score (0–100): ${value}. The first version of the score, kept for transparency; NeevScore above is the score to use.`,
   provisionalLine: (value: number, max: number, read: number, total: number) =>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { formatDay } from "@/lib/format";
 import { getStrings } from "@/lib/i18n/server";
+import { loadMeta } from "@/lib/meta";
 import { PRIVACY_EMAIL, PRIVACY_UPDATED } from "@/lib/i18n/en/privacy";
 import styles from "./privacy.module.css";
 
@@ -10,6 +11,7 @@ export const metadata: Metadata = { title: "Privacy · NeevCheck" };
 /** What is kept about a visitor, in plain words. Read in the visitor's language. */
 export default async function PrivacyPage() {
   const { t, lang } = await getStrings();
+  const meta = await loadMeta();
   const copy = t.privacy;
 
   return (
@@ -18,7 +20,7 @@ export default async function PrivacyPage() {
       <p className={styles.updated}>{copy.updated(formatDay(PRIVACY_UPDATED, lang))}</p>
       <p className="pageLead">{copy.lead}</p>
 
-      {copy.sections.map((section) => (
+      {copy.sections(meta.email_alerts).map((section) => (
         <section key={section.title} className={styles.section}>
           <h2 className={styles.heading}>{section.title}</h2>
           <ul>

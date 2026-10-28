@@ -21,6 +21,13 @@ test("the privacy page says what is kept, in English", async ({ page }) => {
   expect(result.violations.map((v) => v.id)).toEqual([]);
 });
 
+test("the privacy page says alerts appear in the app and promises no email while mail is off", async ({ page }) => {
+  await page.goto("/privacy");
+  await expect(page.getByText(/Alerts appear on your Alerts page/).first()).toBeVisible();
+  await expect(page.getByText("We do not send email.")).toBeVisible();
+  await expect(page.getByText(/alert email/i)).toHaveCount(0);
+});
+
 test("the privacy page is in Hindi too", async ({ page }) => {
   await page.context().addCookies([{ name: "neevcheck-lang", value: "hi", url: "http://localhost:3010" }]);
   await page.goto("/privacy");

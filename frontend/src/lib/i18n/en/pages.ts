@@ -113,7 +113,7 @@ export const pages = {
     title: "For RWAs and residents' groups",
     lead: "A residents' group can watch the project it lives in or is waiting on, and hear about it when a public record changes.",
     stepsTitle: "How watching works",
-    steps: [
+    steps: (email: boolean): { title: string; body: string }[] => [
       { title: "Open the report", body: "Search the project and open its report." },
       {
         title: "Watch it",
@@ -123,10 +123,15 @@ export const pages = {
         title: "We re-check every week",
         body: "Sentinel reads the records again each week and tells you only when something changed, in English or Hindi.",
       },
-      {
-        title: "Alerts have a stop link",
-        body: "Each alert email ends with a link that stops that watch. You can also stop it on the Alerts page.",
-      },
+      email
+        ? {
+            title: "Alerts have a stop link",
+            body: "Alerts appear on your Alerts page and are emailed too. Each email ends with a link that stops that watch.",
+          }
+        : {
+            title: "Alerts appear on your Alerts page",
+            body: "Alerts appear on your Alerts page. You can stop watching a project there at any time.",
+          },
     ],
     budgetNote:
       "A re-check is a live check. When the site's live-check budget for the day is used up, Sentinel waits for the next day.",
