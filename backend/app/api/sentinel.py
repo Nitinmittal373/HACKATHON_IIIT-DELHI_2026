@@ -186,6 +186,15 @@ async def unsubscribe(
     return Response(status_code=204)
 
 
+@router.get("/api/sentinel/watches", dependencies=[Depends(account_rate_limit)])
+def list_watches(
+    user: User, watches: Annotated[SentinelStore, Depends(get_sentinel_store)]
+) -> list[Watch]:
+    """The projects the signed-in account watches, so a report can say whether this one is."""
+    watches.adopt_unowned(user.sub, user.email.lower())
+    return watches.watches_of(user.sub)
+
+
 @router.get("/api/sentinel/alerts", dependencies=[Depends(account_rate_limit)])
 def list_alerts(
     user: User,

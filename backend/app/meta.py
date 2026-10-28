@@ -1,6 +1,7 @@
 """What the app needs to draw the score: the scale, the band edges and the pillars.
 
 The numbers come from the scoring constants, so the frontend never keeps its own copy.
+It also says whether alert email is set up, the one thing here that depends on settings.
 """
 
 from typing import Literal
@@ -41,9 +42,11 @@ class Meta(ApiModel):
     pillars: list[PillarWeight]
     reason_codes: list[ReasonCodeId]
     score_version: ScoreVersion
+    # Whether alerts are also emailed; without it the pages must not promise email.
+    email_alerts: bool
 
 
-def build_meta() -> Meta:
+def build_meta(email_alerts: bool = False) -> Meta:
     bands: list[BandRange] = []
     top = w.SCALE_TOP
     for floor, key in w.BANDS:
@@ -57,4 +60,5 @@ def build_meta() -> Meta:
         pillars=[PillarWeight(id=id_, weight=weight) for id_, weight in w.PILLAR_WEIGHTS.items()],
         reason_codes=[ReasonCodeId(code=code) for code in codes],
         score_version="v2",
+        email_alerts=email_alerts,
     )

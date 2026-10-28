@@ -594,3 +594,16 @@ def test_a_database_from_before_accounts_gets_the_owner_column(tmp_path: Path) -
     assert "user_id" in {column["name"] for column in inspect(engine).get_columns("watches")}
     with engine.connect() as connection:
         assert connection.execute(text("SELECT user_id FROM watches")).scalar() is None
+
+
+def test_an_account_lists_only_the_projects_it_watches(tmp_path: Path) -> None:
+    with build_client(tmp_path) as client:
+        assert client.get("/api/sentinel/watches").json() == []
+        watch(client)
+        watch(client, rera_id="UPRERAPRJ1001", **OTHER)
+
+        [mine] = client.get("/api/sentinel/watches").json()
+        assert mine["rera_id"] == "UPRERAPRJ8334"
+        [theirs] = client.get("/api/sentinel/watches", headers=OTHER).json()
+        assert theirs["rera_id"] == "UPRERAPRJ1001"
+        assert client.get("/api/sentinel/watches", headers=NOBODY).status_code == 401

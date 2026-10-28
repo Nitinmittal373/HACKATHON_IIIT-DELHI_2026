@@ -13,7 +13,7 @@ from app.orchestrator import Orchestrator
 from app.sentinel.diff import diff_findings
 from app.sentinel.models import Watch
 from app.sentinel.monitors import MonitorError, MonitorGateway
-from app.sentinel.notify import send_alert, smtp_configured, stop_link
+from app.sentinel.notify import email_configured, send_alert, stop_link
 from app.sentinel.store import SentinelStore
 from app.store import Store
 
@@ -191,7 +191,7 @@ class Sentinel:
 
     async def _deliver(self, watch: Watch, alert_id: str) -> None:
         alert = self._watches.get_alert(alert_id)
-        if alert is None or not smtp_configured(self._settings):
+        if alert is None or not email_configured(self._settings):
             return
         token = self._watches.new_unsubscribe_token(watch.id, self._clock())
         stop_url = stop_link(self._settings, token)
