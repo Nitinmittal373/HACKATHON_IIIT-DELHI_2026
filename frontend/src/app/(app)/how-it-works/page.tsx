@@ -12,8 +12,9 @@ import { SOURCE_INFO } from "@/lib/sources";
 import type { SourceName } from "@/lib/types";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getStrings();
-  return { title: t.pages.how.metaTitle, description: t.pages.how.metaDescription };
+  const [{ t }, meta] = await Promise.all([getStrings(), loadMeta()]);
+  const { min, max } = meta.scale;
+  return { title: t.pages.how.metaTitle, description: t.pages.how.metaDescription(min, max) };
 }
 
 /** The method in plain words: the steps, the pillars, the scale, and where each record comes from. */
@@ -23,13 +24,13 @@ export default async function HowItWorksPage() {
 
   return (
     <>
-      <PageHead title={copy.title} lead={copy.lead} />
+      <PageHead title={copy.title} lead={copy.lead(meta.scale.min, meta.scale.max)} />
 
       <section className={styles.section} aria-labelledby="steps-title">
         <h2 id="steps-title" className={styles.heading}>
           {copy.stepsTitle}
         </h2>
-        <Steps steps={copy.steps} />
+        <Steps steps={copy.steps(meta.scale.max)} />
       </section>
 
       <section className={styles.section} aria-labelledby="pillars-title">

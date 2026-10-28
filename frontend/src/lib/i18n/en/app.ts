@@ -8,8 +8,8 @@ export const app = {
   },
   hero: {
     headline: ["Know", "your", "builder", "before", "you", "book."],
-    subtitle:
-      "For homebuyers in Uttar Pradesh. Six kinds of records. 300 to 900. Every point links to its source.",
+    subtitle: (min: number, max: number) =>
+      `For homebuyers in Uttar Pradesh. Six kinds of records. ${min} to ${max}. Every point links to its source.`,
     searchLabel: "UP-RERA number, project or builder",
     placeholder: "UP-RERA number, project or builder",
     submit: "Check project",

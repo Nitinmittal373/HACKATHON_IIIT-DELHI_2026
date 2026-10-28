@@ -38,12 +38,13 @@ export const pages = {
   },
   how: {
     metaTitle: "How it works · NeevCheck",
-    metaDescription:
-      "How NeevCheck turns six kinds of public records into a score from 300 to 900, and where each record comes from.",
+    metaDescription: (min: number, max: number) =>
+      `How NeevCheck turns six kinds of public records into a score from ${min} to ${max}, and where each record comes from.`,
     title: "How NeevCheck works",
-    lead: "NeevCheck reads public records for one project and turns them into a score from 300 to 900. Every point links to the record it came from.",
+    lead: (min: number, max: number) =>
+      `NeevCheck reads public records for one project and turns them into a score from ${min} to ${max}. Every point links to the record it came from.`,
     stepsTitle: "The steps",
-    steps: [
+    steps: (max: number) => [
       {
         title: "Find the project",
         body: "Search by UP-RERA number, project name or builder. You confirm which registered phase is yours.",
@@ -54,7 +55,7 @@ export const pages = {
       },
       {
         title: "Score what was found",
-        body: "Everyone starts at 900. Points come off only for records we find. A record we cannot read never adds points.",
+        body: `Everyone starts at ${max}. Points come off only for records we find. A record we cannot read never adds points.`,
       },
       {
         title: "Show the proof",
