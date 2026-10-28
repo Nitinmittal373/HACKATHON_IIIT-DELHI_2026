@@ -84,11 +84,11 @@ test.describe("signed in", () => {
 
     await page.goto("/");
     const nav = page.getByRole("navigation", { name: "Main" });
-    await expect(nav.getByRole("button", { name: "Your account" })).toBeVisible();
+    await expect(nav.getByRole("button", { name: "Account menu" })).toBeVisible();
     await expect(nav.getByRole("link", { name: "Sign in", exact: true })).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Sign in to save reports and get alerts" })).toHaveCount(0);
 
-    await nav.getByRole("button", { name: "Your account" }).click();
+    await nav.getByRole("button", { name: "Account menu" }).click();
     await expect(page.getByRole("menuitem", { name: "My reports" })).toBeVisible();
     await expect(page.getByRole("menuitem", { name: "Sign out" })).toBeVisible();
   });
