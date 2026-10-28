@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from app.models import Finding, InsolvencyScope, Reliability
-from app.scoring.v2 import band_for, clip, pillars_read, score_v2
+from app.scoring.v2 import band_for, clip, partly_read, pillars_read, score_v2
 from app.scoring.v2.models import PillarId
 from tests.test_recorded_check import check
 
@@ -303,13 +303,38 @@ def test_pillars_read_from_checks_and_sources() -> None:
     assert pillars_read([], []) == []
 
 
+def test_uprera_complaints_read_the_promoter_and_legal_pillars() -> None:
+    assert pillars_read(["rera_complaints"], []) == ["P2", "P3"]
+    assert partly_read(["rera_complaints"], []) == {
+        "P2": "UP-RERA complaints",
+        "P3": "UP-RERA complaints",
+    }
+
+
+def test_a_pillar_with_its_own_source_read_is_not_partly_read() -> None:
+    assert partly_read(["rera_complaints", "insolvency"], ["group"]) == {}
+
+
+def test_five_records_read_give_a_band() -> None:
+    # Registration, completion date, both complaint counts and the company status.
+    checks = ["registration", "completion_date", "rera_complaints", "company_status"]
+    read = pillars_read(checks, [])
+    result = score_v2([], read, partly_read=partly_read(["rera_complaints"], []))
+
+    assert read == ["P1", "P2", "P3", "P4"]
+    assert result.band == "Low" and not result.provisional
+    assert result.pillars_unread == ["P5", "P6"]
+    partly = {p.id: p.partly_read for p in result.pillars if p.partly_read}
+    assert partly == {"P2": "UP-RERA complaints", "P3": "UP-RERA complaints"}
+
+
 def test_recorded_8334_check_has_a_v2_score(tmp_path: Path) -> None:
     report = check(tmp_path)["report"]
 
     v2 = report["score_v2"]
     assert report["score"]["value"] == 68  # v1 is untouched
-    assert (v2["value"], v2["band"], v2["confidence"]) == (567, "Elevated", 0.67)
-    assert v2["pillars_unread"] == ["P2", "P5"]
+    assert (v2["value"], v2["band"], v2["confidence"]) == (567, "Elevated", 0.83)
+    assert v2["pillars_unread"] == ["P5"]
     assert [p["id"] for p in v2["pillars"]] == ALL
     codes = [c["code"] for c in v2["reason_codes"]]
     assert codes == ["R05", "R03", "R13", "R11", "R12"]

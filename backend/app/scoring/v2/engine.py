@@ -8,7 +8,7 @@ same findings always give the same score and a missing record never adds points.
 """
 
 import math
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 
 from app.models import Finding
 from app.scoring.v2 import weights as w
@@ -21,6 +21,7 @@ def score_v2(
     findings: list[Finding],
     pillars_read: Iterable[PillarId],
     unavailable: Sequence[str] = (),
+    partly_read: Mapping[PillarId, str] | None = None,
 ) -> ScoreV2:
     """`unavailable` names the records that could not be read (a CAPTCHA, a source down)."""
     drivers, penalties = _apply_pillar_caps(findings)
@@ -51,6 +52,7 @@ def score_v2(
                 weight=weight,
                 penalty=penalties[p],
                 points=-_points(weight, penalties[p]),
+                partly_read=(partly_read or {}).get(p),
             )
             for p, weight in w.PILLAR_WEIGHTS.items()
         ],

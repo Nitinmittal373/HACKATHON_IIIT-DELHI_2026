@@ -58,9 +58,10 @@ def test_another_number_in_the_result_is_ignored() -> None:
 
 
 def test_a_thin_check_shows_no_number(tmp_path: Path) -> None:
-    # The recorded UP-RERA pages give the RERA record but no company page, so few records are read.
+    # 6742 has a recorded details page but no summary page, so no complaint counts and no
+    # company page: few records are read.
     with TestClient(create_app(make_settings(tmp_path), web=make_web())) as client:
-        check_id = client.post("/api/checks", json={"rera_id": "UPRERAPRJ8334"}).json()["id"]
+        check_id = client.post("/api/checks", json={"rera_id": "UPRERAPRJ6742"}).json()["id"]
         read_events(client, check_id)
         report = client.get(f"/api/checks/{check_id}/report").json()
 

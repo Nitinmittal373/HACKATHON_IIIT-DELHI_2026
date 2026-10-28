@@ -195,14 +195,14 @@ def test_my_reports_lists_known_checks_in_the_order_asked(client: TestClient) ->
         "band": "insufficient_evidence",
         "confidence": 0.43,
         "display_score": {
-            # Too little was read to rate it: no number is shown, only kept as provisional.
-            "value": None,
-            "provisional_value": 576,
-            "band": "insufficient_evidence",
+            # The UP-RERA complaint counts read two more pillars, so four of six: it is banded.
+            "value": 576,
+            "provisional_value": None,
+            "band": "Elevated",
             "hard_stop": False,
-            "confidence": 0.33,
-            "provisional": True,
-            "records_read": 2,
+            "confidence": 0.67,
+            "provisional": False,
+            "records_read": 4,
             "records_total": 6,
         },
         "created_at": listed[1]["created_at"],

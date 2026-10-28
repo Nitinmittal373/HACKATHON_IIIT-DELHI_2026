@@ -95,7 +95,12 @@ def with_record(project: Project, record: UpreraRecord) -> Project:
 
 class UpreraSource:
     name = "uprera"
-    checks: tuple[CheckKey, ...] = ("registration", "completion_date", "extensions")
+    checks: tuple[CheckKey, ...] = (
+        "registration",
+        "completion_date",
+        "extensions",
+        "rera_complaints",
+    )
 
     async def run(self, ctx: SourceContext) -> AsyncIterator[SourceEvent]:
         project = ctx.project
@@ -132,6 +137,8 @@ class UpreraSource:
                 yield FoundFinding(finding)
             if "extensions" not in read:
                 read.append("extensions")
+            if summary.promoter_complaints is not None or summary.project_complaints is not None:
+                read.append("rera_complaints")
         else:
             yield Progress("The UP-RERA summary page was not found, so complaints were not read")
         yield ChecksRead(tuple(read))

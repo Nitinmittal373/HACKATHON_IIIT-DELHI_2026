@@ -192,7 +192,9 @@ def test_source_reads_the_details_and_summary_pages() -> None:
     assert details.project.promoter == "SUPERTECH LIMITED"
     kinds = [e.finding.kind for e in events if isinstance(e, FoundFinding)]
     assert kinds == ["registration", "past_end_date", "promoter_complaints", "project_complaints"]
-    assert events[-1] == ChecksRead(("registration", "completion_date", "extensions"))
+    assert events[-1] == ChecksRead(
+        ("registration", "completion_date", "extensions", "rera_complaints")
+    )
 
 
 def test_source_carries_on_when_the_summary_page_is_not_found() -> None:
