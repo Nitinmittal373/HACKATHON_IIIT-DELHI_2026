@@ -70,6 +70,44 @@ function readBody(req: import("node:http").IncomingMessage): Promise<string> {
 
 const recordedReport = (): Schemas["Report"] => json("report.json") as unknown as Schemas["Report"];
 
+// The recorded report with what the credit-protection work added: a re-check that opens later,
+// a pillar read only through UP-RERA's complaint counts, a company status from a secondary
+// source, and e-Jagriti left for the buyer because of its CAPTCHA.
+const CREDIT_ID = "c".repeat(32);
+function creditReport(): Schemas["Report"] {
+  const report = recordedReport();
+  const [template] = report.findings;
+  if (!template) throw new Error("the recorded report has no findings");
+  const secondary: Schemas["Finding"] = {
+    ...template,
+    id: "secondary-company-status",
+    source: "registry",
+    kind: "company_status",
+    title: "Company status: Active",
+    verdict: "ok",
+    reliability: "secondary",
+  };
+  const consumer: Schemas["SourceRun"] = {
+    source: "consumer",
+    status: "blocked",
+    live_url: null,
+    message: "Not checked automatically: the site needs a CAPTCHA",
+    checks_read: [],
+    manual_url: "https://e-jagriti.gov.in/advance-case-search",
+  };
+  const sources = [...report.check.sources.filter((run) => run.source !== "consumer"), consumer];
+  const pillars = report.score_v2.pillars.map((pillar) =>
+    pillar.id === "P2" ? { ...pillar, partly_read: "UP-RERA complaints" } : pillar,
+  );
+  const unread = report.score_v2.pillars_unread.filter((id) => id !== "P2");
+  return {
+    ...report,
+    check: { ...report.check, id: CREDIT_ID, next_recheck_at: "2026-11-01T04:00:00Z", sources },
+    findings: [secondary, ...report.findings],
+    score_v2: { ...report.score_v2, pillars, pillars_unread: unread },
+  };
+}
+
 /** The recorded check as "My reports" lists it (GET /api/checks?ids=). */
 function recordedSummary(): Schemas["CheckSummary"] {
   const { check, project, score, display_score } = recordedReport();
@@ -133,6 +171,36 @@ createServer(async (req, res) => {
 
   if (path === "/api/meta") return send(res, 200, json("meta.json"));
 
+  if (path === "/api/limits") {
+    const signedIn = Boolean(req.headers.authorization);
+    const limits: Schemas["Limits"] = {
+      // Like a deployment run for development; the sign-in rules have their own tests.
+      require_signin: false,
+      invite_only: false,
+      checks_per_account_per_day: 2,
+      reuse_report_days: 7,
+      recheck_min_days: 7,
+      live_checks_open: true,
+      checks_left_today: signedIn ? 2 : null,
+      invited: signedIn ? true : null,
+    };
+    return send(res, 200, limits);
+  }
+
+  if (path === "/api/featured") {
+    // One saved check of a well-known project, as the gallery shows it.
+    const { check, project, display_score } = recordedReport();
+    const card: Schemas["FeaturedProject"] = {
+      rera_id: project.rera_id,
+      check_id: check.id,
+      name: project.name,
+      promoter: project.promoter,
+      display_score,
+      read_at: check.completed_at ?? check.started_at,
+    };
+    return send(res, 200, [card]);
+  }
+
   if (path === "/api/sentinel/alerts") {
     // Alerts belong to the signed-in account; the real API answers 401 without its token.
     if (!req.headers.authorization) return send(res, 401, { detail: "Sign in to use this" });
@@ -176,6 +244,7 @@ createServer(async (req, res) => {
     if (id === UNRATED_ID && tail === "/report") return send(res, 200, json("report-unrated.json"));
     const known = json("check-created.json").id;
     if (id === FLAGGED_ID && tail === "/report") return send(res, 200, json("report-flagged.json"));
+    if (id === CREDIT_ID && tail === "/report") return send(res, 200, creditReport());
     if (id !== known) return send(res, 404, { detail: "No check with this id" });
     if (tail === "/events") return streamEvents(res);
     if (tail === "/report") return send(res, 200, json("report.json"));
