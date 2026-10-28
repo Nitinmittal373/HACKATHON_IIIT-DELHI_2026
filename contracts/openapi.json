@@ -1790,6 +1790,10 @@
             "title": "Bands",
             "type": "array"
           },
+          "email_alerts": {
+            "title": "Email Alerts",
+            "type": "boolean"
+          },
           "pillars": {
             "items": {
               "$ref": "#/components/schemas/PillarWeight"
@@ -1818,7 +1822,8 @@
           "bands",
           "pillars",
           "reason_codes",
-          "score_version"
+          "score_version",
+          "email_alerts"
         ],
         "title": "Meta",
         "type": "object"
@@ -4401,7 +4406,7 @@
             "description": "Validation Error"
           },
           "429": {
-            "description": "The daily search limit (`search_limit`) or TinyFish's rate limit; `Retry-After` says how long to wait"
+            "description": "The visitor's daily search limit (`search_limit`), the whole site's (`site_search_limit`) or TinyFish's rate limit; `Retry-After` says how long to wait"
           },
           "502": {
             "description": "TinyFish failed; `detail.code` says why"
@@ -4783,6 +4788,60 @@
           }
         },
         "summary": "Unsubscribe",
+        "tags": [
+          "sentinel"
+        ]
+      }
+    },
+    "/api/sentinel/watches": {
+      "get": {
+        "description": "The projects the signed-in account watches, so a report can say whether this one is.",
+        "operationId": "list_watches_api_sentinel_watches_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/Watch"
+                  },
+                  "title": "Response List Watches Api Sentinel Watches Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Watches",
         "tags": [
           "sentinel"
         ]

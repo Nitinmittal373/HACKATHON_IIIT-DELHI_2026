@@ -99,5 +99,6 @@ export const META_FALLBACK: Meta = {
       "code": "R14"
     }
   ],
-  "score_version": "v2"
+  "score_version": "v2",
+  "email_alerts": false
 };

@@ -56,6 +56,13 @@ class SentinelStore:
                 .values(user_id=user_id)
             )
 
+    def watches_of(self, user_id: str) -> list[Watch]:
+        with self._sessions() as session:
+            rows = session.scalars(
+                select(WatchRow).where(WatchRow.user_id == user_id).order_by(WatchRow.created_at)
+            )
+            return [_watch(row) for row in rows]
+
     def watch_ids_of(self, user_id: str) -> list[str]:
         with self._sessions() as session:
             return list(session.scalars(select(WatchRow.id).where(WatchRow.user_id == user_id)))

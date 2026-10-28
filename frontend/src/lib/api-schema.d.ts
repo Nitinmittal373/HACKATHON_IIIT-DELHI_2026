@@ -452,6 +452,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/sentinel/watches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Watches
+         * @description The projects the signed-in account watches, so a report can say whether this one is.
+         */
+        get: operations["list_watches_api_sentinel_watches_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/sentinel/webhook": {
         parameters: {
             query?: never;
@@ -1097,6 +1117,8 @@ export interface components {
         Meta: {
             /** Bands */
             bands: components["schemas"]["BandRange"][];
+            /** Email Alerts */
+            email_alerts: boolean;
             /** Pillars */
             pillars: components["schemas"]["PillarWeight"][];
             /** Reason Codes */
@@ -2342,7 +2364,7 @@ export interface operations {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
-            /** @description The daily search limit (`search_limit`) or TinyFish's rate limit; `Retry-After` says how long to wait */
+            /** @description The visitor's daily search limit (`search_limit`), the whole site's (`site_search_limit`) or TinyFish's rate limit; `Retry-After` says how long to wait */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -2569,6 +2591,37 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_watches_api_sentinel_watches_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Watch"][];
+                };
             };
             /** @description Validation Error */
             422: {
