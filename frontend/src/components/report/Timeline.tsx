@@ -1,7 +1,7 @@
 import { formatDay } from "@/lib/format";
 import type { Lang, Strings } from "@/lib/i18n";
 import type { Finding } from "@/lib/types";
-import { toneOf } from "@/lib/verdict";
+import { findingTone } from "@/lib/verdict";
 import styles from "./Timeline.module.css";
 
 interface Props {
@@ -23,7 +23,7 @@ export function Timeline({ events, t, lang }: Props) {
         <ol className={styles.list}>
           {events.map((event) =>
             event.occurred_on ? (
-              <li key={event.id} className={`${styles.item} tone-${toneOf(event.verdict)}`}>
+              <li key={event.id} className={`${styles.item} tone-${findingTone(event)}`}>
                 <time className={`mono ${styles.date}`} dateTime={event.occurred_on}>
                   {formatDay(event.occurred_on, lang)}
                 </time>

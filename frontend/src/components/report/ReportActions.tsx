@@ -58,6 +58,7 @@ export function ReportActions({ reportId, project, score }: Props) {
       <button type="button" className="btn2" onClick={shareOnWhatsApp}>
         {t.insights.whatsapp.button}
       </button>
+      <p className={styles.hint}>{t.sentinel.card}</p>
       <span className={styles.status} role="status">
         {feedback === "copied" && t.report.linkCopied}
         {feedback === "failed" && t.report.copyFailed}

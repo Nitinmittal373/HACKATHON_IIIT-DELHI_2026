@@ -45,6 +45,11 @@ export type ReasonCode = Schemas["ReasonCode"];
 /** The score every screen shows: value, band and how much was read. */
 export type DisplayScore = Schemas["DisplayScore"];
 
+/** GET /api/limits: what a live check costs a visitor, and the account's checks left today. */
+export type Limits = Schemas["Limits"];
+/** A saved check of a well-known project, for the gallery (GET /api/featured). */
+export type FeaturedProject = Schemas["FeaturedProject"];
+
 /** GET /api/meta: the score scale, band edges and pillar weights. */
 export type Meta = Schemas["Meta"];
 

@@ -35,7 +35,12 @@ async function tokenOrNull(): Promise<string | null> {
   }
 }
 
-/** Starts a live check (or reuses one from the last day) and adds it to "My reports". */
+/** The token a signed-in visitor's searches carry, so they get the larger daily limit. */
+export async function searchToken(): Promise<string | undefined> {
+  return (signedInAs ? await tokenOrNull() : null) ?? undefined;
+}
+
+/** Starts a live check (or reuses a recent report) and adds it to "My reports". */
 export async function startCheck(
   project: Pick<Project, "rera_id" | "details_url">,
   options: { fresh?: boolean } = {},

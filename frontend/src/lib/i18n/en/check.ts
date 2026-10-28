@@ -30,6 +30,11 @@ export const check = {
       `The search service is busy right now. Please try again in ${seconds} ${seconds === 1 ? "second" : "seconds"}.`,
     reason: (text: string) => `Reason: ${text}`,
     startFailedTitle: "We could not start the check",
+    signInToRun: "Sign in to run a live check",
+    signedOutNote: (days: number) =>
+      `A report of this project less than ${days} days old opens without signing in.`,
+    liveChecksLeft: (count: number) =>
+      `You have ${count} live ${count === 1 ? "check" : "checks"} left today.`,
   },
   cam: {
     step: "Step 2 of 3 · Live check",
@@ -101,11 +106,16 @@ export const check = {
       context: "Context",
       blocked: "Unable to verify",
       not_found: "Not found",
+      secondary: "From a secondary source",
     },
     stepWaiting: "Getting ready to read the first record",
     stepReading: (source: string) => `Reading ${source}`,
     stepBetween: "Reading the next source",
     stepDone: "All sources finished",
+    pausedCredits: "Paused: live-check credits are low",
+    notCheckedCaptcha: "Not checked automatically: the site needs a CAPTCHA",
+    skippedTradeName:
+      "Skipped: UP-RERA gives the builder only as a trade name, so its group was not looked up.",
     blockedCaptcha: "Agent stopped: this page asks for a CAPTCHA. We never bypass one.",
     blockedTimeout: "Agent stopped: this page did not answer in time.",
     blockedOther: (reason: string) => `Agent stopped: ${reason}`,

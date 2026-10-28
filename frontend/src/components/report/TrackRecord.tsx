@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { NeevScore } from "@/components/NeevScore";
 import { Skeleton } from "@/components/Skeleton";
 import { promoterProjects } from "@/lib/api";
+import { searchToken } from "@/lib/history";
 import { formatDay } from "@/lib/format";
 import { useLang } from "@/lib/LangProvider";
 import type { TrackedProject } from "@/lib/types";
@@ -26,10 +27,12 @@ export function TrackRecord({
 
   useEffect(() => {
     let cancelled = false;
-    promoterProjects(promoter, reraId).then(
-      (record) => !cancelled && setLoaded({ status: "ready", projects: record.projects }),
-      () => !cancelled && setLoaded({ status: "failed" }),
-    );
+    searchToken()
+      .then((token) => promoterProjects(promoter, reraId, token))
+      .then(
+        (record) => !cancelled && setLoaded({ status: "ready", projects: record.projects }),
+        () => !cancelled && setLoaded({ status: "failed" }),
+      );
     return () => {
       cancelled = true;
     };

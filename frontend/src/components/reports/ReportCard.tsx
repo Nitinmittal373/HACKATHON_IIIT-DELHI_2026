@@ -42,7 +42,7 @@ export function ReportCard({ check, picked, canPick, onTogglePicked, onRemove }:
       const fresh = await startCheck(check, { fresh: true });
       router.push(`/check/${fresh.id}`);
     } catch (error) {
-      setProblem(describeApiError(error, t));
+      setProblem(describeApiError(error, t, lang));
       setStarting(false);
     }
   }

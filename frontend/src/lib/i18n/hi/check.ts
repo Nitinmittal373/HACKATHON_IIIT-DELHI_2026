@@ -31,6 +31,10 @@ export const check: typeof en = {
       `खोज सेवा अभी व्यस्त है। कृपया ${seconds} सेकंड बाद फिर कोशिश करें।`,
     reason: (text: string) => `कारण: ${text}`,
     startFailedTitle: "जाँच शुरू नहीं हो सकी",
+    signInToRun: "लाइव जाँच चलाने के लिए साइन इन करें",
+    signedOutNote: (days: number) =>
+      `इस प्रोजेक्ट की ${days} दिन से कम पुरानी रिपोर्ट बिना साइन इन के खुल जाती है।`,
+    liveChecksLeft: (count: number) => `आज आपकी ${count} लाइव जाँच बाकी हैं।`,
   },
   cam: {
     step: "चरण 2 / 3 · लाइव जाँच",
@@ -102,11 +106,16 @@ export const check: typeof en = {
       context: "संदर्भ",
       blocked: "सत्यापित नहीं हो सका",
       not_found: "नहीं मिला",
+      secondary: "द्वितीयक स्रोत से",
     },
     stepWaiting: "पहला रिकॉर्ड पढ़ने की तैयारी",
     stepReading: (source: string) => `${source} पढ़ा जा रहा है`,
     stepBetween: "अगला स्रोत पढ़ा जा रहा है",
     stepDone: "सभी स्रोत पूरे हुए",
+    pausedCredits: "रुका हुआ: लाइव जाँच के क्रेडिट कम हैं",
+    notCheckedCaptcha: "अपने-आप नहीं जाँचा गया: साइट पर CAPTCHA चाहिए",
+    skippedTradeName:
+      "छोड़ा गया: UP-RERA में बिल्डर का सिर्फ़ ट्रेड नाम है, इसलिए उसका समूह नहीं खोजा गया।",
     blockedCaptcha: "एजेंट रुक गया: इस पेज पर CAPTCHA माँगा गया है। हम कभी CAPTCHA पार नहीं करते।",
     blockedTimeout: "एजेंट रुक गया: इस पेज ने समय पर जवाब नहीं दिया।",
     blockedOther: (reason: string) => `एजेंट रुक गया: ${reason}`,

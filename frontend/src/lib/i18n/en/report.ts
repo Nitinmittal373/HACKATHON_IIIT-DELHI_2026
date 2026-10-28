@@ -16,6 +16,7 @@ export const report = {
     insolvency: "Insolvency orders",
     land_dues: "Land authority dues",
     consumer_cases: "Consumer cases",
+    rera_complaints: "UP-RERA complaints",
   },
   verdict: {
     ok: "Confirmed",
@@ -24,6 +25,7 @@ export const report = {
     review: "Review",
     context: "Context",
     not_found: "Not found",
+    secondary: "From a secondary source",
   },
   reliability: { primary: "Official record", secondary: "News or secondary source" },
   /** Appended to the reliability when a fact was read from a Search result, not an opened page. */

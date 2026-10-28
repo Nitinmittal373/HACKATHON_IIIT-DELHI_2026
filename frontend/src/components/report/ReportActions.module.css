@@ -15,3 +15,10 @@
   color: var(--o-text);
   font-weight: 600;
 }
+
+.hint {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--mu);
+  font-size: 13px;
+}

@@ -38,6 +38,17 @@ export const app = {
       `Too many checks from this address. Please try again in ${seconds} ${seconds === 1 ? "second" : "seconds"}.`,
     dailyCap:
       "NeevCheck has reached its limit of live checks for today, so this one cannot start. Please try again tomorrow.",
+    signinRequired: "Sign in to run a live check. Saved reports are open to everyone.",
+    accountLimit: "You have used your live checks for today. They come back at midnight (IST).",
+    siteBudget:
+      "Today's live checks are used up. Saved reports are still open; new checks open again tomorrow.",
+    siteBudgetMonth:
+      "This month's live checks are used up. Saved reports are still open; new checks open again next month.",
+    inviteOnly: "Live checks are invite-only right now. Saved reports are still open.",
+    recheckWait: (date: string) =>
+      `This project was checked recently. Next re-check possible on ${date}.`,
+    searchLimitOut: "You have used today's searches. Sign in for more, or come back tomorrow.",
+    searchLimitIn: "You have used today's searches. They come back tomorrow.",
     walletEmpty:
       "The agents that read the records are paused because the TinyFish account is out of credit. Please try again later.",
   },

@@ -70,3 +70,9 @@
     font-size: 18px;
   }
 }
+
+.limit {
+  margin-top: 6px;
+  color: var(--mu);
+  font-size: 13.5px;
+}

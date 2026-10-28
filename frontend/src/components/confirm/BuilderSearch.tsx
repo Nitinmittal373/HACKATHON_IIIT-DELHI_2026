@@ -8,7 +8,9 @@ import { ConfirmPicker } from "@/components/confirm/ConfirmPicker";
 import styles from "@/components/confirm/ResultCards.module.css";
 import { SearchProgress } from "@/components/confirm/SearchProgress";
 import { searchBuilder, wakeServer } from "@/lib/api";
+import { useAccount } from "@/lib/account";
 import { describeSearchError } from "@/lib/apiMessages";
+import { searchToken } from "@/lib/history";
 import { useLang } from "@/lib/LangProvider";
 import type { PromoterSearchResponse } from "@/lib/types";
 
@@ -20,6 +22,7 @@ type Phase =
 /** A builder's registered projects, and the company pages that carry a similar name. */
 export function BuilderSearch({ builder, city }: { builder: string; city?: string }) {
   const { t } = useLang();
+  const signedIn = useAccount().status === "in";
   const copy = t.find.builderResults;
   const [phase, setPhase] = useState<Phase>({ kind: "searching" });
   const [attempt, setAttempt] = useState(0);
@@ -30,7 +33,7 @@ export function BuilderSearch({ builder, city }: { builder: string; city?: strin
     void (async () => {
       await wakeServer();
       try {
-        const result = await searchBuilder(builder, city);
+        const result = await searchBuilder(builder, city, await searchToken());
         if (!cancelled) setPhase({ kind: "done", result });
       } catch (error) {
         if (!cancelled) setPhase({ kind: "failed", error });
@@ -42,7 +45,7 @@ export function BuilderSearch({ builder, city }: { builder: string; city?: strin
   }, [builder, city, attempt]);
 
   if (phase.kind === "failed") {
-    const { text, reason } = describeSearchError(phase.error, t);
+    const { text, reason } = describeSearchError(phase.error, t, signedIn);
     return (
       <PageMessage
         alert

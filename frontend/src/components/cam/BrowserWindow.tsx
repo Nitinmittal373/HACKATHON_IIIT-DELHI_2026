@@ -4,7 +4,7 @@ import { UpreraReplica } from "@/components/cam/UpreraReplica";
 import type { SourceView } from "@/lib/checkState";
 import type { Strings } from "@/lib/i18n";
 import { SOURCE_INFO } from "@/lib/sources";
-import { stopReason } from "@/lib/stopReason";
+import { plainReason, stopReason } from "@/lib/stopReason";
 import type { Finding, SourceName } from "@/lib/types";
 import styles from "./BrowserWindow.module.css";
 
@@ -121,7 +121,8 @@ function Screen({
     return <Notice tone="stopped" text={stopReason(view.reason, t)} name={name} href={officialUrl} t={t} />;
   }
   if (view.status === "unread" || view.status === "partial") {
-    return <Notice tone="stopped" text={t.cam.unreadReason} name={name} href={officialUrl} t={t} />;
+    const text = plainReason(view.reason, t) ?? t.cam.unreadReason;
+    return <Notice tone="stopped" text={text} name={name} href={officialUrl} t={t} />;
   }
   return <Notice tone="quiet" text={t.cam.status[view.status]} name={name} href={officialUrl} t={t} />;
 }

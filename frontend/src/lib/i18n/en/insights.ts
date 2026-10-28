@@ -36,5 +36,6 @@ export const insights = {
     readOn: (date: string) => `Records read on ${date}`,
     stale: "These records are more than a week old.",
     recheck: "Re-check now",
+    nextRecheck: (date: string) => `Next re-check possible on ${date}`,
   },
 };

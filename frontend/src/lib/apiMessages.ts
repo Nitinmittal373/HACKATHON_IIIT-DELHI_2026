@@ -1,21 +1,40 @@
 import { ApiError } from "@/lib/api";
-import type { Strings } from "@/lib/i18n";
+import { indianDay } from "@/lib/format";
+import type { Lang, Strings } from "@/lib/i18n";
 
 /** A calm, specific sentence for whatever went wrong when calling the API. */
-export function describeApiError(error: unknown, t: Strings): string {
+export function describeApiError(error: unknown, t: Strings, lang: Lang = "en"): string {
   if (!(error instanceof ApiError)) return t.errors.somethingBody;
   if (error.status === 0) return t.errors.unreachableBody;
-  if (error.status === 429) {
-    return error.code === "daily_cap" ? t.errors.dailyCap : t.errors.rateLimited(error.retryAfter ?? 60);
+  switch (error.code) {
+    case "signin_required":
+      return t.errors.signinRequired;
+    case "account_limit":
+      return t.errors.accountLimit;
+    case "site_budget":
+      return /month/i.test(error.message) ? t.errors.siteBudgetMonth : t.errors.siteBudget;
+    case "invite_only":
+      return t.errors.inviteOnly;
+    case "recheck_wait":
+      return t.errors.recheckWait(error.resetsAt ? indianDay(error.resetsAt, lang) : "—");
+    case "search_limit":
+      return t.errors.searchLimitOut;
   }
+  if (error.status === 429) return t.errors.rateLimited(error.retryAfter ?? 60);
   if (error.status === 402 || /credit|wallet|balance/i.test(error.message)) return t.errors.walletEmpty;
   return t.errors.somethingBody;
 }
 
 /** What went wrong with a search, named by the code the API sent: never a generic error. */
-export function describeSearchError(error: unknown, t: Strings): { text: string; reason: string | null } {
+export function describeSearchError(
+  error: unknown,
+  t: Strings,
+  signedIn = false,
+): { text: string; reason: string | null } {
   if (!(error instanceof ApiError)) return { text: t.confirm.searchFailedBody, reason: null };
   switch (error.code) {
+    case "search_limit":
+      return { text: signedIn ? t.errors.searchLimitIn : t.errors.searchLimitOut, reason: null };
     case "timeout":
     case "client_timeout":
       return { text: t.confirm.searchTimeout, reason: null };

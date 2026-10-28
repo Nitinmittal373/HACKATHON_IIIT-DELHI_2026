@@ -6,6 +6,8 @@ import type {
   Comparison,
   CorrectionCreate,
   ExtractResponse,
+  FeaturedProject,
+  Limits,
   Project,
   PromoterSearchResponse,
   RecentCheck,
@@ -36,6 +38,8 @@ export class ApiError extends Error {
     readonly retryAfter: number | null = null,
     /** A short machine-readable reason some answers carry, such as "daily_cap". */
     readonly code: string | null = null,
+    /** When a limit that refused the request opens again (ISO time), if the answer said. */
+    readonly resetsAt: string | null = null,
   ) {
     super(message);
     this.name = "ApiError";
@@ -90,15 +94,17 @@ async function toApiError(response: Response): Promise<ApiError> {
   const retry = Number(response.headers.get("Retry-After"));
   let message = `The request failed (${response.status})`;
   let code: string | null = null;
+  let resetsAt: string | null = null;
   try {
     const payload = (await response.json()) as { detail?: unknown };
     message = describeDetail(payload.detail) ?? message;
     code = codeOf(payload.detail);
+    resetsAt = fieldOf(payload.detail, "resets_at");
   } catch {
     // The body was not JSON (a proxy page, for example); the status message above is enough.
   }
   const wait = Number.isFinite(retry) && retry > 0 ? retry : null;
-  return new ApiError(message, response.status, wait, code);
+  return new ApiError(message, response.status, wait, code, resetsAt);
 }
 
 function describeDetail(detail: unknown): string | null {
@@ -112,8 +118,12 @@ function describeDetail(detail: unknown): string | null {
 }
 
 function codeOf(detail: unknown): string | null {
-  const code = (detail as { code?: unknown } | null)?.code;
-  return typeof code === "string" ? code : null;
+  return fieldOf(detail, "code");
+}
+
+function fieldOf(detail: unknown, name: string): string | null {
+  const value = (detail as Record<string, unknown> | null)?.[name];
+  return typeof value === "string" ? value : null;
 }
 
 let awakeSince = 0;
@@ -146,11 +156,17 @@ export function isTransient(error: unknown): boolean {
 }
 
 /** Runs in the browser, straight to the API, and tries once more after a transient failure. */
-export async function searchProjects(query: string, locality?: string): Promise<SearchResponse> {
+export async function searchProjects(
+  query: string,
+  locality?: string,
+  /** A sign-in token: a signed-in visitor gets a larger daily search limit. */
+  token?: string,
+): Promise<SearchResponse> {
   const place = locality ? `&locality=${encodeURIComponent(locality)}` : "";
   const search = () =>
     request<SearchResponse>(`/api/projects/search?q=${encodeURIComponent(query)}${place}`, {
       timeoutMs: SEARCH_TIMEOUT_MS,
+      token,
     });
   try {
     return await search();
@@ -161,11 +177,15 @@ export async function searchProjects(query: string, locality?: string): Promise<
 }
 
 /** A builder's registered projects and company pages, from up-rera.in and the open web. */
-export function searchBuilder(builder: string, city?: string): Promise<PromoterSearchResponse> {
+export function searchBuilder(
+  builder: string,
+  city?: string,
+  token?: string,
+): Promise<PromoterSearchResponse> {
   const extra = city ? `&city=${encodeURIComponent(city)}` : "";
   return request<PromoterSearchResponse>(
     `/api/promoters/search?q=${encodeURIComponent(builder)}${extra}`,
-    { timeoutMs: SEARCH_TIMEOUT_MS },
+    { timeoutMs: SEARCH_TIMEOUT_MS, token },
   );
 }
 
@@ -187,7 +207,7 @@ export function extractFromText(text: string): Promise<ExtractResponse> {
   });
 }
 
-/** `fresh` skips the reuse of a check from the last 24 hours ("Re-check now"). */
+/** `fresh` asks for a new live check instead of a recent report ("Re-check now"). */
 export function createCheck(
   project: Pick<Project, "rera_id" | "details_url">,
   options: { fresh?: boolean } = {},
@@ -244,9 +264,26 @@ export function compareChecks(ids: string[]): Promise<Comparison> {
 }
 
 /** A promoter's other projects, found with Search on up-rera.in. */
-export function promoterProjects(promoter: string, exclude: string): Promise<TrackRecord> {
+export function promoterProjects(
+  promoter: string,
+  exclude: string,
+  token?: string,
+): Promise<TrackRecord> {
   const query = `name=${encodeURIComponent(promoter)}&exclude=${encodeURIComponent(exclude)}`;
-  return request<TrackRecord>(`/api/promoters/projects?${query}`, { timeoutMs: WAKE_TIMEOUT_MS });
+  return request<TrackRecord>(`/api/promoters/projects?${query}`, {
+    timeoutMs: WAKE_TIMEOUT_MS,
+    token,
+  });
+}
+
+/** What a live check costs, and (with a token) how many the account has left today. */
+export function getLimits(token?: string): Promise<Limits> {
+  return request<Limits>("/api/limits", { token, timeoutMs: WAKE_TIMEOUT_MS });
+}
+
+/** Saved checks of the well-known projects the site features; none that nobody has checked. */
+export function getFeatured(): Promise<FeaturedProject[]> {
+  return request<FeaturedProject[]>("/api/featured", { timeoutMs: WAKE_TIMEOUT_MS });
 }
 
 /** The signed-in account's last few checks, with what the home page card shows. */
