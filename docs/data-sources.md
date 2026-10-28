@@ -8,17 +8,18 @@ NeevCheck reads only public records. Each source has a reliability level that de
 | Company registry | [mca.gov.in](https://www.mca.gov.in), [Economic Times](https://economictimes.indiatimes.com), [zaubacorp.com](https://www.zaubacorp.com) | Company name, CIN, status | Primary on MCA; the mirrors are secondary |
 | Insolvency | NCLT / NCLAT orders, [ibbi.gov.in](https://ibbi.gov.in), news reports of the case | Whether a case was admitted, when, and which projects it covers | Primary on official sites; news reports are secondary |
 | Land authorities | Noida, Greater Noida (GNIDA), YEIDA | Published dues and defaulter lists | Primary |
-| Consumer cases | [e-Jagriti](https://e-jagriti.gov.in) | Cases against the promoter | Primary, behind a CAPTCHA |
+| Consumer cases | [e-Jagriti](https://e-jagriti.gov.in) | Cases against the promoter | Primary, behind a CAPTCHA: not read automatically, the report links to the site |
 | Courts and news | Supreme Court orders, court reporting, news sites | The NBCC order and delay coverage | Orders are primary; reports and news are secondary |
 
 ## How we read them
 
 - **UP-RERA** pages are read with **TinyFish Fetch** and parsed by deterministic Python code, so the same page always gives the same fields. Only the sections we use are requested, so the bank details and phone numbers on the page are never stored.
+- The group lane runs only when UP-RERA gives the builder's exact company name; a trade name could match the wrong company. The insolvency lane fetches its page first and sends an agent only when the page speaks of an admission.
 - For the other sources a **TinyFish browser agent** opens a deep page on the site, searches for the project or promoter and returns the exact fields we ask for as structured JSON. Where **Fetch** can read the page (a company details table, a PDF list, a court order) Python reads it instead, which is free and gives the same answer every time.
 - A page is used for a company only if it carries the promoter's **exact legal name**: "Supertech Limited" is not "Supertech Realtors Limited". A project is matched word for word, so Eco Village-I is never matched to Eco Village-II.
 - A **news report alone never causes a hard stop**. If it says an insolvency covers the whole company or this project, the finding is shown for review with 0 points until a court order is read.
 - Every finding is saved with the **source URL**, the **time it was read** and its **reliability**.
-- If a site shows a **CAPTCHA**, the agent stops and is never retried. The source is marked *Unable to verify* and the report tells the buyer how to check it themselves. e-Jagriti and zaubacorp both do this today.
+- If a site shows a **CAPTCHA**, the agent stops and is never retried. The source is marked *Unable to verify* and the report tells the buyer how to check it themselves. e-Jagriti always shows one, so no agent is sent there at all: the lane is shown as *Not checked automatically: the site needs a CAPTCHA* with a link, and costs nothing. zaubacorp does the same, and its mirror is read instead.
 - A list that is not published or cannot be read (the land authorities' dues lists, on the day of the recorded check) leaves its check **unread**: absence of a record never adds points.
 - We respect each site's rate limits and run at most `AGENT_CONCURRENCY` agents at once.
 
@@ -81,7 +82,7 @@ The group source never runs a browser agent. A profile that does not name exactl
 | Noida / GNIDA / YEIDA defaulter lists | Published as PDFs; exact legal name matched with an amount on the same line (already in `land.py`) | Search + Fetch text | Read (unchanged) |
 | OC / CC past due, failed 25% package deposit | No readable list found | none | **Not read** |
 | SARFAESI auction notices | Lender and IBAPI notice pages are indexed by Search; none named SUPERTECH LIMITED on 26 Oct 2026 | Search only | Read. A lender or government page is scored; any other page is shown for review with no points |
-| Pending consumer or civil cases | e-Jagriti shows a CAPTCHA; we never bypass one | none | Unread: the report links to the official site and lists it under R12 |
+| Pending consumer or civil cases | e-Jagriti shows a CAPTCHA; we never bypass one | none, no agent is sent | Unread: the report links to the official site and lists it under R12 |
 
 ## Feasibility at a glance
 
