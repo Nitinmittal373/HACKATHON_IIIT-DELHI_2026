@@ -4,6 +4,23 @@
  */
 
 export interface paths {
+    "/api/admin/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Usage */
+        get: operations["get_usage_api_admin_usage_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/checks": {
         parameters: {
             query?: never;
@@ -19,7 +36,10 @@ export interface paths {
         put?: never;
         /**
          * Create Check
-         * @description Starts a check. With a sign-in token the check is also saved to that account.
+         * @description Starts a live check, or returns a recent report of the project at no cost.
+         *
+         *     A report finished in the last REUSE_REPORT_DAYS is returned to anyone, signed in or not.
+         *     A new live check needs a sign-in and stays within the account's and the site's budgets.
          */
         post: operations["create_check_api_checks_post"];
         delete?: never;
@@ -134,6 +154,28 @@ export interface paths {
          *     its QR code and sends only the text.
          */
         post: operations["extract_numbers_api_extract_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/featured": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Featured
+         * @description The saved checks of the projects listed in FEATURED_RERA_IDS, in that order.
+         *
+         *     A number nobody has checked yet is left out; no card is ever made up.
+         */
+        get: operations["get_featured_api_featured_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -514,6 +556,26 @@ export interface components {
             /** Reason */
             reason: string;
         };
+        /** CallAverages */
+        CallAverages: {
+            /** Agent */
+            agent: number;
+            /** Fetch */
+            fetch: number;
+            /** Search */
+            search: number;
+        };
+        /** CallCounts */
+        CallCounts: {
+            /** Agent */
+            agent: number;
+            /** Checks */
+            checks: number;
+            /** Fetch */
+            fetch: number;
+            /** Search */
+            search: number;
+        };
         /** Check */
         Check: {
             /** Completed At */
@@ -523,6 +585,8 @@ export interface components {
             display_score: components["schemas"]["DisplayScore"] | null;
             /** Id */
             id: string;
+            /** Next Recheck At */
+            next_recheck_at: string | null;
             /** Rera Id */
             rera_id: string;
             /**
@@ -867,6 +931,28 @@ export interface components {
             promoter_projects: components["schemas"]["FamilyProject"][];
             /** Source Url */
             source_url: string;
+        };
+        /**
+         * FeaturedProject
+         * @description A well-known project NeevCheck has already checked, for the home page gallery.
+         *
+         *     Built from the saved check only: it never says who ran it.
+         */
+        FeaturedProject: {
+            /** Check Id */
+            check_id: string;
+            display_score: components["schemas"]["DisplayScore"];
+            /** Name */
+            name: string | null;
+            /** Promoter */
+            promoter: string | null;
+            /**
+             * Read At
+             * Format: date-time
+             */
+            read_at: string;
+            /** Rera Id */
+            rera_id: string;
         };
         /** Finding */
         Finding: {
@@ -1385,6 +1471,8 @@ export interface components {
             checks_read: ("registration" | "completion_date" | "extensions" | "company_status" | "insolvency" | "land_dues" | "consumer_cases" | "rera_complaints")[];
             /** Live Url */
             live_url: string | null;
+            /** Manual Url */
+            manual_url: string | null;
             /** Message */
             message: string | null;
             /**
@@ -1466,6 +1554,15 @@ export interface components {
             /** Token */
             token: string;
         };
+        /**
+         * Usage
+         * @description TinyFish calls the checks made (only checks that were metered), per day and month.
+         */
+        Usage: {
+            average_per_check: components["schemas"]["CallAverages"];
+            this_month: components["schemas"]["CallCounts"];
+            today: components["schemas"]["CallCounts"];
+        };
         /** ValidationError */
         ValidationError: {
             /** Context */
@@ -1522,6 +1619,51 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    get_usage_api_admin_usage_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                "x-admin-token"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Usage"];
+                };
+            };
+            /** @description Missing or wrong `X-Admin-Token` */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description ADMIN_TOKEN is not set, so this route is off */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_checks_api_checks_get: {
         parameters: {
             query: {
@@ -1567,7 +1709,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description A check from the last 24 hours was reused */
+            /** @description A recent report of this project was returned; no credit was spent */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -1583,6 +1725,20 @@ export interface operations {
                     "application/json": components["schemas"]["Check"];
                 };
             };
+            /** @description Sign in to start a live check (`detail.code` is `signin_required`) */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Live checks are invite-only right now (`invite_only`) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             /** @description Validation Error */
             422: {
                 headers: {
@@ -1591,6 +1747,13 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
+            };
+            /** @description A limit is used up: `detail.code` is `account_limit`, `site_budget`, or `recheck_wait`; `Retry-After` says how long */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -1855,6 +2018,26 @@ export interface operations {
             };
         };
     };
+    get_featured_api_featured_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FeaturedProject"][];
+                };
+            };
+        };
+    };
     health_api_health_get: {
         parameters: {
             query?: never;
@@ -2063,7 +2246,9 @@ export interface operations {
                 /** @description City or locality such as 'Sector 43 Noida' */
                 locality?: string | null;
             };
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2087,7 +2272,7 @@ export interface operations {
                     "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
-            /** @description TinyFish rate limit; `Retry-After` says how long to wait */
+            /** @description The daily search limit (`search_limit`) or TinyFish's rate limit; `Retry-After` says how long to wait */
             429: {
                 headers: {
                     [name: string]: unknown;
@@ -2118,7 +2303,9 @@ export interface operations {
                 /** @description RERA no. to skip */
                 exclude?: string | null;
             };
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path?: never;
             cookie?: never;
         };
@@ -2159,7 +2346,9 @@ export interface operations {
                 /** @description City or locality */
                 city?: string | null;
             };
-            header?: never;
+            header?: {
+                authorization?: string | null;
+            };
             path?: never;
             cookie?: never;
         };

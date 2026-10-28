@@ -28,6 +28,12 @@ def make_settings(tmp_path: Path, **overrides: object) -> Settings:
         "tinyfish_api_key": "test-key-not-real",
         "database_url": f"sqlite:///{(tmp_path / 'test.db').as_posix()}",
         "rate_limit_per_minute": 100,
+        # Most tests start checks without an account; the sign-in rules have their own tests.
+        "require_signin_for_checks": False,
+        "site_checks_per_day": 100,
+        "site_checks_per_month": 1000,
+        "checks_per_account_per_day": 100,
+        "recheck_min_days": 0,
         **overrides,
     }
     return Settings(_env_file=None, **values)  # type: ignore[arg-type, call-arg]

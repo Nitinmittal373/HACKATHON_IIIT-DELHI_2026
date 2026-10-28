@@ -7,12 +7,14 @@ from typing import Annotated
 from fastapi import HTTPException, Path, Request
 
 from app.accounts import UserReports
+from app.budget import recheck_opens_at
 from app.config import Settings
 from app.corrections import CorrectionStore
 from app.events import EventHub
 from app.models import Check
 from app.orchestrator import Orchestrator
 from app.ratelimit import RateLimiter
+from app.search_gate import SearchGate
 from app.sentinel.monitors import MonitorGateway
 from app.sentinel.service import Sentinel
 from app.sentinel.store import SentinelStore
@@ -66,6 +68,10 @@ def get_clock(request: Request) -> Callable[[], datetime]:
     return request.app.state.clock
 
 
+def get_search_gate(request: Request) -> SearchGate:
+    return request.app.state.search_gate
+
+
 def get_limiter(request: Request) -> RateLimiter:
     return request.app.state.limiter
 
@@ -83,3 +89,9 @@ def find_check(store: Store, check_id: str) -> Check:
     if check is None:
         raise HTTPException(status_code=404, detail="No check with this id")
     return check
+
+
+def with_recheck(check: Check, store: Store, settings: Settings, now: datetime) -> Check:
+    """The check with the date "Re-check now" opens again for its project."""
+    opens = recheck_opens_at(store, check.rera_id, settings, now)
+    return check.model_copy(update={"next_recheck_at": opens})

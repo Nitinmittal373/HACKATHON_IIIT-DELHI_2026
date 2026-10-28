@@ -1,8 +1,11 @@
+from collections.abc import Callable
+from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.api.deps import CheckId, find_check, get_store
+from app.api.deps import CheckId, find_check, get_clock, get_settings, get_store, with_recheck
+from app.config import Settings
 from app.models import Check, DisplayScore, Report
 from app.store import Store
 
@@ -10,8 +13,13 @@ router = APIRouter(tags=["checks"])
 
 
 @router.get("/api/checks/{check_id}/report", responses={409: {"description": "No report yet"}})
-def get_report(check_id: CheckId, store: Annotated[Store, Depends(get_store)]) -> Report:
-    check = find_check(store, check_id)
+def get_report(
+    check_id: CheckId,
+    store: Annotated[Store, Depends(get_store)],
+    settings: Annotated[Settings, Depends(get_settings)],
+    clock: Annotated[Callable[[], datetime], Depends(get_clock)],
+) -> Report:
+    check = with_recheck(find_check(store, check_id), store, settings, clock())
     if check.status in ("queued", "running"):
         raise HTTPException(status_code=409, detail="The check is still running")
     report = assemble_report(store, check)

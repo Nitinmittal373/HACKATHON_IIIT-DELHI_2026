@@ -50,6 +50,7 @@ from app.sources.base import (
 )
 from app.store import Store
 from app.tinyfish import WebClient, WebError
+from app.usage import CREDIT_CODES, PAUSED_MESSAGE, MeteredWeb, Usage
 
 logger = logging.getLogger(__name__)
 IST = timezone(timedelta(hours=5, minutes=30))  # records are dated in Indian time
@@ -86,11 +87,13 @@ class Orchestrator:
         # The family tree a check's group source drew, kept until its score is saved.
         self._families: dict[str, FamilyTree] = {}
 
-    def start(self, project: Project, fresh: bool = False) -> Check:
+    def start(
+        self, project: Project, fresh: bool = False, started_by: str | None = None
+    ) -> Check:
         """Create the check and run it in the background; returns at once."""
         check_id = uuid.uuid4().hex
         self._store.save_project(_merge(self._store.get_project(project.rera_id), project))
-        self._store.create_check(check_id, project.rera_id, self._clock())
+        self._store.create_check(check_id, project.rera_id, self._clock(), started_by)
         self._hub.open(check_id)
         task = asyncio.create_task(self._run(check_id, project, fresh))
         self._tasks[check_id] = task
@@ -116,24 +119,25 @@ class Orchestrator:
 
     async def _run(self, check_id: str, project: Project, fresh: bool = False) -> None:
         self._store.set_check_status(check_id, "running")
+        usage = Usage()
         try:
             primary, *others = self._sources()
             now = self._clock()
             ctx = SourceContext(
                 project=_merge(self._store.get_project(project.rera_id), project),
-                web=self._web,
+                web=MeteredWeb(self._web, usage),
                 today=now.astimezone(IST).date(),
                 now=now,
                 check_id=check_id,
                 cache_dir=self._cache_dir,
             )
-            ctx, primary_read = await self._run_source(check_id, primary, ctx, fresh)
+            ctx, primary_read = await self._run_source(check_id, primary, ctx, fresh, usage)
             if "registration" not in primary_read and not ctx.project.promoter:
                 message = "UP-RERA could not be read and no builder is known, so there is no score"
                 self._finish(check_id, "failed", message=message)
                 return
             others_read = await asyncio.gather(
-                *(self._run_source(check_id, s, ctx, fresh) for s in others)
+                *(self._run_source(check_id, s, ctx, fresh, usage) for s in others)
             )
             read = set(primary_read).union(*(checks for _, checks in others_read))
             findings = self._store.list_findings(check_id)
@@ -157,9 +161,16 @@ class Orchestrator:
         except Exception:
             logger.exception("check %s failed", check_id)
             self._finish(check_id, "failed", message="Something went wrong while running the check")
+        finally:
+            self._store.save_usage(check_id, usage.as_dict())
 
     async def _run_source(
-        self, check_id: str, source: Source, ctx: SourceContext, fresh: bool = False
+        self,
+        check_id: str,
+        source: Source,
+        ctx: SourceContext,
+        fresh: bool,
+        usage: Usage,
     ) -> tuple[SourceContext, tuple[CheckKey, ...]]:
         async with self._slots:
             run = SourceRun(source=source.name, status="running")
@@ -168,10 +179,13 @@ class Orchestrator:
             read: tuple[CheckKey, ...] = ()
             entity = entity_for(source.name, ctx.project) if self._source_cache else None
             cached = None if fresh else self._cached(source, entity, ctx)
+            manual_url = getattr(source, "manual_url", None)
             collected: list[Finding] = []
             family: FamilyTree | None = None
             try:
                 async with asyncio.timeout(self._source_timeout):
+                    if cached is None:
+                        usage.check_open()  # no credit left: skip the lane before it starts
                     events = replay(cached) if cached else source.run(ctx)
                     async for event in events:
                         match event:
@@ -188,7 +202,11 @@ class Orchestrator:
                                 self._emit(check_id, "finding.added", source.name, finding=data)
                             case Blocked(reason=reason):
                                 run = run.model_copy(
-                                    update={"status": "blocked", "message": reason}
+                                    update={
+                                        "status": "blocked",
+                                        "message": reason,
+                                        "manual_url": manual_url,
+                                    }
                                 )
                                 self._emit(check_id, "source.blocked", source.name, reason=reason)
                             case ChecksRead(checks=checks):
@@ -203,9 +221,16 @@ class Orchestrator:
                 run = run.model_copy(update={"status": status})
                 if status == "completed" and cached is None and entity and (read or collected):
                     self._remember(source, entity, ctx, collected, read, family)
+            except WebError as error:
+                kept = bool(read or collected)
+                if error.code not in CREDIT_CODES:
+                    run = _stopped(run, "failed", str(error), kept)
+                else:
+                    run = _stopped(run, "unavailable", PAUSED_MESSAGE, kept)
+                    self._emit(check_id, "source.progress", source.name, text=PAUSED_MESSAGE)
             except SourceUnavailable as error:
                 run = run.model_copy(update={"status": "unavailable", "message": str(error)})
-            except (SourceError, WebError) as error:
+            except SourceError as error:
                 run = _stopped(run, "failed", str(error), bool(read or collected))
             except TimeoutError:
                 message = f"No answer within {self._source_timeout:.0f} seconds"

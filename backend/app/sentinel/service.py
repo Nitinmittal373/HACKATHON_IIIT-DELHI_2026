@@ -6,7 +6,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime
 
-from app.budget import seconds_until_cap_resets
+from app.budget import site_wait
 from app.config import Settings
 from app.orchestrator import Orchestrator
 from app.sentinel.diff import diff_findings
@@ -64,9 +64,7 @@ class Sentinel:
         summary = RunSummary()
         async with self._running:
             for rera_id in self._watches.watched_projects():
-                wait = seconds_until_cap_resets(
-                    self._store, self._settings.max_checks_per_day, self._clock()
-                )
+                wait = site_wait(self._store, self._settings, self._clock())
                 if wait is not None:
                     summary.stopped_by_daily_cap = True
                     logger.info("Sentinel stopped: the daily check cap was reached")
@@ -78,9 +76,7 @@ class Sentinel:
     async def recheck_project(self, rera_id: str) -> int:
         """Re-check one project now, as a monitor's webhook asks. 0 when the daily cap is hit."""
         async with self._running:
-            wait = seconds_until_cap_resets(
-                self._store, self._settings.max_checks_per_day, self._clock()
-            )
+            wait = site_wait(self._store, self._settings, self._clock())
             if wait is not None:
                 logger.info("Webhook re-check skipped: the daily check cap was reached")
                 return 0

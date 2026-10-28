@@ -1,6 +1,6 @@
 import re
 from collections.abc import Callable
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
@@ -17,9 +17,10 @@ from app.api.deps import (
     get_settings,
     get_store,
     get_user_reports,
+    with_recheck,
 )
 from app.bridge_token import BridgeUser
-from app.budget import REUSE_WINDOW, seconds_until_cap_resets
+from app.budget import Refusal, account_refusal, recheck_opens_at, site_refusal
 from app.config import Settings
 from app.models import Check, CheckCreate, Project, RecentCheck
 from app.orchestrator import Orchestrator
@@ -52,7 +53,15 @@ def rate_limit(
     "/api/checks",
     status_code=202,
     dependencies=[Depends(rate_limit)],
-    responses={200: {"description": "A check from the last 24 hours was reused"}},
+    responses={
+        200: {"description": "A recent report of this project was returned; no credit was spent"},
+        401: {"description": "Sign in to start a live check (`detail.code` is `signin_required`)"},
+        403: {"description": "Live checks are invite-only right now (`invite_only`)"},
+        429: {
+            "description": "A limit is used up: `detail.code` is `account_limit`, `site_budget`, "
+            "or `recheck_wait`; `Retry-After` says how long"
+        },
+    },
 )
 async def create_check(
     body: CheckCreate,
@@ -64,35 +73,69 @@ async def create_check(
     reports: Annotated[UserReports, Depends(get_user_reports)],
     user: MaybeUser,
 ) -> Check:
-    """Starts a check. With a sign-in token the check is also saved to that account."""
-    now = clock()
-    if not body.fresh:
-        recent = store.latest_completed_check(body.rera_id, since=now - REUSE_WINDOW)
-        if recent:
-            response.status_code = 200
-            response.headers["Location"] = f"/api/checks/{recent.id}"
-            _save_for(user, recent.id, reports, now)
-            return recent.model_copy(update={"reused": True})
+    """Starts a live check, or returns a recent report of the project at no cost.
 
-    wait = seconds_until_cap_resets(store, settings.max_checks_per_day, now)
-    if wait is not None:
-        raise HTTPException(
-            status_code=429,
-            detail={
-                "code": "daily_cap",
-                "message": "NeevCheck has reached its limit of live checks for today",
-            },
-            headers={"Retry-After": str(wait)},
-        )
+    A report finished in the last REUSE_REPORT_DAYS is returned to anyone, signed in or not.
+    A new live check needs a sign-in and stays within the account's and the site's budgets.
+    """
+    now = clock()
+    recent = store.latest_completed_check(
+        body.rera_id, since=now - timedelta(days=settings.reuse_report_days)
+    )
+    if recent and not body.fresh:
+        response.status_code = 200
+        response.headers["Location"] = f"/api/checks/{recent.id}"
+        _save_for(user, recent.id, reports, now)
+        return with_recheck(recent.model_copy(update={"reused": True}), store, settings, now)
+
+    _refuse_unless_allowed(user, body, store, settings, now)
     # The page search confirmed for this number; a number sent alone gets its stable page.
     asked = Project(
         rera_id=body.rera_id,
         details_url=project_details_url(body.rera_id, body.details_url or ""),
     )
-    check = orchestrator.start(asked, fresh=body.fresh)
+    check = orchestrator.start(asked, fresh=body.fresh, started_by=user.sub if user else None)
     response.headers["Location"] = f"/api/checks/{check.id}"
     _save_for(user, check.id, reports, now)
     return check
+
+
+def _refuse_unless_allowed(
+    user: BridgeUser | None, body: CheckCreate, store: Store, settings: Settings, now: datetime
+) -> None:
+    """Raises the reason a new live check may not start; returns when it may."""
+    if settings.require_signin_for_checks and user is None:
+        raise _refusal(
+            401,
+            "signin_required",
+            "Sign in to run a live check. Saved reports are open to everyone.",
+        )
+    invited = user is not None and user.email.lower() in settings.allowed_email_set
+    if settings.invite_only and not invited:
+        raise _refusal(403, "invite_only", "Live checks are invite-only right now.")
+    if body.fresh and (opens := recheck_opens_at(store, body.rera_id, settings, now)):
+        message = f"This project was checked recently. Next re-check possible on {opens:%d %b %Y}."
+        raise _refusal(429, "recheck_wait", message, Refusal("recheck_wait", message, opens), now)
+    refusal = site_refusal(store, settings, now)
+    if refusal is None and user is not None:
+        refusal = account_refusal(store, user.sub, settings, now)
+    if refusal is not None:
+        raise _refusal(429, refusal.code, refusal.message, refusal, now)
+
+
+def _refusal(
+    status: int,
+    code: str,
+    message: str,
+    limit: Refusal | None = None,
+    now: datetime | None = None,
+) -> HTTPException:
+    detail: dict[str, str] = {"code": code, "message": message}
+    headers = None
+    if limit is not None and now is not None:
+        detail["resets_at"] = limit.resets_at.isoformat()
+        headers = {"Retry-After": str(limit.retry_after(now))}
+    return HTTPException(status_code=status, detail=detail, headers=headers)
 
 
 def _save_for(user: BridgeUser | None, check_id: str, reports: UserReports, now: datetime) -> None:
@@ -114,5 +157,10 @@ def list_checks(
 
 
 @router.get("/api/checks/{check_id}")
-def get_check(check_id: CheckId, store: Annotated[Store, Depends(get_store)]) -> Check:
-    return find_check(store, check_id)
+def get_check(
+    check_id: CheckId,
+    store: Annotated[Store, Depends(get_store)],
+    settings: Annotated[Settings, Depends(get_settings)],
+    clock: Annotated[Callable[[], datetime], Depends(get_clock)],
+) -> Check:
+    return with_recheck(find_check(store, check_id), store, settings, clock())
