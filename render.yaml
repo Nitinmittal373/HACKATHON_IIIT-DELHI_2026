@@ -49,6 +49,8 @@ services:
         value: "15"
       - key: SEARCHES_PER_IP_PER_DAY_SIGNED_IN
         value: "40"
+      - key: SITE_SEARCHES_PER_DAY
+        value: "200"
       - key: INVITE_ONLY
         value: "false"
       - key: ALLOWED_EMAILS
@@ -64,11 +66,25 @@ services:
         value: "2"
       - key: SENTINEL_INTERVAL_HOURS
         value: "168"
-      # Optional. The API's own public address; with WEBHOOK_SECRET it lets watches create
-      # TinyFish Monitors that call the webhook. Without it Sentinel keeps its weekly schedule.
+      - key: SENTINEL_CHECKS_PER_DAY
+        value: "1"
+      # TinyFish Monitors bill outside the site budget, so they stay off. While false, any
+      # monitor made earlier for a current watch is cancelled at startup.
+      - key: SENTINEL_MONITORS
+        value: "false"
+      # Only read when SENTINEL_MONITORS is true: the API's own public address.
       - key: PUBLIC_BASE_URL
         sync: false
-      # Optional email for alerts.
+      # Optional email for alerts, through an HTTPS email API (Brevo or Resend). Render's free
+      # plan blocks SMTP, so this is the way to send email there. Without it alerts are only
+      # shown on the Alerts page.
+      - key: EMAIL_PROVIDER
+        value: brevo
+      - key: EMAIL_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      # Fallback: SMTP.
       - key: SMTP_HOST
         sync: false
       - key: SMTP_USER
