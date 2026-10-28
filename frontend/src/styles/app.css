@@ -38,6 +38,7 @@
 }
 
 .pageLead {
+  max-width: 68ch;
   color: var(--mu);
   margin: 8px 0 0;
 }

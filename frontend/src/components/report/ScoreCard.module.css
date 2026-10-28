@@ -12,7 +12,7 @@
 .provisional {
   padding: 5px 10px;
   border: 1px dashed var(--ln2);
-  border-radius: 999px;
+  border-radius: 6px;
   color: var(--mu);
   font-size: 12.5px;
 }

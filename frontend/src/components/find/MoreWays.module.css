@@ -13,12 +13,21 @@
   margin: 0 auto;
   padding: 9px 16px;
   border: 1px solid var(--ln2);
-  border-radius: 999px;
+  border-radius: var(--r-sm);
   background: #fff;
   font: 600 14px var(--font-sans);
   color: var(--ink);
   cursor: pointer;
   list-style: none;
+}
+
+/* On inner pages the toggle starts at the left edge with everything else. */
+.start {
+  margin-left: 0;
+}
+
+.start .summary {
+  margin: 0;
 }
 
 .summary::-webkit-details-marker {

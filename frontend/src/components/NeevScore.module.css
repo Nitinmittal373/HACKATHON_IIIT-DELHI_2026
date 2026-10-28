@@ -147,7 +147,7 @@
   align-items: baseline;
   gap: 8px;
   padding: 4px 11px;
-  border-radius: 999px;
+  border-radius: 6px;
   background: var(--tone-bg);
   color: var(--tone-fg);
   font-size: 12.5px;
