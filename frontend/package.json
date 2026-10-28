@@ -10,7 +10,6 @@
     "typecheck": "tsc --noEmit",
     "e2e": "playwright test",
     "capture": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/capture.ts",
-    "capture:live": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/capture-live.ts",
     "gen:api": "openapi-typescript ../contracts/openapi.json -o src/lib/api-schema.d.ts --default-non-nullable false",
     "test:unit": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"src/**/*.test.ts\""
   },
