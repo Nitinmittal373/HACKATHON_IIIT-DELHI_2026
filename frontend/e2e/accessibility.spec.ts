@@ -16,6 +16,11 @@ async function violations(page: Page) {
 
 const SCREENS: [string, string][] = [
   ["home", "/"],
+  ["check a project", "/check"],
+  ["how it works", "/how-it-works"],
+  ["for RWAs", "/rwa"],
+  ["privacy", "/privacy"],
+  ["login", "/login"],
   ["confirm", "/check?q=Supertech%20Eco%20Village"],
   ["no result", "/check?q=nothing"],
   ["report", REPORT],
@@ -57,6 +62,21 @@ test("the live check has no accessibility violations once it has finished", asyn
   await page.getByRole("button", { name: "Yes, check this project" }).click();
   await expect(page.getByText("NeevScore 495 · Elevated")).toBeVisible();
   await page.waitForTimeout(1500);
+  expect(await violations(page)).toEqual([]);
+});
+
+test("the new pages have no accessibility violations in Hindi either", async ({ page, context }) => {
+  await context.addCookies([{ name: "neevcheck-lang", value: "hi", url: "http://localhost:3010" }]);
+  for (const path of ["/check", "/how-it-works", "/rwa"]) {
+    await page.goto(path);
+    await page.waitForTimeout(2500);
+    expect(await violations(page), path).toEqual([]);
+  }
+});
+
+test("the credit report (partly read pillar, grey badge, CAPTCHA lane) has no accessibility violations", async ({ page }) => {
+  await page.goto(`/report/${"c".repeat(32)}`);
+  await page.waitForTimeout(2500);
   expect(await violations(page)).toEqual([]);
 });
 

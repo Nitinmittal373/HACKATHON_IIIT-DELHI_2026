@@ -1,14 +1,23 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { AccountMenu } from "@/components/AccountMenu";
 import { Logo } from "@/components/Logo";
 import { useLang } from "@/lib/LangProvider";
 import styles from "./Header.module.css";
 
+const PAGES = [
+  { href: "/check", label: "check" },
+  { href: "/how-it-works", label: "how" },
+  { href: "/rwa", label: "rwa" },
+  { href: "/alerts", label: "alerts" },
+] as const;
+
 export function Header() {
   const { lang, setLang, t } = useLang();
+  const pathname = usePathname();
 
   return (
     <header className={styles.header}>
@@ -17,10 +26,14 @@ export function Header() {
           <Logo />
         </Link>
         <div className={styles.links}>
-          <Link href="/#search">{t.nav.check}</Link>
-          <Link href="/#how-it-works">{t.nav.how}</Link>
-          <Link href="/#sentinel">{t.nav.rwa}</Link>
-          <Link href="/alerts">{t.nav.alerts}</Link>
+          {PAGES.map(({ href, label }) => {
+            const current = pathname === href || pathname.startsWith(`${href}/`);
+            return (
+              <Link key={href} href={href} aria-current={current ? "page" : undefined}>
+                {t.nav[label]}
+              </Link>
+            );
+          })}
         </div>
         <div className={styles.lang} role="group" aria-label={t.common.language}>
           <button type="button" aria-pressed={lang === "en"} onClick={() => setLang("en")} lang="en">

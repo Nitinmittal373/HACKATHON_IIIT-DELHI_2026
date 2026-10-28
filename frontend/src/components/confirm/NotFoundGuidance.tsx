@@ -25,7 +25,7 @@ export function NotFoundGuidance({ outsideUp, t }: Props) {
           {t.find.outsideUp}
         </h2>
         <div className={styles.actions}>
-          <Link href="/#search" className="btn">
+          <Link href="/check" className="btn">
             {copy.tryButton}
           </Link>
         </div>
@@ -60,7 +60,7 @@ export function NotFoundGuidance({ outsideUp, t }: Props) {
         ))}
       </ul>
       <div className={styles.actions}>
-        <Link href="/#more" className="btn">
+        <Link href="/check" className="btn">
           {copy.tryButton}
         </Link>
       </div>

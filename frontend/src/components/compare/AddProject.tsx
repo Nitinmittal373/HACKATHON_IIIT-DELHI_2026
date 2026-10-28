@@ -81,7 +81,7 @@ export function AddProject({ current, onAdd }: Props) {
       )}
       <p className={styles.small}>
         {t.compare.addSearchHint}{" "}
-        <Link href="/#search" className={styles.inlineLink}>
+        <Link href="/check" className={styles.inlineLink}>
           {t.compare.searchNew}
         </Link>
       </p>

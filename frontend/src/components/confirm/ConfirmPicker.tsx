@@ -98,7 +98,7 @@ export function ConfirmPicker({ projects }: { projects: Project[] }) {
               {t.confirm.no}
             </button>
           ) : (
-            <Link href="/#search" className="btn2">
+            <Link href="/check" className="btn2">
               {t.confirm.no}
             </Link>
           )}

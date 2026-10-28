@@ -48,7 +48,7 @@ export function ResumeCheck({ checkId }: { checkId: string }) {
 
   if (loaded.status === "missing") {
     return (
-      <PageMessage title={t.errors.notFoundTitle} actions={<Link href="/#search" className="btn">{t.hero.submit}</Link>}>
+      <PageMessage title={t.errors.notFoundTitle} actions={<Link href="/check" className="btn">{t.hero.submit}</Link>}>
         {t.errors.notFoundBody}
       </PageMessage>
     );

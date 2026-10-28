@@ -58,7 +58,7 @@ export function AccountAlerts() {
       <PageMessage
         title={t.alerts.empty}
         actions={
-          <Link href="/#search" className="btn2">
+          <Link href="/check" className="btn2">
             {t.nav.check}
           </Link>
         }

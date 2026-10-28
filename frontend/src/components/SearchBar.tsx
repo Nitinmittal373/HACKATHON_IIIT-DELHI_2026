@@ -9,12 +9,14 @@ interface Props {
   label: string;
   placeholder: string;
   submitLabel: string;
+  /** The home hero is centred; inner pages start at the left edge. */
+  align?: "center" | "start";
 }
 
 const MAX_QUERY_LENGTH = 100;
 
 /** The big search box. It takes a UP-RERA number, a project name or a builder's name. */
-export function SearchBar({ label, placeholder, submitLabel }: Props) {
+export function SearchBar({ label, placeholder, submitLabel, align = "center" }: Props) {
   const router = useRouter();
   const inputId = useId();
   const input = useRef<HTMLInputElement>(null);
@@ -31,7 +33,7 @@ export function SearchBar({ label, placeholder, submitLabel }: Props) {
 
   return (
     // Without JavaScript the form still works as a plain GET to the same address.
-    <form id="search" className={styles.bar} action="/check" method="get" onSubmit={search} role="search">
+    <form id="search" className={`${styles.bar} ${align === "start" ? styles.start : ""}`} action="/check" method="get" onSubmit={search} role="search">
       <svg
         width="22"
         height="22"

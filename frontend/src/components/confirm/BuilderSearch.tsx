@@ -77,7 +77,7 @@ export function BuilderSearch({ builder, city }: { builder: string; city?: strin
         <PageMessage
           title={copy.noneTitle}
           actions={
-            <Link href="/#more" className="btn">
+            <Link href="/check" className="btn">
               {t.find.notFound.tryButton}
             </Link>
           }

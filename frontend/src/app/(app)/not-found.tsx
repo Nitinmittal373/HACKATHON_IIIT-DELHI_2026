@@ -9,7 +9,7 @@ export default async function AppNotFound() {
     <PageMessage
       title={t.errors.notFoundTitle}
       actions={
-        <Link href="/#search" className="btn">
+        <Link href="/check" className="btn">
           {t.hero.submit}
         </Link>
       }

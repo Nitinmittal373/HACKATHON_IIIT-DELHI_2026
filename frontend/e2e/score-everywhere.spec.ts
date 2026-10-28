@@ -35,7 +35,6 @@ const BANDS_EN: Record<Schemas["DisplayScore"]["band"], string> = {
   High: "High risk",
   insufficient_evidence: "Not enough evidence yet",
 };
-const WATCH = BANDS_EN[SCORE.band];
 const label = (score: Schemas["DisplayScore"]) =>
   `NeevScore ${score.value} out of ${max}, ${BANDS_EN[score.band]}`;
 const NEEVSCORE_LABEL = new RegExp(`^NeevScore (\\d+) out of ${max}, `);
@@ -67,28 +66,15 @@ test("the fixtures really are on the 300-900 scale the API reports", () => {
   expect(META.bands.map((band) => band.key)).toEqual(["Low", "Watch", "Elevated", "High"]);
 });
 
-test("home: the scale is drawn from the meta and the marker is your latest check", async ({ page }) => {
-  await remember(page, [ECO]);
-  await page.goto("/");
+test("how it works: the scale and bands are drawn from the meta", async ({ page }) => {
+  await page.goto("/how-it-works");
 
-  const scale = page.getByRole("heading", { name: `One honest number, ${min} to ${max}` });
-  await expect(scale).toBeVisible();
-  const bands = page.locator("#scale-title").locator("xpath=ancestor::section").getByRole("listitem");
+  await expect(page.getByRole("heading", { name: `The ${min} to ${max} scale` })).toBeVisible();
+  const scale = page.getByRole("region", { name: `The ${min} to ${max} scale` });
   for (const band of META.bands) {
-    await expect(bands.filter({ hasText: BANDS_EN[band.key] }).first()).toContainText(`${band.min}–${band.max}`);
+    await expect(scale.getByText(`${BANDS_EN[band.key]}: ${band.min} to ${band.max}`)).toBeVisible();
   }
-  // The marker carries the score of the check on the hero card.
-  await expect(page.locator("section[aria-labelledby=scale-title]").getByText(String(SCORE.value), { exact: true })).toBeVisible();
-  await expect(page.locator("section[aria-labelledby=scale-title]")).toContainText(REPORT.project.name ?? "");
-
-  expect(await drawnScores(page)).toContain(SCORE.value);
-  await expect(page.getByRole("link", { name: /Latest NeevCheck report/ })).toContainText(WATCH);
   await noOldScale(page);
-});
-
-test("home: the example illustrations name the example check's NeevScore", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.getByText(new RegExp(`NeevScore unchanged at \\d+`))).toBeVisible();
 });
 
 test("check result: the finished check ends on its NeevScore", async ({ page }) => {
@@ -172,8 +158,8 @@ test("in Hindi the band labels and the scale follow the same map", async ({ page
   await page.context().addCookies([{ name: "neevcheck-lang", value: "hi", url: "http://localhost:3010" }]);
   await page.goto(`/report/${ECO}`);
   await expect(page.getByRole("img", { name: `नींवस्कोर ${max} में से ${SCORE.value}, बढ़ा हुआ जोखिम` })).toBeVisible();
-  await page.goto("/");
-  await expect(page.getByRole("heading", { name: `एक ईमानदार संख्या, ${min} से ${max}` })).toBeVisible();
+  await page.goto("/how-it-works");
+  await expect(page.getByRole("heading", { name: `${min} से ${max} का पैमाना` })).toBeVisible();
 });
 
 test("the shared preview image is served for a report", async ({ page, request }) => {
