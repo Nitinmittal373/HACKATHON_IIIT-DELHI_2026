@@ -4,19 +4,24 @@ import asyncio
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from app.budget import site_wait
 from app.config import Settings
+from app.indian_time import day_start
 from app.orchestrator import Orchestrator
 from app.sentinel.diff import diff_findings
 from app.sentinel.models import Watch
+from app.sentinel.monitors import MonitorError, MonitorGateway
 from app.sentinel.notify import send_alert, smtp_configured, stop_link
 from app.sentinel.store import SentinelStore
 from app.store import Store
 
 logger = logging.getLogger(__name__)
-HOUR_SECONDS = 3600
+# Recorded as the starter of every Sentinel check, so its share of the day's credit can be counted.
+SENTINEL_STARTER = "sentinel"
+# However many requests arrive, the automatic schedule looks at most this often.
+MIN_GAP = timedelta(hours=1)
 
 
 @dataclass
@@ -42,6 +47,7 @@ class Sentinel:
         self._clock = clock
         self._running = asyncio.Lock()
         self._background: asyncio.Task[RunSummary] | None = None
+        self._last_poke: datetime | None = None
 
     def start_run(self) -> bool:
         """Begin a run in the background; False if one is already going."""
@@ -50,15 +56,70 @@ class Sentinel:
         self._background = asyncio.create_task(self.run_once())
         return True
 
-    async def loop(self) -> None:
-        """Re-check on the configured schedule until the app stops."""
-        interval = self._settings.sentinel_interval_hours * HOUR_SECONDS
-        while True:
-            await asyncio.sleep(interval)
+    def poke(self) -> None:
+        """Called at startup and on every request: look for due re-checks, at most hourly.
+
+        There is no timer. A free host sleeps when idle, and a sleeping process cannot count
+        168 hours, so the next visit is what wakes Sentinel up.
+        """
+        now = self._clock()
+        if self._settings.sentinel_interval_hours <= 0 or self._running.locked():
+            return
+        if self._last_poke is not None and now - self._last_poke < MIN_GAP:
+            return
+        self._last_poke = now
+        self._background = asyncio.create_task(self._run_due_safely())
+
+    def stop(self) -> None:
+        if self._background is not None:
+            self._background.cancel()
+
+    async def _run_due_safely(self) -> RunSummary:
+        try:
+            return await self.run_due()
+        except Exception:
+            logger.exception("Sentinel run failed")
+            return RunSummary()
+
+    async def run_due(self) -> RunSummary:
+        """Re-check watched projects whose last check is older than the interval.
+
+        Bounded three ways: one look an hour (kept in the database, so a restart does not reset
+        it), SENTINEL_CHECKS_PER_DAY re-checks a day, and never past the site's own budget.
+        """
+        summary = RunSummary()
+        async with self._running:
+            now = self._clock()
+            if not self._watches.claim_run(now, MIN_GAP):
+                return summary
+            today = self._store.count_checks_since(day_start(now), started_by=SENTINEL_STARTER)
+            room = self._settings.sentinel_checks_per_day - today
+            for rera_id in self._due_projects(now)[: max(0, room)]:
+                if site_wait(self._store, self._settings, self._clock()) is not None:
+                    summary.stopped_by_daily_cap = True
+                    logger.info("Sentinel stopped: the site check budget is used up")
+                    break
+                summary.alerts_created += await self._recheck(rera_id)
+                summary.projects_checked += 1
+        return summary
+
+    def _due_projects(self, now: datetime) -> list[str]:
+        """Watched projects never checked first, then the one checked longest ago."""
+        oldest = now - timedelta(hours=self._settings.sentinel_interval_hours)
+        watched = self._watches.watched_projects()
+        last = {id_: self._store.latest_check_started(id_) for id_ in watched}
+        due = [id_ for id_, started in last.items() if started is None or started < oldest]
+        return sorted(due, key=lambda id_: (last[id_] is not None, last[id_] or now))
+
+    async def cancel_monitors(self, gateway: MonitorGateway) -> None:
+        """Monitors bill outside the site budget, so with them off none should keep running."""
+        for monitor_id in self._watches.monitor_ids():
             try:
-                await self.run_once()
-            except Exception:
-                logger.exception("Sentinel run failed")
+                await gateway.cancel(monitor_id)
+            except MonitorError as error:
+                logger.warning("A monitor was not cancelled, will retry at next start: %s", error)
+                continue
+            self._watches.forget_monitor(monitor_id)
 
     async def run_once(self) -> RunSummary:
         summary = RunSummary()
@@ -87,7 +148,7 @@ class Sentinel:
         if project is None:
             return 0
         # A re-check exists to see what changed, so it must not reuse a read made earlier today.
-        started = self._orchestrator.start(project, fresh=True)
+        started = self._orchestrator.start(project, fresh=True, started_by=SENTINEL_STARTER)
         check = await self._orchestrator.finished(started.id)
         if check.status != "completed":
             return 0

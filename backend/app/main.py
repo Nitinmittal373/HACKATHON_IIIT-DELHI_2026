@@ -1,12 +1,11 @@
 """FastAPI app factory. Run with: uvicorn app.main:app --reload"""
 
-import asyncio
-from collections.abc import AsyncIterator, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from datetime import datetime
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.accounts import UserReports
@@ -51,6 +50,16 @@ EXTRACT_PER_MINUTE = 10
 # Saved-report calls per minute from one address; each is a small database read or write.
 ACCOUNT_PER_MINUTE = 30
 UNSUBSCRIBE_PER_MINUTE = 10
+
+
+async def wake_sentinel(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+) -> Response:
+    """Every request is a chance to start a due re-check; Sentinel keeps it to once an hour."""
+    sentinel = getattr(request.app.state, "sentinel", None)
+    if sentinel is not None:
+        sentinel.poke()
+    return await call_next(request)
 
 
 def create_app(
@@ -111,21 +120,24 @@ def create_app(
             settings,
             clock,
         )
-        # Monitors need an address TinyFish can call and a secret to prove the call is its own.
-        wants_monitors = settings.public_base_url and settings.webhook_secret
+        # Monitors bill outside the site budget, so they exist only when SENTINEL_MONITORS is on.
+        # Switched off, any that an earlier version made for current watches are cancelled now.
+        monitors_on = bool(
+            settings.sentinel_monitors and settings.public_base_url and settings.webhook_secret
+        )
+        leftover = not settings.sentinel_monitors and app.state.sentinel_store.monitor_ids()
         app.state.monitors = monitors or (
             TinyFishMonitors(settings.tinyfish_api_key, timeout=settings.fetch_timeout_seconds)
-            if wants_monitors
+            if monitors_on or leftover
             else None
         )
-        schedule = None
-        if settings.sentinel_interval_hours > 0:
-            schedule = asyncio.create_task(app.state.sentinel.loop())
+        if leftover and app.state.monitors:
+            await app.state.sentinel.cancel_monitors(app.state.monitors)
+        app.state.sentinel.poke()
         try:
             yield
         finally:
-            if schedule:
-                schedule.cancel()
+            app.state.sentinel.stop()
             await app.state.orchestrator.shutdown()
             await app.state.web.aclose()
             if app.state.monitors:
@@ -137,6 +149,7 @@ def create_app(
     app.state.clock = clock
 
     app.middleware("http")(add_security_headers)
+    app.middleware("http")(wake_sentinel)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,

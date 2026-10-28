@@ -94,7 +94,7 @@ async def create_watch(
         created_at=clock(),
         baseline_check_id=latest.id if latest else None,
     )
-    if gateway:
+    if gateway and settings.sentinel_monitors:
         project = store.get_project(body.rera_id)
         await add_monitors(
             gateway, watches, watch, details_url, project and project.promoter, settings
