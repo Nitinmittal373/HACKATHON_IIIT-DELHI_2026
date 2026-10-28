@@ -51,6 +51,7 @@ def build(tmp_path: Path, monitors: FakeMonitors, **settings: object) -> TestCli
     values = {
         "webhook_secret": SECRET,
         "public_base_url": BASE,
+        "sentinel_monitors": True,
         "sentinel_interval_hours": 0,
         "auth_bridge_secret": BRIDGE_SECRET,
         **settings,
@@ -137,6 +138,7 @@ def test_a_delivery_rechecks_the_project_once_and_alerts_with_the_diff(tmp_path:
             tmp_path,
             webhook_secret=SECRET,
             public_base_url=BASE,
+            sentinel_monitors=True,
             sentinel_interval_hours=0,
             auth_bridge_secret=BRIDGE_SECRET,
         ),

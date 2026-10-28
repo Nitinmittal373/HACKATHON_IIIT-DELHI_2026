@@ -185,6 +185,15 @@ class WebhookReceiptRow(Base):
     received_at: Mapped[datetime] = mapped_column(UTCDateTime)
 
 
+class SentinelStateRow(Base):
+    """When Sentinel's automatic re-check last ran, so a restart does not reset its pacing."""
+
+    __tablename__ = "sentinel_state"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    last_run_at: Mapped[datetime] = mapped_column(UTCDateTime)
+
+
 class CorrectionRow(Base):
     """A reader's request to correct a report, kept for the operator to review."""
 

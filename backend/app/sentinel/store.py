@@ -3,7 +3,7 @@
 import hashlib
 import secrets
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy import delete, func, select, update
 from sqlalchemy.orm import Session, sessionmaker
@@ -13,6 +13,7 @@ from app.db import (
     AlertRow,
     MonitorRow,
     ProjectRow,
+    SentinelStateRow,
     UnsubscribeTokenRow,
     WatchRow,
     WebhookReceiptRow,
@@ -21,6 +22,7 @@ from app.models import DisplayScore
 from app.sentinel.models import Alert, Diff, FindingChange, Language, Watch
 
 TOKEN_BYTES = 32
+STATE_ID = 1
 
 
 def hash_token(token: str) -> str:
@@ -133,6 +135,26 @@ class SentinelStore:
     def add_monitor(self, watch_id: str, monitor_id: str, kind: str) -> None:
         with self._sessions.begin() as session:
             session.add(MonitorRow(monitor_id=monitor_id, watch_id=watch_id, kind=kind))
+
+    def monitor_ids(self) -> list[str]:
+        with self._sessions() as session:
+            return list(session.scalars(select(MonitorRow.monitor_id)))
+
+    def forget_monitor(self, monitor_id: str) -> None:
+        with self._sessions.begin() as session:
+            session.execute(delete(MonitorRow).where(MonitorRow.monitor_id == monitor_id))
+
+    def claim_run(self, now: datetime, min_gap: timedelta) -> bool:
+        """True, and the time is saved, when the last automatic run is at least `min_gap` ago."""
+        with self._sessions.begin() as session:
+            state = session.get(SentinelStateRow, STATE_ID)
+            if state is None:
+                session.add(SentinelStateRow(id=STATE_ID, last_run_at=now))
+                return True
+            if now - state.last_run_at < min_gap:
+                return False
+            state.last_run_at = now
+            return True
 
     def project_for_monitor(self, monitor_id: str) -> str | None:
         with self._sessions() as session:
