@@ -1,6 +1,7 @@
 import { account as accountEn } from "@/lib/i18n/en/account";
 import { app as appEn } from "@/lib/i18n/en/app";
 import { home as homeEn } from "@/lib/i18n/en/home";
+import { pages as pagesEn } from "@/lib/i18n/en/pages";
 import { insights as insightsEn } from "@/lib/i18n/en/insights";
 import { check as checkEn } from "@/lib/i18n/en/check";
 import { complaint as complaintEn } from "@/lib/i18n/en/complaint";
@@ -17,6 +18,7 @@ import { alerts as alertsEn, sentinel as sentinelEn } from "@/lib/i18n/en/sentin
 import { account as accountHi } from "@/lib/i18n/hi/account";
 import { app as appHi } from "@/lib/i18n/hi/app";
 import { home as homeHi } from "@/lib/i18n/hi/home";
+import { pages as pagesHi } from "@/lib/i18n/hi/pages";
 import { insights as insightsHi } from "@/lib/i18n/hi/insights";
 import { check as checkHi } from "@/lib/i18n/hi/check";
 import { complaint as complaintHi } from "@/lib/i18n/hi/complaint";
@@ -38,6 +40,7 @@ const en = {
   ...checkEn,
   account: accountEn,
   home: homeEn,
+  pages: pagesEn,
   credit: creditEn,
   complaint: complaintEn,
   family: familyEn,
@@ -61,6 +64,7 @@ const hi: Strings = {
   ...checkHi,
   account: accountHi,
   home: homeHi,
+  pages: pagesHi,
   credit: creditHi,
   complaint: complaintHi,
   family: familyHi,

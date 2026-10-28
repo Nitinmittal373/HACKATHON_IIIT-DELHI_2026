@@ -13,7 +13,7 @@ const TABS = ["builder", "locality", "document", "qr"] as const;
 type Tab = (typeof TABS)[number];
 
 /** For projects with no website: find them by builder, by place, from a brochure or a QR code. */
-export function MoreWays() {
+export function MoreWays({ align = "center" }: { align?: "center" | "start" }) {
   const { t } = useLang();
   const base = useId();
   const [tab, setTab] = useState<Tab>("builder");
@@ -35,7 +35,7 @@ export function MoreWays() {
   }
 
   return (
-    <details id="more" className={styles.more}>
+    <details id="more" className={`${styles.more} ${align === "start" ? styles.start : ""}`}>
       <summary className={styles.summary}>
         {t.find.more.summary}
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">

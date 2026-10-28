@@ -1,4 +1,3 @@
-import { Glow } from "@/components/Glow";
 import { SkylineCrane } from "@/components/SkylineCrane";
 import { SkylineTower } from "@/components/SkylineTower";
 import {
@@ -20,7 +19,7 @@ interface Props {
   variant: "hero" | "app";
 }
 
-/** The animated construction skyline: towers rising, cranes working, a glowing "neev" line. */
+/** The animated construction skyline: towers rising, cranes working, a running "neev" line. */
 export function Skyline({ variant }: Props) {
   const random = seededRandom(7);
   const far = farBlocks(random);
@@ -103,10 +102,5 @@ export function Skyline({ variant }: Props) {
   );
 
   if (variant === "hero") return svg;
-  return (
-    <div className={styles.scene}>
-      <Glow dots soft />
-      {svg}
-    </div>
-  );
+  return <div className={styles.scene}>{svg}</div>;
 }

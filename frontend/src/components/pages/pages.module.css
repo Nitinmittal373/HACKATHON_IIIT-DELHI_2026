@@ -1,0 +1,209 @@
+/* Inner pages read left to right in a normal measure: about 68 characters a line. */
+.page {
+  max-width: 68ch;
+}
+
+.title {
+  font-size: 40px;
+}
+
+.lead {
+  margin-top: 10px;
+  color: var(--mu);
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.section {
+  max-width: 68ch;
+  margin-top: 48px;
+}
+
+/* A section that holds a grid of cards may use the full width. */
+.sectionWide {
+  margin-top: 48px;
+}
+
+.heading {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.text {
+  max-width: 68ch;
+  margin-top: 10px;
+  color: var(--ink2);
+  line-height: 1.65;
+}
+
+.list {
+  margin: 14px 0 0;
+  padding-left: 1.2em;
+  color: var(--ink2);
+  line-height: 1.65;
+}
+
+.list li + li {
+  margin-top: 6px;
+}
+
+.plain {
+  padding-left: 0;
+  list-style: none;
+}
+
+.steps {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--ln);
+}
+
+.steps li {
+  display: grid;
+  grid-template-columns: 2.2em 1fr;
+  gap: 4px 12px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--ln);
+}
+
+.stepNumber {
+  grid-row: span 2;
+  color: var(--o-text);
+  font: 500 15px var(--font-mono);
+}
+
+.stepTitle {
+  font-weight: 600;
+}
+
+.stepBody {
+  color: var(--mu);
+  line-height: 1.6;
+}
+
+.rows {
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--ln);
+}
+
+.rows li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--ln);
+}
+
+.rowText {
+  color: var(--mu);
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+
+.rowName {
+  display: block;
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.weight {
+  flex: none;
+  font: 500 14px var(--font-mono);
+  color: var(--ink2);
+}
+
+.band {
+  padding-left: 12px;
+  border-left: 4px solid var(--ln2);
+}
+
+.band[data-tone="low"] {
+  border-color: var(--low);
+}
+
+.band[data-tone="moderate"] {
+  border-color: var(--moderate);
+}
+
+.band[data-tone="high"] {
+  border-color: var(--high);
+}
+
+.band[data-tone="critical"] {
+  border-color: var(--critical);
+}
+
+.links a,
+.text a {
+  color: var(--o-text);
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.galleryCard {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 14px;
+  align-items: center;
+  height: 100%;
+  padding: 16px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.galleryCard:hover {
+  border-color: var(--ink);
+}
+
+.galleryName {
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.galleryMeta {
+  grid-column: 2;
+  color: var(--mu);
+  font-size: 13px;
+}
+
+.galleryOpen {
+  grid-column: 1 / -1;
+  color: var(--o-text);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+@media (max-width: 960px) {
+  .title {
+    font-size: 30px;
+  }
+
+  .lead {
+    font-size: 16.5px;
+  }
+
+  .section,
+  .sectionWide {
+    margin-top: 36px;
+  }
+}

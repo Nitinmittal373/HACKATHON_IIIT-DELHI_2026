@@ -21,7 +21,10 @@ const LEFTOVERS =
 
 const PAGES = [
   { name: "home", path: "/" },
-  { name: "rwas", path: "/#sentinel" },
+  { name: "check", path: "/check" },
+  { name: "how-it-works", path: "/how-it-works" },
+  { name: "rwas", path: "/rwa" },
+  { name: "privacy", path: "/privacy" },
   { name: "search-and-confirm", path: "/check?q=Supertech%20Eco%20Village" },
   { name: "outside-up", path: "/check?q=P51800000937" },
   { name: "nothing-found", path: "/check?q=nothing%20here" },

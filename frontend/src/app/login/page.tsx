@@ -9,7 +9,7 @@ import styles from "./login.module.css";
 export const metadata: Metadata = { title: "Sign in · NeevCheck" };
 
 /**
- * A glass card over the skyline. Signing in is optional: checking a project never needs it.
+ * A plain panel over the skyline. Signing in is optional: checking a project never needs it.
  * `next` says where to go afterwards (the home page by default); only a path on this site counts.
  */
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {

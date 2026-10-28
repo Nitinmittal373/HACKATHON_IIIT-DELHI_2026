@@ -27,7 +27,7 @@ export function RecheckNote({ hours, readOn, project, nextRecheckAt }: Props) {
   const stale = hours > STALE_AFTER_HOURS;
   const router = useRouter();
   const { lang, t } = useLang();
-  const waiting = nextRecheckAt !== null;
+  const waiting = Boolean(nextRecheckAt);
   const [starting, setStarting] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
 
@@ -50,7 +50,7 @@ export function RecheckNote({ hours, readOn, project, nextRecheckAt }: Props) {
       </span>
       {stale && <span>{t.insights.freshness.stale}</span>}
       {waiting ? (
-        <span className={styles.wait}>{t.insights.freshness.nextRecheck(indianDay(nextRecheckAt, lang))}</span>
+        <span className={styles.wait}>{t.insights.freshness.nextRecheck(indianDay(nextRecheckAt ?? "", lang))}</span>
       ) : (
         <button type="button" className={stale ? "btn" : styles.button} onClick={recheck} disabled={starting}>
           {stale ? t.insights.freshness.recheck : t.report.recheck}

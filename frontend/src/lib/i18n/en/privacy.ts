@@ -42,6 +42,14 @@ export const privacy = {
       ],
     },
     {
+      title: "Search limits",
+      points: [
+        "Searches cost money, so each address may run a fixed number of searches a day. To count them, the server keeps your IP address with a number in its memory for one day, then drops it.",
+        "A saved search answer is kept for a few days so the same question is not paid for twice. It holds the question and the public answer, never your address.",
+        "A live check you start is stored with your account id, so the daily limit per account can count it. Nothing here is used for anything else.",
+      ],
+    },
+    {
       title: "No ads, no selling, no sharing",
       points: [
         "There are no ads and no trackers for advertising.",

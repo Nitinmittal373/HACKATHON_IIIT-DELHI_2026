@@ -12,19 +12,18 @@ async function remember(page: Page, ids: string[]) {
 }
 
 test.describe("home", () => {
-  test("the hero card and the strip show this browser's own latest check", async ({ page }) => {
+  test("the strip shows this browser's own latest check", async ({ page }) => {
     await remember(page, [ECO]);
     await page.goto("/");
-    await expect(page.getByRole("link", { name: /Latest NeevCheck report: SUPERTECH ECO VILLAGE-I PHASE I-C/ })).toBeVisible();
     const strip = page.getByRole("region", { name: "Checked in this browser" });
     await expect(strip.getByRole("link", { name: /NeevScore 495, Elevated/ })).toHaveAttribute("href", `/report/${ECO}`);
   });
 
-  test("with no check of your own: an empty card, no numbers, no strip, nobody else's checks", async ({ page }) => {
+  test("with no check of your own: no strip, no numbers, nobody else's checks", async ({ page }) => {
     const asked: string[] = [];
     page.on("request", (request) => asked.push(request.url()));
     await page.goto("/");
-    await expect(page.getByLabel("Placeholder for your report")).toContainText("Your report appears here");
+    await expect(page.getByRole("search")).toBeVisible();
     await expect(page.getByText("Checked in this browser")).toHaveCount(0);
     await expect(page.getByText("Recently checked on NeevCheck")).toHaveCount(0);
     expect(asked.filter((url) => url.includes("/api/checks"))).toEqual([]);

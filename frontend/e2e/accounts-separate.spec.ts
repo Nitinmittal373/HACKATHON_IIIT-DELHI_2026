@@ -37,7 +37,7 @@ async function expectNothingOfAsha(page: Page) {
   await expect(page.getByText("No alerts yet.")).toBeVisible();
   await expect(page.getByRole("article")).toHaveCount(0);
   await page.goto("/");
-  await expect(page.getByLabel("Placeholder for your report")).toContainText("Your report appears here");
+  await expect(page.getByRole("search")).toBeVisible();
   await expect(page.getByText("Your recent checks")).toHaveCount(0);
   await expect(page.getByText("Checked in this browser")).toHaveCount(0);
 }
@@ -92,7 +92,7 @@ test.describe("separate accounts in one browser", () => {
     await page.goto("/reports");
     await expect(page.getByRole("heading", { name: "No reports yet" })).toBeVisible();
     await page.goto("/");
-    await expect(page.getByLabel("Placeholder for your report")).toContainText("Your report appears here");
+    await expect(page.getByRole("search")).toBeVisible();
     await expect(page.getByRole("region", { name: "Your recent checks" })).toHaveCount(0);
   });
 

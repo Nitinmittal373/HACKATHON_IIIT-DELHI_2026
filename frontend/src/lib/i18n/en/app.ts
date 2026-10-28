@@ -7,10 +7,9 @@ export const app = {
     alerts: "Alerts",
   },
   hero: {
-    pill: "Built for homebuyers in Uttar Pradesh",
     headline: ["Know", "your", "builder", "before", "you", "book."],
     subtitle:
-      "NeevCheck reads UP-RERA, company records, insolvency orders and court news for under-construction homes in Uttar Pradesh, and gives you a clear risk score with proof.",
+      "For homebuyers in Uttar Pradesh. Six kinds of records. 300 to 900. Every point links to its source.",
     searchLabel: "UP-RERA number, project or builder",
     placeholder: "UP-RERA number, project or builder",
     submit: "Check project",

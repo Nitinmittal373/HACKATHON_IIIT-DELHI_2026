@@ -2,41 +2,26 @@
 
 import Link from "next/link";
 
-import { SignInHint } from "@/components/SignInHint";
-import { Glow } from "@/components/Glow";
 import { MoreWays } from "@/components/find/MoreWays";
-import { ReportStage } from "@/components/ReportStage";
 import { SearchBar } from "@/components/SearchBar";
+import { SignInHint } from "@/components/SignInHint";
 import { Skyline } from "@/components/Skyline";
-import { heroCard } from "@/lib/heroCard";
 import { useLang } from "@/lib/LangProvider";
-import { useMeta } from "@/lib/MetaProvider";
-import { useRecentChecks } from "@/lib/useRecentChecks";
 import styles from "./Hero.module.css";
 
 // Examples read from up-rera.in itself.
 const CHIPS = ["UPRERAPRJ8334", "Gaur City", "Supertech"];
 const WORD_STEP_SECONDS = 0.06;
 
-/** Search-first hero: headline, search, quick examples and the latest real report. */
+/** The only centred block on the site: the headline, one line, the search and quick examples. */
 export function Hero() {
   const { lang, t } = useLang();
-  const meta = useMeta();
   const words = t.hero.headline;
-  const recent = useRecentChecks();
-  const latest = recent.status === "ready" ? recent.checks[0] : undefined;
-  const card = latest ? heroCard(latest, t, lang, meta) : null;
 
   return (
     <section className={styles.hero}>
-      <Glow dots />
       <Skyline variant="hero" />
       <div className={`wrap ${styles.content}`}>
-        <div className={`${styles.pill} ${styles.fadeUp}`}>
-          <span className={styles.live} aria-hidden="true" />
-          {t.hero.pill}
-        </div>
-
         <h1 className={`${styles.title} ${lang === "hi" ? `dev ${styles.hindi}` : ""}`}>
           {words.map((word, index) => (
             <span key={`${lang}-${word}`}>
@@ -79,19 +64,6 @@ export function Hero() {
             </Link>
           ))}
         </div>
-
-        <ReportStage card={card} t={t} />
-        <p className={styles.note}>
-          {card && (
-            <>
-              {t.home.report.latestNote(card.readOn)}{" "}
-              <Link href={`/report/${card.id}`} className={styles.noteLink}>
-                {t.home.report.open}
-              </Link>
-            </>
-          )}
-          {recent.status === "ready" && !card && t.home.report.skeletonNote}
-        </p>
       </div>
     </section>
   );
