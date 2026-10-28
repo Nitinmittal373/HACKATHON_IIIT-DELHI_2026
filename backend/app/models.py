@@ -112,7 +112,8 @@ class CheckCreate(BaseModel):
     # The page search returned. Required for new-format numbers, whose pages have no stable
     # address; send it for every number, since many later numbers have no stable page either.
     details_url: str | None = Field(default=None, max_length=500)
-    # Skip the 24-hour reuse of a recent check ("Re-check now"). The daily cap still applies.
+    # "Re-check now": read the records again instead of reusing a recent report. Allowed once per
+    # project in RECHECK_MIN_DAYS, and only for a signed-in account like any new live check.
     fresh: bool = False
 
     @model_validator(mode="after")
@@ -163,6 +164,8 @@ class SourceRun(ApiModel):
     live_url: str | None = None
     message: str | None = None
     checks_read: list[CheckKey] = []
+    # Where a visitor can look the record up themselves when it is not checked automatically.
+    manual_url: str | None = None
 
 
 PillarId = Literal["P1", "P2", "P3", "P4", "P5", "P6"]
@@ -274,6 +277,8 @@ class Check(ApiModel):
     sources: list[SourceRun] = []
     # True when an earlier finished check of the same project was returned instead of a new one.
     reused: bool = False
+    # When "Re-check now" opens again for this project; None when it is open now.
+    next_recheck_at: datetime | None = None
     # Set once the check has a score.
     display_score: DisplayScore | None = None
 
@@ -413,6 +418,20 @@ class Report(ApiModel):
     # Where the UP-RERA portal is, and where a complaint is filed.
     portal_url: str = "https://www.up-rera.in/"
     complaint_url: str = "https://www.up-rera.in/ComplaintHome"
+
+
+class FeaturedProject(ApiModel):
+    """A well-known project NeevCheck has already checked, for the home page gallery.
+
+    Built from the saved check only: it never says who ran it.
+    """
+
+    rera_id: str
+    check_id: str
+    name: str | None
+    promoter: str | None
+    display_score: DisplayScore
+    read_at: datetime
 
 
 class Event(BaseModel):

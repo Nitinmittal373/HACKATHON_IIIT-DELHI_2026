@@ -229,18 +229,18 @@ def test_one_account_can_watch_three_projects(
         assert fourth.json()["detail"]["code"] == "watch_limit"
 
 
-def test_the_daily_cap_refuses_new_checks_with_429(tmp_path: Path) -> None:
-    with build_client(tmp_path, max_checks_per_day=1) as client:
+def test_the_site_budget_refuses_new_checks_with_429(tmp_path: Path) -> None:
+    with build_client(tmp_path, site_checks_per_day=1) as client:
         run_check(client)
         capped = client.post("/api/checks", json={"rera_id": "UPRERAPRJ8334", "fresh": True})
 
         assert capped.status_code == 429
-        assert capped.json()["detail"]["code"] == "daily_cap"
+        assert capped.json()["detail"]["code"] == "site_budget"
         assert int(capped.headers["Retry-After"]) >= 1
 
 
 def test_the_daily_cap_also_stops_sentinel(tmp_path: Path) -> None:
-    with build_client(tmp_path, max_checks_per_day=1) as client:
+    with build_client(tmp_path, site_checks_per_day=1) as client:
         run_check(client)
         watch(client)
         before = len(client.app.state.web.calls)  # type: ignore[attr-defined]
@@ -249,7 +249,7 @@ def test_the_daily_cap_also_stops_sentinel(tmp_path: Path) -> None:
         assert len(client.app.state.web.calls) == before  # type: ignore[attr-defined]
 
 
-def test_a_check_from_the_last_day_is_reused_unless_a_fresh_one_is_asked_for(
+def test_a_recent_check_is_reused_unless_a_fresh_one_is_asked_for(
     sentinel_client: TestClient,
 ) -> None:
     with sentinel_client as client:
@@ -264,7 +264,7 @@ def test_a_check_from_the_last_day_is_reused_unless_a_fresh_one_is_asked_for(
         assert fresh.json()["id"] != first
 
 
-def test_a_check_older_than_a_day_is_not_reused(tmp_path: Path) -> None:
+def test_a_check_older_than_the_reuse_window_is_not_reused(tmp_path: Path) -> None:
     now = [FIXED_NOW]
     app = create_app(
         make_settings(tmp_path, webhook_secret=SECRET),
@@ -274,7 +274,7 @@ def test_a_check_older_than_a_day_is_not_reused(tmp_path: Path) -> None:
     )
     with TestClient(app) as client:
         first = run_check(client)
-        now[0] = FIXED_NOW + timedelta(hours=25)
+        now[0] = FIXED_NOW + timedelta(days=8)
         later = client.post("/api/checks", json={"rera_id": "UPRERAPRJ8334"})
 
         assert later.status_code == 202

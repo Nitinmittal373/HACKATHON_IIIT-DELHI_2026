@@ -56,11 +56,33 @@ class Store:
             row = session.get(ProjectRow, rera_id)
             return _project(row) if row else None
 
-    def create_check(self, check_id: str, rera_id: str, started_at: datetime) -> None:
+    def create_check(
+        self, check_id: str, rera_id: str, started_at: datetime, started_by: str | None = None
+    ) -> None:
         with self._sessions.begin() as session:
             session.add(
-                CheckRow(id=check_id, rera_id=rera_id, status="queued", started_at=started_at)
+                CheckRow(
+                    id=check_id,
+                    rera_id=rera_id,
+                    status="queued",
+                    started_at=started_at,
+                    started_by=started_by,
+                )
             )
+
+    def save_usage(self, check_id: str, usage: dict[str, int]) -> None:
+        with self._sessions.begin() as session:
+            session.get_one(CheckRow, check_id).usage = usage
+
+    def usage_since(self, since: datetime) -> list[dict[str, int]]:
+        """Call counts of the checks started since then (checks made before metering have none)."""
+        with self._sessions() as session:
+            rows = session.scalars(
+                select(CheckRow.usage).where(
+                    CheckRow.started_at >= since, CheckRow.usage.is_not(None)
+                )
+            ).all()
+        return [dict(usage) for usage in rows if usage is not None]
 
     def set_check_status(
         self, check_id: str, status: CheckStatus, completed_at: datetime | None = None
@@ -111,14 +133,21 @@ class Store:
                 sources=[_source_run(run) for run in runs],
             )
 
-    def count_checks_since(self, since: datetime) -> int:
-        """How many checks were started since then; each one costs live agent runs."""
+    def count_checks_since(self, since: datetime, started_by: str | None = None) -> int:
+        """How many checks were started since then (by one account, if given)."""
+        query = select(func.count()).select_from(CheckRow).where(CheckRow.started_at >= since)
+        if started_by is not None:
+            query = query.where(CheckRow.started_by == started_by)
         with self._sessions() as session:
-            return (
-                session.scalar(
-                    select(func.count()).select_from(CheckRow).where(CheckRow.started_at >= since)
+            return session.scalar(query) or 0
+
+    def latest_check_started(self, rera_id: str) -> datetime | None:
+        """When the project was last checked live; a check that failed does not count."""
+        with self._sessions() as session:
+            return session.scalar(
+                select(func.max(CheckRow.started_at)).where(
+                    CheckRow.rera_id == rera_id, CheckRow.status != "failed"
                 )
-                or 0
             )
 
     def latest_completed_check(self, rera_id: str, since: datetime | None = None) -> Check | None:
@@ -171,6 +200,7 @@ class Store:
             row.live_url = run.live_url
             row.message = run.message
             row.checks_read = list(run.checks_read)
+            row.manual_url = run.manual_url
 
     def add_finding(self, check_id: str, finding: Finding) -> None:
         # No source, no claim: a finding without a link is never stored.
@@ -370,6 +400,7 @@ def _source_run(row: SourceRunRow) -> SourceRun:
             "live_url": row.live_url,
             "message": row.message,
             "checks_read": row.checks_read,
+            "manual_url": row.manual_url,
         }
     )
 

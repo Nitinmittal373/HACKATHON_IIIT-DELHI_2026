@@ -11,11 +11,13 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.accounts import UserReports
 from app.api import (
+    admin,
     checks,
     compare,
     corrections,
     events,
     extract,
+    featured,
     health,
     me,
     meta,
@@ -30,7 +32,8 @@ from app.corrections import CorrectionStore
 from app.db import make_engine, make_session_factory
 from app.events import EventHub
 from app.orchestrator import Orchestrator, utc_now
-from app.ratelimit import RateLimiter
+from app.ratelimit import DailyLimiter, RateLimiter
+from app.search_gate import SavedSearches, SearchGate
 from app.security import add_security_headers
 from app.sentinel.monitors import MonitorGateway, TinyFishMonitors
 from app.sentinel.service import Sentinel
@@ -78,6 +81,9 @@ def create_app(
         app.state.store.rescore_all()
         app.state.hub = EventHub()
         app.state.limiter = RateLimiter(settings.rate_limit_per_minute)
+        app.state.search_gate = SearchGate(
+            SavedSearches(make_session_factory(engine)), DailyLimiter(), settings, clock
+        )
         app.state.extract_limiter = RateLimiter(EXTRACT_PER_MINUTE)
         app.state.account_limiter = RateLimiter(ACCOUNT_PER_MINUTE)
         app.state.unsubscribe_limiter = RateLimiter(UNSUBSCRIBE_PER_MINUTE)
@@ -147,6 +153,8 @@ def create_app(
         promoters,
         compare,
         checks,
+        featured,
+        admin,
         events,
         reports,
         sentinel,

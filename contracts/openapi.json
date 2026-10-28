@@ -231,6 +231,57 @@
         "title": "BlockedData",
         "type": "object"
       },
+      "CallAverages": {
+        "properties": {
+          "agent": {
+            "title": "Agent",
+            "type": "number"
+          },
+          "fetch": {
+            "title": "Fetch",
+            "type": "number"
+          },
+          "search": {
+            "title": "Search",
+            "type": "number"
+          }
+        },
+        "required": [
+          "search",
+          "fetch",
+          "agent"
+        ],
+        "title": "CallAverages",
+        "type": "object"
+      },
+      "CallCounts": {
+        "properties": {
+          "agent": {
+            "title": "Agent",
+            "type": "integer"
+          },
+          "checks": {
+            "title": "Checks",
+            "type": "integer"
+          },
+          "fetch": {
+            "title": "Fetch",
+            "type": "integer"
+          },
+          "search": {
+            "title": "Search",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "checks",
+          "search",
+          "fetch",
+          "agent"
+        ],
+        "title": "CallCounts",
+        "type": "object"
+      },
       "Check": {
         "properties": {
           "completed_at": {
@@ -262,6 +313,18 @@
           "id": {
             "title": "Id",
             "type": "string"
+          },
+          "next_recheck_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Recheck At"
           },
           "rera_id": {
             "title": "Rera Id",
@@ -305,6 +368,7 @@
           "completed_at",
           "sources",
           "reused",
+          "next_recheck_at",
           "display_score"
         ],
         "title": "Check",
@@ -1272,6 +1336,59 @@
           "companies"
         ],
         "title": "FamilyTree",
+        "type": "object"
+      },
+      "FeaturedProject": {
+        "description": "A well-known project NeevCheck has already checked, for the home page gallery.\n\nBuilt from the saved check only: it never says who ran it.",
+        "properties": {
+          "check_id": {
+            "title": "Check Id",
+            "type": "string"
+          },
+          "display_score": {
+            "$ref": "#/components/schemas/DisplayScore"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "promoter": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Promoter"
+          },
+          "read_at": {
+            "format": "date-time",
+            "title": "Read At",
+            "type": "string"
+          },
+          "rera_id": {
+            "title": "Rera Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rera_id",
+          "check_id",
+          "name",
+          "promoter",
+          "display_score",
+          "read_at"
+        ],
+        "title": "FeaturedProject",
         "type": "object"
       },
       "Finding": {
@@ -2787,6 +2904,17 @@
             ],
             "title": "Live Url"
           },
+          "manual_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Manual Url"
+          },
           "message": {
             "anyOf": [
               {
@@ -2830,7 +2958,8 @@
           "status",
           "live_url",
           "message",
-          "checks_read"
+          "checks_read",
+          "manual_url"
         ],
         "title": "SourceRun",
         "type": "object"
@@ -3052,6 +3181,27 @@
         "title": "Unsubscribe",
         "type": "object"
       },
+      "Usage": {
+        "description": "TinyFish calls the checks made (only checks that were metered), per day and month.",
+        "properties": {
+          "average_per_check": {
+            "$ref": "#/components/schemas/CallAverages"
+          },
+          "this_month": {
+            "$ref": "#/components/schemas/CallCounts"
+          },
+          "today": {
+            "$ref": "#/components/schemas/CallCounts"
+          }
+        },
+        "required": [
+          "today",
+          "this_month",
+          "average_per_check"
+        ],
+        "title": "Usage",
+        "type": "object"
+      },
       "ValidationError": {
         "properties": {
           "ctx": {
@@ -3185,6 +3335,61 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/admin/usage": {
+      "get": {
+        "operationId": "get_usage_api_admin_usage_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "x-admin-token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Usage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "description": "Missing or wrong `X-Admin-Token`"
+          },
+          "404": {
+            "description": "ADMIN_TOKEN is not set, so this route is off"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Usage",
+        "tags": [
+          "admin"
+        ]
+      }
+    },
     "/api/checks": {
       "get": {
         "description": "The checks a browser kept, by id. Ids the server no longer has are left out.",
@@ -3228,7 +3433,7 @@
         ]
       },
       "post": {
-        "description": "Starts a check. With a sign-in token the check is also saved to that account.",
+        "description": "Starts a live check, or returns a recent report of the project at no cost.\n\nA report finished in the last REUSE_REPORT_DAYS is returned to anyone, signed in or not.\nA new live check needs a sign-in and stays within the account's and the site's budgets.",
         "operationId": "create_check_api_checks_post",
         "parameters": [
           {
@@ -3260,7 +3465,7 @@
         },
         "responses": {
           "200": {
-            "description": "A check from the last 24 hours was reused"
+            "description": "A recent report of this project was returned; no credit was spent"
           },
           "202": {
             "content": {
@@ -3272,6 +3477,12 @@
             },
             "description": "Successful Response"
           },
+          "401": {
+            "description": "Sign in to start a live check (`detail.code` is `signin_required`)"
+          },
+          "403": {
+            "description": "Live checks are invite-only right now (`invite_only`)"
+          },
           "422": {
             "content": {
               "application/json": {
@@ -3281,6 +3492,9 @@
               }
             },
             "description": "Validation Error"
+          },
+          "429": {
+            "description": "A limit is used up: `detail.code` is `account_limit`, `site_budget`, or `recheck_wait`; `Retry-After` says how long"
           }
         },
         "summary": "Create Check",
@@ -3660,6 +3874,32 @@
         ]
       }
     },
+    "/api/featured": {
+      "get": {
+        "description": "The saved checks of the projects listed in FEATURED_RERA_IDS, in that order.\n\nA number nobody has checked yet is left out; no card is ever made up.",
+        "operationId": "get_featured_api_featured_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FeaturedProject"
+                  },
+                  "title": "Response Get Featured Api Featured Get",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Featured",
+        "tags": [
+          "checks"
+        ]
+      }
+    },
     "/api/health": {
       "get": {
         "operationId": "health_api_health_get",
@@ -4009,6 +4249,22 @@
               "description": "City or locality such as 'Sector 43 Noida'",
               "title": "Locality"
             }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
           }
         ],
         "responses": {
@@ -4033,7 +4289,7 @@
             "description": "Validation Error"
           },
           "429": {
-            "description": "TinyFish rate limit; `Retry-After` says how long to wait"
+            "description": "The daily search limit (`search_limit`) or TinyFish's rate limit; `Retry-After` says how long to wait"
           },
           "502": {
             "description": "TinyFish failed; `detail.code` says why"
@@ -4083,6 +4339,22 @@
               ],
               "description": "RERA no. to skip",
               "title": "Exclude"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
             }
           }
         ],
@@ -4152,6 +4424,22 @@
               ],
               "description": "City or locality",
               "title": "City"
+            }
+          },
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
             }
           }
         ],

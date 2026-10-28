@@ -27,8 +27,27 @@ class Settings(BaseSettings):
     # by agent_timeout_seconds. Turn this on once the account is enabled.
     agent_send_max_steps: bool = False
 
-    # Every live check costs money, Sentinel's included; past this many a day none may start.
-    max_checks_per_day: int = Field(default=30, ge=1)
+    # Every live check spends TinyFish credit, Sentinel's included. These limits keep the bill
+    # predictable; a day and a month are counted in Indian time.
+    site_checks_per_day: int = Field(default=5, ge=1)
+    site_checks_per_month: int = Field(default=60, ge=1)
+    require_signin_for_checks: bool = True
+    checks_per_account_per_day: int = Field(default=2, ge=1)
+    # A finished check this recent is returned instead of starting another, for everyone.
+    reuse_report_days: int = Field(default=7, ge=0)
+    # "Re-check now" works once per project in this many days.
+    recheck_min_days: int = Field(default=7, ge=0)
+    # Search results (names, builders, localities, RERA numbers) are kept this many days.
+    search_cache_days: int = Field(default=7, ge=0)
+    searches_per_ip_per_day: int = Field(default=15, ge=1)
+    searches_per_ip_per_day_signed_in: int = Field(default=40, ge=1)
+    # Only these signed-in e-mails (comma separated) may start live checks when invite_only is on.
+    invite_only: bool = False
+    allowed_emails: str = ""
+    # Sent as the X-Admin-Token header to read GET /api/admin/usage; without it that route is off.
+    admin_token: SecretStr | None = None
+    # UP-RERA numbers (comma separated) shown in the home page gallery when a check is saved.
+    featured_rera_ids: str = ""
     # How often Sentinel re-checks watched projects; 0 turns the built-in schedule off (an
     # external cron can still call POST /api/sentinel/run).
     sentinel_interval_hours: float = Field(default=168, ge=0)
@@ -53,6 +72,7 @@ class Settings(BaseSettings):
     @field_validator(
         "webhook_secret",
         "auth_bridge_secret",
+        "admin_token",
         "public_base_url",
         "site_url",
         "smtp_host",
@@ -72,6 +92,14 @@ class Settings(BaseSettings):
         if not value.get_secret_value().strip():
             raise ValueError("TINYFISH_API_KEY is empty")
         return value
+
+    @property
+    def allowed_email_set(self) -> frozenset[str]:
+        return frozenset(e.strip().lower() for e in self.allowed_emails.split(",") if e.strip())
+
+    @property
+    def featured_ids(self) -> list[str]:
+        return [i.strip().upper() for i in self.featured_rera_ids.split(",") if i.strip()]
 
     @property
     def cors_origins(self) -> list[str]:

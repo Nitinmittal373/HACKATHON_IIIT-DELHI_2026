@@ -62,6 +62,10 @@ class CheckRow(Base):
     status: Mapped[str] = mapped_column(String(20))
     started_at: Mapped[datetime] = mapped_column(UTCDateTime)
     completed_at: Mapped[datetime | None] = mapped_column(UTCDateTime)
+    # The signed-in account that started the check; None for Sentinel's own re-checks.
+    started_by: Mapped[str | None] = mapped_column(String(64), index=True)
+    # TinyFish calls the check made: {"search": n, "fetch": n, "agent": n}.
+    usage: Mapped[dict[str, int] | None] = mapped_column(JSON)
 
 
 class SourceRunRow(Base):
@@ -74,6 +78,7 @@ class SourceRunRow(Base):
     live_url: Mapped[str | None] = mapped_column(String(1000))
     message: Mapped[str | None] = mapped_column(String(500))
     checks_read: Mapped[list[str]] = mapped_column(JSON, default=list)
+    manual_url: Mapped[str | None] = mapped_column(String(500))
 
 
 class FindingRow(Base):
@@ -203,6 +208,16 @@ class UserReportRow(Base):
     saved_at: Mapped[datetime] = mapped_column(UTCDateTime)
 
 
+class SearchCacheRow(Base):
+    """A search answer kept for SEARCH_CACHE_DAYS, so the same query never calls Search twice."""
+
+    __tablename__ = "search_cache"
+
+    key: Mapped[str] = mapped_column(String(500), primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, index=True)
+    payload: Mapped[dict[str, object]] = mapped_column(JSON)
+
+
 class AlertRow(Base):
     __tablename__ = "alerts"
 
@@ -225,13 +240,24 @@ def normalize_database_url(database_url: str) -> str:
     return database_url
 
 
+# Columns added after the first release; create_all never alters an existing table.
+ADDED_COLUMNS = (
+    ("watches", "user_id", "VARCHAR(255)", True),
+    ("checks", "started_by", "VARCHAR(64)", True),
+    ("checks", "usage", "JSON", False),
+    ("source_runs", "manual_url", "VARCHAR(500)", False),
+)
+
+
 def add_missing_columns(engine: Engine) -> None:
-    """create_all never alters a table; a database from before accounts gets user_id here."""
-    if "user_id" in {column["name"] for column in inspect(engine).get_columns("watches")}:
-        return
-    with engine.begin() as connection:
-        connection.execute(text("ALTER TABLE watches ADD COLUMN user_id VARCHAR(255)"))
-        connection.execute(text("CREATE INDEX ix_watches_user_id ON watches (user_id)"))
+    """Bring a database made by an older version up to date by adding the columns it lacks."""
+    for table, column, kind, indexed in ADDED_COLUMNS:
+        if column in {c["name"] for c in inspect(engine).get_columns(table)}:
+            continue
+        with engine.begin() as connection:
+            connection.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {kind}"))
+            if indexed:
+                connection.execute(text(f"CREATE INDEX ix_{table}_{column} ON {table} ({column})"))
 
 
 def make_engine(database_url: str) -> Engine:
