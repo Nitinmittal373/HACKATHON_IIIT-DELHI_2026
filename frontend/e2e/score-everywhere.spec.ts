@@ -89,6 +89,8 @@ test("check result: the finished check ends on its NeevScore", async ({ page }) 
 
 test("report: the dial, the summary, the drivers and the title all use it", async ({ page }) => {
   await page.goto(`/report/${ECO}`);
+  // Let the page finish loading, so a score drawn twice while it settles is not counted.
+  await page.waitForLoadState("networkidle");
 
   expect(await drawnScores(page)).toEqual([SCORE.value]);
   await expect(page.getByRole("heading", { name: `Why ${SCORE.value}` })).toBeVisible();
