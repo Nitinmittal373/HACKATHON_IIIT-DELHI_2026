@@ -5,8 +5,7 @@ export const account = {
   deleteConfirm:
     "Delete your account, saved reports, watches and alerts? This cannot be undone. Checks themselves are public records and stay.",
   deleteFailed: "We could not delete your data. Please try again, or email us.",
-  menuLabel: "Your account",
-  avatarAlt: (name: string) => `${name}, signed in`,
+  menuLabel: "Account menu",
   heroLink: "Sign in to save reports and get alerts",
   login: {
     title: "Sign in to NeevCheck",

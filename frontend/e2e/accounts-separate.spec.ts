@@ -23,7 +23,7 @@ const stored = (page: Page) =>
   page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? "[]") as { id: string; owner: string }[], REPORTS_KEY);
 
 async function signOut(page: Page) {
-  await page.getByRole("button", { name: "Your account" }).click();
+  await page.getByRole("button", { name: "Account menu" }).click();
   await page.getByRole("menuitem", { name: "Sign out" }).click();
   const nav = page.getByRole("navigation", { name: "Main" });
   await expect(nav.getByRole("link", { name: "Sign in", exact: true })).toBeVisible();
@@ -184,7 +184,7 @@ test.describe("reports made while signed out", () => {
     );
     accounts.signInAs(BALA);
     await page.goto("/");
-    await expect(page.getByRole("button", { name: "Your account" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Account menu" })).toBeVisible();
     await expect(page.getByRole("dialog")).toHaveCount(0);
     expect(accounts.saves).toEqual([]);
   });
@@ -209,7 +209,7 @@ test.describe("after signing in", () => {
     await page.getByRole("navigation", { name: "Main" }).getByRole("link", { name: "Sign in", exact: true }).click();
     await expect(page).toHaveURL(/\/login$/);
     await page.getByRole("button", { name: "Continue with Google" }).click();
-    await expect(page.getByRole("button", { name: "Your account" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Account menu" })).toBeVisible();
     expect(signIn.callbackUrl()).toBe("/");
     await expect(page).toHaveURL(HOME);
   });

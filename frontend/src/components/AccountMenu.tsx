@@ -4,6 +4,7 @@ import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
+import { Avatar } from "@/components/Avatar";
 import { clearAccountData } from "@/lib/accountData";
 import { deleteMyData } from "@/lib/accountReports";
 import { useAccount } from "@/lib/account";
@@ -69,13 +70,7 @@ export function AccountMenu() {
         aria-label={t.account.menuLabel}
         onClick={() => setOpen((value) => !value)}
       >
-        {account.user.image ? (
-          // A small remote Google picture; next/image would need its host configured.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={account.user.image} alt={t.account.avatarAlt(name)} width={36} height={36} referrerPolicy="no-referrer" />
-        ) : (
-          <span aria-hidden="true">{name.slice(0, 1).toUpperCase()}</span>
-        )}
+        <Avatar src={account.user.image} name={name} label={t.account.menuLabel} size={36} />
       </button>
       {open && (
         <div className={styles.menu} role="menu">

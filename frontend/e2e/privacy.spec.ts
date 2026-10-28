@@ -64,7 +64,7 @@ test("Delete my data asks first, sends the token, then signs out", async ({ page
 
   await page.goto("/");
   const open = async () => {
-    await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: "Your account" }).click();
+    await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: "Account menu" }).click();
   };
 
   // Cancelling the question deletes nothing.
