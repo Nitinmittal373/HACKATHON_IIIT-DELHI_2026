@@ -35,6 +35,7 @@ CheckKey = Literal[
     "insolvency",
     "land_dues",
     "consumer_cases",
+    "rera_complaints",
 ]
 EventType = Literal[
     "source.started",
@@ -176,6 +177,8 @@ class Pillar(ApiModel):
     penalty: int
     # Points lost on the 300-900 scale, negative like the v1 drivers.
     points: float
+    # Set when only part of the pillar was read, naming what was ("UP-RERA complaints").
+    partly_read: str | None = None
 
 
 class DriverV2(ApiModel):

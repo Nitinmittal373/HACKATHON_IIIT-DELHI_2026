@@ -722,7 +722,8 @@
                 "company_status",
                 "insolvency",
                 "land_dues",
-                "consumer_cases"
+                "consumer_cases",
+                "rera_complaints"
               ],
               "type": "string"
             },
@@ -1689,6 +1690,17 @@
             "title": "Name",
             "type": "string"
           },
+          "partly_read": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Partly Read"
+          },
           "penalty": {
             "title": "Penalty",
             "type": "integer"
@@ -1707,7 +1719,8 @@
           "name",
           "weight",
           "penalty",
-          "points"
+          "points",
+          "partly_read"
         ],
         "title": "Pillar",
         "type": "object"
@@ -2278,7 +2291,8 @@
                 "company_status",
                 "insolvency",
                 "land_dues",
-                "consumer_cases"
+                "consumer_cases",
+                "rera_complaints"
               ],
               "type": "string"
             },
@@ -2570,7 +2584,8 @@
                 "company_status",
                 "insolvency",
                 "land_dues",
-                "consumer_cases"
+                "consumer_cases",
+                "rera_complaints"
               ],
               "type": "string"
             },
@@ -2753,7 +2768,8 @@
                 "company_status",
                 "insolvency",
                 "land_dues",
-                "consumer_cases"
+                "consumer_cases",
+                "rera_complaints"
               ],
               "type": "string"
             },

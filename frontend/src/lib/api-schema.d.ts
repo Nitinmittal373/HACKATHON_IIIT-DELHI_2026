@@ -675,7 +675,7 @@ export interface components {
             /** Top Findings */
             top_findings: components["schemas"]["FindingLine"][];
             /** Unread */
-            unread: ("registration" | "completion_date" | "extensions" | "company_status" | "insolvency" | "land_dues" | "consumer_cases")[];
+            unread: ("registration" | "completion_date" | "extensions" | "company_status" | "insolvency" | "land_dues" | "consumer_cases" | "rera_complaints")[];
         };
         /** Comparison */
         Comparison: {
@@ -1006,6 +1006,8 @@ export interface components {
             id: "P1" | "P2" | "P3" | "P4" | "P5" | "P6";
             /** Name */
             name: string;
+            /** Partly Read */
+            partly_read: string | null;
             /** Penalty */
             penalty: number;
             /** Points */
@@ -1195,7 +1197,7 @@ export interface components {
             /** Band Label */
             band_label: string;
             /** Checks Unread */
-            checks_unread: ("registration" | "completion_date" | "extensions" | "company_status" | "insolvency" | "land_dues" | "consumer_cases")[];
+            checks_unread: ("registration" | "completion_date" | "extensions" | "company_status" | "insolvency" | "land_dues" | "consumer_cases" | "rera_complaints")[];
             /** Confidence */
             confidence: number;
             /** Drivers */
@@ -1302,7 +1304,7 @@ export interface components {
              * Checks Read
              * @default []
              */
-            checks_read: ("registration" | "completion_date" | "extensions" | "company_status" | "insolvency" | "land_dues" | "consumer_cases")[];
+            checks_read: ("registration" | "completion_date" | "extensions" | "company_status" | "insolvency" | "land_dues" | "consumer_cases" | "rera_complaints")[];
             /** Message */
             message: string | null;
             /**
@@ -1380,7 +1382,7 @@ export interface components {
              * Checks Read
              * @default []
              */
-            checks_read: ("registration" | "completion_date" | "extensions" | "company_status" | "insolvency" | "land_dues" | "consumer_cases")[];
+            checks_read: ("registration" | "completion_date" | "extensions" | "company_status" | "insolvency" | "land_dues" | "consumer_cases" | "rera_complaints")[];
             /** Live Url */
             live_url: string | null;
             /** Message */
