@@ -1,6 +1,7 @@
 """Group companies: the promoter's directors, charges, related companies and their projects.
 
-Everything here is free Search and Fetch; no browser agent runs. The steps:
+Search and Fetch only; no browser agent runs. It runs only when UP-RERA gives the builder's
+exact company name (a trade name could match the wrong company). The steps:
 1. Read the promoter's public company profile (Tofler) for directors, charges and related companies.
 2. Read each related company's registry status (at most MAX_COMPANIES).
 3. List the UP-RERA projects of the promoter and of those companies (at most MAX_PROJECTS), read
@@ -14,7 +15,7 @@ import re
 from collections.abc import AsyncIterator, Awaitable, Iterable
 from datetime import date, timedelta
 
-from app.matching import blob, legal_name_in
+from app.matching import blob, has_legal_form, legal_name_in
 from app.models import (
     CheckKey,
     FamilyCompany,
@@ -32,6 +33,7 @@ from app.sources.base import (
     SourceContext,
     SourceError,
     SourceEvent,
+    SourceUnavailable,
 )
 from app.sources.findings import build_finding
 from app.sources.mca import CompanyProfile, is_this_company, parse_profile
@@ -71,6 +73,12 @@ class GroupSource:
         promoter = ctx.project.promoter
         if not promoter:
             raise SourceError("The promoter's name is not known, so its group cannot be looked up")
+        if not has_legal_form(promoter):
+            # A trade name would match the wrong company's pages, and the lookup costs credit.
+            raise SourceUnavailable(
+                f"Skipped: UP-RERA lists the builder as '{promoter}', which is not an exact "
+                "company name, so the group was not looked up"
+            )
 
         yield Progress(f"Finding the public company profile of {promoter}")
         found = await self._profile(promoter, ctx)

@@ -98,7 +98,7 @@ def test_check_shows_every_source_and_why_it_was_not_read(client: TestClient) ->
         "sarfaesi": "completed",
         "insolvency": "completed",
         "land": "completed",
-        "consumer": "failed",  # the fake web client gives the agent nothing to answer with
+        "consumer": "blocked",  # e-Jagriti always shows a CAPTCHA, so no agent is sent
         "news": "completed",
     }
 

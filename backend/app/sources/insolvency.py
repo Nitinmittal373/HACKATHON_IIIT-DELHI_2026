@@ -15,14 +15,17 @@ import re
 from typing import Any
 from urllib.parse import urlsplit
 
-from app.matching import blob, legal_name_in, mentions_project, project_pattern
+from app.matching import blob, legal_name_in, mentions_project, normalize, project_pattern
 from app.models import CheckKey, Finding, InsolvencyScope, Project, Reliability, Verdict
 from app.sources.agent import AgentSource, AgentTask
 from app.sources.base import SourceContext
 from app.sources.findings import build_finding, parse_day
-from app.tinyfish import SearchHit
+from app.tinyfish import SearchHit, WebError
 
 SEARCH_PURPOSE = "Find an order or report on a builder's insolvency case"
+FETCH_PURPOSE = "Read a page about a builder's insolvency case for an admission"
+# Words a page uses when an insolvency application was admitted or the process began.
+ADMISSION = re.compile(r"\badmit|\bcommence|\binitiat|\bmoratorium|\bCIRP\b", re.IGNORECASE)
 OFFICIAL_HOSTS = ("nclt.gov.in", "nclat.nic.in", "ibbi.gov.in", "sci.gov.in")
 # Pages anyone can upload to or post on say nothing reliable about a court case.
 UPLOAD_HOSTS = ("scribd.com", "facebook.com", "instagram.com", "youtube.com", "linkedin.com")
@@ -80,6 +83,22 @@ class InsolvencySource(AgentSource):
             output_schema=OUTPUT_SCHEMA,
             max_steps=20,
         )
+
+    async def read_directly(self, task: AgentTask, ctx: SourceContext) -> dict[str, Any] | None:
+        """Fetch the page first: one that never mentions an admission needs no browser agent.
+
+        An answer with nothing in it leaves the lane unread, exactly as an agent that found
+        nothing would, so no credit is spent where the agent could not have added a record.
+        A page Fetch cannot read, or one that does speak of an admission, still goes to the agent.
+        """
+        try:
+            page = await ctx.web.fetch_text(task.url, purpose=FETCH_PURPOSE)
+        except WebError:
+            return None
+        names_case = legal_name_in(ctx.project.promoter, normalize(page.text))
+        if names_case and ADMISSION.search(page.text):
+            return None
+        return dict.fromkeys(OUTPUT_SCHEMA["required"])
 
     def to_findings(
         self, result: dict[str, Any], ctx: SourceContext, task: AgentTask

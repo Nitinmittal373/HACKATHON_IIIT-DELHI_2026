@@ -37,6 +37,14 @@ ROMAN_NUMBERS = {
 }
 
 
+LEGAL_FORM = re.compile(r"\b(limited|llp|corporation)\b")
+
+
+def has_legal_form(name: str | None) -> bool:
+    """True when the name is a registered entity's ("... Private Limited"), not a trade name."""
+    return bool(LEGAL_FORM.search(normalize(name)))
+
+
 def normalize(text: str | None) -> str:
     """Lower case, spell out legal suffixes, flatten punctuation.
 

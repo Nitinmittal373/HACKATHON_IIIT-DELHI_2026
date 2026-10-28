@@ -104,22 +104,18 @@ def test_the_supreme_court_order_is_context_and_costs_nothing(tmp_path: Path) ->
     assert all(d["finding_id"] != order["id"] for d in report["score"]["drivers"])
 
 
-def test_a_captcha_on_e_jagriti_lowers_confidence_and_leaves_the_score_alone(
+def test_e_jagriti_is_not_checked_automatically_and_leaves_the_score_alone(
     tmp_path: Path,
 ) -> None:
-    def captcha(web: FakeWebClient) -> None:
-        web.agent_runs[CONSUMER_PAGE] = [
-            AgentDone("COMPLETED", {"total_cases": None, "cases": [], "captcha_seen": True})
-        ]
-
-    result = check(tmp_path, captcha)
+    result = check(tmp_path)
     report = result["report"]
 
     consumer = next(r for r in report["check"]["sources"] if r["source"] == "consumer")
     assert (consumer["status"], consumer["message"]) == (
         "blocked",
-        "This page asks for a CAPTCHA. We never bypass one",
+        "Not checked automatically: the site needs a CAPTCHA",
     )
+    assert consumer["manual_url"] == "https://e-jagriti.gov.in/advance-case-search"
     assert any(
         e["type"] == "source.blocked" and e["source"] == "consumer" for e in result["events"]
     )
@@ -156,17 +152,8 @@ def test_a_run_that_times_out_is_blocked_as_a_timeout_and_never_retried(tmp_path
     assert len(starts) == 1
 
 
-def test_an_agent_that_types_a_captcha_is_stopped_even_when_it_says_it_saw_none(
-    tmp_path: Path,
-) -> None:
+def test_no_agent_is_ever_sent_to_the_captcha_page(tmp_path: Path) -> None:
     result = check(tmp_path)
 
-    notes = [e["data"]["text"] for e in result["events"] if e["type"] == "source.progress"]
-    consumer_notes = [
-        e["data"]["text"]
-        for e in result["events"]
-        if e["type"] == "source.progress" and e["source"] == "consumer"
-    ]
-    assert consumer_notes[-1] == "Check CAPTCHA text and form state"
-    assert not any("Enter CAPTCHA text" in note for note in notes)
+    assert ("agent", CONSUMER_PAGE) not in result["web"].calls
     assert not any(f["source"] == "consumer" for f in result["report"]["findings"])
