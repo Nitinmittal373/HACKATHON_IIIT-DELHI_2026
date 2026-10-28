@@ -141,12 +141,19 @@ test.describe("How it works", () => {
   });
 });
 
+test("robots.txt allows everything and points to the sitemap", async ({ request }) => {
+  const body = await (await request.get("/robots.txt")).text();
+  expect(body).toMatch(/User-Agent: \*\s+Allow: \//i);
+  expect(body).toMatch(/Sitemap: https?:\/\/[^\s]+\/sitemap\.xml/);
+});
+
 test.describe("For RWAs", () => {
-  test("explains watching, alerts and stop links, and asks a visitor to sign in", async ({ page }) => {
+  test("explains watching and where alerts appear, promises no email, and asks to sign in", async ({ page }) => {
     await page.goto("/rwa");
     await expect(page).toHaveTitle("For RWAs · NeevCheck");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("For RWAs and residents' groups");
-    await expect(page.getByText("Each alert email ends with a link that stops that watch.")).toBeVisible();
+    await expect(page.getByText("Alerts appear on your Alerts page. You can stop watching a project there")).toBeVisible();
+    await expect(page.getByText(/alert email/i)).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Sign in", exact: true }).last()).toHaveAttribute("href", /\/login\?next=/);
   });
 

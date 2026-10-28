@@ -2,6 +2,8 @@ export const sentinel = {
   open: "Watch with Sentinel",
   title: "Watch this project",
   lead: "We re-check it every week and tell you only when a record really changes. Your email is used for nothing else.",
+  leadInApp:
+    "We re-check it every week and tell you only when a record really changes. Alerts appear on your Alerts page.",
   sentTo: (email: string) => `Alerts go to ${email}, the email of your account.`,
   signInReason: "Sign in so only you can see and stop your alerts.",
   signIn: "Sign in with Google",
@@ -13,13 +15,14 @@ export const sentinel = {
   saving: "Saving…",
   cancel: "Cancel",
   doneTitle: "Watching this project",
-  doneBody:
-    "Alerts always show on the Alerts page. An email is sent too when this service has email set up.",
+  doneBody: "Alerts appear on your Alerts page.",
+  doneBodyEmail: "Alerts appear on your Alerts page. We also email them to you.",
   seeAlerts: "See your alerts",
   close: "Close",
   limit: "One account can watch up to 3 projects. Stop watching one before adding another.",
   failed: "We could not save this watch. Please try again.",
   card: "We re-check this project every week and tell you only when a record changes.",
+  cardNotWatching: "Watch this project to hear when a record changes.",
 };
 
 export const alerts = {

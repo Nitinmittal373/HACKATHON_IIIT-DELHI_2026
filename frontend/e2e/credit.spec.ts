@@ -5,6 +5,7 @@ import { signInAsAsha } from "./signedIn";
 const API = "http://localhost:8010";
 const CORS = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "Authorization, Content-Type" };
 const CREDIT_REPORT = `/report/${"c".repeat(32)}`;
+const CREDIT_RERA_ID = "UPRERAPRJ8334";
 
 const LIMITS = {
   require_signin: true,
@@ -41,6 +42,19 @@ async function limitSearches(page: Page) {
     }),
   );
 }
+
+test("a used-up site search cap is explained calmly", async ({ page }) => {
+  await page.route(`${API}/api/projects/search**`, (route) =>
+    route.fulfill({
+      status: 429,
+      headers: { ...CORS, "Retry-After": "3600" },
+      contentType: "application/json",
+      body: JSON.stringify({ detail: { code: "site_search_limit", message: "x" } }),
+    }),
+  );
+  await page.goto("/check?q=Gaur%20City");
+  await expect(page.getByText(/Today's searches are used up for everyone/)).toBeVisible();
+});
 
 test.describe("starting a live check", () => {
   test("signed out, the button asks for a sign-in and returns to this page afterwards", async ({ page }) => {
@@ -131,10 +145,40 @@ test.describe("a report", () => {
     await expect(page.getByText(/Not checked automatically: the site needs a CAPTCHA/).first()).toBeVisible();
   });
 
-  test("the Watch button explains Sentinel in one line, with no near-empty card", async ({ page }) => {
+  test("signed out, the report invites a watch and does not claim a weekly re-check", async ({ page }) => {
     await page.goto(CREDIT_REPORT);
     await expect(page.getByRole("button", { name: "Watch with Sentinel" })).toHaveCount(1);
+    await expect(page.getByText("Watch this project to hear when a record changes.")).toBeVisible();
+    await expect(page.getByText(/We re-check this project every week/)).toHaveCount(0);
+  });
+
+  test("signed in but not watching, the report still only invites a watch", async ({ page }) => {
+    await signInAsAsha(page);
+    await page.goto(CREDIT_REPORT);
+    await expect(page.getByText("Watch this project to hear when a record changes.")).toBeVisible();
+    await expect(page.getByText(/We re-check this project every week/)).toHaveCount(0);
+  });
+
+  test("signed in and watching this project, the report says it is re-checked every week", async ({ page }) => {
+    await signInAsAsha(page);
+    await page.route(`${API}/api/sentinel/watches`, (route) =>
+      route.fulfill({
+        headers: CORS,
+        contentType: "application/json",
+        body: JSON.stringify([{ id: "w".repeat(32), rera_id: CREDIT_RERA_ID, email: "asha@example.com", language: "en", created_at: "2026-10-25T04:00:00Z", baseline_check_id: null }]),
+      }),
+    );
+    await page.goto(CREDIT_REPORT);
     await expect(page.getByText("We re-check this project every week and tell you only when a record changes.")).toBeVisible();
+    await expect(page.getByText("Watch this project to hear when a record changes.")).toHaveCount(0);
+  });
+
+  test("the method note links docs/scoring.md to the file on GitHub", async ({ page }) => {
+    await page.goto(CREDIT_REPORT);
+    await expect(page.getByRole("link", { name: "docs/scoring.md" })).toHaveAttribute(
+      "href",
+      /^https:\/\/github\.com\/.+\/blob\/main\/docs\/scoring\.md$/,
+    );
   });
 });
 

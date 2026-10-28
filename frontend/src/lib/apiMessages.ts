@@ -19,6 +19,8 @@ export function describeApiError(error: unknown, t: Strings, lang: Lang = "en"):
       return t.errors.recheckWait(error.resetsAt ? indianDay(error.resetsAt, lang) : "—");
     case "search_limit":
       return t.errors.searchLimitOut;
+    case "site_search_limit":
+      return t.errors.siteSearchLimit;
   }
   if (error.status === 429) return t.errors.rateLimited(error.retryAfter ?? 60);
   if (error.status === 402 || /credit|wallet|balance/i.test(error.message)) return t.errors.walletEmpty;
@@ -35,6 +37,8 @@ export function describeSearchError(
   switch (error.code) {
     case "search_limit":
       return { text: signedIn ? t.errors.searchLimitIn : t.errors.searchLimitOut, reason: null };
+    case "site_search_limit":
+      return { text: t.errors.siteSearchLimit, reason: null };
     case "timeout":
     case "client_timeout":
       return { text: t.confirm.searchTimeout, reason: null };

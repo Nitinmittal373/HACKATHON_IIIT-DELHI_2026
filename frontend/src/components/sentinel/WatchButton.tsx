@@ -11,9 +11,10 @@ interface Props {
   project: Pick<Project, "rera_id" | "details_url">;
   /** "primary" is the orange header button; "card" is the white button on the orange card. */
   look?: "primary" | "card";
+  onWatched?: () => void;
 }
 
-export function WatchButton({ project, look = "primary" }: Props) {
+export function WatchButton({ project, look = "primary", onWatched }: Props) {
   const { t } = useLang();
   const account = useAccount();
   const [open, setOpen] = useState(false);
@@ -40,7 +41,7 @@ export function WatchButton({ project, look = "primary" }: Props) {
       >
         {t.sentinel.open}
       </button>
-      <WatchDialog project={project} open={open} onClose={() => setOpen(false)} />
+      <WatchDialog project={project} open={open} onClose={() => setOpen(false)} onWatched={onWatched} />
     </>
   );
 }

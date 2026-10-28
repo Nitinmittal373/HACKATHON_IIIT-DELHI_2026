@@ -1,4 +1,5 @@
 import type { Strings } from "@/lib/i18n";
+import { SCORING_DOC_URL } from "@/lib/site";
 import type { Meta, Report } from "@/lib/types";
 import styles from "./MethodNote.module.css";
 
@@ -16,7 +17,13 @@ export function MethodNote({ report, meta, t }: Props) {
       <h2 id="method-title" className={styles.title}>
         {t.credit.methodTitle}
       </h2>
-      <p className={styles.body}>{t.credit.methodBody(meta.scale.max)}</p>
+      <p className={styles.body}>
+        {t.credit.methodBody(meta.scale.max)} {t.credit.methodDoc.before}
+        <a href={SCORING_DOC_URL} target="_blank" rel="noopener noreferrer">
+          {t.credit.methodDoc.link}
+        </a>
+        {t.credit.methodDoc.after}
+      </p>
       {display.value === null ? (
         <p className={styles.classic}>
           {t.credit.provisionalLine(

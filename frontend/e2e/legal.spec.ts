@@ -41,11 +41,12 @@ test("the rating notice is on the report and the QR code appears only in print",
   await expect(page.getByText("Scan to open the live report")).toBeVisible();
 });
 
-test("the watch dialog tells people what their email is used for", async ({ page }) => {
+test("the watch dialog makes no email promise while mail is off", async ({ page }) => {
   await signInAsAsha(page);
   await page.goto(REPORT);
   await page.getByRole("button", { name: "Watch with Sentinel" }).first().click();
-  await expect(page.getByText("We use your email only to send alerts about this project.").first()).toBeVisible();
+  await expect(page.getByText("You can stop watching at any time.").first()).toBeVisible();
+  await expect(page.getByText("We use your email only to send alerts about this project.")).toHaveCount(0);
 });
 
 test("the correction form has no accessibility violations, in Hindi too", async ({ page, context }) => {

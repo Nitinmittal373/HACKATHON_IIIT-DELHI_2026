@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AddToCompare } from "@/components/report/AddToCompare";
 import { WatchButton } from "@/components/sentinel/WatchButton";
+import { useAccount } from "@/lib/account";
+import { myWatches } from "@/lib/accountReports";
 import { useLang } from "@/lib/LangProvider";
 import { useMeta } from "@/lib/MetaProvider";
 import type { DisplayScore, Project } from "@/lib/types";
@@ -21,7 +23,25 @@ type Feedback = "copied" | "failed" | null;
 export function ReportActions({ reportId, project, score }: Props) {
   const { t } = useLang();
   const meta = useMeta();
+  const account = useAccount();
   const [feedback, setFeedback] = useState<Feedback>(null);
+  const [watching, setWatching] = useState(false);
+  const signedIn = account.status === "in";
+
+  useEffect(() => {
+    // Only the viewer's own account decides what the note says. Signed out, or if the lookup
+    // fails, the page does not claim a re-check it cannot vouch for.
+    if (!signedIn) return;
+    let current = true;
+    myWatches()
+      .then((watches) => {
+        if (current) setWatching(watches.some((watch) => watch.rera_id === project.rera_id));
+      })
+      .catch(() => undefined);
+    return () => {
+      current = false;
+    };
+  }, [signedIn, project.rera_id]);
 
   async function share() {
     const link = `${window.location.origin}/report/${reportId}`;
@@ -47,7 +67,7 @@ export function ReportActions({ reportId, project, score }: Props) {
 
   return (
     <div className={`${styles.actions} noPrint`}>
-      <WatchButton project={project} />
+      <WatchButton project={project} onWatched={() => setWatching(true)} />
       <AddToCompare reportId={reportId} />
       <button type="button" className="btn2" onClick={() => window.print()}>
         {t.report.download}
@@ -58,7 +78,7 @@ export function ReportActions({ reportId, project, score }: Props) {
       <button type="button" className="btn2" onClick={shareOnWhatsApp}>
         {t.insights.whatsapp.button}
       </button>
-      <p className={styles.hint}>{t.sentinel.card}</p>
+      <p className={styles.hint}>{signedIn && watching ? t.sentinel.card : t.sentinel.cardNotWatching}</p>
       <span className={styles.status} role="status">
         {feedback === "copied" && t.report.linkCopied}
         {feedback === "failed" && t.report.copyFailed}

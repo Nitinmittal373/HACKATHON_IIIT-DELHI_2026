@@ -5,6 +5,7 @@ import styles from "@/components/pages/pages.module.css";
 import { RwaSignIn } from "@/components/pages/RwaSignIn";
 import { Steps } from "@/components/pages/Steps";
 import { getStrings } from "@/lib/i18n/server";
+import { loadMeta } from "@/lib/meta";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getStrings();
@@ -14,6 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
 /** How a residents' group watches a project with Neev Sentinel. */
 export default async function RwaPage() {
   const { t } = await getStrings();
+  const meta = await loadMeta();
   const copy = t.pages.rwa;
 
   return (
@@ -24,7 +26,7 @@ export default async function RwaPage() {
         <h2 id="watch-title" className={styles.heading}>
           {copy.stepsTitle}
         </h2>
-        <Steps steps={copy.steps} />
+        <Steps steps={copy.steps(meta.email_alerts)} />
         <p className={styles.text}>{copy.budgetNote}</p>
       </section>
 

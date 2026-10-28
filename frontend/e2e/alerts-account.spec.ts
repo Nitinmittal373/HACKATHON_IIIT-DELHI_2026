@@ -38,7 +38,7 @@ test("signed out, Watch this project asks to sign in first and has no email box"
   await expect(dialog.getByRole("button", { name: "Start watching" })).toHaveCount(0);
 });
 
-test("signed in, watching sends the token and no email, and names the account email", async ({ page }) => {
+test("signed in, watching sends the token and no email, and promises none while mail is off", async ({ page }) => {
   await signInAsAsha(page);
   const sent: { auth: string | undefined; body: unknown }[] = [];
   await page.route(`${API}/api/sentinel`, (route) => {
@@ -51,11 +51,16 @@ test("signed in, watching sends the token and no email, and names the account em
   await page.goto(REPORT);
   await page.getByRole("button", { name: "Watch with Sentinel" }).first().click();
   const dialog = page.getByRole("dialog");
-  await expect(dialog.getByText("Alerts go to asha@example.com, the email of your account.")).toBeVisible();
+  // The mock API reports no email setup, so the dialog must not promise an email.
+  await expect(dialog.getByText(/Alerts appear on your Alerts page/)).toBeVisible();
+  await expect(dialog.getByText(/Alerts go to/)).toHaveCount(0);
+  await expect(dialog.getByText(/We use your email/)).toHaveCount(0);
   await expect(dialog.locator("input[type=email]")).toHaveCount(0);
   await dialog.getByRole("button", { name: "Start watching" }).click();
 
   await expect(dialog.getByRole("heading", { name: "Watching this project" })).toBeVisible();
+  await expect(dialog.getByText("Alerts appear on your Alerts page.", { exact: true })).toBeVisible();
+  await expect(dialog.getByText(/email/i)).toHaveCount(0);
   expect(sent).toHaveLength(1);
   expect(sent[0]?.auth).toBe("Bearer test-token");
   expect(Object.keys(sent[0]?.body as object).sort()).toEqual(["details_url", "language", "rera_id"]);

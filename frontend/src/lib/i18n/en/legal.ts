@@ -21,4 +21,5 @@ export const legal = {
     label: "QR code linking to the live report",
   },
   consent: "We use your email only to send alerts about this project. You can stop watching at any time.",
+  consentInApp: "You can stop watching at any time.",
 };

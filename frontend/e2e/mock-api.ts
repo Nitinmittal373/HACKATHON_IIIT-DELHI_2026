@@ -201,6 +201,11 @@ createServer(async (req, res) => {
     return send(res, 200, [card]);
   }
 
+  if (path === "/api/sentinel/watches") {
+    if (!req.headers.authorization) return send(res, 401, { detail: "Sign in to use this" });
+    return send(res, 200, []);
+  }
+
   if (path === "/api/sentinel/alerts") {
     // Alerts belong to the signed-in account; the real API answers 401 without its token.
     if (!req.headers.authorization) return send(res, 401, { detail: "Sign in to use this" });

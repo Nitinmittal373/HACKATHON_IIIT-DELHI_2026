@@ -48,6 +48,8 @@ export const app = {
       `This project was checked recently. Next re-check possible on ${date}.`,
     searchLimitOut: "You have used today's searches. Sign in for more, or come back tomorrow.",
     searchLimitIn: "You have used today's searches. They come back tomorrow.",
+    siteSearchLimit:
+      "Today's searches are used up for everyone. Saved reports and earlier searches still open; new searches open again tomorrow.",
     walletEmpty:
       "The agents that read the records are paused because the TinyFish account is out of credit. Please try again later.",
   },
