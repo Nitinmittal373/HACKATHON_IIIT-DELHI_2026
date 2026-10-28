@@ -9,7 +9,11 @@ import { loadMeta } from "@/lib/meta";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getStrings();
-  return { title: t.pages.rwa.metaTitle, description: t.pages.rwa.metaDescription };
+  const meta = await loadMeta();
+  return {
+    title: t.pages.rwa.metaTitle,
+    description: t.pages.rwa.metaDescription(meta.email_alerts),
+  };
 }
 
 /** How a residents' group watches a project with Neev Sentinel. */
