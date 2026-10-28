@@ -108,8 +108,10 @@ export const pages = {
   },
   rwa: {
     metaTitle: "For RWAs · NeevCheck",
-    metaDescription:
-      "How a residents' group can watch a project with Neev Sentinel and get an alert, with a stop link, when a public record changes.",
+    metaDescription: (email: boolean): string =>
+      email
+        ? "How a residents' group can watch a project with Neev Sentinel and get an alert, with a stop link, when a public record changes."
+        : "How a residents' group can watch a project with Neev Sentinel and get an alert when a public record changes.",
     title: "For RWAs and residents' groups",
     lead: "A residents' group can watch the project it lives in or is waiting on, and hear about it when a public record changes.",
     stepsTitle: "How watching works",
@@ -120,17 +122,17 @@ export const pages = {
         body: "Press Watch with Sentinel and sign in with Google. One account can watch 3 projects.",
       },
       {
-        title: "We re-check every week",
-        body: "Sentinel reads the records again each week and tells you only when something changed, in English or Hindi.",
+        title: "We re-check regularly",
+        body: "We re-check watched projects regularly, within the site's daily budget, and tell you only when something changed.",
       },
       email
         ? {
             title: "Alerts have a stop link",
-            body: "Alerts appear on your Alerts page and are emailed too. Each email ends with a link that stops that watch.",
+            body: "Each alert is emailed to you too, and each email ends with a link that stops that watch.",
           }
         : {
             title: "Alerts appear on your Alerts page",
-            body: "Alerts appear on your Alerts page. You can stop watching a project there at any time.",
+            body: "You can stop watching a project there at any time.",
           },
     ],
     budgetNote:
