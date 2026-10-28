@@ -152,7 +152,7 @@ test.describe("For RWAs", () => {
     await page.goto("/rwa");
     await expect(page).toHaveTitle("For RWAs · NeevCheck");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("For RWAs and residents' groups");
-    await expect(page.getByText("Alerts appear on your Alerts page. You can stop watching a project there")).toBeVisible();
+    await expect(page.getByText("You can stop watching a project there at any time.")).toBeVisible();
     await expect(page.getByText(/alert email/i)).toHaveCount(0);
     await expect(page.getByRole("link", { name: "Sign in", exact: true }).last()).toHaveAttribute("href", /\/login\?next=/);
   });
