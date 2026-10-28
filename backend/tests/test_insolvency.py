@@ -1,9 +1,11 @@
+import asyncio
 from typing import Any
 
 import pytest
 
 from app.models import Project
 from app.scoring.engine import score
+from app.sources.agent import AgentTask
 from app.sources.insolvency import (
     InsolvencySource,
     decide_scope,
@@ -11,6 +13,7 @@ from app.sources.insolvency import (
     to_findings,
 )
 from app.tinyfish import SearchHit
+from tests.fakes import FakeWebClient
 from tests.sourcekit import ECO_VILLAGE_1, context
 
 NEWS = "https://www.fortuneindia.com/enterprise/nclt-declares-supertech-insolvent/107553"
@@ -134,3 +137,30 @@ def test_the_agent_is_sent_to_a_readable_page_about_the_promoter() -> None:
     ]
     page = pick_case_page(hits, "SUPERTECH LIMITED")
     assert page is not None and page.url == NEWS  # deep page first; no PDF, upload or other company
+
+
+def read_directly(texts: dict[str, str]) -> tuple[dict[str, object] | None, FakeWebClient]:
+    web = FakeWebClient(texts=texts)
+    ctx = context(web=web)
+    task = AgentTask(url=NEWS, goal="", output_schema={})
+    return asyncio.run(InsolvencySource().read_directly(task, ctx)), web
+
+
+def test_a_page_that_never_mentions_an_admission_is_read_without_the_agent() -> None:
+    result, web = read_directly({NEWS: "Supertech Limited launches a new tower in Noida."})
+
+    # Every field empty: the lane stays unread, exactly as an agent that found nothing would.
+    assert result is not None and all(value is None for value in result.values())
+    assert web.agent_requests == []
+
+
+def test_a_page_that_speaks_of_an_admission_still_goes_to_the_agent() -> None:
+    result, _ = read_directly({NEWS: "NCLT admitted the insolvency plea against Supertech Ltd."})
+
+    assert result is None
+
+
+def test_a_page_fetch_cannot_read_goes_to_the_agent() -> None:
+    result, _ = read_directly({})
+
+    assert result is None

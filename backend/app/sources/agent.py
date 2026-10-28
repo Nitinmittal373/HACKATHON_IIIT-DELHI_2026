@@ -76,7 +76,8 @@ class AgentSource(ABC):
     async def read_directly(self, task: AgentTask, ctx: SourceContext) -> dict[str, Any] | None:
         """Read the page without a browser when plain Fetch is enough (free and repeatable).
 
-        Return the same shape the agent would, or None to let the agent do it.
+        Return the same shape the agent would, or None to let the agent do it. An answer with
+        every field empty leaves the source unread without running the agent.
         """
         return None
 
@@ -130,7 +131,7 @@ class AgentSource(ABC):
             yield Blocked(CAPTCHA_REASON)
             return
         if is_empty(result):
-            yield Progress("The agent found nothing it could read, so this source stays unread")
+            yield Progress("Nothing readable was found, so this source stays unread")
             return
         for finding in self.to_findings(result, ctx, task):
             yield FoundFinding(finding)

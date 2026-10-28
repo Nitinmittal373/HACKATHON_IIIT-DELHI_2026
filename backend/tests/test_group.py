@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from app.models import FamilyTree, Finding, Project
-from app.sources.base import FoundFinding, GroupTree, SourceContext, SourceError
+from app.sources.base import FoundFinding, GroupTree, SourceContext, SourceError, SourceUnavailable
 from app.sources.group import GroupSource, is_delayed, status_findings
 from app.sources.mca import is_this_company, parse_profile
 from app.sources.registry import parse_company_table
@@ -202,3 +202,13 @@ def test_a_report_without_the_group_source_has_no_family_tree(tmp_path: Path) ->
     from tests.test_recorded_check import check
 
     assert check(tmp_path)["report"]["family"] is None
+
+
+def test_a_trade_name_is_not_looked_up_and_costs_nothing() -> None:
+    web = FakeWebClient().replay(RECORDING)
+    project = PROJECT.model_copy(update={"promoter": "Ram Builders"})
+
+    with pytest.raises(SourceUnavailable, match="not an exact company name"):
+        run(project, web)
+
+    assert web.calls == []
