@@ -30,9 +30,34 @@ services:
       # on every deploy. Paste the Internal Database URL of a Render Postgres to keep data.
       - key: DATABASE_URL
         sync: false
-      # Cost guards; the defaults are fine, change them in the dashboard if needed.
-      - key: MAX_CHECKS_PER_DAY
-        value: "30"
+      # Credit protection; the defaults are fine, change them in the dashboard if needed.
+      - key: REQUIRE_SIGNIN_FOR_CHECKS
+        value: "true"
+      - key: CHECKS_PER_ACCOUNT_PER_DAY
+        value: "2"
+      - key: SITE_CHECKS_PER_DAY
+        value: "5"
+      - key: SITE_CHECKS_PER_MONTH
+        value: "60"
+      - key: REUSE_REPORT_DAYS
+        value: "7"
+      - key: RECHECK_MIN_DAYS
+        value: "7"
+      - key: SEARCH_CACHE_DAYS
+        value: "7"
+      - key: SEARCHES_PER_IP_PER_DAY
+        value: "15"
+      - key: SEARCHES_PER_IP_PER_DAY_SIGNED_IN
+        value: "40"
+      - key: INVITE_ONLY
+        value: "false"
+      - key: ALLOWED_EMAILS
+        sync: false
+      # Secret: reads GET /api/admin/usage. Leave unset to keep that route off.
+      - key: ADMIN_TOKEN
+        sync: false
+      - key: FEATURED_RERA_IDS
+        sync: false
       - key: RATE_LIMIT_PER_MINUTE
         value: "6"
       - key: AGENT_CONCURRENCY
