@@ -39,106 +39,10 @@ flowchart TB
 | Step | Endpoint | What happens |
 | --- | --- | --- |
 | 1. Search (from the browser) | `GET /api/projects/search?q=` | A RERA number is confirmed on its own UP-RERA page; a name or promoter goes through TinyFish Search limited to up-rera.in (see [Finding a project](#finding-a-project)) |
-| 2. Confirm | `POST /api/checks` | Creates a check for one registration number and starts it; returns the check and its `id` (202) |
-| 3. Watch | `GET /api/checks/{id}/events` | Server-Sent Events: `source.started`, `source.live_url`, `source.progress`, `finding.added`, `source.blocked`, `source.completed`, `check.completed` |
-| 4. Report | `GET /api/checks/{id}/report` | Score, drivers, evidence and timeline (action plan in Phase 4) |
-| 5. Watch list | `POST /api/sentinel` | Adds the project to weekly re-checks; alerts are read with `GET /api/sentinel/alerts`; both need a sign-in |
-
-## Scope: Uttar Pradesh only
-
-NeevCheck reads one register, UP-RERA, and the sources that follow its promoter. A registration number of another state's RERA, or a name that only a city outside Uttar Pradesh explains, is answered with `outside_up: true` on `GET /api/projects/search` and `GET /api/promoters/search`, and the app says: *"NeevCheck covers Uttar Pradesh RERA projects for now. Check this project on its own state's RERA website."* `POST /api/checks` refuses such a number with the same words. Nothing is searched for it.
-
-## Finding a project
-
-`app/resolve.py` turns what the buyer typed into at most 8 candidates, each with its name, promoter, district and registration date, and the page a check will read.
-
-| Typed | How it is found |
-| --- | --- |
-| A number from 2017-18, `UPRERAPRJ8334` | Its stable details page is read directly; no Search |
-| A later number, `UPRERAPRJ188811/08/2024` or six digits such as `UPRERAPRJ396176` | These have no stable page, so Search for the exact number on up-rera.in finds its Projectsummary page |
-| A project or promoter name | TinyFish Search limited to up-rera.in. If no result carries a number, a second Search without the limit is read for UPRERAPRJ numbers |
-| `uprera prj 8334`, `UPRERA-PRJ-8334` | Spaces, hyphens, dots and case are normalised first |
-
-A number counts only when its own up-rera.in page shows it with a name and a promoter. Numbers from the second, unlimited Search must also share a word with the query, because pages about one project often print the numbers of others. Search results are completed from their own pages, four at a time within 35 seconds; a page that cannot be read in time keeps what Search said, since that came from up-rera.in itself. A query with no UP-RERA project (a project outside Uttar Pradesh, for example) returns an empty list, which the app shows as "No UP-RERA project found" with tips.
-
-### Finding a project on the open web
-
-A project whose up-rera.in page Search does not return still has its number printed by the builder and by listing sites, so `app/states/openweb.py` also runs two Searches with no domain limit (`<q> RERA registration number`, `<q> RERA`, cached for 24 hours) beside the portal search. It looks for the number formats of every state (`id_patterns`) in the titles and snippets and votes:
-
-| Who prints the number | Points |
-| --- | --- |
-| A page on up-rera.in | +3 |
-| The builder's own site (its domain holds the brand word of the query) | +2 |
-| Any other distinct domain | +1 each |
-
-A number is kept at 3 points, or when two domains print it, and only if one of them prints it next to the project's name (at least 75% of its distinctive words, city names ignored). A list of projects gives each number only the words up to its neighbours, so a number beside another project's name is not this project's. Plain formats such as `112 of 2021` need "RERA" beside them. Several numbers (phases, towers) are separate candidates.
-
-Each kept number is then looked up exactly on up-rera.in (`app/states/confirm.py`, at most four per query). A page that prints it makes the candidate `confirmed`; otherwise it stays `listings_only` and the app says so. Listing sites are used only to find the number; a finding still needs the portal. A listing sentence such as "does not apply to RERA and has already been delivered" (`app/states/prerera.py`) becomes a `pre_rera` note: the app quotes the sentence, links the page and offers a builder-only check, with no project score. A number typed alone that no portal page names gets its builder from `identify_builder`.
-
-### Builder and locality search
-
-For buyers whose project has no website to search:
-
-- `GET /api/promoters/search?q=&city=` (`app/states/promoter_search.py`) takes a builder's name and runs three Searches: up-rera.in, company-registry mirrors of MCA data (name and CIN only), and the open web, whose numbers are voted on like a project name's. It returns the registered projects found, each with its number, state, status and the sites that printed it, and the company pages found. Generic words such as "Limited" and "Developers" never decide a match, and different Lodha companies are listed apart, never merged.
-- `GET /api/projects/search?q=&locality=` adds a city or locality ("Sector 150 Noida"). `app/states/places.py` lists the cities homebuyers search, so a city outside Uttar Pradesh can be answered calmly when nothing is found; the locality is added to the open-web search and never counts as part of the project's name.
-
-### Brochure, agreement and QR
-
-`POST /api/extract` finds the number in a document the buyer already has. It takes a PDF as the raw request body (`Content-Type: application/pdf`, at most 5 MB, 40 pages read) or `{"text": "..."}` for the address a QR code held; at most ten requests a minute per address. The PDF is read in memory with pypdf and never written to disk, so there is nothing to delete afterwards; only the numbers and the words around each one come back, with phone numbers, e-mail addresses, PAN and Aadhaar numbers replaced by `[removed]`. The numbers are searched on their state's portal like any other (`from_document` until a portal page prints them, then `confirmed`). A photo is never uploaded: the browser decodes its QR code (jsQR) and sends only the text, and no OCR runs anywhere.
-
-### Public orders
-
-Only when the portals, the open web and the buyer's documents found nothing, `app/states/orders.py` searches for orders that name the project (`<q> RERA order`, `<q> judgment` on indiankanoon.org, `<q> NCLT order` on nclt.gov.in). An order published as a PDF (a court, tribunal or government site) is opened with Fetch, up to two a query, and read for a registration number next to the project's name; those numbers are `from_order` candidates with the order's link in `found_in`. Fetch cannot read every court site, so a page it fails to read falls back to its snippet and no number is invented. When an order only names the builder ("X vs Mahagun India Pvt. Ltd."), the search answers with an `order_leads` entry (builder, order title and link) and the app offers that builder's registered projects. Orders are only a way to find the project; they are never a finding in a report.
-
-## Sources
-
-Each source is one small module with the same shape: it reads one kind of public record and yields events (progress, live view URL, findings, which key checks it read). It never writes to the database; the orchestrator does.
-
-| Source | Site | How it reads | Extracts |
-| --- | --- | --- | --- |
-| `uprera` | up-rera.in | **Fetch** + deterministic Python parser; the summary page is found with Search | name, number, registration date, promoter, type, district, start and end dates, extensions granted, completion certificate date, permits, documents, complaint counts |
-| `registry` | MCA, Economic Times, zaubacorp | Search finds the page; **Fetch** + parser reads the details table, an **agent** reads it when Fetch cannot | company name, CIN and status |
-| `insolvency` | NCLT / NCLAT orders and reports, IBBI | Search finds a page about the promoter's case; an **agent** reads it | whether the case was admitted, when, and which projects it covers |
-| `land` | Noida, Greater Noida and Yamuna Expressway authorities | Search + **Fetch** of the published dues list (usually a PDF), searched in Python | whether the promoter is on a dues list |
-| `consumer` | e-Jagriti | an **agent** opens the case search and stops at its CAPTCHA | cases against the promoter, only if the portal shows results without one |
-| `news` | news sites, Supreme Court | Search (news) and Fetch of a court order | up to three delay stories, and whether the NBCC order names the project |
-
-UP-RERA runs first: it confirms the project exists and names the promoter the other sources look for. If it cannot be read, the check fails and no score is shown. The other sources run in parallel, at most `AGENT_CONCURRENCY` at a time, each within `AGENT_TIMEOUT_SECONDS`.
-
-### Fetch or agent?
-
-Fetch and Search are cheap, fast and repeatable, so a page that Fetch can turn into text is read in Python. An agent (a real browser driven by a goal in plain English) is only used where a person would have to click: a search form, a page that renders in the browser, an article whose scope has to be read. Each agent source is a module with a `GOAL`, an `OUTPUT_SCHEMA` and a pure `to_findings()` that turns the agent's JSON into findings. Python, not the agent, decides what the facts mean: for example, whether an insolvency covers this project is decided by matching project names word for word, so Eco Village-I is never matched to Eco Village-II.
-
-### Live view and progress
-
-Agent sources share one runner (`app/sources/agent.py`). It maps the agent's stream onto the event stream the Agent Cam reads:
-
-| TinyFish event | NeevCheck event |
-| --- | --- |
-| started | `source.started` (sent by the orchestrator when the source begins) |
-| streaming URL | `source.live_url`, the address of the live browser view |
-| progress | `source.progress`, the agent's note cut to one line of at most 140 characters |
-| complete | `finding.added` for each finding, then `source.completed` |
-
-The runner tells every agent never to solve or get around a CAPTCHA, and marks the source `blocked` when one appears. It does not trust the agent's own `captcha_seen` flag alone: a progress note that mentions a CAPTCHA also stops the run and blocks the source, because a recorded e-Jagriti run once reported no CAPTCHA while its notes showed it typing one. A run that fails or returns only empty fields leaves the source **unread**, which lowers confidence and never changes the score. A run that runs out of time is `blocked` with the reason `timeout` and is not retried. Agents are opened on deep pages, never on a large homepage, and every run is capped by `AGENT_TIMEOUT_SECONDS`. The raw answer of each agent is saved under `backend/data/cache/{check_id}/{source}.json` (git-ignored) so a surprising finding can be traced back to what the agent returned.
-
-At most `AGENT_CONCURRENCY` (2) agents run at once. TinyFish accepts a step limit only on beta accounts; set `AGENT_SEND_MAX_STEPS=true` once yours is enabled.
-
-## Testing without the network
-
-Tests never call TinyFish. `scripts/capture_fixtures.py` records real responses (UP-RERA pages, search results) into `backend/tests/fixtures/` through the same client and selectors the app uses, and refuses to save a file that contains the API key. `python -m scripts.capture_fixtures check_8334.json` runs one complete live check of `UPRERAPRJ8334` and records every search, document and agent answer, scrubbed of emails, phone numbers and live-view addresses. Tests replay them through a fake `WebClient`, with the clock fixed to the day of the recording, so the score is stable. One optional test, `pytest -m live`, runs a real check when `TINYFISH_API_KEY` is set; it is deselected by default and skipped in CI.
-
-## API
-
-Interactive docs are served at `/docs`.
-
-| Method and path | Success | Errors |
-| --- | --- | --- |
-| `GET /api/health` | `200 {"status": "ok"}` | |
-| `GET /api/meta` | `200 {scale, bands[], pillars[], reason_codes[], score_version}`: the NeevScore scale (300 to 900), band edges, pillar weights and reason codes, read from the scoring constants | |
-| `GET /api/projects/search?q=` | `200 {query, candidates[]}`, at most 8; answers within 90 seconds | `422` query shorter than 2 characters; `502` TinyFish failed, `504` too slow, `429` TinyFish rate limit (with `Retry-After`). Each error's `detail.code` names the reason: `tinyfish_key`, `wallet_empty`, `rate_limited`, `timeout`, `unreachable` or `upstream` |
-| `GET /api/promoters/projects?name=&exclude=` | `200 {promoter, projects[], searched_at}`: up to 10 other UP-RERA projects whose up-rera.in search results carry the promoter's full legal name, each with its `display_score` when NeevCheck already holds a finished check of it; Search only, cached per promoter for 24 hours | `422` name shorter than 3 characters; `502` with `detail.code` when TinyFish fails |
-| `POST /api/checks` `{rera_id, details_url?, fresh?}` | `202` check, `Location` header; `200` with `reused: true` when a check of the same project finished in the last 24 hours (send `fresh: true` to re-check). With a sign-in token (`Authorization: Bearer`) the check, new or reused, is also saved to that account | `401` a token that is present but invalid, `422` bad input, `429` over `RATE_LIMIT_PER_MINUTE` or over `MAX_CHECKS_PER_DAY` (`detail.code` is `daily_cap`; both send `Retry-After`) |
+| 2. Confirm | `POST /api/checks` `{rera_id, details_url?, fresh?}` | `200` with `reused: true` and the report's check when a check of the project finished within `REUSE_REPORT_DAYS`, for anyone, with no token and no credit; otherwise `202` and a new live check, with a `Location` header. With a sign-in token (`Authorization: Bearer`) the check, new or reused, is also saved to that account. `fresh: true` asks for a new check once per project every `RECHECK_MIN_DAYS` | `401` `signin_required` (a new live check with `REQUIRE_SIGNIN_FOR_CHECKS`) or a token that is present but invalid, `403` `invite_only`, `422` bad input, `429` over `RATE_LIMIT_PER_MINUTE`, or a limit with `detail.code` `account_limit`, `site_budget` or `recheck_wait` (with `detail.resets_at` and `Retry-After`) |
+| `GET /api/limits` | `200` what a live check costs: `require_signin`, `invite_only`, `checks_per_account_per_day`, `reuse_report_days`, `recheck_min_days`, `live_checks_open`, and, with a token, `checks_left_today` and `invited` | |
+| `GET /api/featured` | `200` the saved checks of the numbers in `FEATURED_RERA_IDS`, in that order: `rera_id`, `check_id`, `name`, `promoter`, `display_score`, `read_at`. A number nobody has checked is left out; nothing says who ran a check | |
+| `GET /api/admin/usage` with header `X-Admin-Token` | `200` `{today, this_month, average_per_check}`: checks and the Search, Fetch and Agent calls they made | `401` missing or wrong token, `404` when `ADMIN_TOKEN` is not set |
 | `GET /api/checks?ids=a,b,c` | `200` each known check (`id`, `rera_id`, `details_url`, `project`, `promoter`, `status`, `display_score`, `created_at`, `completed_at`, plus the classic `score`, `band` and `confidence`, and the card facts: registration date, sources read, top drivers and reasons), in the order asked; ids the server does not have are left out | `422` more than 50 ids or a malformed one |
 | `GET /api/checks/compare?ids=a,b,c` | `200` two or three finished checks side by side: `display_score`, points lost per pillar, months past the completion date, complaint counts, insolvency, company status, unread checks and top three findings with links (`null` where a check could not read something), plus `best` and `reason` (`best_score`, `tie`, `not_enough_evidence`) | `422` not two or three valid ids, `404` unknown check, `409` a check with no score |
 | `GET /api/checks/{id}` | `200` check with each source's status and, once it has one, its `display_score` | `404`, `422` malformed id |
@@ -252,7 +156,14 @@ An alert stores the old and new NeevScore and the diff, and is shown on the acco
 
 ### Cost guards
 
-`MAX_CHECKS_PER_DAY` (default 30) caps the checks started per UTC day, Sentinel's included; past it new checks get `429` with the wait until midnight and Sentinel stops its run. A check of the same project that finished in the last 24 hours is returned instead of starting another (`reused: true`); the report then says "Checked X h ago" with a **Re-check now** button that sends `fresh: true`.
+Live checks and searches spend TinyFish credit, so each has a limit; every one is an environment variable (see `docs/deployment.md`). Days and months are counted in Indian time.
+
+- **Who may start a check.** A new live check needs a sign-in (`REQUIRE_SIGNIN_FOR_CHECKS`), and each account gets `CHECKS_PER_ACCOUNT_PER_DAY`. With `INVITE_ONLY` only the e-mails in `ALLOWED_EMAILS` may. Reading, sharing and reusing saved reports never needs a sign-in.
+- **Reuse.** A check of the same project that finished within `REUSE_REPORT_DAYS` is returned instead of starting another (`reused: true`), to anyone. The report shows when the records were read, and **Re-check now** (`fresh: true`) works once per project every `RECHECK_MIN_DAYS`; until then the check carries `next_recheck_at`.
+- **Site budget.** `SITE_CHECKS_PER_DAY` and `SITE_CHECKS_PER_MONTH` cap the checks started, Sentinel's included. Past them new checks get `429` `site_budget` and Sentinel stops its run; searching and reading reports keep working.
+- **Searches.** `app/search_gate.py` keeps each answer in the `search_cache` table for `SEARCH_CACHE_DAYS` and counts the searches that really run per address and Indian day in memory (`SEARCHES_PER_IP_PER_DAY`, `SEARCHES_PER_IP_PER_DAY_SIGNED_IN`).
+- **Metering.** `app/usage.py` wraps the TinyFish client for each check and counts its Search, Fetch and Agent calls, saved on the check. The first call that fails for lack of credit (`wallet_empty`) or a rate limit (`rate_limited`) pauses the check: every later call is refused without reaching TinyFish, and the lanes show *Paused: live-check credits are low*.
+- **Lanes.** Consumer cases never run an agent (e-Jagriti always shows a CAPTCHA); the group lane runs only for an exact company name; the insolvency lane reads its page with Fetch and runs the agent only when the page speaks of an admission.
 
 ### Watching with TinyFish Monitors
 

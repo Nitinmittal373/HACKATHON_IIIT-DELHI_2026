@@ -159,6 +159,10 @@ Everything else in a report (registration date, a completion date not yet passed
 | A "Proforma of Completion Certificate" is not a certificate | It is the blank template every project uploads at registration; it never skips the delay penalty and is not shown |
 | Too little evidence gives no band | Below 50% confidence the band is "Not enough evidence yet"; the score is still shown, marked provisional |
 
+### Which pillars count as read
+
+A pillar is read when one of its key records was read. The complaint counts on UP-RERA's own summary page (the key check `rera_complaints`) are a real record for two pillars: the builder's complaints (P2) and the project's complaints (P3). They are why a check that read UP-RERA alone now reads three pillars. When they are all that was read for a pillar, the report says *Partly read (UP-RERA complaints)* and the pillar carries `partly_read`; the other records of that pillar (group projects for P2, insolvency and consumer cases for P3) stay unread. A band needs P1 and at least four of the six pillars, so a check with the registration, both complaint counts and the company status read is banded. Checks stored before this key existed get it from their stored complaint findings when they are re-scored at start-up.
+
 ### Confidence
 
 Confidence is the share of seven key checks that were actually read: registration, completion date, extensions, company status, insolvency, land dues and consumer cases. A blocked, failed or unreadable source leaves its checks unread. "Extensions" counts as read when the project's summary page was read, because that page lists the extensions granted (or none). "Insolvency" counts as read only when a page actually reported the case; finding no page proves nothing. "Land dues" counts as read only when every land authority list for the project's district was read. If UP-RERA itself cannot be read, the check fails and no score is shown.
