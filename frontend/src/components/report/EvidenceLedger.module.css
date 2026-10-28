@@ -60,7 +60,7 @@
 .filter {
   padding: 6px 11px;
   border: 1px solid var(--ln);
-  border-radius: 999px;
+  border-radius: 6px;
   background: #fff;
   color: var(--mu);
   font-size: 12.5px;

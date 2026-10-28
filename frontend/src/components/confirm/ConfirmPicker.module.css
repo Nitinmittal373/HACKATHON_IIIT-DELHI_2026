@@ -27,7 +27,6 @@
   padding: 22px 24px;
   border-color: var(--o);
   background: #fffdfb;
-  box-shadow: var(--shadow-soft);
 }
 
 .found {

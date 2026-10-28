@@ -41,7 +41,7 @@
 
 .status {
   padding: 3px 10px;
-  border-radius: 999px;
+  border-radius: 6px;
   background: #f3eee9;
   color: var(--ink2);
   font-size: 12px;

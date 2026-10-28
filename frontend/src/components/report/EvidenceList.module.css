@@ -66,7 +66,7 @@
 
 .pill {
   padding: 4px 9px;
-  border-radius: 999px;
+  border-radius: 6px;
   background: var(--tone-bg);
   color: var(--tone-fg);
   font-size: 12px;
