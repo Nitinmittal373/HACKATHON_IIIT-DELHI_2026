@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Changed (audit fixes)
+
+- **Sentinel can no longer overspend credit.** TinyFish Monitors are off by default (`SENTINEL_MONITORS=false`); while off, no watch creates one and monitors made earlier for current watches are cancelled once at startup. The in-process 168-hour sleep is gone: at startup and on every request, at most once an hour, the API re-checks watched projects whose last check is older than `SENTINEL_INTERVAL_HOURS`, at most `SENTINEL_CHECKS_PER_DAY` (1) a day, and never when the site's daily or monthly budget is used up. The time of the last look is kept in a new `sentinel_state` table, so a restart does not reset it. `POST /api/sentinel/run` is unchanged.
+- **Alert email through an HTTPS API.** With `EMAIL_API_KEY` and `EMAIL_FROM` set, alerts are sent through Brevo or Resend (`EMAIL_PROVIDER`), because many hosts block SMTP. SMTP stays as the fallback. `GET /api/meta` gains `email_alerts`; with no email setup the RWA page, the privacy page and the Watch dialog say "Alerts appear on your Alerts page" and promise no email.
+- **The report only claims a weekly re-check when it is true.** *We re-check this project every week…* shows only when the signed-in viewer watches this project; otherwise the report says *Watch this project to hear when a record changes.* New `GET /api/sentinel/watches` lists the account's watches.
+- **A site-wide search cap.** `SITE_SEARCHES_PER_DAY` (200) limits the searches that really run across the whole site per Indian day; saved answers never count. Past it, `429` `site_search_limit` and a calm message.
+- **Small fixes.** Added `robots.txt` (allow all, points to the sitemap). The README link to the API contract now points to `#api-contract`. `docs/scoring.md` in the report's method note is a link to the file on GitHub.
+
+New environment variables: `SENTINEL_MONITORS`, `SENTINEL_CHECKS_PER_DAY`, `SITE_SEARCHES_PER_DAY`, `EMAIL_PROVIDER`, `EMAIL_API_KEY`, `EMAIL_FROM`.
+
 ### Added (credit protection)
 
 - **Sign in to start a live check.** `REQUIRE_SIGNIN_FOR_CHECKS` (default on) makes `POST /api/checks` need the sign-in token for a new live check; each account gets `CHECKS_PER_ACCOUNT_PER_DAY` (2) in Indian time, then `429` `account_limit` with the reset time. Opening, sharing and reusing saved reports stays open. The picker says *Sign in to run a live check* when signed out and *You have N live checks left today* when signed in (`GET /api/limits`).

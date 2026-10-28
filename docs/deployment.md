@@ -21,9 +21,9 @@ python -c "import secrets; print(secrets.token_urlsafe(32))"
    - `TINYFISH_API_KEY`: paste your TinyFish key.
    - `FRONTEND_ORIGINS`: leave a placeholder such as `https://example.com` for now; you set the real value in step 3 below.
    - `WEBHOOK_SECRET`: paste the random string you made.
-   - `PUBLIC_BASE_URL` (optional): this service's own address, for example `https://<your-service>.onrender.com`. With `WEBHOOK_SECRET` set, watching a project also creates TinyFish Monitors that call the webhook; leave it empty to keep the weekly Sentinel schedule only.
+   - `PUBLIC_BASE_URL` (optional): this service's own address. It is only read when `SENTINEL_MONITORS=true`, which is off by default because TinyFish Monitors bill outside the site budget. Leave it empty.
    - `SITE_URL` (optional): the web app's address, for example `https://<your-app>.vercel.app`. Alert emails end with a link to its `/alerts/stop` page.
-   - `DATABASE_URL`, `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`: leave empty (see "Keeping data" and "Email" below).
+   - `DATABASE_URL`, `EMAIL_API_KEY`, `EMAIL_FROM`, `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`: leave empty (see "Keeping data" and "Email" below).
 5. Click **Apply** and wait for the first deploy (a few minutes). When the log says the service is live, open `https://<your-service>.onrender.com/api/health`. It must answer `{"status":"ok"}`.
 6. Copy the service address (`https://<your-service>.onrender.com`). You need it next.
 
@@ -39,7 +39,15 @@ The free Render database expires after a period set by Render; use a paid plan f
 
 ### Email (optional)
 
-Alerts always show on the Alerts page for the signed-in account. To also email them, set `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD` and `SMTP_FROM` under **Environment** (any SMTP provider works; the API uses port 587 with STARTTLS). Leave them empty to send nothing.
+Alerts always show on the Alerts page for the signed-in account. Without an email setup the site says only that: "Alerts appear on your Alerts page", and it makes no promise of email.
+
+To also email them, prefer an HTTPS email API, because Render's free plan blocks SMTP. Create a key with [Brevo](https://www.brevo.com) or [Resend](https://resend.com), verify a sender, then set under **Environment**:
+
+- `EMAIL_PROVIDER`: `brevo` (default) or `resend`.
+- `EMAIL_API_KEY`: the provider's API key (secret).
+- `EMAIL_FROM`: the verified sender, for example `NeevCheck <alerts@your-domain>`.
+
+As a fallback, set `SMTP_HOST`, `SMTP_USER`, `SMTP_PASSWORD` and `SMTP_FROM` (port 587 with STARTTLS). The API is tried first; if it refuses, SMTP is used. The pages start mentioning email as soon as one of the two is complete.
 
 > **Redeploying the API.** The Render service was created from the public repository URL, so Render does **not** deploy on its own when `main` changes (the `autoDeploy` line in `render.yaml` applies only to services made from the Blueprint). After each merge: **Render → `neevcheck-api` → Manual Deploy → Deploy latest commit**. Vercel does deploy on every push to `main`.
 
@@ -77,9 +85,9 @@ Without these settings the site works as before and `/login` says sign-in is not
 
 Never put these in a `NEXT_PUBLIC_` variable.
 
-## Weekly Sentinel re-checks
+## Sentinel re-checks
 
-The API re-checks watched projects every `SENTINEL_INTERVAL_HOURS` (168, one week) while it is running. On Render's free plan the service sleeps when idle, which also pauses that schedule. To re-check on time, call the webhook from an external cron (for example a free cron service, or a scheduled GitHub Action):
+There is no timer. When the API starts and on every request, at most once an hour, it re-checks watched projects whose last check is older than `SENTINEL_INTERVAL_HOURS` (168, one week). It starts at most `SENTINEL_CHECKS_PER_DAY` (1) a day and never when the site's daily or monthly check budget is used up. The time of the last look is stored in the database, so a restart does not reset it. A sleeping free-plan service does nothing until the next visit wakes it. `SENTINEL_MONITORS` is `false`: no TinyFish Monitors are created, and any made earlier for current watches are cancelled at startup. To re-check on a fixed clock instead, call the webhook from an external cron (for example a free cron service, or a scheduled GitHub Action); this run is not paced by the daily limit above, only by the site budget:
 
 ```bash
 curl -X POST https://<your-service>.onrender.com/api/sentinel/run \
@@ -103,6 +111,10 @@ TinyFish credit is spent by live checks and by searches. Everything below is an 
 | `SEARCH_CACHE_DAYS` | `7` | Search answers (names, builders, localities, RERA numbers) are kept in the database this long. |
 | `SEARCHES_PER_IP_PER_DAY` | `15` | Searches that really run, per address, signed out. A kept answer does not count. |
 | `SEARCHES_PER_IP_PER_DAY_SIGNED_IN` | `40` | The same for signed-in visitors. |
+| `SITE_SEARCHES_PER_DAY` | `200` | Searches that really run across the whole site per day. Over it: `429` `site_search_limit`. A kept answer never counts. |
+| `SENTINEL_INTERVAL_HOURS` | `168` | A watched project is re-checked once its last check is this old. `0` turns the schedule off. |
+| `SENTINEL_CHECKS_PER_DAY` | `1` | Re-checks the schedule may start per day. |
+| `SENTINEL_MONITORS` | `false` | Create TinyFish Monitors for watches. Off, existing ones are cancelled at startup. |
 | `INVITE_ONLY` | `false` | When `true`, only the e-mails in `ALLOWED_EMAILS` can start live checks; everyone else still reads saved reports. |
 | `ALLOWED_EMAILS` | empty | Comma-separated e-mails for the invite-only switch. |
 | `ADMIN_TOKEN` | unset (secret) | Sent as the `X-Admin-Token` header to read `GET /api/admin/usage`. Unset, that route answers `404`. |

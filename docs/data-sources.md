@@ -100,5 +100,5 @@ The group source never runs a browser agent. A profile that does not name exactl
 | OC / CC past due, failed 25% deposit | No readable list | none | Not read |
 | SARFAESI auction notices | Lender and IBAPI pages | Search | Read; review only unless the page is a lender's or the government's |
 | Pending consumer cases | e-Jagriti shows a CAPTCHA | none | Not read; the report links to the official site |
-| Page changes after a watch starts | Public UP-RERA page and news search | Monitors (page and topic) | Triggers a re-check only; never a claim |
+| Page changes after a watch starts | Public UP-RERA page and news search | Monitors (page and topic), only when `SENTINEL_MONITORS=true`; off by default | Triggers a re-check only; never a claim |
 | Builder background dossier (BETA idea) | TinyFish Research would be needed | not built | Skipped: it must never feed the score |

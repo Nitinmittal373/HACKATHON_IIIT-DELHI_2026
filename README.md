@@ -171,7 +171,7 @@ Google sign-in is **optional**. Checking a project, reading a saved report and s
 
 - **Separate accounts.** Reports and alerts belong to one Google account. Another account on the same browser sees none of them, and nobody sees anyone else's checks.
 - **Saved reports.** Signed in, every check you start or reuse is saved to your account. Signed out, they stay in this browser and can be moved into an account later.
-- **Alerts with stop links.** Watch a project with Neev Sentinel and it is re-checked every week. An alert is created only when a record changed, in English or हिंदी, and every alert email ends with a link that stops that one watch. An account can watch 3 projects.
+- **Alerts with stop links.** Watch a project with Neev Sentinel and it is re-checked about every week, within the site's daily budget. An alert is created only when a record changed, in English or हिंदी, and appears on your Alerts page. When email is set up it is emailed too, and every email ends with a link that stops that one watch. An account can watch 3 projects.
 - **What is kept.** A Google id, a name, an e-mail and the ids of your reports. Delete it all from the account menu. See `/privacy`.
 
 ## Credit protection
@@ -180,8 +180,9 @@ Every live check and search spends TinyFish credit, so each has a limit. All of 
 
 - **Sign in to start a live check.** A new live check needs a Google sign-in, and an account gets 2 a day. Opening, sharing and reusing saved reports stays open to everyone.
 - **Reuse of recent reports.** A report finished in the last 7 days is returned to anyone instead of starting a new check, at no cost. *Re-check now* works once per project every 7 days, and the report shows *Next re-check possible on …* until then.
-- **Saved searches.** A search answer (a name, a builder, a locality or a RERA number) is kept in the database for 7 days, so the same query never calls Search twice. Searches per address are limited to 15 a day signed out and 40 signed in; a saved answer does not count.
+- **Saved searches.** A search answer (a name, a builder, a locality or a RERA number) is kept in the database for 7 days, so the same query never calls Search twice. Searches per address are limited to 15 a day signed out and 40 signed in, and the whole site runs at most 200 a day; a saved answer never counts, and when the site cap is reached the page says so calmly.
 - **Daily and monthly budgets.** The whole site starts at most 5 live checks a day and 60 a month, Sentinel's re-checks included. When they are used up the site says *"Today's live checks are used up. Saved reports are still open; new checks open again tomorrow."* Searching and opening saved reports keep working.
+- **Sentinel is paced.** There is no timer: at startup and on requests, at most once an hour, the API re-checks watched projects whose last check is older than `SENTINEL_INTERVAL_HOURS`, at most `SENTINEL_CHECKS_PER_DAY` (1) a day, and never when the site's daily or monthly budget is used up. TinyFish Monitors are off (`SENTINEL_MONITORS=false`), because they bill outside that budget.
 - **Invite-only switch.** With `INVITE_ONLY=true`, only the e-mails in `ALLOWED_EMAILS` can start live checks; everyone else still reads saved reports.
 - **Lanes that cannot succeed are not run.** Consumer cases (e-Jagriti) always show a CAPTCHA, so no agent is sent: the lane says *Not checked automatically: the site needs a CAPTCHA* and links to the site. The group lane runs only when UP-RERA gives the builder's exact company name. The insolvency lane reads its page with Fetch first and sends an agent only when the page speaks of an admission.
 - **A stop when credit runs out.** If TinyFish reports no credit left or a rate limit, the rest of that check's lanes are skipped, with no retries, and the War Room says *Paused: live-check credits are low*.
@@ -196,7 +197,7 @@ Every source tries the cheapest way to read a page first and escalates only when
 | **Search** | Finding the project on the open web and on up-rera.in; company pages; lender notices; news; public orders |
 | **Fetch** | Opening UP-RERA project pages, company-registry pages and PDFs, lender and land-authority documents |
 | **Agent** | The last step, for a page that needs clicks, such as an insolvency order that speaks of an admission |
-| **Monitors** | Watching a project's page and builder news; a change re-checks and alerts |
+| **Monitors** | Optional and off by default (`SENTINEL_MONITORS`): watching a project's page and builder news; a change re-checks and alerts |
 
 When an agent meets a CAPTCHA, a login or a paywall it stops. The lane says *Unable to verify*, the report lowers confidence, and nothing is bypassed. Results are cached per source, entity and day, so a second project of the same builder reads its company records from the cache. The escalation ladder is in [`docs/architecture.md`](docs/architecture.md#the-escalation-ladder).
 
@@ -319,7 +320,7 @@ curl localhost:8000/api/checks/<id>/report
 curl localhost:8000/api/limits                              # what a live check costs
 ```
 
-The full API is described in [`docs/architecture.md`](docs/architecture.md#api).
+The full API is described in [`docs/architecture.md`](docs/architecture.md#api-contract).
 
 To refresh the README pictures without spending any credit: build the app, start the recorded API (`node e2e/mock-api.ts`), point the site at it with `NEXT_PUBLIC_API_URL`, then run `npm run capture` in `frontend/`.
 
@@ -337,7 +338,8 @@ Set the **Render** values on the API service and the **Vercel** values on the we
 | `WEBHOOK_SECRET` | unset | yes | Protects `POST /api/sentinel/run` and the monitor webhook |
 | `ADMIN_TOKEN` | unset | yes | Sent as `X-Admin-Token` to read `GET /api/admin/usage`. Unset, that route is off |
 | `DATABASE_URL` | SQLite file | yes | A Postgres URL keeps data across deploys |
-| `SMTP_PASSWORD` | unset | yes | Password for alert e-mail |
+| `EMAIL_API_KEY` | unset | yes | Key for the HTTPS e-mail API (Brevo or Resend) that sends alerts |
+| `SMTP_PASSWORD` | unset | yes | Password for alert e-mail over SMTP, the fallback |
 | `REQUIRE_SIGNIN_FOR_CHECKS` | `true` | | A new live check needs a sign-in |
 | `CHECKS_PER_ACCOUNT_PER_DAY` | `2` | | Live checks one account may start per day |
 | `SITE_CHECKS_PER_DAY` | `5` | | Live checks the whole site may start per day |
@@ -347,6 +349,7 @@ Set the **Render** values on the API service and the **Vercel** values on the we
 | `SEARCH_CACHE_DAYS` | `7` | | How long a search answer is kept |
 | `SEARCHES_PER_IP_PER_DAY` | `15` | | Searches per address per day, signed out |
 | `SEARCHES_PER_IP_PER_DAY_SIGNED_IN` | `40` | | The same, signed in |
+| `SITE_SEARCHES_PER_DAY` | `200` | | Searches that really run across the whole site per day; a saved answer never counts |
 | `INVITE_ONLY` | `false` | | Only `ALLOWED_EMAILS` may start live checks |
 | `ALLOWED_EMAILS` | empty | | Comma-separated e-mails for the invite-only switch |
 | `FEATURED_RERA_IDS` | empty | | UP-RERA numbers for the gallery on the Check page; only those with a saved check show |
@@ -355,11 +358,14 @@ Set the **Render** values on the API service and the **Vercel** values on the we
 | `AGENT_TIMEOUT_SECONDS` | `300` | | Longest one agent may run |
 | `AGENT_SEND_MAX_STEPS` | `false` | | Send a step limit with each run (TinyFish beta accounts only) |
 | `FETCH_TIMEOUT_SECONDS` | `60` | | Longest one Fetch may take |
-| `SENTINEL_INTERVAL_HOURS` | `168` | | Hours between re-checks of watched projects; `0` turns it off |
+| `SENTINEL_INTERVAL_HOURS` | `168` | | A watched project is re-checked once its last check is this old; `0` turns the schedule off |
+| `SENTINEL_CHECKS_PER_DAY` | `1` | | Re-checks the schedule may start per day |
+| `SENTINEL_MONITORS` | `false` | | Create TinyFish Monitors for watches. Off, existing ones are cancelled at startup |
 | `TRUST_FORWARDED_FOR` | `true` on Render | | Read the visitor's address from the proxy header |
-| `PUBLIC_BASE_URL` | unset | | The API's own address, for TinyFish Monitors |
+| `PUBLIC_BASE_URL` | unset | | The API's own address; only read when `SENTINEL_MONITORS=true` |
 | `SITE_URL` | unset | | The web app's address, for the stop link in alert e-mails |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_FROM` | unset, port `587` | | Optional e-mail delivery of alerts |
+| `EMAIL_PROVIDER`, `EMAIL_FROM` | `brevo`, unset | | Which e-mail API to use and the verified sender. With `EMAIL_API_KEY` they turn e-mail alerts on |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_FROM` | unset, port `587` | | Fallback e-mail delivery of alerts over SMTP |
 
 ### Vercel (web app)
 
