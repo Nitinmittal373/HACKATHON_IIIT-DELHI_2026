@@ -199,6 +199,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/limits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Limits */
+        get: operations["get_limits_api_limits_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me": {
         parameters: {
             query?: never;
@@ -1048,6 +1065,28 @@ export interface components {
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /**
+         * Limits
+         * @description What a live check costs a visitor, so the pages can say it before they start one.
+         */
+        Limits: {
+            /** Checks Left Today */
+            checks_left_today: number | null;
+            /** Checks Per Account Per Day */
+            checks_per_account_per_day: number;
+            /** Invite Only */
+            invite_only: boolean;
+            /** Invited */
+            invited: boolean | null;
+            /** Live Checks Open */
+            live_checks_open: boolean;
+            /** Recheck Min Days */
+            recheck_min_days: number;
+            /** Require Signin */
+            require_signin: boolean;
+            /** Reuse Report Days */
+            reuse_report_days: number;
         };
         /** LiveUrlData */
         LiveUrlData: {
@@ -2056,6 +2095,37 @@ export interface operations {
                     "application/json": {
                         [key: string]: string;
                     };
+                };
+            };
+        };
+    };
+    get_limits_api_limits_get: {
+        parameters: {
+            query?: never;
+            header?: {
+                authorization?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Limits"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

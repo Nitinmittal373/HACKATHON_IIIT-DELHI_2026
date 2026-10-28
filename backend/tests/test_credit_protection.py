@@ -345,3 +345,24 @@ def test_a_failed_check_is_not_in_the_gallery(tmp_path: Path) -> None:
         read_events(client, failed.json()["id"])
 
         assert client.get("/api/featured").json() == []
+
+
+# --- what a visitor is told before starting --------------------------------------------------
+
+
+def test_limits_tell_a_signed_in_account_how_many_live_checks_are_left(tmp_path: Path) -> None:
+    with build(tmp_path, checks_per_account_per_day=2, reuse_report_days=0) as client:
+        out = client.get("/api/limits").json()
+        assert out["checks_left_today"] is None and out["require_signin"] is True
+        assert out["live_checks_open"] is True and out["reuse_report_days"] == 0
+
+        finish(client, start(client, auth(), fresh=True).json())
+
+        assert client.get("/api/limits", headers=auth()).json()["checks_left_today"] == 1
+
+
+def test_limits_say_when_the_site_budget_is_used_up(tmp_path: Path) -> None:
+    with build(tmp_path, site_checks_per_day=1) as client:
+        finish(client, start(client, auth()).json())
+
+        assert client.get("/api/limits").json()["live_checks_open"] is False
