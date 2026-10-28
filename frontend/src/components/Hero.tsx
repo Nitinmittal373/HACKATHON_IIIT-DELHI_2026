@@ -7,6 +7,7 @@ import { SearchBar } from "@/components/SearchBar";
 import { SignInHint } from "@/components/SignInHint";
 import { Skyline } from "@/components/Skyline";
 import { useLang } from "@/lib/LangProvider";
+import { useMeta } from "@/lib/MetaProvider";
 import styles from "./Hero.module.css";
 
 // Examples read from up-rera.in itself.
@@ -16,6 +17,7 @@ const WORD_STEP_SECONDS = 0.06;
 /** The only centred block on the site: the headline, one line, the search and quick examples. */
 export function Hero() {
   const { lang, t } = useLang();
+  const meta = useMeta();
   const words = t.hero.headline;
 
   return (
@@ -35,7 +37,7 @@ export function Hero() {
           ))}
         </h1>
 
-        <p className={styles.subtitle}>{t.hero.subtitle}</p>
+        <p className={styles.subtitle}>{t.hero.subtitle(meta.scale.min, meta.scale.max)}</p>
 
         <div className={styles.fadeUp} style={{ animationDelay: "0.5s" }}>
           <SearchBar
