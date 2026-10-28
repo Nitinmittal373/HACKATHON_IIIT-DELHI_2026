@@ -90,7 +90,31 @@ It answers `202`. Calls without the right secret get `401`.
 
 ## Cost and safety settings
 
-- `MAX_CHECKS_PER_DAY` (default 30) is the most checks the API will start per day, Sentinel included. Lower it to cap your TinyFish spend.
-- `RATE_LIMIT_PER_MINUTE` (default 6) limits checks per visitor.
-- A finished check of the same project from the last 24 hours is reused, so repeat visitors cost nothing.
-- Never put `TINYFISH_API_KEY` into Vercel or any `NEXT_PUBLIC_` variable: those are sent to every visitor's browser.
+TinyFish credit is spent by live checks and by searches. Everything below is an environment variable on **Render**; days and months are counted in Indian time. The defaults are in `.env.example` and `render.yaml`.
+
+| Variable | Default | What it does |
+| --- | --- | --- |
+| `REQUIRE_SIGNIN_FOR_CHECKS` | `true` | A new live check needs a Google sign-in. Reading, sharing and reusing saved reports never does. |
+| `CHECKS_PER_ACCOUNT_PER_DAY` | `2` | Live checks one account may start per day. Over it: `429` `account_limit` with the reset time. |
+| `SITE_CHECKS_PER_DAY` | `5` | Live checks the whole site may start per day, Sentinel included. Replaces `MAX_CHECKS_PER_DAY`. |
+| `SITE_CHECKS_PER_MONTH` | `60` | The same, per month. Used up: `429` `site_budget`, "Today's live checks are used up. Saved reports are still open; new checks open again tomorrow." |
+| `REUSE_REPORT_DAYS` | `7` | A finished report this recent is returned to anyone instead of starting a check. It costs nothing. |
+| `RECHECK_MIN_DAYS` | `7` | "Re-check now" works once per project in this many days. |
+| `SEARCH_CACHE_DAYS` | `7` | Search answers (names, builders, localities, RERA numbers) are kept in the database this long. |
+| `SEARCHES_PER_IP_PER_DAY` | `15` | Searches that really run, per address, signed out. A kept answer does not count. |
+| `SEARCHES_PER_IP_PER_DAY_SIGNED_IN` | `40` | The same for signed-in visitors. |
+| `INVITE_ONLY` | `false` | When `true`, only the e-mails in `ALLOWED_EMAILS` can start live checks; everyone else still reads saved reports. |
+| `ALLOWED_EMAILS` | empty | Comma-separated e-mails for the invite-only switch. |
+| `ADMIN_TOKEN` | unset (secret) | Sent as the `X-Admin-Token` header to read `GET /api/admin/usage`. Unset, that route answers `404`. |
+| `FEATURED_RERA_IDS` | empty | Comma-separated UP-RERA numbers for the home page gallery. A number with no saved check is not shown. |
+| `RATE_LIMIT_PER_MINUTE` | `6` | Check creation per visitor per minute. |
+
+Every check records how many Search, Fetch and Agent calls it made. To learn what one check really costs:
+
+```bash
+curl https://<your-service>.onrender.com/api/admin/usage -H "X-Admin-Token: <your ADMIN_TOKEN>"
+```
+
+It returns today's and this month's totals and the average per check. When TinyFish reports no credit left or a rate limit, the check stops calling it: the remaining lanes show "Paused: live-check credits are low".
+
+Never put `TINYFISH_API_KEY` into Vercel or any `NEXT_PUBLIC_` variable: those are sent to every visitor's browser.
