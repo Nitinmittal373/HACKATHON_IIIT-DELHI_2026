@@ -215,6 +215,52 @@ def test_the_search_count_starts_again_the_next_indian_day(tmp_path: Path) -> No
         assert client.get("/api/projects/search", params={"q": "Lodha Palava"}).status_code == 200
 
 
+def test_the_whole_site_has_a_daily_search_cap_that_saved_answers_do_not_use(
+    tmp_path: Path,
+) -> None:
+    with build(tmp_path, site_searches_per_day=2) as client:
+
+        def search(q: str, **headers: str):
+            return client.get("/api/projects/search", params={"q": q}, headers=headers or None)
+
+        assert search("Gaur City").status_code == 200
+        for _ in range(3):
+            assert search("Gaur City").status_code == 200  # saved, so free
+        assert search("Supertech Eco Village").status_code == 200
+
+        # A different visitor still has their own allowance, but the site is out.
+        refused = search("UPRERAPRJ8334", **auth("someone-else"))
+        assert refused.status_code == 429
+        detail = refused.json()["detail"]
+        assert detail["code"] == "site_search_limit"
+        assert "used up" in detail["message"] and "tomorrow" in detail["message"]
+        assert int(refused.headers["Retry-After"]) >= 1
+        assert search("Gaur City").status_code == 200  # saved answers stay open
+
+
+def test_a_search_refused_for_one_visitor_does_not_use_up_the_site_cap(tmp_path: Path) -> None:
+    with build(tmp_path, searches_per_ip_per_day=1, site_searches_per_day=2) as client:
+        ok = client.get("/api/projects/search", params={"q": "Gaur City"})
+        for q in ("Lodha Palava", "UPRERAPRJ8334"):
+            assert client.get("/api/projects/search", params={"q": q}).status_code == 429
+        assert ok.status_code == 200
+        other = client.get(
+            "/api/projects/search", params={"q": "Supertech Eco Village"}, headers=auth("x")
+        )
+        assert other.status_code == 200
+
+
+def test_the_site_search_cap_starts_again_the_next_indian_day(tmp_path: Path) -> None:
+    now = [FIXED_NOW]
+    with build(tmp_path, now, site_searches_per_day=1) as client:
+        assert client.get("/api/projects/search", params={"q": "Gaur City"}).status_code == 200
+        assert client.get("/api/projects/search", params={"q": "Lodha Palava"}).status_code == 429
+
+        now[0] = FIXED_NOW + timedelta(days=1)
+
+        assert client.get("/api/projects/search", params={"q": "Lodha Palava"}).status_code == 200
+
+
 # --- C. a budget for the whole site -----------------------------------------------------------
 
 

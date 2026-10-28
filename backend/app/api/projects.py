@@ -22,8 +22,8 @@ ERROR_STATUS = {"timeout": 504, "rate_limited": 429}
     "/api/projects/search",
     responses={
         429: {
-            "description": "The daily search limit (`search_limit`) or TinyFish's rate limit; "
-            "`Retry-After` says how long to wait"
+            "description": "The visitor's daily search limit (`search_limit`), the whole site's "
+            "(`site_search_limit`) or TinyFish's rate limit; `Retry-After` says how long to wait"
         },
         502: {"description": "TinyFish failed; `detail.code` says why"},
         504: {"description": "The search took too long"},
