@@ -21,6 +21,8 @@ export const credit: typeof English = {
     P5: "भूमि प्राधिकरण और मंज़ूरियाँ",
     P6: "भावना और खबरें",
   },
+  partlyRead: (covered: string) => `आंशिक रूप से पढ़ा गया (${covered})`,
+  partlyCovers: { "UP-RERA complaints": "UP-RERA शिकायतें" } as Record<string, string>,
   unread: "पढ़ा नहीं गया",
   reasonsTitle: "इस स्कोर के मुख्य कारण",
   noReasons: "हमारे पढ़े किसी रिकॉर्ड से कोई अंक नहीं कटा।",

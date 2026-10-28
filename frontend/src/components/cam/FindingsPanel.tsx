@@ -1,5 +1,5 @@
 import type { Strings } from "@/lib/i18n";
-import { toneOf } from "@/lib/verdict";
+import { findingTone, isSecondaryOk } from "@/lib/verdict";
 import type { Finding } from "@/lib/types";
 import styles from "./FindingsPanel.module.css";
 
@@ -10,8 +10,9 @@ interface Props {
 
 type VerdictLabels = Strings["cam"]["verdict"];
 
-function labelFor(verdict: Finding["verdict"], labels: VerdictLabels): string {
-  return verdict === "red_flag" ? labels.fail : labels[verdict];
+function labelFor(finding: Finding, labels: VerdictLabels): string {
+  if (isSecondaryOk(finding)) return labels.secondary;
+  return finding.verdict === "red_flag" ? labels.fail : labels[finding.verdict];
 }
 
 /** Findings so far, newest on top, each coloured by its verdict and tied to its source. */
@@ -27,12 +28,12 @@ export function FindingsPanel({ findings, t }: Props) {
       ) : (
         <ol className={styles.list} aria-live="polite">
           {findings.map((finding) => (
-            <li key={finding.id} className={`${styles.item} tone-${toneOf(finding.verdict)}`}>
+            <li key={finding.id} className={`${styles.item} tone-${findingTone(finding)}`}>
               <span className={styles.dot} aria-hidden="true" />
               <span className={styles.text}>
                 <span className={styles.title}>{finding.title}</span>
                 <span className={`mono ${styles.meta}`}>
-                  {t.cam.sourceLabels[finding.source]} · {labelFor(finding.verdict, t.cam.verdict)}
+                  {t.cam.sourceLabels[finding.source]} · {labelFor(finding, t.cam.verdict)}
                 </span>
               </span>
             </li>

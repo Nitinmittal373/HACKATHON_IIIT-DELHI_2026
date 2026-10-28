@@ -38,5 +38,6 @@ export const insights: typeof en = {
     readOn: (date: string) => `रिकॉर्ड ${date} को पढ़े गए`,
     stale: "ये रिकॉर्ड एक हफ़्ते से ज़्यादा पुराने हैं।",
     recheck: "अभी फिर जाँचें",
+    nextRecheck: (date: string) => `अगली दोबारा जाँच ${date} को संभव है`,
   },
 };

@@ -1,7 +1,10 @@
 import type { CheckKey, Finding, Report, SourceName } from "@/lib/types";
 
+/** The seven records the report names one by one. The complaint counts are not among them. */
+type KeyCheck = Exclude<CheckKey, "rera_complaints">;
+
 /** The source that settles each key check; used to say where an unread check can be done by hand. */
-const CHECK_SOURCE: Record<CheckKey, SourceName> = {
+const CHECK_SOURCE: Record<KeyCheck, SourceName> = {
   registration: "uprera",
   completion_date: "uprera",
   extensions: "uprera",
@@ -24,9 +27,9 @@ export function evidenceIds(findings: Finding[]): Map<string, string> {
 }
 
 /** The key checks that no source read, taken from the source runs themselves. */
-export function unreadChecks(report: Report): CheckKey[] {
+export function unreadChecks(report: Report): KeyCheck[] {
   const read = new Set(report.check.sources.flatMap((run) => run.checks_read));
-  return (Object.keys(CHECK_SOURCE) as CheckKey[]).filter((check) => !read.has(check));
+  return (Object.keys(CHECK_SOURCE) as KeyCheck[]).filter((check) => !read.has(check));
 }
 
 export interface UnreadEntry {

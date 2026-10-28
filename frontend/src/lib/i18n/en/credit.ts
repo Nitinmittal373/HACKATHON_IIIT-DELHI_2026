@@ -20,6 +20,8 @@ export const credit = {
     P6: "Sentiment and news",
   },
   unread: "Not read",
+  partlyRead: (covered: string) => `Partly read (${covered})`,
+  partlyCovers: { "UP-RERA complaints": "UP-RERA complaints" } as Record<string, string>,
   reasonsTitle: "Top reasons for this score",
   noReasons: "No record we read cost any points.",
   reasonOpen: (code: string) => `Show the evidence for ${code}`,

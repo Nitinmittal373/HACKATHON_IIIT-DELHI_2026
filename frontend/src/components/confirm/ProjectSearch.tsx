@@ -8,7 +8,9 @@ import { NotFoundGuidance } from "@/components/confirm/NotFoundGuidance";
 import { OrderLeadCard } from "@/components/confirm/OrderLeadCard";
 import { SearchProgress } from "@/components/confirm/SearchProgress";
 import { searchProjects, wakeServer } from "@/lib/api";
+import { useAccount } from "@/lib/account";
 import { describeSearchError } from "@/lib/apiMessages";
+import { searchToken } from "@/lib/history";
 import { useLang } from "@/lib/LangProvider";
 import type { SearchResponse } from "@/lib/types";
 
@@ -28,6 +30,7 @@ const WAKE_NOTICE_AFTER_MS = 1500;
  */
 export function ProjectSearch({ query, locality }: { query: string; locality?: string }) {
   const { t } = useLang();
+  const signedIn = useAccount().status === "in";
   const [phase, setPhase] = useState<Phase>({ kind: "connecting" });
   const [attempt, setAttempt] = useState(0);
 
@@ -43,7 +46,10 @@ export function ProjectSearch({ query, locality }: { query: string; locality?: s
       clearTimeout(notice);
       update({ kind: "searching" });
       try {
-        update({ kind: "done", result: await searchProjects(query, locality) });
+        update({
+          kind: "done",
+          result: await searchProjects(query, locality, await searchToken()),
+        });
       } catch (error) {
         update({ kind: "failed", error });
       }
@@ -57,7 +63,7 @@ export function ProjectSearch({ query, locality }: { query: string; locality?: s
   }, [query, locality, attempt]);
 
   if (phase.kind === "failed") {
-    const { text, reason } = describeSearchError(phase.error, t);
+    const { text, reason } = describeSearchError(phase.error, t, signedIn);
     return (
       <PageMessage
         alert

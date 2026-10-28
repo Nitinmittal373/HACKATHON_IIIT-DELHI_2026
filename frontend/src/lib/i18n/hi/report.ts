@@ -18,6 +18,7 @@ export const report: typeof en = {
     insolvency: "दिवाला आदेश",
     land_dues: "भूमि प्राधिकरण का बकाया",
     consumer_cases: "उपभोक्ता मामले",
+    rera_complaints: "UP-RERA शिकायतें",
   },
   verdict: {
     ok: "पुष्ट",
@@ -26,6 +27,7 @@ export const report: typeof en = {
     review: "देखें",
     context: "संदर्भ",
     not_found: "नहीं मिला",
+    secondary: "द्वितीयक स्रोत से",
   },
   reliability: { primary: "आधिकारिक रिकॉर्ड", secondary: "खबर या द्वितीयक स्रोत" },
   viaSnippet: "खोज अंश",

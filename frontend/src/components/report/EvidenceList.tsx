@@ -5,7 +5,7 @@ import { unreadEntries } from "@/lib/reportView";
 import { SOURCE_INFO } from "@/lib/sources";
 import { stopReason } from "@/lib/stopReason";
 import type { Finding, Report } from "@/lib/types";
-import { toneOf } from "@/lib/verdict";
+import { findingTone, isSecondaryOk } from "@/lib/verdict";
 import styles from "./EvidenceList.module.css";
 
 interface Props {
@@ -80,7 +80,11 @@ interface RowProps {
 function FindingRow({ finding, id, points, t, lang }: RowProps) {
   const time = finding.read_at ? formatTime(finding.read_at, lang) : null;
   const readOn = t.report.readOn(formatDay(finding.read_on, lang), time);
-  const verdict = finding.verdict === "red_flag" ? "fail" : finding.verdict;
+  const verdict = isSecondaryOk(finding)
+    ? "secondary"
+    : finding.verdict === "red_flag"
+      ? "fail"
+      : finding.verdict;
   const lost = points ? `−${Math.abs(Math.round(points))}` : null;
 
   return (
@@ -95,7 +99,7 @@ function FindingRow({ finding, id, points, t, lang }: RowProps) {
       </span>
       <span className={styles.side}>
         {lost && <span className={`num ${styles.lost}`}>{lost}</span>}
-        <span className={`${styles.pill} tone-${toneOf(finding.verdict)}`}>{t.report.verdict[verdict]}</span>
+        <span className={`${styles.pill} tone-${findingTone(finding)}`}>{t.report.verdict[verdict]}</span>
         <a
           className={styles.link}
           href={finding.source_url}

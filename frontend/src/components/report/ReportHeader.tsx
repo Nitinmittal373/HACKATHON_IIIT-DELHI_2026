@@ -36,6 +36,7 @@ export function ReportHeader({ report, t, lang }: Props) {
             hours={hoursSince(check.completed_at ?? check.started_at)}
             readOn={checkedOn}
             project={project}
+            nextRecheckAt={check.next_recheck_at}
           />
         </div>
         <ReportActions reportId={check.id} project={project} score={report.display_score} />

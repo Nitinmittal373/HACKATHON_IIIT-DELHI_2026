@@ -5,6 +5,14 @@ import styles from "./PillarBars.module.css";
 /** One bar per pillar: its weight, and how much of it was lost. A bar is risk, not a grade. */
 export function PillarBars({ score, t }: { score: ScoreV2; t: Strings }) {
   const unread = new Set(score.pillars_unread);
+  const costOf = (pillar: ScoreV2["pillars"][number]): string => {
+    if (unread.has(pillar.id)) return t.credit.unread;
+    const lost = Math.abs(Math.round(pillar.points));
+    const cost = pillar.penalty ? t.credit.pillarCost(pillar.penalty, lost) : t.credit.noPenalty;
+    if (!pillar.partly_read) return cost;
+    const covered = t.credit.partlyCovers[pillar.partly_read] ?? pillar.partly_read;
+    return `${t.credit.partlyRead(covered)} · ${cost}`;
+  };
 
   return (
     <section aria-labelledby="pillars-title">
@@ -14,7 +22,6 @@ export function PillarBars({ score, t }: { score: ScoreV2; t: Strings }) {
       <p className={styles.lead}>{t.credit.pillarsLead}</p>
       <ul className={styles.list}>
         {score.pillars.map((pillar) => {
-          const lost = Math.abs(Math.round(pillar.points));
           return (
             <li key={pillar.id} className={styles.row}>
               <div className={styles.top}>
@@ -30,23 +37,11 @@ export function PillarBars({ score, t }: { score: ScoreV2; t: Strings }) {
                 aria-valuemin={0}
                 aria-valuemax={100}
                 aria-valuenow={pillar.penalty}
-                aria-valuetext={
-                  unread.has(pillar.id)
-                    ? t.credit.unread
-                    : pillar.penalty
-                      ? t.credit.pillarCost(pillar.penalty, lost)
-                      : t.credit.noPenalty
-                }
+                aria-valuetext={costOf(pillar)}
               >
                 <div className={styles.fill} style={{ width: `${pillar.penalty}%` }} />
               </div>
-              <span className={styles.cost}>
-                {unread.has(pillar.id)
-                  ? t.credit.unread
-                  : pillar.penalty
-                    ? t.credit.pillarCost(pillar.penalty, lost)
-                    : t.credit.noPenalty}
-              </span>
+              <span className={styles.cost}>{costOf(pillar)}</span>
             </li>
           );
         })}

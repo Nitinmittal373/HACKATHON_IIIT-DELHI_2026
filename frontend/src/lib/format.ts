@@ -27,6 +27,18 @@ export function formatTime(moment: string, lang: Lang): string | null {
   }).format(date);
 }
 
+/** The calendar day of a moment in Indian time, such as when a limit opens again. */
+export function indianDay(moment: string, lang: Lang): string {
+  const date = new Date(moment);
+  if (Number.isNaN(date.getTime())) return moment;
+  return new Intl.DateTimeFormat(LOCALES[lang], {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    timeZone: "Asia/Kolkata",
+  }).format(date);
+}
+
 export function dayOf(moment: string, lang: Lang): string {
   return formatDay(moment.slice(0, 10), lang);
 }
