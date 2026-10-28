@@ -1705,6 +1705,69 @@
         "title": "HTTPValidationError",
         "type": "object"
       },
+      "Limits": {
+        "description": "What a live check costs a visitor, so the pages can say it before they start one.",
+        "properties": {
+          "checks_left_today": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checks Left Today"
+          },
+          "checks_per_account_per_day": {
+            "title": "Checks Per Account Per Day",
+            "type": "integer"
+          },
+          "invite_only": {
+            "title": "Invite Only",
+            "type": "boolean"
+          },
+          "invited": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Invited"
+          },
+          "live_checks_open": {
+            "title": "Live Checks Open",
+            "type": "boolean"
+          },
+          "recheck_min_days": {
+            "title": "Recheck Min Days",
+            "type": "integer"
+          },
+          "require_signin": {
+            "title": "Require Signin",
+            "type": "boolean"
+          },
+          "reuse_report_days": {
+            "title": "Reuse Report Days",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "require_signin",
+          "invite_only",
+          "checks_per_account_per_day",
+          "reuse_report_days",
+          "recheck_min_days",
+          "live_checks_open",
+          "checks_left_today",
+          "invited"
+        ],
+        "title": "Limits",
+        "type": "object"
+      },
       "LiveUrlData": {
         "properties": {
           "url": {
@@ -3922,6 +3985,55 @@
         "summary": "Health",
         "tags": [
           "health"
+        ]
+      }
+    },
+    "/api/limits": {
+      "get": {
+        "operationId": "get_limits_api_limits_get",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "authorization",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Authorization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Limits"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Limits",
+        "tags": [
+          "meta"
         ]
       }
     },
