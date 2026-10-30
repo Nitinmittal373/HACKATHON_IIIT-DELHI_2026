@@ -3,4 +3,4 @@ export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:30
 
 /** The scoring method, on GitHub, because the report is not served next to the repository's files. */
 export const SCORING_DOC_URL =
-  "https://github.com/Nitinmittal373/HACKATHON_IIIT-DELHI_2026/blob/main/docs/scoring.md";
+  "https://github.com/Nitinmittal373/NeevCheck/blob/main/docs/scoring.md";
