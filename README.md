@@ -284,7 +284,7 @@ More detail in [`docs/architecture.md`](docs/architecture.md).
 > Every check is live, so you need a [TinyFish API key](https://agent.tinyfish.ai/api-keys). To put NeevCheck online, follow [`docs/deployment.md`](docs/deployment.md).
 
 ```bash
-git clone https://github.com/Nitinmittal373/HACKATHON_IIIT-DELHI_2026.git neevcheck
+git clone https://github.com/Nitinmittal373/NeevCheck.git neevcheck
 cd neevcheck
 cp .env.example .env            # then set TINYFISH_API_KEY in .env
 
